@@ -1,0 +1,551 @@
+#include <dlfcn.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <stdint.h>
+#include <stdarg.h>
+#include <unistd.h>
+#include <sys/param.h>
+#include <sys/mman.h>
+#include <sys/types.h>
+#include <sys/stat.h>
+#include <iostream>
+#include <fstream>
+#include <vector>
+#include <glad/glad.h>
+#include <GLFW/glfw3.h>
+#include <ninecraft/minecraft_keys.hpp>
+#include <ninecraft/android_string.hpp>
+#include <ninecraft/symbols.hpp>
+#include <ninecraft/AppPlatform_linux.hpp>
+#include <ninecraft/audio_engine.hpp>
+#include <ninecraft/hooks.hpp>
+
+#include <hybris/dlfcn.h>
+#include <hybris/hook.h>
+#include <hybris/jb/linker.h>
+
+const char *libs[] = {
+    "libc.so",
+    "libstdc++.so",
+    "libm.so",
+    "libandroid.so",
+    "liblog.so",
+    "libEGL.so",
+    "libOpenSLES.so",
+    "libGLESv1_CM.so"};
+
+void *handle;
+GLFWwindow* _window;
+
+float y_cam = 0.0;
+float x_cam = 0.0;
+
+int window_width = 720;
+int window_height = 480;
+
+std::string getCWD()
+{
+    char _cwd[MAXPATHLEN];
+    getcwd(_cwd, MAXPATHLEN);
+    return std::string(_cwd) + "/";
+}
+
+#ifdef __i386__
+
+void detour(void *dst_addr, void *src_addr, bool jump) {
+    uint32_t page_size = sysconf(_SC_PAGESIZE);
+    void *protect = (void *)((uintptr_t)(dst_addr) & -page_size);
+    mprotect(protect, page_size, PROT_READ | PROT_WRITE | PROT_EXEC);
+    uint32_t addr = ((uint32_t)src_addr) - ((uint32_t)dst_addr) - 5;
+    *(uint8_t *)(dst_addr) = jump ? 0xE9 : 0xE8;
+    *(uint32_t *)(((uint32_t)dst_addr) + 1) = addr;
+    mprotect(protect, page_size, PROT_EXEC);
+}
+
+#else
+
+#ifdef __arm__
+
+uint32_t encode_branch(uint32_t pc, uint32_t branch_to, uint8_t has_link, uint8_t is_relative) {
+	uint32_t offset = branch_to - ((pc + 4) & 0xFFFFFFFE);
+	uint8_t s = (offset >> 24) & 1;
+	uint8_t j = (~((offset >> 23) & 1) ^ s) & 1;
+	uint8_t j2 = (~((offset >> 22) & 1) ^ s) & 1;
+	uint16_t h = (offset >> 12) & 0x3ff;
+	uint16_t l = (offset >> 1) & 0x7ff;
+	uint8_t type = has_link ? 0b11 : 0b10;
+	uint8_t thumb_bit = is_relative ? 1 : 0;
+	uint8_t opcode = 0b11110;
+	uint32_t result = opcode << 27;
+	result |= s << 26;
+	result |= h << 16;
+	result |= type << 14;
+	result |= j << 13;
+	result |= thumb_bit << 12;
+	result |= j2 << 11;
+	result |= l;
+	return ((result & 0xffff) << 16) | ((result >> 16) & 0xffff);
+}
+
+void detour(void *dst_addr, void *src_addr, bool jump) {
+	long page_size = sysconf(_SC_PAGESIZE);
+	void *protect = (void *)((uintptr_t)(dst_addr-1) & -page_size);
+	mprotect(protect, page_size, PROT_READ | PROT_WRITE | PROT_EXEC);
+	uint32_t b = encode_branch((int) dst_addr-1, (int) src_addr-1, jump ? 0 : 1, 1);
+	memcpy(dst_addr-1, (void *) &b, sizeof(uint32_t));
+	mprotect(protect, page_size, PROT_EXEC);
+}
+
+#else
+
+void detour(void *dst_addr, void *src_addr, bool jump);
+
+#endif
+
+#endif
+
+bool load_library(std::string path) {
+    #ifdef __i386__
+    std::string arch = "x86";
+    #else
+    #ifdef __arm__
+    std::string arch = "arm";
+    #else
+    std::string arch = "";
+    #endif
+    #endif
+    std::string fullpath = getCWD() + "/libs/" + arch + "/" + path;
+    void *handle = hybris_dlopen(fullpath.c_str(), RTLD_LAZY);
+    if (handle == NULL)
+    {
+        std::cout << "failed to load library " << fullpath << ": " << hybris_dlerror() << "\n";
+        return false;
+    }
+    std::cout << "lib: " << fullpath << ": " << (int)handle << "\n";
+    return true;
+}
+
+void *load_minecraftpe()
+{
+    #ifdef __i386__
+    std::string arch = "x86";
+    #else
+    #ifdef __arm__
+    std::string arch = "arm";
+    #else
+    std::string arch = "";
+    #endif
+    #endif
+    std::string fullpath = getCWD() + "/libs/" + arch + "/libminecraftpe.so";
+    void *handle = hybris_dlopen(fullpath.c_str(), RTLD_LAZY);
+    if (handle == NULL)
+    {
+        std::cout << "failed to load library " << fullpath << ": " << hybris_dlerror() << "\n";
+        return NULL;
+    }
+    std::cout << "lib: " << fullpath << ": " << (int)handle << "\n";
+    return handle;
+}
+
+void *load_library_os(std::string path, const char **symbols)
+{
+    void *handle = dlopen(path.c_str(), RTLD_LAZY);
+    if (handle == NULL)
+    {
+        std::cout << "failed to load library " << path << ": " << dlerror() << "\n";
+        return NULL;
+    }
+    std::cout << "oslib: " << path << ": " << (int)handle << "\n";
+    int i = 0;
+    while (true)
+    {
+        const char *sym = symbols[i];
+        if (sym == NULL)
+            break;
+        void *ptr = dlsym(handle, sym);
+        hybris_hook(sym, ptr);
+        ++i;
+    }
+    return handle;
+}
+
+void stub_symbols(const char **symbols, void *stub_func)
+{
+    int i = 0;
+    while (true)
+    {
+        const char *sym = symbols[i];
+        if (sym == NULL)
+        {
+            break;
+        }
+        hybris_hook(sym, stub_func);
+        ++i;
+    }
+}
+
+extern "C" void __android_log_print(int prio, const char *tag, const char *fmt, ...)
+{
+    va_list args;
+    va_start(args, fmt);
+    printf("[%s] ", tag);
+    vprintf(fmt, args);
+    printf("\n");
+    va_end(args);
+}
+
+void android_stub()
+{
+    std::cout << "warn: android call\n";
+}
+
+void egl_stub()
+{
+    std::cout << "warn: egl call\n";
+}
+
+void sles_stub()
+{
+    std::cout << "warn: sles call\n";
+}
+
+void sound_engine_stub()
+{
+    // std::cout << "warn: sound engine\n";
+}
+
+void *ninecraft_app;
+
+struct KeyboardAction
+{
+    int action;
+    int keyCode;
+};
+
+static std::vector<KeyboardAction> *keyboard_inputs;
+static int *keyboard_states;
+
+static unsigned char *controller_states;
+static float *controller_x_stick;
+static float *controller_y_stick;
+
+ALCdevice *audio_device;
+ALCcontext *audio_context;
+
+static void minecraft_draw()
+{
+    ((void (*)(void *))hybris_dlsym(handle, "_ZN12NinecraftApp6updateEv"))(ninecraft_app);
+}
+
+bool mouse_pointer_hidden = false;
+
+int mouseToGameKeyCode(int keyCode) {
+    if (keyCode == GLFW_MOUSE_BUTTON_LEFT) {
+        return MCKEY_BREAK;
+    } else if (keyCode == GLFW_MOUSE_BUTTON_RIGHT) {
+        return MCKEY_PLACE;
+    }
+}
+
+static void mouse_click_callback(GLFWwindow* window, int button, int action, int mods) {
+    double xpos, ypos;
+    glfwGetCursorPos(window, &xpos, &ypos);
+    if (!mouse_pointer_hidden) {
+        int mc_button = (button == GLFW_MOUSE_BUTTON_LEFT ? 1 : (button == GLFW_MOUSE_BUTTON_RIGHT ? 2 : 0));
+        ((void (*)(char, char, short, short, short, short))hybris_dlsym(handle, "_ZN5Mouse4feedEccssss"))((char) mc_button, (char) (action == GLFW_PRESS ? 1 : 0), (short)xpos, (short)ypos, 0, 0);
+    } else {
+        int game_keycode = mouseToGameKeyCode(button);
+        
+        if (action == GLFW_PRESS) {
+            keyboard_inputs->push_back({1, game_keycode});
+            keyboard_states[game_keycode] = 1;
+        } else if (action == GLFW_RELEASE) {
+            keyboard_inputs->push_back({0, game_keycode});
+            keyboard_states[game_keycode] = 0;
+        }
+    }
+}
+
+static void mouse_scroll_callback(GLFWwindow* window, double xoffset, double yoffset) {
+    double xpos, ypos;
+    glfwGetCursorPos(window, &xpos, &ypos);
+    printf("%lf %lf\n", xoffset, yoffset);
+    char key_code = 0;
+    if (yoffset > 0) {
+        key_code = MCKEY_HOTBAR_PREVIOUS;
+    } else if (yoffset < 0) {
+        key_code = MCKEY_HOTBAR_NEXT;
+    }
+    keyboard_inputs->push_back({1, key_code});
+    keyboard_states[key_code] = 1;
+    keyboard_inputs->push_back({0, key_code});
+    keyboard_states[key_code] = 0;
+}
+
+static void mouse_pos_callback(GLFWwindow* window, double xpos, double ypos) {
+    if (!mouse_pointer_hidden) {
+        ((void (*)(char, char, short, short, short, short))hybris_dlsym(handle, "_ZN5Mouse4feedEccssss"))(0, 0, (short)xpos, (short)ypos, 0, 0);
+    } else {
+        int cx;
+        int cy;
+        glfwGetWindowSize(window, &cx, &cy);
+        cx /= 2;
+        cy /= 2;
+        if ((int)xpos != cy || (int)ypos != cy) {
+            glfwSetCursorPos(window, cx, cy);
+            y_cam -= ((float) ypos - (float)cy) / 8.0;
+            x_cam += ((float)xpos - (float)cx) / 6.0;
+        }
+    }
+}
+
+int getGameKeyCode(int keycode) {
+    if (keycode == GLFW_KEY_W) {
+        return MCKEY_FORWARD;
+    } else if (keycode == GLFW_KEY_A) {
+        return MCKEY_STEP_LEFT;
+    } else if (keycode == GLFW_KEY_S) {
+        return MCKEY_BACKWARDS;
+    } else if (keycode == GLFW_KEY_D) {
+        return MCKEY_STEP_RIGHT;
+    } else if (keycode == GLFW_KEY_SPACE) {
+        return MCKEY_JUMP;
+    } else if (keycode == GLFW_KEY_E) {
+        return MCKEY_INVENTORY;
+    } else if (keycode == GLFW_KEY_ESCAPE) {
+        return MCKEY_PAUSE;
+    } else if (keycode == GLFW_KEY_C) {
+        return MCKEY_CRAFTING;
+    } else {
+        return 0;
+    }
+}
+
+static void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods) {
+    if (key == GLFW_KEY_F11) {
+        if (action == GLFW_PRESS) {
+            // todo fullscreen
+        }
+    } else {
+        if (mouse_pointer_hidden) {
+            int game_keycode = getGameKeyCode(key);
+            if (key == GLFW_KEY_LEFT_SHIFT) {
+                if (action == GLFW_PRESS) {
+                    controller_states[0] = 1;
+                } else if (action == GLFW_RELEASE) {
+                    controller_states[0] = 0;
+                }
+            } else {
+                if (action == GLFW_PRESS) {
+                    keyboard_inputs->push_back({1, game_keycode});
+                    keyboard_states[game_keycode] = 1;
+                } else if (action == GLFW_RELEASE) {
+                    keyboard_inputs->push_back({0, game_keycode});
+                    keyboard_states[game_keycode] = 0;
+                }
+            }
+        }
+    }
+}
+
+static void resize_callback(GLFWwindow* window, int width, int height) {
+    window_width = width;
+    window_height = height;
+    ((void (*)(void *, int, int))hybris_dlsym(handle, "_ZN9Minecraft7setSizeEii"))(ninecraft_app, width, height);
+}
+
+static void char_callback(GLFWwindow* window, unsigned int codepoint) {
+    ((void (*)(char))hybris_dlsym(handle, "_ZN8Keyboard8feedTextEc"))((char)codepoint);
+}
+
+void mcinit()
+{
+    if (!*((int *)ninecraft_app + 183))
+    {
+        ((void (*)(void *))hybris_dlsym(handle, "_ZN9Minecraft12_reloadInputEv"))(ninecraft_app);
+    }
+}
+
+void grab_mouse() {
+    std::cout << "grab_mouse" << std::endl;
+    mouse_pointer_hidden = true;
+    glfwSetInputMode(_window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
+}
+
+void release_mouse() {
+    std::cout << "release_mouse" << std::endl;
+    mouse_pointer_hidden = false;
+    glfwSetInputMode(_window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+}
+
+ALuint effect;
+
+void sound_engine_playui_stub(void *sound_engine, const char *sound_name, float volume)
+{
+    std::cout << sound_name << std::endl;
+    audio_engine_play(effect);
+}
+
+void render_menu_background(void *screen, void *texture_name) {
+    /*std::cout << "rnder this\n";
+    TextureData image = read_png("./assets/background.png", true);
+    GLuint texid = load_texture(image);
+    glBindTexture(GL_TEXTURE_2D, texid);
+    glPushMatrix();
+    glBegin(0x0007);
+    glTexCoord2f(0, 0);
+    glVertex2f(0, 0); // Upper left
+
+    glTexCoord2f(1, 0);
+    glVertex2f(window_width, 0); // Upper right
+
+    glTexCoord2f(1, 1);
+    glVertex2f(window_width, window_height); // Lower right
+
+    glTexCoord2f(0, 1);
+    glVertex2f(0, window_height); // Lower left
+    glEnd();
+    glPopMatrix();
+    free(image.pixels);*/
+}
+
+android_string get_game_version() {
+    android_string out;
+    to_str(&out, "Ninecraft 1.0.0", handle);
+    return out;
+}
+
+int main(int argc, char **argv)
+{
+    struct stat st = {0};
+    if (stat("storage", &st) == -1) {
+        mkdir("storage", 0700);
+        if (stat("storage/internal", &st) == -1) {
+            mkdir("storage/internal", 0700);
+        }
+        if (stat("storage/external", &st) == -1) {
+            mkdir("storage/external", 0700);
+        }
+    }
+    void *gles = load_library_os("libGLESv1_CM.so", gles_1_symbols);
+    void *math = load_library_os("libm.so.6", math_symbols);
+    hybris_hook("__android_log_print", (void *)__android_log_print);
+    stub_symbols(android_symbols, (void *)android_stub);
+    stub_symbols(egl_symbols, (void *)egl_stub);
+    stub_symbols(sles_symbols, (void *)sles_stub);
+    int i;
+    for (i = 0; i < 8; ++i)
+    {
+        load_library(libs[i]);
+    }
+    handle = load_minecraftpe();
+
+    audio_engine_create_audio_device(&audio_device, &audio_context);
+    char *buf = (char *) hybris_dlsym(handle, "PCM_click");
+    effect = audio_engine_create_sound_effect(buf);
+
+    keyboard_inputs = (std::vector<KeyboardAction> *)hybris_dlsym(handle, "_ZN8Keyboard7_inputsE");
+    keyboard_states = (int *)hybris_dlsym(handle, "_ZN8Keyboard7_statesE");
+    controller_states = (unsigned char *)hybris_dlsym(handle, "_ZN10Controller15isTouchedValuesE");
+    controller_x_stick = (float *)hybris_dlsym(handle, "_ZN10Controller12stickValuesXE");
+    controller_y_stick = (float *)hybris_dlsym(handle, "_ZN10Controller12stickValuesYE");
+
+    detour(hybris_dlsym(handle, "_ZN12MouseHandler4grabEv"), (void *)grab_mouse, true);
+    detour(hybris_dlsym(handle, "_ZN12MouseHandler7releaseEv"), (void *)release_mouse, true);
+
+    //detour(hybris_dlsym(handle, "_ZN6Screen20renderDirtBackgroundEi"), (void *)render_menu_background, true);
+    
+    unsigned char *dat = (unsigned char *)hybris_dlsym(handle, "_ZN15StartMenuScreenC1Ev");
+    
+    #ifdef __i386__
+    dat[268] = 0xa0;
+    #endif
+    
+    detour(hybris_dlsym(handle, "_ZN6Common20getGameVersionStringERKSs"), (void *)get_game_version, true);
+
+    detour(hybris_dlsym(handle, "_ZN9Minecraft13reloadOptionsEv"), (void *)mcinit, true);
+    detour(hybris_dlsym(handle, "_ZN11SoundEngineC1Ef"), (void *)sound_engine_stub, true);
+    detour(hybris_dlsym(handle, "_ZN11SoundEngine4initEP9MinecraftP7Options"), (void *)sound_engine_stub, true);
+    detour(hybris_dlsym(handle, "_ZN11SoundEngine14_getVolumeMultEfff"), (void *)sound_engine_stub, true);
+    detour(hybris_dlsym(handle, "_ZN11SoundEngine7destroyEv"), (void *)sound_engine_stub, true);
+    detour(hybris_dlsym(handle, "_ZN11SoundEngine6enableEb"), (void *)sound_engine_stub, true);
+    detour(hybris_dlsym(handle, "_ZN11SoundEngine4playERKSsfffff"), (void *)sound_engine_stub, true);
+    detour(hybris_dlsym(handle, "_ZN11SoundEngine6playUIERKSsff"), (void *)sound_engine_playui_stub, true);
+    detour(hybris_dlsym(handle, "_ZN11SoundEngine6updateEP3Mobf"), (void *)sound_engine_stub, true);
+    detour(hybris_dlsym(handle, "_ZN11SoundEngine13updateOptionsEv"), (void *)sound_engine_stub, true);
+    detour(hybris_dlsym(handle, "_ZN11SoundEngineD1Ev"), (void *)sound_engine_stub, true);
+    detour(hybris_dlsym(handle, "_ZN11SoundEngineD2Ev"), (void *)sound_engine_stub, true);
+    ninecraft_app = operator new(0xe6c);
+
+    if (!glfwInit()) {
+        // Initialization failed
+    }
+
+
+    glfwWindowHint(GLFW_CLIENT_API, GLFW_OPENGL_ES_API) ;
+    glfwWindowHint(GLFW_CONTEXT_CREATION_API, GLFW_EGL_CONTEXT_API);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 1);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 1);
+    _window = glfwCreateWindow(window_width, window_height, "Ninecraft", NULL, NULL);
+    if (!_window) {
+        puts("cant create");
+    }
+    glfwMakeContextCurrent(_window);
+    gladLoadGLLoader((GLADloadproc) glfwGetProcAddress);
+
+    glfwInit();
+
+    printf("%s\n", glGetString(GL_VERSION));
+
+    NinecraftApp$construct ninecraft_app_construct = (NinecraftApp$construct)hybris_dlsym(handle, "_ZN12NinecraftAppC2Ev");
+    printf("%p\n", ninecraft_app_construct);
+    ninecraft_app_construct(ninecraft_app);
+
+    ((void (*)(int, const char *))hybris_dlsym(handle, "_ZNSsaSEPKc"))((int)ninecraft_app + 3544, "./storage/internal/");
+    ((void (*)(int, const char *))hybris_dlsym(handle, "_ZNSsaSEPKc"))((int)ninecraft_app + 3568, "./storage/external/");
+    AppPlatform_linux platform;
+    AppPlatform_linux$AppPlatform_linux(&platform, handle);
+    *(uintptr_t *)(((int)ninecraft_app) + 0x14) = (uintptr_t)&platform;
+    printf("%p\n", &platform);
+    NinecraftApp$init ninecraft_app_init = (NinecraftApp$init)hybris_dlsym(handle, "_ZN12NinecraftApp4initEv");
+    ninecraft_app_init(ninecraft_app);
+
+
+    printf("%d\n", *(char *)(ninecraft_app+84));
+    printf("%d\n", *(char *)(ninecraft_app+112));
+    printf("%d\n", *(char *)(ninecraft_app+280));
+    printf("%d\n", *(char *)(ninecraft_app+196));
+    printf("%d\n", *(char *)(ninecraft_app+140));
+    printf("%d\n", *(char *)(ninecraft_app+168));
+    printf("%d\n", *(char *)(ninecraft_app+224));
+    printf("%d\n", *(char *)(ninecraft_app+252));
+    printf("%d\n", *(char *)(ninecraft_app+336));
+    printf("%d\n", *(char *)(ninecraft_app+364));
+    printf("%d\n", *(char *)(ninecraft_app+392));
+    printf("%d\n", *(char *)(ninecraft_app+420));
+    printf("%d\n", *(char *)(ninecraft_app+448));
+    printf("%d\n", *(char *)(ninecraft_app+476));
+
+    ((void (*)(void *, int, int))hybris_dlsym(handle, "_ZN9Minecraft7setSizeEii"))(ninecraft_app, 720, 480);
+
+    glfwSetKeyCallback(_window, key_callback);
+    glfwSetCharCallback(_window, char_callback);
+    glfwSetMouseButtonCallback(_window, mouse_click_callback);
+    glfwSetScrollCallback(_window, mouse_scroll_callback);
+    glfwSetCursorPosCallback(_window, mouse_pos_callback);
+    glfwSetWindowSizeCallback(_window, resize_callback);
+
+    while (true) {
+        if (mouse_pointer_hidden) {
+            controller_states[1] = 1;
+            controller_y_stick[1] = (float)(y_cam - 180.0) * 0.0055555557;
+            controller_x_stick[1] = ((float)((x_cam - 483.0)) * 0.0020703934);
+        }
+        minecraft_draw();
+        glfwSwapBuffers(_window);
+        glfwPollEvents();
+    }
+
+    return 0;
+}
