@@ -428,7 +428,7 @@ int main(int argc, char **argv)
             mkdir("storage/external", 0700);
         }
     }
-    void *gles = load_library_os("libGLESv1_CM.so", gles_1_symbols);
+    void *gles = load_library_os("libGLESv1_CM.so.1", gles_1_symbols);
     void *math = load_library_os("libm.so.6", math_symbols);
     hybris_hook("__android_log_print", (void *)__android_log_print);
     stub_symbols(android_symbols, (void *)android_stub);
