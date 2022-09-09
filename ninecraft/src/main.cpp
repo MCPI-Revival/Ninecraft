@@ -14,6 +14,7 @@
 #include <vector>
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
+#include <ninecraft/gles_compat.hpp>
 #include <ninecraft/minecraft_keys.hpp>
 #include <ninecraft/android_string.hpp>
 #include <ninecraft/symbols.hpp>
@@ -202,7 +203,7 @@ void android_stub()
 
 void egl_stub()
 {
-    std::cout << "warn: egl call\n";
+    //std::cout << "warn: egl call\n";
 }
 
 void sles_stub()
@@ -387,33 +388,77 @@ void sound_engine_playui_stub(void *sound_engine, const char *sound_name, float 
     audio_engine_play(effect);
 }
 
-void render_menu_background(void *screen, void *texture_name) {
-    /*std::cout << "rnder this\n";
-    TextureData image = read_png("./assets/background.png", true);
-    GLuint texid = load_texture(image);
-    glBindTexture(GL_TEXTURE_2D, texid);
-    glPushMatrix();
-    glBegin(0x0007);
-    glTexCoord2f(0, 0);
-    glVertex2f(0, 0); // Upper left
-
-    glTexCoord2f(1, 0);
-    glVertex2f(window_width, 0); // Upper right
-
-    glTexCoord2f(1, 1);
-    glVertex2f(window_width, window_height); // Lower right
-
-    glTexCoord2f(0, 1);
-    glVertex2f(0, window_height); // Lower left
-    glEnd();
-    glPopMatrix();
-    free(image.pixels);*/
-}
-
 android_string get_game_version() {
     android_string out;
     to_str(&out, "Ninecraft 1.0.0", handle);
     return out;
+}
+
+void gles_hook() {
+    hybris_hook("glAlphaFunc", (void *) gl_alpha_func);
+    hybris_hook("glBindBuffer", (void *) gl_bind_buffer);
+    hybris_hook("glBindTexture", (void *) gl_bind_texture);
+    hybris_hook("glBlendFunc", (void *) gl_blend_func);
+    hybris_hook("glBufferData", (void *) gl_buffer_data);
+    hybris_hook("glClear", (void *) gl_clear);
+    hybris_hook("glClearColor", (void *) gl_clear_color);
+    hybris_hook("glColor4f", (void *) gl_color_4_f);
+    hybris_hook("glColorMask", (void *) gl_color_mask);
+    hybris_hook("glColorPointer", (void *) gl_color_pointer);
+    hybris_hook("glCullFace", (void *) gl_cull_face);
+    hybris_hook("glDeleteBuffers", (void *) gl_delete_buffers);
+    hybris_hook("glDeleteTextures", (void *) gl_delete_textures);
+    hybris_hook("glDepthFunc", (void *) gl_depth_func);
+    hybris_hook("glDepthMask", (void *) gl_depth_mask);
+    hybris_hook("glDepthRangef", (void *) gl_depth_range_f);
+    hybris_hook("glDisable", (void *) gl_disable);
+    hybris_hook("glDisableClientState", (void *) gl_disable_client_state);
+    hybris_hook("glDrawArrays", (void *) gl_draw_arrays);
+    hybris_hook("glEnable", (void *) gl_enable);
+    hybris_hook("glEnableClientState", (void *) gl_enable_client_state);
+    hybris_hook("glFogf", (void *) gl_fog_f);
+    hybris_hook("glFogfv", (void *) gl_fog_f_v);
+    hybris_hook("glFogx", (void *) gl_fog_x);
+    hybris_hook("glGenTextures", (void *) gl_gen_textures);
+    hybris_hook("glGetFloatv", (void *) gl_get_float_v);
+    hybris_hook("glGetString", (void *) gl_get_string);
+    hybris_hook("glHint", (void *) gl_hint);
+    hybris_hook("glLineWidth", (void *) gl_line_width);
+    hybris_hook("glLoadIdentity", (void *) gl_load_identity);
+    hybris_hook("glMatrixMode", (void *) gl_matrix_mode);
+    hybris_hook("glMultMatrixf", (void *) gl_mult_matrix_f);
+    hybris_hook("glNormal3f", (void *) gl_normal_3_f);
+    hybris_hook("glOrthof", (void *) gl_ortho_f);
+    hybris_hook("glPolygonOffset", (void *) gl_polygon_offset);
+    hybris_hook("glPopMatrix", (void *) gl_pop_matrix);
+    hybris_hook("glPushMatrix", (void *) gl_push_matrix);
+    hybris_hook("glReadPixels", (void *) gl_read_pixels);
+    hybris_hook("glRotatef", (void *) gl_rotate_f);
+    hybris_hook("glScalef", (void *) gl_scale_f);
+    hybris_hook("glScissor", (void *) gl_scissor);
+    hybris_hook("glShadeModel", (void *) gl_shade_model);
+    hybris_hook("glTexCoordPointer", (void *) gl_tex_coord_pointer);
+    hybris_hook("glTexImage2D", (void *) gl_tex_image_2_d);
+    hybris_hook("glTexParameteri", (void *) gl_tex_parameter_i);
+    hybris_hook("glTexSubImage2D", (void *) gl_tex_sub_image_2_d);
+    hybris_hook("glTranslatef", (void *) gl_translate_f);
+    hybris_hook("glVertexPointer", (void *) gl_vertex_pointer);
+    hybris_hook("glViewport", (void *) gl_viewport);
+}
+
+void render_menu_background(void *screen, void *texture_name) {
+    TextureData image = read_png("./images/background.png", true, true);
+    GLuint texid = load_texture(image);
+    GLuint fboId = 0;
+    glBindTexture(GL_TEXTURE_2D, texid);
+    glTexStorage2D(GL_TEXTURE_2D, 0, image.alpha ? GL_RGBA : GL_RGB, window_width, window_height);
+    glGenFramebuffers(1, &fboId);
+    glBindFramebuffer(GL_READ_FRAMEBUFFER, fboId);
+    glFramebufferTexture2D(GL_READ_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, texid, 0);
+    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
+    glBlitFramebuffer(0, 0, image.width, image.height, 0, 0, window_width, window_height, GL_COLOR_BUFFER_BIT, GL_NEAREST);
+    glDeleteTextures(1, &texid);
+    free(image.pixels);
 }
 
 int main(int argc, char **argv)
@@ -428,8 +473,24 @@ int main(int argc, char **argv)
             mkdir("storage/external", 0700);
         }
     }
-    void *gles = load_library_os("libGLESv1_CM.so.1", gles_1_symbols);
-    void *math = load_library_os("libm.so.6", math_symbols);
+
+    if (!glfwInit()) {
+        // Initialization failed
+    }
+
+    glfwWindowHint(GLFW_CLIENT_API, GLFW_OPENGL_API);
+    glfwWindowHint(GLFW_CONTEXT_CREATION_API, GLFW_NATIVE_CONTEXT_API);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
+    _window = glfwCreateWindow(window_width, window_height, "Ninecraft", NULL, NULL);
+    if (!_window) {
+        puts("cant create");
+    }
+    glfwMakeContextCurrent(_window);
+    gladLoadGLLoader((GLADloadproc)glfwGetProcAddress);
+    glfwInit();
+
+    gles_hook();
     hybris_hook("__android_log_print", (void *)__android_log_print);
     stub_symbols(android_symbols, (void *)android_stub);
     stub_symbols(egl_symbols, (void *)egl_stub);
@@ -454,7 +515,7 @@ int main(int argc, char **argv)
     detour(hybris_dlsym(handle, "_ZN12MouseHandler4grabEv"), (void *)grab_mouse, true);
     detour(hybris_dlsym(handle, "_ZN12MouseHandler7releaseEv"), (void *)release_mouse, true);
 
-    //detour(hybris_dlsym(handle, "_ZN6Screen20renderDirtBackgroundEi"), (void *)render_menu_background, true);
+    detour(hybris_dlsym(handle, "_ZN6Screen20renderDirtBackgroundEi"), (void *)render_menu_background, true);
     
     unsigned char *dat = (unsigned char *)hybris_dlsym(handle, "_ZN15StartMenuScreenC1Ev");
     
@@ -477,24 +538,6 @@ int main(int argc, char **argv)
     detour(hybris_dlsym(handle, "_ZN11SoundEngineD1Ev"), (void *)sound_engine_stub, true);
     detour(hybris_dlsym(handle, "_ZN11SoundEngineD2Ev"), (void *)sound_engine_stub, true);
     ninecraft_app = operator new(0xe6c);
-
-    if (!glfwInit()) {
-        // Initialization failed
-    }
-
-
-    glfwWindowHint(GLFW_CLIENT_API, GLFW_OPENGL_ES_API) ;
-    glfwWindowHint(GLFW_CONTEXT_CREATION_API, GLFW_EGL_CONTEXT_API);
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 1);
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 1);
-    _window = glfwCreateWindow(window_width, window_height, "Ninecraft", NULL, NULL);
-    if (!_window) {
-        puts("cant create");
-    }
-    glfwMakeContextCurrent(_window);
-    gladLoadGLLoader((GLADloadproc) glfwGetProcAddress);
-
-    glfwInit();
 
     printf("%s\n", glGetString(GL_VERSION));
 

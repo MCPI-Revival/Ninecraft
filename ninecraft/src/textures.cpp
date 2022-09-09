@@ -3,7 +3,7 @@
 #include <cerrno>
 #include <cstdlib>
 
-TextureData read_png(char *path, bool alpha) {
+TextureData read_png(char *path, bool alpha, bool reverse_load) {
     TextureData texture_data;
     FILE *file = fopen(path, "r");
 
@@ -56,7 +56,11 @@ TextureData read_png(char *path, bool alpha) {
     texture_data.pixels = (unsigned char *)malloc(rowbytes * texture_data.height);
     png_bytep *row_pointers = (png_bytep*)malloc(sizeof(png_bytep) * texture_data.height);
     for (unsigned int y = 0; y < texture_data.height; ++y) {
-        row_pointers[y] = (png_byte *)&texture_data.pixels[y * rowbytes];
+        if (!reverse_load) {
+            row_pointers[y] = (png_byte *)&texture_data.pixels[y * rowbytes];
+        } else {
+            row_pointers[y] = (png_byte *)&texture_data.pixels[((texture_data.height - 1 - y) * rowbytes)];
+        }
     }
     png_read_image(png, row_pointers);
     fclose(file);
@@ -70,12 +74,12 @@ GLuint load_texture(TextureData texture) {
     GLuint textureID;
     glGenTextures(1, &textureID);
 	glBindTexture(GL_TEXTURE_2D, textureID);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
 	glTexImage2D(GL_TEXTURE_2D, 0, texture.alpha ? GL_RGBA : GL_RGB, texture.width, texture.height, 0, texture.alpha ? GL_RGBA : GL_RGB, GL_UNSIGNED_BYTE, texture.pixels);
-    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, texture.alpha ? GL_CLAMP_TO_EDGE : GL_REPEAT); 
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, texture.alpha ? GL_CLAMP_TO_EDGE : GL_REPEAT);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
-	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-    //glGenerateMipmap(GL_TEXTURE_2D);
-	glBindTexture(GL_TEXTURE_2D, 0);
+    glGenerateMipmap(GL_TEXTURE_2D);
+    glBindTexture(GL_TEXTURE_2D, 0);
 	return textureID;
 }

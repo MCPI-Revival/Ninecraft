@@ -1,13 +1,9 @@
 cmake_minimum_required (VERSION 3.1)
 
-project(ninecraft)
+project(ninecraft-core)
 
 find_package(PNG REQUIRED)
 find_package(OpenAL REQUIRED)
-
-include_directories(../libhybris/include)
-include_directories(../glad/include)
-include_directories(../glfw/include)
 
 file(GLOB SOURCE_FILES src/*.cpp)
 

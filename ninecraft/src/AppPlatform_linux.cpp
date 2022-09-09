@@ -254,7 +254,7 @@ TextureData AppPlatform_linux$loadTexture(AppPlatform_linux *app_platform, void 
     fullpath[7] = 's';
     fullpath[8] = '/';
     memcpy(fullpath+9, path, pathlen+1);
-    return read_png(fullpath, alpha);
+    return read_png(fullpath, alpha, false);
 }
 
 void AppPlatform_linux$playSound(AppPlatform_linux *app_platform, const android_string& sound_name, float volume, float pitch) {

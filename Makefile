@@ -3,7 +3,7 @@
 BUILD_DIR ?= build/
 
 .PHONY: build
-build: clean
+build:
 	mkdir -p ${BUILD_DIR}
 	cd ${BUILD_DIR}; cmake ..; make
 
