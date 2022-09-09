@@ -1,0 +1,6 @@
+[submodule "glfw"]
+	path = glfw
+	url = https://github.com/glfw/glfw.git
+[submodule "glad"]
+	path = glad
+	url = https://github.com/Dav1dde/glad.git
