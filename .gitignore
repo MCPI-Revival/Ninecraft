@@ -1,7 +1,7 @@
-build/
-assets/
-overrides/
-libs/x86/libminecraftpe.so
-libs/arm/libminecraftpe.so
-.vscode/
-storage/
+/build/
+/assets/
+/overrides/
+/libs/x86/libminecraftpe.so
+/libs/arm/libminecraftpe.so
+/.vscode/
+/storage/
