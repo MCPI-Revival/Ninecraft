@@ -13,6 +13,8 @@ char *to_str(void *str, char *cstr, void *handle) {
     *(void **)(str + 16) = str;
     *(void **)(str + 20) = str;
     ((void (*)(void *, unsigned int)) hybris_dlsym(handle, "_ZNSt4priv12_String_baseIcSaIcEE17_M_allocate_blockEj"))(str, length + 1);
-    memcpy(*(char **)(str + 20), cstr, length+1);
-    *(void **)(str + 16) = &(*(char **)(str + 20))[length];
+    char *pcstr = *(char **)(str + 20);
+    memcpy(pcstr, cstr, length);
+    *(void **)(str + 16) = pcstr + length;
+    pcstr[length] = 0;
 }

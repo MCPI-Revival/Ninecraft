@@ -243,18 +243,28 @@ TextureData AppPlatform_linux$loadTexture(AppPlatform_linux *app_platform, void 
     printf("%p\n", app_platform);
     char *path = *(char **)(path_str + 20);
     size_t pathlen = strlen(path);
-    char *fullpath = (char *) malloc(10 + pathlen);
-    fullpath[0] = '.';
-    fullpath[1] = '/';
-    fullpath[2] = 'a';
-    fullpath[3] = 's';
-    fullpath[4] = 's';
-    fullpath[5] = 'e';
-    fullpath[6] = 't';
-    fullpath[7] = 's';
-    fullpath[8] = '/';
-    memcpy(fullpath+9, path, pathlen+1);
-    return read_png(fullpath, alpha, false);
+    char *fullpath_original = (char *) malloc(10 + pathlen);
+    memcpy(fullpath_original, "./assets/", 9);
+    memcpy(fullpath_original+9, path, pathlen+1);
+    char *fullpath_internal_overrides = (char *) malloc(29 + pathlen);
+    memcpy(fullpath_internal_overrides, "./internal_overrides/assets/", 28);
+    memcpy(fullpath_internal_overrides+28, path, pathlen+1);
+    char *fullpath_overrides = (char *) malloc(20 + pathlen);
+    memcpy(fullpath_overrides, "./overrides/assets/", 19);
+    memcpy(fullpath_overrides+19, path, pathlen+1);
+    char *fullpath = NULL;
+    if(access(fullpath_overrides, F_OK) == 0) {
+        fullpath = fullpath_overrides;
+    } else if(access(fullpath_internal_overrides, F_OK) == 0) {
+        fullpath = fullpath_internal_overrides;
+    } else if(access(fullpath_original, F_OK) == 0) {
+        fullpath = fullpath_original;
+    }
+    TextureData texture_data = read_png(fullpath, alpha, false);
+    free(fullpath_original);
+    free(fullpath_internal_overrides);
+    free(fullpath_overrides);
+    return texture_data;
 }
 
 void AppPlatform_linux$playSound(AppPlatform_linux *app_platform, const android_string& sound_name, float volume, float pitch) {
@@ -266,18 +276,24 @@ asset_file AppPlatform_linux$readAssetFile(AppPlatform_linux *app_platform, void
     android_string str;
     char *path = *(char **)(path_str + 20);
     size_t pathlen = strlen(path);
-    char *fullpath = (char *) malloc(8 + pathlen);
-
-    fullpath[0] = 'a';
-    fullpath[1] = 's';
-    fullpath[2] = 's';
-    fullpath[3] = 'e';
-    fullpath[4] = 't';
-    fullpath[5] = 's';
-    fullpath[6] = '/';
+    char *fullpath_original = (char *) malloc(10 + pathlen);
+    memcpy(fullpath_original, "./assets/", 9);
+    memcpy(fullpath_original+9, path, pathlen+1);
+    char *fullpath_internal_overrides = (char *) malloc(29 + pathlen);
+    memcpy(fullpath_internal_overrides, "./internal_overrides/assets/", 28);
+    memcpy(fullpath_internal_overrides+28, path, pathlen+1);
+    char *fullpath_overrides = (char *) malloc(20 + pathlen);
+    memcpy(fullpath_overrides, "./overrides/assets/", 19);
+    memcpy(fullpath_overrides+19, path, pathlen+1);
+    char *fullpath = NULL;
+    if(access(fullpath_overrides, F_OK) == 0) {
+        fullpath = fullpath_overrides;
+    } else if(access(fullpath_internal_overrides, F_OK) == 0) {
+        fullpath = fullpath_internal_overrides;
+    } else if(access(fullpath_original, F_OK) == 0) {
+        fullpath = fullpath_original;
+    }
     asset_file asset;
-
-    memcpy(fullpath+7, path, pathlen+1);
 
     FILE *file = fopen(fullpath, "r");
     if (!file) {
@@ -294,6 +310,9 @@ asset_file AppPlatform_linux$readAssetFile(AppPlatform_linux *app_platform, void
     fseek(file, 0, SEEK_SET);
     fread(asset.data, 1, asset.size, file);
     asset.size;
+    free(fullpath_original);
+    free(fullpath_internal_overrides);
+    free(fullpath_overrides);
     return asset;
 }
 

@@ -21,6 +21,7 @@
 #include <ninecraft/AppPlatform_linux.hpp>
 #include <ninecraft/audio_engine.hpp>
 #include <ninecraft/hooks.hpp>
+#include <math.h>
 
 #include <hybris/dlfcn.h>
 #include <hybris/hook.h>
@@ -149,28 +150,6 @@ void *load_minecraftpe()
     return handle;
 }
 
-void *load_library_os(std::string path, const char **symbols)
-{
-    void *handle = dlopen(path.c_str(), RTLD_LAZY);
-    if (handle == NULL)
-    {
-        std::cout << "failed to load library " << path << ": " << dlerror() << "\n";
-        return NULL;
-    }
-    std::cout << "oslib: " << path << ": " << (int)handle << "\n";
-    int i = 0;
-    while (true)
-    {
-        const char *sym = symbols[i];
-        if (sym == NULL)
-            break;
-        void *ptr = dlsym(handle, sym);
-        hybris_hook(sym, ptr);
-        ++i;
-    }
-    return handle;
-}
-
 void stub_symbols(const char **symbols, void *stub_func)
 {
     int i = 0;
@@ -271,7 +250,6 @@ static void mouse_click_callback(GLFWwindow* window, int button, int action, int
 static void mouse_scroll_callback(GLFWwindow* window, double xoffset, double yoffset) {
     double xpos, ypos;
     glfwGetCursorPos(window, &xpos, &ypos);
-    printf("%lf %lf\n", xoffset, yoffset);
     char key_code = 0;
     if (yoffset > 0) {
         key_code = MCKEY_HOTBAR_PREVIOUS;
@@ -371,13 +349,13 @@ void mcinit()
 void grab_mouse() {
     std::cout << "grab_mouse" << std::endl;
     mouse_pointer_hidden = true;
-    glfwSetInputMode(_window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
+    glfwSetInputMode(_window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 }
 
 void release_mouse() {
     std::cout << "release_mouse" << std::endl;
     mouse_pointer_hidden = false;
-    glfwSetInputMode(_window, GLFW_CURSOR, GLFW_CURSOR_NORMAL);
+    glfwSetInputMode(_window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
 }
 
 ALuint effect;
@@ -446,19 +424,13 @@ void gles_hook() {
     hybris_hook("glViewport", (void *) gl_viewport);
 }
 
-void render_menu_background(void *screen, void *texture_name) {
-    TextureData image = read_png("./images/background.png", true, true);
-    GLuint texid = load_texture(image);
-    GLuint fboId = 0;
-    glBindTexture(GL_TEXTURE_2D, texid);
-    glTexStorage2D(GL_TEXTURE_2D, 0, image.alpha ? GL_RGBA : GL_RGB, window_width, window_height);
-    glGenFramebuffers(1, &fboId);
-    glBindFramebuffer(GL_READ_FRAMEBUFFER, fboId);
-    glFramebufferTexture2D(GL_READ_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, texid, 0);
-    glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
-    glBlitFramebuffer(0, 0, image.width, image.height, 0, 0, window_width, window_height, GL_COLOR_BUFFER_BIT, GL_NEAREST);
-    glDeleteTextures(1, &texid);
-    free(image.pixels);
+void render_menu_background(void *screen) {
+    void *minecraft = *(void **)(screen + 20);
+    void *textures = *(void **)(minecraft + 688);
+    static android_string str;
+    to_str(&str, "gui/bg32.png", handle);
+    ((void (*)(void *, android_string *))hybris_dlsym(handle, "_ZN8Textures18loadAndBindTextureERKSs"))(textures, &str);
+    ((void (*)(void *, int, int, int, int, int, int, int, int))hybris_dlsym(handle, "_ZN12GuiComponent4blitEiiiiiiii"))(screen, 0, 0, 0, 0, *(int *)(screen+8), *(int *)(screen+12), 0x100, 0x100);
 }
 
 int main(int argc, char **argv)
@@ -489,6 +461,7 @@ int main(int argc, char **argv)
     glfwMakeContextCurrent(_window);
     gladLoadGLLoader((GLADloadproc)glfwGetProcAddress);
     glfwInit();
+    glfwSetInputMode(_window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
 
     gles_hook();
     hybris_hook("__android_log_print", (void *)__android_log_print);
@@ -505,7 +478,6 @@ int main(int argc, char **argv)
     audio_engine_create_audio_device(&audio_device, &audio_context);
     char *buf = (char *) hybris_dlsym(handle, "PCM_click");
     effect = audio_engine_create_sound_effect(buf);
-
     keyboard_inputs = (std::vector<KeyboardAction> *)hybris_dlsym(handle, "_ZN8Keyboard7_inputsE");
     keyboard_states = (int *)hybris_dlsym(handle, "_ZN8Keyboard7_statesE");
     controller_states = (unsigned char *)hybris_dlsym(handle, "_ZN10Controller15isTouchedValuesE");
@@ -538,6 +510,8 @@ int main(int argc, char **argv)
     detour(hybris_dlsym(handle, "_ZN11SoundEngineD1Ev"), (void *)sound_engine_stub, true);
     detour(hybris_dlsym(handle, "_ZN11SoundEngineD2Ev"), (void *)sound_engine_stub, true);
     ninecraft_app = operator new(0xe6c);
+
+    printf("app: %p\n", ninecraft_app);
 
     printf("%s\n", glGetString(GL_VERSION));
 
@@ -586,6 +560,13 @@ int main(int argc, char **argv)
             controller_x_stick[1] = ((float)((x_cam - 483.0)) * 0.0020703934);
         }
         minecraft_draw();
+        
+        if (!mouse_pointer_hidden) {
+            float inv_gui_scale = *((float *)hybris_dlsym(handle, "_ZN3Gui11InvGuiScaleE"));
+            short cx = (short)((float)((short (*)())hybris_dlsym(handle, "_ZN5Mouse4getXEv"))() * inv_gui_scale);
+            short cy = (short)((float)((short (*)())hybris_dlsym(handle, "_ZN5Mouse4getYEv"))() * inv_gui_scale);
+            ((void (*)(float, float, void *))hybris_dlsym(handle, "_Z12renderCursorffP9Minecraft"))(cx, cy, ninecraft_app);
+        }
         glfwSwapBuffers(_window);
         glfwPollEvents();
     }
