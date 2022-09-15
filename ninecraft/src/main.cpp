@@ -69,34 +69,19 @@ void detour(void *dst_addr, void *src_addr, bool jump) {
 
 #ifdef __arm__
 
-uint32_t encode_branch(uint32_t pc, uint32_t branch_to, uint8_t has_link, uint8_t is_b) {
-	int32_t offset = branch_to - (pc + 4);
-	uint8_t s = (offset >> 24) & 1;
-	uint8_t j = (~((offset >> 23)) ^ s) & 1;
-	uint8_t j2 = (~((offset >> 22)) ^ s) & 1;
-	uint16_t h = (offset >> 12) & 0x3ff;
-	uint16_t l = (offset >> 1) & 0x7ff;
-	uint8_t type = has_link ? 0b11 : 0b10;
-	uint8_t thumb_bit = is_b ? 1 : 0;
-	uint8_t opcode = 0b11110;
-	uint32_t result = opcode << 27;
-	result |= s << 26;
-	result |= h << 16;
-	result |= type << 14;
-	result |= j << 13;
-	result |= thumb_bit << 12;
-	result |= j2 << 11;
-	result |= l;
-	return ((result & 0xffff) << 16) | ((result >> 16) & 0xffff);
-}
-
-void detour(void *dst_addr, void *src_addr, bool unused) {
-	long page_size = sysconf(_SC_PAGESIZE);
-	void *protect = (void *)(((uintptr_t)dst_addr - 1) & -page_size);
-	mprotect(protect, 4, PROT_READ | PROT_WRITE | PROT_EXEC);
-	uint32_t b = encode_branch((uint32_t)dst_addr-1, (uint32_t)src_addr-1, 0, 1);
-	*(uint32_t *)((uint32_t)dst_addr-1) = b;
-	mprotect(protect, 4, PROT_EXEC);
+void detour(void *dst_addr, void *src_addr, bool jump) {
+    long page_size = sysconf(_SC_PAGESIZE);
+    void *protect = (void *)(((uintptr_t)dst_addr-1) & -page_size);
+    mprotect(protect, 10, PROT_READ | PROT_WRITE | PROT_EXEC);
+    uint32_t i = 0;
+    if ((((uint32_t)dst_addr & 0xFFFFFFFE) % 4) != 0) {
+        ((uint16_t *)((uint32_t)dst_addr & 0xFFFFFFFE))[i++] = 0xBF00;
+    }
+    ((uint16_t *)((uint32_t)dst_addr & 0xFFFFFFFE))[i++] = 0xF8DF;
+    ((uint16_t *)((uint32_t)dst_addr & 0xFFFFFFFE))[i++] = 0xF000;
+    ((uint16_t *)((uint32_t)dst_addr & 0xFFFFFFFE))[i++] = (uint32_t)src_addr & 0xFFFF;
+    ((uint16_t *)((uint32_t)dst_addr & 0xFFFFFFFE))[i++] = (uint32_t)src_addr >> 16;
+    mprotect(protect, 10, PROT_EXEC);
 }
 
 #else
