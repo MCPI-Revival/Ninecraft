@@ -1,4 +1,4 @@
-#include <hybris/hook.h>
+#include <hybris/dlsym.h>
 #include <ninecraft/android_string.hpp>
 
 void to_str(void *str, char *cstr, void *handle) {
