@@ -1,9 +1,9 @@
 #include <ninecraft/AppPlatform_linux.hpp>
 #include <cstdlib>
 #include <errno.h>
+#include <ninecraft/android_alloc.hpp>
 
 void AppPlatform_linux$AppPlatform_linux(AppPlatform_linux *app_platform, void *handle) {
-    memset(app_platform->filler, 0, 0xd0);
     app_platform->vtable = (void **) operator new(31 * sizeof(void *));
     app_platform->vtable[0] = (void *) AppPlatform_linux$destroy;
     app_platform->vtable[1] = (void *) AppPlatform_linux$destroy;
@@ -37,6 +37,7 @@ void AppPlatform_linux$AppPlatform_linux(AppPlatform_linux *app_platform, void *
     app_platform->vtable[29] = (void *) AppPlatform_linux$isKeyboardVisible;
     app_platform->vtable[30] = (void *) AppPlatform_linux$showKeyboard;
     app_platform->handle = handle;
+    app_platform->status = -1;
 }
 
 void AppPlatform_linux$_tick(AppPlatform_linux *app_platform) {
@@ -54,6 +55,8 @@ int AppPlatform_linux$checkLicense(AppPlatform_linux *app_platform) {
 
 void AppPlatform_linux$createUserInput(AppPlatform_linux *app_platform) {
     std::cout << "debug: AppPlatform_linux::createUserInput" << std::endl;
+    app_platform->status = 1;
+    //app_platform->user_input_text = NULL;
 }
 
 void AppPlatform_linux$finish(AppPlatform_linux *app_platform) {
@@ -166,15 +169,70 @@ int AppPlatform_linux$getKeyFromKeyCode(AppPlatform_linux *app_platform, unsigne
     return 0;
 }
 
-int AppPlatform_linux$getOptionStrings(AppPlatform_linux *app_platform) {
+android_vector AppPlatform_linux$getOptionStrings(AppPlatform_linux *app_platform) {
     std::cout << "debug: AppPlatform_linux::getOptionsStrings" << std::endl;
-    /*std::string *strarr = new std::string[1024];
-    for (unsigned int i = 0; i < 1024; ++i) {
-        strarr[i] = NULL;
-    }
-    return strarr;*/
-    char *buf = (char *) hybris_dlsym(app_platform->handle, "_ZZN19AppPlatform_android16getOptionStringsEvE3buf");
-    return 1;
+    android_string username_name; // mp_username
+    android_string username_value; // Steve
+    android_string server_visible_name; // mp_server_visible_default
+    android_string server_visible_value; // true
+    android_string fancygraphics_name; // gfx_fancygraphics
+    android_string fancygraphics_value; // true
+    android_string lowquality_name; // gfx_lowquality
+    android_string lowquality_value; // false
+    android_string sensitivity_name; // ctrl_sensitivity
+    android_string sensitivity_value; // gcvt(0.01 * 100) 100
+    android_string invertmouse_name; // ctrl_invertmouse
+    android_string invertmouse_value; // false
+    android_string islefthanded_name; // ctrl_islefthanded
+    android_string islefthanded_value; // false
+    android_string usetouchscreen_name; // ctrl_usetouchscreen
+    android_string usetouchscreen_value; // false
+    android_string difficulty_name; // game_difficulty
+    android_string difficulty_value; // 0, 4
+    unsigned int size = 24;
+    char tmp[100];
+    to_str(&username_name, "mp_username", app_platform->handle);
+    to_str(&username_value, "Ninecraft", app_platform->handle);
+    to_str(&server_visible_name, "mp_server_visible_default", app_platform->handle);
+    to_str(&server_visible_value, "true", app_platform->handle);
+    to_str(&fancygraphics_name, "gfx_fancygraphics", app_platform->handle);
+    to_str(&fancygraphics_value, "true", app_platform->handle);
+    to_str(&lowquality_name, "gfx_lowquality", app_platform->handle);
+    to_str(&lowquality_value, "false", app_platform->handle);
+    to_str(&sensitivity_name, "ctrl_sensitivity", app_platform->handle);
+    to_str(&sensitivity_value, gcvt(0.01 * 100, 6, tmp), app_platform->handle);
+    to_str(&invertmouse_name, "ctrl_invertmouse", app_platform->handle);
+    to_str(&invertmouse_value, "false", app_platform->handle);
+    to_str(&islefthanded_name, "ctrl_islefthanded", app_platform->handle);
+    to_str(&islefthanded_value, "false", app_platform->handle);
+    to_str(&usetouchscreen_name, "ctrl_usetouchscreen", app_platform->handle);
+    to_str(&usetouchscreen_value, "false", app_platform->handle);
+    to_str(&difficulty_name, "game_difficulty", app_platform->handle);
+    to_str(&difficulty_value, "4", app_platform->handle);
+    android_vector out;
+    out._M_start = (unsigned long)android_alloc$allocate(&size, app_platform->handle);
+    out._M_finish = out._M_start;
+    out._M_end_of_storage = out._M_start + 24;
+    android_vector$push_back(&out, &username_name, app_platform->handle);
+    android_vector$push_back(&out, &username_value, app_platform->handle);
+    //android_vector$push_back(&out, &server_visible_name, app_platform->handle);
+    //android_vector$push_back(&out, &server_visible_value, app_platform->handle);
+    //android_vector$push_back(&out, &fancygraphics_name, app_platform->handle);
+    //android_vector$push_back(&out, &fancygraphics_value, app_platform->handle);
+    //android_vector$push_back(&out, &lowquality_name, app_platform->handle);
+    //android_vector$push_back(&out, &lowquality_value, app_platform->handle);
+    //android_vector$push_back(&out, &sensitivity_name, app_platform->handle);
+    //android_vector$push_back(&out, &sensitivity_value, app_platform->handle);
+    //android_vector$push_back(&out, &invertmouse_name, app_platform->handle);
+    //android_vector$push_back(&out, &invertmouse_value, app_platform->handle);
+    //android_vector$push_back(&out, &islefthanded_name, app_platform->handle);
+    //android_vector$push_back(&out, &islefthanded_value, app_platform->handle);
+    //android_vector$push_back(&out, &usetouchscreen_name, app_platform->handle);
+    //android_vector$push_back(&out, &usetouchscreen_value, app_platform->handle);
+    //android_vector$push_back(&out, &difficulty_name, app_platform->handle);
+    //android_vector$push_back(&out, &difficulty_value, app_platform->handle);
+    printf("start: %u; finish: %u; end: %u;\n", out._M_start, out._M_finish, out._M_end_of_storage);
+    return out;
 }
 
 float AppPlatform_linux$getPixelsPerMillimeter(AppPlatform_linux *app_platform) {
@@ -199,14 +257,31 @@ int AppPlatform_linux$getScreenWidth(AppPlatform_linux *app_platform) {
     return 900;
 }
 
-android_string *AppPlatform_linux$getUserInput(AppPlatform_linux *app_platform) {
+android_vector AppPlatform_linux$getUserInput(AppPlatform_linux *app_platform) {
     std::cout << "debug: AppPlatform_linux::getUserInput" << std::endl;
-    return NULL;
+    android_string name;
+    android_string seed;
+    android_string gamemode;
+    to_str(&name, "random world", app_platform->handle);
+    to_str(&seed, "12345678", app_platform->handle);
+    to_str(&gamemode, "creative", app_platform->handle);
+    unsigned int size = 24;
+    android_vector out;
+    out._M_start = (unsigned long)android_alloc$allocate(&size, app_platform->handle);
+    out._M_finish = out._M_start;
+    out._M_end_of_storage = out._M_start + 24;
+    puts("ok----");
+    android_vector$push_back(&out, &name, app_platform->handle);
+    android_vector$push_back(&out, &seed, app_platform->handle);
+    android_vector$push_back(&out, &gamemode, app_platform->handle);
+
+    printf("start: %u; finish: %u; end: %u;\n", out._M_start, out._M_finish, out._M_end_of_storage);
+    return out;
 }
 
 int AppPlatform_linux$getUserInputStatus(AppPlatform_linux *app_platform) {
     std::cout << "debug: AppPlatform_linux::getUserInputStatus" << std::endl;
-    return -1;
+    return app_platform->status;
 }
 
 bool AppPlatform_linux$hasBuyButtonWhenInvalidLicense(AppPlatform_linux *app_platform) {
@@ -298,7 +373,7 @@ asset_file AppPlatform_linux$readAssetFile(AppPlatform_linux *app_platform, void
     FILE *file = fopen(fullpath, "r");
     if (!file) {
         printf("Error[%d] failed to read %s\n", errno, fullpath);
-        to_str((void *) &str, "", app_platform->handle);
+        to_str(&str, "", app_platform->handle);
         asset.data = 0;
         asset.size = -1;
         return asset;
@@ -322,6 +397,14 @@ void AppPlatform_linux$saveScreenshot(AppPlatform_linux *app_platform, const and
 
 void AppPlatform_linux$showDialog(AppPlatform_linux *app_platform, int dialog_id) {
     std::cout << "debug: AppPlatform_linux::showDialog" << std::endl;
+    if (dialog_id == did_new_world) {
+        std::cout << "Create New World" << std::endl;
+        app_platform->status = 1;
+    } else if (dialog_id == did_options) {
+        std::cout << "Options" << std::endl;
+    } else if (dialog_id == did_rename_world) {
+        std::cout << "Rename World" << std::endl;
+    }
 }
 
 void AppPlatform_linux$showKeyboard(AppPlatform_linux *app_platform) {

@@ -258,8 +258,8 @@ static void mouse_pos_callback(GLFWwindow* window, double xpos, double ypos) {
         cy /= 2;
         if ((int)xpos != cy || (int)ypos != cy) {
             glfwSetCursorPos(window, cx, cy);
-            y_cam -= ((float) ypos - (float)cy) / 8.0;
-            x_cam += ((float)xpos - (float)cx) / 6.0;
+            y_cam -= ((float) ypos - (float)cy) / 6.0;
+            x_cam += ((float)xpos - (float)cx) / 4.0;
         }
     }
 }
@@ -473,11 +473,47 @@ int main(int argc, char **argv)
     detour(hybris_dlsym(handle, "_ZN12MouseHandler7releaseEv"), (void *)release_mouse, true);
 
     detour(hybris_dlsym(handle, "_ZN6Screen20renderDirtBackgroundEi"), (void *)render_menu_background, true);
-    
+
     unsigned char *dat = (unsigned char *)hybris_dlsym(handle, "_ZN15StartMenuScreenC1Ev");
     
     #ifdef __i386__
     dat[268] = 0xa0;
+    #endif
+
+    unsigned char *dat2 = (unsigned char *)hybris_dlsym(handle, "_ZN17SelectWorldScreen4tickEv");
+    #ifdef __i386__
+    // found call of AppPlatform_linux::getUserInput at 0x101ea0
+    //dat2[(0x10216f-0x101ea0)] = 0x90;
+    //dat2[(0x10216f-0x101ea0)+1] = 0x90;
+    //dat2[(0x10216f-0x101ea0)+2] = 0x90;
+    #endif
+
+    unsigned char *dat3 = (unsigned char *)hybris_dlsym(handle, "_ZN17SelectWorldScreen4tickEv");
+    #ifdef __i386__
+    // found call of AppPlatform_linux::getUserInput at 0x101ea0
+    /*dat3[(0x0011fe1b-0x00101ea0)] = 0x90;
+    dat3[(0x0011fe1b-0x00101ea0)+1] = 0x90;
+    dat3[(0x0011fe1b-0x00101ea0)+2] = 0x90;
+    dat3[(0x0011fe1b-0x00101ea0)+3] = 0x90;
+    dat3[(0x0011fe1b-0x00101ea0)+4] = 0x90;
+
+    dat3[(0x0011fe4f-0x00101ea0)] = 0x90;
+    dat3[(0x0011fe4f-0x00101ea0)+1] = 0x90;
+    dat3[(0x0011fe4f-0x00101ea0)+2] = 0x90;
+    dat3[(0x0011fe4f-0x00101ea0)+3] = 0x90;
+    dat3[(0x0011fe4f-0x00101ea0)+4] = 0x90;
+
+    dat3[(0x0011fea4-0x00101ea0)] = 0x90;
+    dat3[(0x0011fea4-0x00101ea0)+1] = 0x90;
+    dat3[(0x0011fea4-0x00101ea0)+2] = 0x90;
+    dat3[(0x0011fea4-0x00101ea0)+3] = 0x90;
+    dat3[(0x0011fea4-0x00101ea0)+4] = 0x90;
+
+    dat3[(0x0011feb1-0x00101ea0)] = 0x90;
+    dat3[(0x0011feb1-0x00101ea0)+1] = 0x90;
+    dat3[(0x0011feb1-0x00101ea0)+2] = 0x90;
+    dat3[(0x0011feb1-0x00101ea0)+3] = 0x90;
+    dat3[(0x0011feb1-0x00101ea0)+4] = 0x90;*/
     #endif
     
     detour(hybris_dlsym(handle, "_ZN6Common20getGameVersionStringERKSs"), (void *)get_game_version, true);
@@ -494,6 +530,7 @@ int main(int argc, char **argv)
     detour(hybris_dlsym(handle, "_ZN11SoundEngine13updateOptionsEv"), (void *)sound_engine_stub, true);
     detour(hybris_dlsym(handle, "_ZN11SoundEngineD1Ev"), (void *)sound_engine_stub, true);
     detour(hybris_dlsym(handle, "_ZN11SoundEngineD2Ev"), (void *)sound_engine_stub, true);
+    
     ninecraft_app = operator new(0xe6c);
 
     printf("app: %p\n", ninecraft_app);
@@ -501,7 +538,7 @@ int main(int argc, char **argv)
     printf("%s\n", glGetString(GL_VERSION));
 
     NinecraftApp$construct ninecraft_app_construct = (NinecraftApp$construct)hybris_dlsym(handle, "_ZN12NinecraftAppC2Ev");
-    printf("%p\n", ninecraft_app_construct);
+    printf("nine construct %p\n", ninecraft_app_construct);
     ninecraft_app_construct(ninecraft_app);
 
     ((void (*)(int, const char *))hybris_dlsym(handle, "_ZNSsaSEPKc"))((int)ninecraft_app + 3544, "./storage/internal/");

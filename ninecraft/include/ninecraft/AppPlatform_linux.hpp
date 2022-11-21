@@ -8,12 +8,14 @@
 #include <hybris/hook.h>
 #include <hybris/jb/linker.h>
 #include "textures.hpp"
+#include <vector>
 #include <ninecraft/android_string.hpp>
+#include <ninecraft/android_vector.hpp>
 
 typedef struct {
     void **vtable;
-    unsigned char filler[0xd0];
     void *handle;
+    int status;
 } AppPlatform_linux;
 
 typedef struct {
@@ -24,6 +26,18 @@ typedef struct {
 enum class TextureFormat {
     U8888, U888, U565, U5551, U4444, C565, C5551, C4444
 };
+
+typedef enum {
+    did_new_world = 1,
+    did_options = 3,
+    did_rename_world = 4
+} platform_dialogue_id;
+
+typedef struct {
+    android_string name;
+    android_string seed;
+    char filler[0x1000];
+} user_input;
 
 void AppPlatform_linux$AppPlatform_linux(AppPlatform_linux *app_platform, void *handle);
 
@@ -41,7 +55,7 @@ android_string AppPlatform_linux$getDateString(AppPlatform_linux *app_platform, 
 
 int32_t AppPlatform_linux$getKeyFromKeyCode(AppPlatform_linux *app_platform, unsigned int key_code, unsigned int meta_state, unsigned int device_id);
 
-int AppPlatform_linux$getOptionStrings(AppPlatform_linux *app_platform);
+android_vector AppPlatform_linux$getOptionStrings(AppPlatform_linux *app_platform);
 
 float AppPlatform_linux$getPixelsPerMillimeter(AppPlatform_linux *app_platform);
 
@@ -51,7 +65,7 @@ int AppPlatform_linux$getScreenHeight(AppPlatform_linux *app_platform);
 
 int AppPlatform_linux$getScreenWidth(AppPlatform_linux *app_platform);
 
-android_string *AppPlatform_linux$getUserInput(AppPlatform_linux *app_platform);
+android_vector AppPlatform_linux$getUserInput(AppPlatform_linux *app_platform);
 
 int AppPlatform_linux$getUserInputStatus(AppPlatform_linux *app_platform);
 

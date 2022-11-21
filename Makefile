@@ -10,3 +10,7 @@ build:
 .PHONY: clean
 clean:
 	rm -rf $(BUILD_DIR)
+
+.PHONY: run
+run:
+	${BUILD_DIR}/ninecraft/ninecraft
