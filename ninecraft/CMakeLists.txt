@@ -5,9 +5,10 @@ project(ninecraft-core)
 find_package(PNG REQUIRED)
 find_package(OpenAL REQUIRED)
 
-file(GLOB SOURCE_FILES src/*.cpp)
+file(GLOB SOURCE_FILES src/*.c)
 
 add_executable(ninecraft ${GLAD_SOURCES} ${SOURCE_FILES})
+target_compile_definitions(ninecraft PRIVATE _GNU_SOURCE)
 target_include_directories(ninecraft PUBLIC include/)
 target_link_libraries(ninecraft ${CMAKE_DL_LIBS} glfw hybris glad ${GLFW3_LIBRARY} ${OPENAL_LIBRARY} ${PNG_LIBRARIES})
 include_directories(ninecraft PUBLIC include/)
