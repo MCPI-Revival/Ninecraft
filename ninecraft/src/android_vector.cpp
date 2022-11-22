@@ -3,7 +3,7 @@
 #include <ninecraft/android_alloc.h>
 #include <string.h>
 
-uint32_t android_vector$_M_compute_next_size(android_vector *__this, size_t __n) {
+size_t android_vector$_M_compute_next_size(android_vector *__this, size_t __n) {
     size_t __size = STLPORT_SIZE_TYPE(__this->_M_finish - __this->_M_start);
     if (__n > STLPORT_MAX_SIZE - __size) {
         puts("Invalid vector length");
@@ -16,7 +16,7 @@ uint32_t android_vector$_M_compute_next_size(android_vector *__this, size_t __n)
     return __len;
 }
 
-uint32_t android_vector$__uninitialized_fill(uintptr_t __first, size_t __n, uintptr_t __x, void *handle) {
+uintptr_t android_vector$__uninitialized_fill(uintptr_t __first, size_t __n, uintptr_t __x, void *handle) {
     size_t size = STLPORT_SIZE_TYPE(__n * 24);
     while (size > 0) {
         android_string$string((android_string *)__first, (android_string *)__x, handle);
