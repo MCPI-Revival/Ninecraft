@@ -20,6 +20,7 @@ void to_str(android_string *str, char *cstr, void *handle) {
     android_string$_M_allocate_block(str, length + 1, handle);
     str->_M_finish = android_string$__ucopy_trivial(cstr, last, str->_M_start_of_storage);
     *(char *)str->_M_finish = 0;
+    //printf(">>> start: %u; finish: %u; end: %u;\n", str->_M_start_of_storage, str->_M_finish, str->buffers._M_end_of_storage);
 }
 
 void android_string$string(android_string *__this, android_string *str, void *handle) {
