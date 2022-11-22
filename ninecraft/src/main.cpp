@@ -518,7 +518,6 @@ int main(int argc, char **argv)
     
     detour(hybris_dlsym(handle, "_ZN6Common20getGameVersionStringERKSs"), (void *)get_game_version, true);
 
-    detour(hybris_dlsym(handle, "_ZN9Minecraft13reloadOptionsEv"), (void *)mcinit, true);
     detour(hybris_dlsym(handle, "_ZN11SoundEngineC1Ef"), (void *)sound_engine_stub, true);
     detour(hybris_dlsym(handle, "_ZN11SoundEngine4initEP9MinecraftP7Options"), (void *)sound_engine_stub, true);
     detour(hybris_dlsym(handle, "_ZN11SoundEngine14_getVolumeMultEfff"), (void *)sound_engine_stub, true);
