@@ -11,7 +11,6 @@
 #include <sys/stat.h>
 #include <iostream>
 #include <fstream>
-#include <vector>
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 #include <ninecraft/gles_compat.h>
@@ -188,7 +187,7 @@ struct KeyboardAction
     int keyCode;
 };
 
-static std::vector<KeyboardAction> *keyboard_inputs;
+android_vector *keyboard_inputs;
 static int *keyboard_states;
 
 static unsigned char *controller_states;
@@ -223,10 +222,12 @@ static void mouse_click_callback(GLFWwindow* window, int button, int action, int
         int game_keycode = mouseToGameKeyCode(button);
         
         if (action == GLFW_PRESS) {
-            keyboard_inputs->push_back({1, game_keycode});
+            struct KeyboardAction action = {1, game_keycode};
+            android_vector$push_back_2(keyboard_inputs, &action, handle);
             keyboard_states[game_keycode] = 1;
         } else if (action == GLFW_RELEASE) {
-            keyboard_inputs->push_back({0, game_keycode});
+            struct KeyboardAction action = {0, game_keycode};
+            android_vector$push_back_2(keyboard_inputs, &action, handle);
             keyboard_states[game_keycode] = 0;
         }
     }
@@ -241,9 +242,11 @@ static void mouse_scroll_callback(GLFWwindow* window, double xoffset, double yof
     } else if (yoffset < 0) {
         key_code = MCKEY_HOTBAR_NEXT;
     }
-    keyboard_inputs->push_back({1, key_code});
+    struct KeyboardAction action1 = {1, key_code};
+    android_vector$push_back_2(keyboard_inputs, &action1, handle);
     keyboard_states[key_code] = 1;
-    keyboard_inputs->push_back({0, key_code});
+    struct KeyboardAction action2 = {0, key_code};
+    android_vector$push_back_2(keyboard_inputs, &action2, handle);
     keyboard_states[key_code] = 0;
 }
 
@@ -306,10 +309,12 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
                 controller_states[0] = 0;
             }
         } else if (action == GLFW_PRESS) {
-            keyboard_inputs->push_back({1, game_keycode});
+            struct KeyboardAction action = {1, game_keycode};
+            android_vector$push_back_2(keyboard_inputs, &action, handle);
             keyboard_states[game_keycode] = 1;
         } else if (action == GLFW_RELEASE) {
-            keyboard_inputs->push_back({0, game_keycode});
+            struct KeyboardAction action = {0, game_keycode};
+            android_vector$push_back_2(keyboard_inputs, &action, handle);
             keyboard_states[game_keycode] = 0;
         }
     }
@@ -465,7 +470,7 @@ int main(int argc, char **argv)
     audio_engine_create_audio_device(&audio_device, &audio_context);
     char *buf = (char *) hybris_dlsym(handle, "PCM_click");
     effect = audio_engine_create_sound_effect(buf);
-    keyboard_inputs = (std::vector<KeyboardAction> *)hybris_dlsym(handle, "_ZN8Keyboard7_inputsE");
+    keyboard_inputs = (android_vector *)hybris_dlsym(handle, "_ZN8Keyboard7_inputsE");
     keyboard_states = (int *)hybris_dlsym(handle, "_ZN8Keyboard7_statesE");
     controller_states = (unsigned char *)hybris_dlsym(handle, "_ZN10Controller15isTouchedValuesE");
     controller_x_stick = (float *)hybris_dlsym(handle, "_ZN10Controller12stickValuesXE");
