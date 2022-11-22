@@ -1,4 +1,4 @@
-#include <ninecraft/textures.hpp>
+#include <ninecraft/textures.h>
 #include <png.h>
 #include <cerrno>
 #include <cstdlib>

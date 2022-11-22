@@ -1,11 +1,7 @@
-#include <cstddef>
+#include <stddef.h>
 #include <AL/alext.h>
-#include <ninecraft/audio_engine.hpp>
-#include <cstdio>
-
-#ifdef __cplusplus
-extern "C" {
-#endif
+#include <ninecraft/audio_engine.h>
+#include <stdio.h>
 
 struct pcm_metadata {
     int32_t channels;
@@ -117,7 +113,3 @@ void audio_engine_play(ALuint buffer) {
     alSourcePlay(p_Source);
     //alDeleteSources(1, &p_Source);
 }
-
-#ifdef __cplusplus
-}
-#endif

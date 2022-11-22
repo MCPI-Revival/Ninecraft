@@ -1,10 +1,11 @@
-#include <ninecraft/AppPlatform_linux.hpp>
-#include <cstdlib>
+#include <ninecraft/AppPlatform_linux.h>
+#include <stdlib.h>
 #include <errno.h>
-#include <ninecraft/android_alloc.hpp>
+#include <stdio.h>
+#include <ninecraft/android_alloc.h>
 
 void AppPlatform_linux$AppPlatform_linux(AppPlatform_linux *app_platform, void *handle) {
-    app_platform->vtable = (void **) operator new(31 * sizeof(void *));
+    app_platform->vtable = (void **) malloc(31 * sizeof(void *));
     app_platform->vtable[0] = (void *) AppPlatform_linux$destroy;
     app_platform->vtable[1] = (void *) AppPlatform_linux$destroy;
     app_platform->vtable[2] = (void *) AppPlatform_linux$saveScreenshot;
@@ -41,36 +42,34 @@ void AppPlatform_linux$AppPlatform_linux(AppPlatform_linux *app_platform, void *
 }
 
 void AppPlatform_linux$_tick(AppPlatform_linux *app_platform) {
-    std::cout << "debug: AppPlatform_linux::_tick" << std::endl;
+    puts("debug: AppPlatform_linux::_tick");
 }
 
 void AppPlatform_linux$buyGame(AppPlatform_linux *app_platform) {
-    std::cout << "debug: AppPlatform_linux::buyGame" << std::endl;
+    puts("debug: AppPlatform_linux::buyGame");
 }
  
 int AppPlatform_linux$checkLicense(AppPlatform_linux *app_platform) {
-    std::cout << "debug: AppPlatform_linux::checkLicense" << std::endl;
+    puts("debug: AppPlatform_linux::checkLicense");
     return 0;
 }
 
 void AppPlatform_linux$createUserInput(AppPlatform_linux *app_platform) {
-    std::cout << "debug: AppPlatform_linux::createUserInput" << std::endl;
+    puts("debug: AppPlatform_linux::createUserInput");
     app_platform->status = 1;
     //app_platform->user_input_text = NULL;
 }
 
 void AppPlatform_linux$finish(AppPlatform_linux *app_platform) {
-    std::cout << "debug: AppPlatform_linux::finish" << std::endl;
+    puts("debug: AppPlatform_linux::finish");
 }
 
 android_string AppPlatform_linux$getDateString(AppPlatform_linux *app_platform, unsigned int seconds) {
-    std::cout << "debug: AppPlatform_linux::getDateString" << std::endl;
+    puts("debug: AppPlatform_linux::getDateString");
     android_string str;
 
-    std::string ans = "";
-
     int daysOfMonth[] = { 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 };
-    long int currYear, daysTillNow, extraTime, extraDays, index, date, month, hours, minutes, secondss, flag = 0;
+    int currYear, daysTillNow, extraTime, extraDays, index, date, month, hours, minutes, secondss, flag = 0;
  
     daysTillNow = seconds / (24 * 60 * 60);
     extraTime = seconds % (24 * 60 * 60);
@@ -148,29 +147,21 @@ android_string AppPlatform_linux$getDateString(AppPlatform_linux *app_platform, 
     minutes = (extraTime % 3600) / 60;
     secondss = (extraTime % 3600) % 60;
 
-    ans += std::to_string(date);
-    ans += "/";
-    ans += std::to_string(month);
-    ans += "/";
-    ans += std::to_string(currYear);
-    ans += " ";
-    ans += std::to_string(hours);
-    ans += ":";
-    ans += std::to_string(minutes);
-    ans += ":";
-    ans += std::to_string(secondss);
-
-    to_str(&str, (char *) ans.c_str(), app_platform->handle);
+    char ans[200];
+    
+    sprintf(ans, "%d/%d/%d %d:%d:%d", date, month, currYear, hours, minutes, secondss);
+    
+    to_str(&str, (char *) ans, app_platform->handle);
     return str;
 }
 
 int AppPlatform_linux$getKeyFromKeyCode(AppPlatform_linux *app_platform, unsigned int key_code, unsigned int meta_state, unsigned int device_id) {
-    std::cout << "debug: AppPlatform_linux::getKeyFromKeyCode" << std::endl;
+    puts("debug: AppPlatform_linux::getKeyFromKeyCode");
     return 0;
 }
 
 android_vector AppPlatform_linux$getOptionStrings(AppPlatform_linux *app_platform) {
-    std::cout << "debug: AppPlatform_linux::getOptionsStrings" << std::endl;
+    puts("debug: AppPlatform_linux::getOptionsStrings");
     android_string username_name; // mp_username
     android_string username_value; // Steve
     android_string server_visible_name; // mp_server_visible_default
@@ -236,29 +227,29 @@ android_vector AppPlatform_linux$getOptionStrings(AppPlatform_linux *app_platfor
 }
 
 float AppPlatform_linux$getPixelsPerMillimeter(AppPlatform_linux *app_platform) {
-    std::cout << "debug: AppPlatform_linux::getPixelsPerMillimeter" << std::endl;
+    puts("debug: AppPlatform_linux::getPixelsPerMillimeter");
     return 1.f;
 }
 
 android_string AppPlatform_linux$getPlatformStringVar(AppPlatform_linux *app_platform, int zero) {
-    std::cout << "debug: AppPlatform_linux::getPlatformStringVar" << std::endl;
+    puts("debug: AppPlatform_linux::getPlatformStringVar");
     android_string str;
     to_str(&str, "Linux", app_platform->handle);
     return str;
 }
 
 int AppPlatform_linux$getScreenHeight(AppPlatform_linux *app_platform) {
-    std::cout << "debug: AppPlatform_linux::getScreenHeight" << std::endl;
+    puts("debug: AppPlatform_linux::getScreenHeight");
     return 1440;
 }
 
 int AppPlatform_linux$getScreenWidth(AppPlatform_linux *app_platform) {
-    std::cout << "debug: AppPlatform_linux::getScreenWidth" << std::endl;
+    puts("debug: AppPlatform_linux::getScreenWidth");
     return 900;
 }
 
 android_vector AppPlatform_linux$getUserInput(AppPlatform_linux *app_platform) {
-    std::cout << "debug: AppPlatform_linux::getUserInput" << std::endl;
+    puts("debug: AppPlatform_linux::getUserInput");
     android_string name;
     android_string seed;
     android_string gamemode;
@@ -280,41 +271,41 @@ android_vector AppPlatform_linux$getUserInput(AppPlatform_linux *app_platform) {
 }
 
 int AppPlatform_linux$getUserInputStatus(AppPlatform_linux *app_platform) {
-    std::cout << "debug: AppPlatform_linux::getUserInputStatus" << std::endl;
+    puts("debug: AppPlatform_linux::getUserInputStatus");
     return app_platform->status;
 }
 
 bool AppPlatform_linux$hasBuyButtonWhenInvalidLicense(AppPlatform_linux *app_platform) {
-    std::cout << "debug: AppPlatform_linux::hasBuyButtonWhenInvalidLicense" << std::endl;
+    puts("debug: AppPlatform_linux::hasBuyButtonWhenInvalidLicense");
     return true;
 }
 
 void AppPlatform_linux$hideKeyboard(AppPlatform_linux *app_platform) {
-    std::cout << "debug: AppPlatform_linux::hideKeyboard" << std::endl;
+    puts("debug: AppPlatform_linux::hideKeyboard");
 }
 
 bool AppPlatform_linux$isKeyboardVisible(AppPlatform_linux *app_platform) {
-    std::cout << "debug: AppPlatform_linux::isKeyboardVisible" << std::endl;
+    puts("debug: AppPlatform_linux::isKeyboardVisible");
     return false;
 }
 
 bool AppPlatform_linux$isNetworkEnabled(AppPlatform_linux *app_platform) {
-    std::cout << "debug: AppPlatform_linux::isNetworkEnabled" << std::endl;
+    puts("debug: AppPlatform_linux::isNetworkEnabled");
     return true;
 }
 
 bool AppPlatform_linux$isPowerVR(AppPlatform_linux *app_platform) {
-    std::cout << "debug: AppPlatform_linux::isPowerVR" << std::endl;
+    puts("debug: AppPlatform_linux::isPowerVR");
     return false;
 }
 
 bool AppPlatform_linux$isTouchscreen(AppPlatform_linux *app_platform) {
-    std::cout << "debug: AppPlatform_linux::isTouchscreen" << std::endl;
+    puts("debug: AppPlatform_linux::isTouchscreen");
     return false;
 }
 
 TextureData AppPlatform_linux$loadTexture(AppPlatform_linux *app_platform, void *path_str, bool alpha) {
-    std::cout << "debug: AppPlatform_linux::loadTexture" << std::endl;
+    puts("debug: AppPlatform_linux::loadTexture");
     printf("%p\n", app_platform);
     char *path = *(char **)(path_str + 20);
     size_t pathlen = strlen(path);
@@ -342,12 +333,12 @@ TextureData AppPlatform_linux$loadTexture(AppPlatform_linux *app_platform, void 
     return texture_data;
 }
 
-void AppPlatform_linux$playSound(AppPlatform_linux *app_platform, const android_string& sound_name, float volume, float pitch) {
-    std::cout << "debug: AppPlatform_linux::playSound" << std::endl;
+void AppPlatform_linux$playSound(AppPlatform_linux *app_platform, android_string *sound_name, float volume, float pitch) {
+    puts("debug: AppPlatform_linux::playSound");
 }
 
 asset_file AppPlatform_linux$readAssetFile(AppPlatform_linux *app_platform, void *path_str) {
-    std::cout << "debug: AppPlatform_linux::readAssetFile" << std::endl;
+    puts("debug: AppPlatform_linux::readAssetFile");
     android_string str;
     char *path = *(char **)(path_str + 20);
     size_t pathlen = strlen(path);
@@ -391,35 +382,35 @@ asset_file AppPlatform_linux$readAssetFile(AppPlatform_linux *app_platform, void
     return asset;
 }
 
-void AppPlatform_linux$saveScreenshot(AppPlatform_linux *app_platform, const android_string& path, int width, int height) {
-    std::cout << "debug: AppPlatform_linux::saveScreenshot" << std::endl;
+void AppPlatform_linux$saveScreenshot(AppPlatform_linux *app_platform, android_string *path, int width, int height) {
+    puts("debug: AppPlatform_linux::saveScreenshot");
 }
 
 void AppPlatform_linux$showDialog(AppPlatform_linux *app_platform, int dialog_id) {
-    std::cout << "debug: AppPlatform_linux::showDialog" << std::endl;
+    puts("debug: AppPlatform_linux::showDialog");
     if (dialog_id == did_new_world) {
-        std::cout << "Create New World" << std::endl;
+        puts("Create New World");
         app_platform->status = 1;
     } else if (dialog_id == did_options) {
-        std::cout << "Options" << std::endl;
+        puts("Options");
     } else if (dialog_id == did_rename_world) {
-        std::cout << "Rename World" << std::endl;
+        puts("Rename World");
     }
 }
 
 void AppPlatform_linux$showKeyboard(AppPlatform_linux *app_platform) {
-    std::cout << "debug: AppPlatform_linux::showKeyboard" << std::endl;
+    puts("debug: AppPlatform_linux::showKeyboard");
 }
 
 void AppPlatform_linux$uploadPlatformDependentData(AppPlatform_linux *app_platform, int size, void *data) {
-    std::cout << "debug: AppPlatform_linux::uploadPlatformDependentData" << std::endl;
+    puts("debug: AppPlatform_linux::uploadPlatformDependentData");
 }
 
 void AppPlatform_linux$vibrate(AppPlatform_linux *app_platform, int milliseconds) {
-    std::cout << "debug: AppPlatform_linux::vibrate" << std::endl;
+    puts("debug: AppPlatform_linux::vibrate");
 }
 
 void AppPlatform_linux$destroy(AppPlatform_linux *app_platform) {
-    std::cout << "debug: AppPlatform_linux::destroy" << std::endl;
-    operator delete(app_platform->vtable);
+    puts("debug: AppPlatform_linux::destroy");
+    free(app_platform->vtable);
 }

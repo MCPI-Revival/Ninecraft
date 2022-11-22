@@ -1,6 +1,6 @@
 #pragma once
 
-#include <ninecraft/gles_compat.hpp>
+#include <ninecraft/gles_compat.h>
 
 void gl_alpha_func(GLenum func, GLclampf ref) {
     glAlphaFunc(func, ref);

@@ -16,7 +16,7 @@ const char *egl_symbols[] = {
     "eglSwapBuffers",
     "eglSwapInterval",
     "eglTerminate",
-    NULL
+    0
 };
 
 const char *android_symbols[] = {
@@ -54,7 +54,7 @@ const char *android_symbols[] = {
     "AInputQueue_detachLooper",
     "AConfiguration_delete",
     "AInputQueue_attachLooper",
-    NULL
+    0
 };
 
 const char *sles_symbols[] = {
@@ -65,7 +65,7 @@ const char *sles_symbols[] = {
     "SL_IID_BUFFERQUEUE",
     "SL_IID_VOLUME",
     "SL_IID_PLAY",
-    NULL
+    0
 };
 
 #endif

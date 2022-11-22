@@ -1,6 +1,6 @@
-#include <ninecraft/android_vector.hpp>
+#include <ninecraft/android_vector.h>
 #include <hybris/dlfcn.h>
-#include <ninecraft/android_alloc.hpp>
+#include <ninecraft/android_alloc.h>
 #include <string.h>
 
 uint32_t android_vector$_M_compute_next_size(android_vector *__this, size_t __n) {

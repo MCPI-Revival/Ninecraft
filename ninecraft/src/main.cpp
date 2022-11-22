@@ -14,13 +14,13 @@
 #include <vector>
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
-#include <ninecraft/gles_compat.hpp>
-#include <ninecraft/minecraft_keys.hpp>
-#include <ninecraft/android_string.hpp>
-#include <ninecraft/symbols.hpp>
-#include <ninecraft/AppPlatform_linux.hpp>
-#include <ninecraft/audio_engine.hpp>
-#include <ninecraft/hooks.hpp>
+#include <ninecraft/gles_compat.h>
+#include <ninecraft/minecraft_keys.h>
+#include <ninecraft/android_string.h>
+#include <ninecraft/symbols.h>
+#include <ninecraft/AppPlatform_linux.h>
+#include <ninecraft/audio_engine.h>
+#include <ninecraft/hooks.h>
 #include <math.h>
 
 #include <hybris/dlfcn.h>

@@ -3,13 +3,9 @@
 #include <stdlib.h>
 #include <stdio.h>
 #include <sys/param.h>
-#include <ninecraft/android_string.hpp>
+#include <ninecraft/android_string.h>
 #include <stdint.h>
-
-#include <new>
-#include <limits>
-#include <iostream>
-#include <vector>
+#include <stdbool.h>
 
 #define STLPORT_MAX_SIZE 178956970
 #define STLPORT_SIZE_TYPE(x) (-1431655765 * (x >> 3))

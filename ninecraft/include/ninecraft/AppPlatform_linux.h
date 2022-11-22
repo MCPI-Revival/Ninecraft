@@ -1,16 +1,13 @@
 #pragma once
 
+#include <string.h>
 #include <dlfcn.h>
-#include <iostream>
-#include <cstring>
-#include <fstream>
 #include <hybris/dlfcn.h>
 #include <hybris/hook.h>
 #include <hybris/jb/linker.h>
-#include "textures.hpp"
-#include <vector>
-#include <ninecraft/android_string.hpp>
-#include <ninecraft/android_vector.hpp>
+#include <ninecraft/textures.h>
+#include <ninecraft/android_string.h>
+#include <ninecraft/android_vector.h>
 
 typedef struct {
     void **vtable;
@@ -22,10 +19,6 @@ typedef struct {
     char *data;
     int size;
 } asset_file;
-
-enum class TextureFormat {
-    U8888, U888, U565, U5551, U4444, C565, C5551, C4444
-};
 
 typedef enum {
     did_new_world = 1,
@@ -83,11 +76,11 @@ bool AppPlatform_linux$isTouchscreen(AppPlatform_linux *app_platform);
 
 TextureData AppPlatform_linux$loadTexture(AppPlatform_linux *app_platform, void *path_str, bool alpha);
 
-void AppPlatform_linux$playSound(AppPlatform_linux *app_platform, const android_string& sound_name, float volume, float pitch);
+void AppPlatform_linux$playSound(AppPlatform_linux *app_platform, android_string *sound_name, float volume, float pitch);
 
 asset_file AppPlatform_linux$readAssetFile(AppPlatform_linux *app_platform, void *path_str);
 
-void AppPlatform_linux$saveScreenshot(AppPlatform_linux *app_platform, const android_string& path, int32_t width, int32_t height);
+void AppPlatform_linux$saveScreenshot(AppPlatform_linux *app_platform, android_string *path, int32_t width, int32_t height);
 
 void AppPlatform_linux$showDialog(AppPlatform_linux *app_platform, int32_t dialog_id);
 

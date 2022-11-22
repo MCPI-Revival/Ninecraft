@@ -1,5 +1,5 @@
 #include <hybris/dlfcn.h>
-#include <ninecraft/android_string.hpp>
+#include <ninecraft/android_string.h>
 
 void to_str(android_string *str, char *cstr, void *handle) {
     #ifdef __i386__
