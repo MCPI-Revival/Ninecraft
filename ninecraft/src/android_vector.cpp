@@ -1,6 +1,7 @@
 #include <ninecraft/android_vector.hpp>
 #include <hybris/dlfcn.h>
 #include <ninecraft/android_alloc.hpp>
+#include <string.h>
 
 uint32_t android_vector$_M_compute_next_size(android_vector *__this, size_t __n) {
     size_t __size = STLPORT_SIZE_TYPE(__this->_M_finish - __this->_M_start);
@@ -15,9 +16,14 @@ uint32_t android_vector$_M_compute_next_size(android_vector *__this, size_t __n)
     return __len;
 }
 
+void *__ucopy_trivial(const void *__first, const void *__last, void *__result) {
+    ptrdiff_t n = (const char *)__last - (const char *)__first;
+    //dums: this version can use memcpy (__copy_trivial can't)
+    return n ? (void *)((char *)memcpy(__result, __first, n) + n) : __result;
+}
+
 void android_vector$_M_insert_overflow_aux(android_vector *__this, void *__pos, void *__x, void *reserved, size_t __fill_len, bool __atend, void *handle) {
     puts("got called!");
-    unsigned int v11; // r6
     uintptr_t v13; // __node_alloc
     uintptr_t v14; // r8
     int v15; // r11
@@ -25,22 +31,19 @@ void android_vector$_M_insert_overflow_aux(android_vector *__this, void *__pos, 
     int v19; // r9
     uintptr_t v20; // r9
     int v21; // r11
-    unsigned int v24; // [sp+Ch] [bp-2Ch]
 
     uintptr_t __new_finish;
-    size_t __size = android_vector$_M_compute_next_size(__this, __fill_len);
-    v11 = __size;
-    if (__size > 0xAAAAAAA) {
+    size_t __len = android_vector$_M_compute_next_size(__this, __fill_len);
+    if (__len > 0xAAAAAAA) {
         puts("out of memory\n");
         abort();
     }
-    uintptr_t __new_start = __size;
-    printf("size: %u\n", __size);
-    if (__size) {
-        v24 = 24 * __size;
-        __new_start = (uintptr_t)android_alloc$allocate(&v24, handle);
+    uintptr_t __new_start = __len;
+    printf("size: %u\n", __len);
+    if (__len) {
+        size_t __size = __len * 24;
+        __new_start = (uintptr_t)android_alloc$allocate((uint32_t *)&__size, handle);
         puts("allocated!");
-        v11 = v24 / 0x18;
     }
     v13 = __this->_M_start;
     v14 = __new_start;
@@ -92,9 +95,8 @@ void android_vector$_M_insert_overflow_aux(android_vector *__this, void *__pos, 
     }
     __this->_M_start = __new_start;
     __this->_M_finish = __new_finish;
-    __this->_M_end_of_storage = __new_start + 24 * v11;
+    __this->_M_end_of_storage = __new_start + 24 * __len;
 }
-
 
 void android_vector$_M_insert_overflow_aux_2(android_vector *__this, void *__pos, void *__x, void *reserved, size_t __fill_len, bool __atend, void *handle) {
     android_string v12;
