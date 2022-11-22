@@ -281,6 +281,12 @@ int getGameKeyCode(int keycode) {
         return MCKEY_PAUSE;
     } else if (keycode == GLFW_KEY_C) {
         return MCKEY_CRAFTING;
+    } else if (keycode == GLFW_KEY_ENTER) {
+        return MCKEY_SIGN_ENTER;
+    } else if (keycode == GLFW_KEY_BACKSPACE) {
+        return MCKEY_SIGN_BACKSPACE;
+    } else if (keycode == GLFW_KEY_LEFT_CONTROL) {
+        return MCKEY_MENU_CANCEL;
     } else {
         return 0;
     }
@@ -292,23 +298,19 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
             // todo fullscreen
         }
     } else {
-        if (mouse_pointer_hidden) {
-            int game_keycode = getGameKeyCode(key);
-            if (key == GLFW_KEY_LEFT_SHIFT) {
-                if (action == GLFW_PRESS) {
-                    controller_states[0] = 1;
-                } else if (action == GLFW_RELEASE) {
-                    controller_states[0] = 0;
-                }
-            } else {
-                if (action == GLFW_PRESS) {
-                    keyboard_inputs->push_back({1, game_keycode});
-                    keyboard_states[game_keycode] = 1;
-                } else if (action == GLFW_RELEASE) {
-                    keyboard_inputs->push_back({0, game_keycode});
-                    keyboard_states[game_keycode] = 0;
-                }
+        int game_keycode = getGameKeyCode(key);
+        if (mouse_pointer_hidden && key == GLFW_KEY_LEFT_SHIFT) {
+            if (action == GLFW_PRESS) {
+                controller_states[0] = 1;
+            } else if (action == GLFW_RELEASE) {
+                controller_states[0] = 0;
             }
+        } else if (action == GLFW_PRESS) {
+            keyboard_inputs->push_back({1, game_keycode});
+            keyboard_states[game_keycode] = 1;
+        } else if (action == GLFW_RELEASE) {
+            keyboard_inputs->push_back({0, game_keycode});
+            keyboard_states[game_keycode] = 0;
         }
     }
 }
