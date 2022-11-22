@@ -1,7 +1,7 @@
 #include <ninecraft/textures.h>
 #include <png.h>
-#include <cerrno>
-#include <cstdlib>
+#include <errno.h>
+#include <stdlib.h>
 
 TextureData read_png(char *path, bool alpha, bool reverse_load) {
     TextureData texture_data;

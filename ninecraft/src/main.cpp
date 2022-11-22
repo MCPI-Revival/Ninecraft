@@ -9,8 +9,6 @@
 #include <sys/mman.h>
 #include <sys/types.h>
 #include <sys/stat.h>
-#include <iostream>
-#include <fstream>
 #include <glad/glad.h>
 #include <GLFW/glfw3.h>
 #include <ninecraft/gles_compat.h>
@@ -44,13 +42,6 @@ float x_cam = 0.0;
 
 int window_width = 720;
 int window_height = 480;
-
-std::string getCWD()
-{
-    char _cwd[MAXPATHLEN];
-    getcwd(_cwd, MAXPATHLEN);
-    return std::string(_cwd) + "/";
-}
 
 #ifdef __i386__
 
@@ -91,46 +82,57 @@ void detour(void *dst_addr, void *src_addr, bool jump);
 
 #endif
 
-bool load_library(std::string path) {
+bool load_library(const char *path) {
     #ifdef __i386__
-    std::string arch = "x86";
+    char *arch = "x86";
     #else
     #ifdef __arm__
-    std::string arch = "arm";
+    char *arch = "arm";
     #else
-    std::string arch = "";
+    char *arch = "";
     #endif
     #endif
-    std::string fullpath = getCWD() + "/libs/" + arch + "/" + path;
-    void *handle = hybris_dlopen(fullpath.c_str(), RTLD_LAZY);
+    char fullpath[MAXPATHLEN];
+    getcwd(fullpath, MAXPATHLEN);
+    strcat(fullpath, "/libs/");
+    strcat(fullpath, arch);
+    strcat(fullpath, "/");
+    strcat(fullpath, path);
+
+    void *handle = hybris_dlopen(fullpath, RTLD_LAZY);
     if (handle == NULL)
     {
-        std::cout << "failed to load library " << fullpath << ": " << hybris_dlerror() << "\n";
+        printf("failed to load library %s: %s\n", fullpath, hybris_dlerror());
         return false;
     }
-    std::cout << "lib: " << fullpath << ": " << (int)handle << "\n";
+    printf("lib: %s: : %p\n", fullpath, handle);
     return true;
 }
 
 void *load_minecraftpe()
 {
     #ifdef __i386__
-    std::string arch = "x86";
+    char *arch = "x86";
     #else
     #ifdef __arm__
-    std::string arch = "arm";
+    char *arch = "arm";
     #else
-    std::string arch = "";
+    char *arch = "";
     #endif
     #endif
-    std::string fullpath = getCWD() + "/libs/" + arch + "/libminecraftpe.so";
-    void *handle = hybris_dlopen(fullpath.c_str(), RTLD_LAZY);
+    char fullpath[MAXPATHLEN];
+    getcwd(fullpath, MAXPATHLEN);
+    strcat(fullpath, "/libs/");
+    strcat(fullpath, arch);
+    strcat(fullpath, "/libminecraftpe.so");
+    
+    void *handle = hybris_dlopen(fullpath, RTLD_LAZY);
     if (handle == NULL)
     {
-        std::cout << "failed to load library " << fullpath << ": " << hybris_dlerror() << "\n";
+        printf("failed to load library %s: %s\n", fullpath, hybris_dlerror());
         return NULL;
     }
-    std::cout << "lib: " << fullpath << ": " << (int)handle << "\n";
+    printf("lib: %s: : %p\n", fullpath, handle);
     return handle;
 }
 
@@ -149,8 +151,7 @@ void stub_symbols(const char **symbols, void *stub_func)
     }
 }
 
-extern "C" void __android_log_print(int prio, const char *tag, const char *fmt, ...)
-{
+void __android_log_print(int prio, const char *tag, const char *fmt, ...) {
     va_list args;
     va_start(args, fmt);
     printf("[%s] ", tag);
@@ -161,22 +162,22 @@ extern "C" void __android_log_print(int prio, const char *tag, const char *fmt, 
 
 void android_stub()
 {
-    std::cout << "warn: android call\n";
+    puts("warn: android call");
 }
 
 void egl_stub()
 {
-    //std::cout << "warn: egl call\n";
+    //puts("warn: egl call");
 }
 
 void sles_stub()
 {
-    std::cout << "warn: sles call\n";
+    puts("warn: sles call");
 }
 
 void sound_engine_stub()
 {
-    // std::cout << "warn: sound engine\n";
+    // puts("warn: sound engine");
 }
 
 void *ninecraft_app;
@@ -339,13 +340,13 @@ void mcinit()
 }
 
 void grab_mouse() {
-    std::cout << "grab_mouse" << std::endl;
+    puts("grab_mouse");
     mouse_pointer_hidden = true;
     glfwSetInputMode(_window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
 }
 
 void release_mouse() {
-    std::cout << "release_mouse" << std::endl;
+    puts("release_mouse");
     mouse_pointer_hidden = false;
     glfwSetInputMode(_window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
 }
@@ -354,7 +355,7 @@ ALuint effect;
 
 void sound_engine_playui_stub(void *sound_engine, const char *sound_name, float volume)
 {
-    std::cout << sound_name << std::endl;
+    printf("%s\n", sound_name);
     audio_engine_play(effect);
 }
 
@@ -419,7 +420,7 @@ void gles_hook() {
 void render_menu_background(void *screen) {
     void *minecraft = *(void **)(screen + 20);
     void *textures = *(void **)(minecraft + 688);
-    static android_string str;
+    android_string str;
     to_str(&str, "gui/bg32.png", handle);
     ((void (*)(void *, android_string *))hybris_dlsym(handle, "_ZN8Textures18loadAndBindTextureERKSs"))(textures, &str);
     ((void (*)(void *, int, int, int, int, int, int, int, int))hybris_dlsym(handle, "_ZN12GuiComponent4blitEiiiiiiii"))(screen, 0, 0, 0, 0, *(int *)(screen+8), *(int *)(screen+12), 0x100, 0x100);
@@ -537,7 +538,7 @@ int main(int argc, char **argv)
     detour(hybris_dlsym(handle, "_ZN11SoundEngineD1Ev"), (void *)sound_engine_stub, true);
     detour(hybris_dlsym(handle, "_ZN11SoundEngineD2Ev"), (void *)sound_engine_stub, true);
     
-    ninecraft_app = operator new(0xe6c);
+    ninecraft_app = malloc(0xe6c);
 
     printf("app: %p\n", ninecraft_app);
 
