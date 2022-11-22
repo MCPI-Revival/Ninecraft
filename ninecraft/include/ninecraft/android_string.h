@@ -13,6 +13,10 @@ typedef struct {
     void *_M_start_of_storage;
 } android_string;
 
+void *android_string$__ucopy_trivial(const void *__first, const void *__last, void *__result);
+
+void android_string$_M_allocate_block(android_string *__this, size_t __n, void *handle);
+
 void to_str(android_string *str, char *cstr, void *handle);
 
 void android_string$string(android_string *__this, android_string *str, void *handle);
