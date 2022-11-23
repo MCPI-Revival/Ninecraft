@@ -3,67 +3,56 @@
 #include <ninecraft/audio_engine.h>
 #include <stdio.h>
 
-struct pcm_metadata {
-    int32_t channels;
-    int32_t frame_size;
-    int32_t sample_rate;
-    int32_t frames;
-};
-
-int audio_engine_create_audio_device(ALCdevice **device, ALCcontext **context) {
-    *device = alcOpenDevice(NULL);
-	if (!*device) {
-        printf("errorr!!! 1\n");
-		return 0;
+bool audio_engine_create_audio_device(audio_engine_t *audio_engine) {
+    audio_engine->device = alcOpenDevice(NULL);
+	if (!audio_engine->device) {
+        puts("Failed to open audio device");
+		return false;
     }
 
-	*context = alcCreateContext(*device, NULL);
-	if (!*context) {
-        printf("errorr!!! 2\n");
-		return 0;
+	audio_engine->context = alcCreateContext(audio_engine->device, NULL);
+    ALCenum alc_err = alcGetError(audio_engine->device);
+	if (alc_err != ALC_NO_ERROR) {
+        puts("Failed to create audio context");
+		return false;
     }
 
-	alcMakeContextCurrent(*context);
-    ALenum err = alGetError();
-	if (err != AL_NO_ERROR) {
-        printf("errorr!!! 3\n");
-		return 0;
+	alcMakeContextCurrent(audio_engine->context);
+    alc_err = alcGetError(audio_engine->device);
+	if (alc_err != ALC_NO_ERROR) {
+        puts("Failed to set audio context");
+		return false;
     }
+
     alEnable(AL_SOURCE_DISTANCE_MODEL);
-    err = alGetError();
-	if (err != AL_NO_ERROR) {
-        printf("errorr!!! 4\n");
-		return 0;
+    ALenum al_err = alGetError();
+	if (al_err != AL_NO_ERROR) {
+        puts("Failed to enable the source distance model");
+		return false;
     }
-
-    const ALCchar* name = NULL;
-	if (alcIsExtensionPresent(*device, "ALC_ENUMERATE_ALL_EXT"))
-		name = alcGetString(*device, ALC_ALL_DEVICES_SPECIFIER);
-	if (!name || alcGetError(*device) != AL_NO_ERROR)
-		name = alcGetString(*device, ALC_DEVICE_SPECIFIER);
-	printf("Opened \"%s\"\n", name);
-
-    puts("alls good");
-    return 1;
+    return true;
 }
 
-int audio_engine_destroy_audio_device(ALCdevice **device, ALCcontext **context) {
+bool audio_engine_destroy_audio_device(audio_engine_t *audio_engine) {
     alcMakeContextCurrent(NULL);
-    ALenum err = alGetError();
-	if (err != AL_NO_ERROR) {
-		return 0;
+    ALCenum alc_err = alcGetError(audio_engine->device);
+	if (alc_err != ALC_NO_ERROR) {
+        puts("Failed to set audio context");
+		return false;
     }
-	alcDestroyContext(*context);
-	err = alGetError();
-	if (err != AL_NO_ERROR) {
-		return 0;
+	alcDestroyContext(audio_engine->context);
+	alc_err = alcGetError(audio_engine->device);
+	if (alc_err != ALC_NO_ERROR) {
+        puts("Failed to destroy audio context");
+		return false;
     }
-	alcCloseDevice(*device);
-    err = alGetError();
-	if (err != AL_NO_ERROR) {
-		return 0;
+	alcCloseDevice(audio_engine->device);
+    alc_err = alcGetError(audio_engine->device);
+	if (alc_err != ALC_NO_ERROR) {
+        puts("Failed to close audio device");
+		return false;
     }
-    return 1;
+    return true;
 }
 
 ALuint audio_engine_create_sound_effect(void *symbol) {

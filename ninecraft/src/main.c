@@ -195,8 +195,7 @@ static unsigned char *controller_states;
 static float *controller_x_stick;
 static float *controller_y_stick;
 
-ALCdevice *audio_device;
-ALCcontext *audio_context;
+audio_engine_t audio_engine;
 
 static void minecraft_draw()
 {
@@ -348,6 +347,11 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
     }
 }
 
+void window_close_callback(GLFWwindow* handle, GLFWwindowclosefun cbfun) {
+    audio_engine_destroy_audio_device(&audio_engine);
+    exit(0);
+}
+
 void grab_mouse() {
     puts("grab_mouse");
     mouse_pointer_hidden = true;
@@ -477,7 +481,7 @@ int main(int argc, char **argv)
     }
     handle = load_minecraftpe();
 
-    audio_engine_create_audio_device(&audio_device, &audio_context);
+    audio_engine_create_audio_device(&audio_engine);
     char *buf = (char *) hybris_dlsym(handle, "PCM_click");
     effect = audio_engine_create_sound_effect(buf);
     keyboard_inputs = (android_vector *)hybris_dlsym(handle, "_ZN8Keyboard7_inputsE");
@@ -590,6 +594,7 @@ int main(int argc, char **argv)
     glfwSetScrollCallback(_window, mouse_scroll_callback);
     glfwSetCursorPosCallback(_window, mouse_pos_callback);
     glfwSetWindowSizeCallback(_window, resize_callback);
+    glfwSetWindowCloseCallback(_window, window_close_callback);
 
     while (true) {
         if (mouse_pointer_hidden) {
