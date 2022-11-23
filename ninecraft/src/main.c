@@ -296,10 +296,37 @@ int getGameKeyCode(int keycode) {
     }
 }
 
+static void resize_callback(GLFWwindow* window, int width, int height) {
+    window_width = width;
+    window_height = height;
+    ((void (*)(void *, int, int))hybris_dlsym(handle, "_ZN9Minecraft7setSizeEii"))(ninecraft_app, width, height);
+}
+
+static void char_callback(GLFWwindow* window, unsigned int codepoint) {
+    ((void (*)(char))hybris_dlsym(handle, "_ZN8Keyboard8feedTextEc"))((char)codepoint);
+}
+
+void mcinit()
+{
+    if (!*((int *)ninecraft_app + 183))
+    {
+        ((void (*)(void *))hybris_dlsym(handle, "_ZN9Minecraft12_reloadInputEv"))(ninecraft_app);
+    }
+}
+
+int old_pos_x, old_pos_y, old_width, old_height;
+
 static void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods) {
     if (key == GLFW_KEY_F11) {
         if (action == GLFW_PRESS) {
-            // todo fullscreen
+            if (glfwGetWindowMonitor(_window) == NULL) {
+                glfwGetWindowPos(_window, &old_pos_x, &old_pos_y);
+                glfwGetWindowSize(_window, &old_width, &old_height);
+                const GLFWvidmode * mode = glfwGetVideoMode(glfwGetPrimaryMonitor());
+                glfwSetWindowMonitor(_window, glfwGetPrimaryMonitor(), 0, 0, mode->width, mode->height, 0);
+            } else {
+                glfwSetWindowMonitor(_window, NULL, old_pos_x, old_pos_y, old_width, old_height, 0);
+            }
         }
     } else {
         int game_keycode = getGameKeyCode(key);
@@ -318,24 +345,6 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
             android_vector$push_back_2(keyboard_inputs, &action, handle);
             keyboard_states[game_keycode] = 0;
         }
-    }
-}
-
-static void resize_callback(GLFWwindow* window, int width, int height) {
-    window_width = width;
-    window_height = height;
-    ((void (*)(void *, int, int))hybris_dlsym(handle, "_ZN9Minecraft7setSizeEii"))(ninecraft_app, width, height);
-}
-
-static void char_callback(GLFWwindow* window, unsigned int codepoint) {
-    ((void (*)(char))hybris_dlsym(handle, "_ZN8Keyboard8feedTextEc"))((char)codepoint);
-}
-
-void mcinit()
-{
-    if (!*((int *)ninecraft_app + 183))
-    {
-        ((void (*)(void *))hybris_dlsym(handle, "_ZN9Minecraft12_reloadInputEv"))(ninecraft_app);
     }
 }
 
