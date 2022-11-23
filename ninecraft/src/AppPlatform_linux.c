@@ -183,7 +183,27 @@ android_vector AppPlatform_linux$getOptionStrings(AppPlatform_linux *app_platfor
     unsigned int size = 24;
     char tmp[100];
     to_str(&username_name, "mp_username", app_platform->handle);
-    to_str(&username_value, "Ninecraft", app_platform->handle);
+    FILE *fp = popen("zenity --entry --title='Profile' --text='Enter Username:'", "r");
+    if (fp == NULL) {
+        to_str(&username_value, "Steve", app_platform->handle);
+    } else {
+        char input_value[100];
+        for (int i = 0; i < 100; ++i) {
+            char c = fgetc(fp);
+            if (c == '\n' || c == '\0' || c == EOF) {
+                input_value[i] = '\0';
+                break;
+            }
+            input_value[i] = c;
+        }
+        input_value[99] = '\0';
+        if (input_value[0] != 0) {
+            to_str(&username_value, input_value, app_platform->handle);
+        } else {
+            to_str(&username_value, "Steve", app_platform->handle);
+        }
+        pclose(fp);
+    }
     to_str(&server_visible_name, "mp_server_visible_default", app_platform->handle);
     to_str(&server_visible_value, "true", app_platform->handle);
     to_str(&fancygraphics_name, "gfx_fancygraphics", app_platform->handle);
@@ -253,9 +273,65 @@ android_vector AppPlatform_linux$getUserInput(AppPlatform_linux *app_platform) {
     android_string name;
     android_string seed;
     android_string gamemode;
-    to_str(&name, "random world", app_platform->handle);
-    to_str(&seed, "12345678", app_platform->handle);
-    to_str(&gamemode, "survival", app_platform->handle);
+    FILE *fp = popen("zenity --entry --title='Create New World' --text='Enter World Name:'", "r");
+    if (fp == NULL) {
+        to_str(&name, "random world", app_platform->handle);
+    } else {
+        char input_value[100];
+        for (int i = 0; i < 100; ++i) {
+            char c = fgetc(fp);
+            if (c == '\n' || c == '\0' || c == EOF) {
+                input_value[i] = '\0';
+                break;
+            }
+            input_value[i] = c;
+        }
+        input_value[99] = '\0';
+        printf("%s\n", input_value);
+        to_str(&name, input_value, app_platform->handle);
+        pclose(fp);
+    }
+
+    fp = popen("zenity --entry --title='Create New World' --text='Enter World Seed:'", "r");
+    if (fp == NULL) {
+        to_str(&seed, "random world", app_platform->handle);
+    } else {
+        char input_value[100];
+        for (int i = 0; i < 100; ++i) {
+            char c = fgetc(fp);
+            if (c == '\n' || c == '\0' || c == EOF) {
+                input_value[i] = '\0';
+                break;
+            } else if (c < '0' || c > '9') {
+                input_value[0] = '\0';
+                break;
+            }
+            input_value[i] = c;
+        }
+        input_value[99] = '\0';
+        printf("%s\n", input_value);
+        to_str(&seed, input_value, app_platform->handle);
+        pclose(fp);
+    }
+
+    fp = popen("zenity --entry --title='Create New World' --text='Enter World Gamemode:' 'creative' 'survival'", "r");
+    if (fp == NULL) {
+        to_str(&seed, "random world", app_platform->handle);
+    } else {
+        char input_value[100];
+        for (int i = 0; i < 100; ++i) {
+            char c = fgetc(fp);
+            if (c == '\n' || c == '\0' || c == EOF) {
+                input_value[i] = '\0';
+                break;
+            }
+            input_value[i] = c;
+        }
+        input_value[99] = '\0';
+        printf("%s\n", input_value);
+        to_str(&gamemode, input_value, app_platform->handle);
+        pclose(fp);
+    }
     unsigned int size = 24;
     android_vector out;
     out._M_start = (unsigned long)android_alloc$allocate(&size, app_platform->handle);
