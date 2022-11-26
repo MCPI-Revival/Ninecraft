@@ -1,5 +1,7 @@
 #pragma once
 
+void get_sound(char **arr, char *name);
+
 /*
 PCM_pop2
 PCM_cloth1

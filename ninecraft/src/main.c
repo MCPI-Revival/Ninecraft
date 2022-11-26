@@ -364,12 +364,26 @@ void release_mouse() {
     glfwSetInputMode(_window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
 }
 
-ALuint effect;
+void sound_engine_playui(void *sound_engine, android_string *sound_name, float volume, float pitch) {
+    audio_engine_play(&audio_engine, handle, sound_name->_M_start_of_storage, 0, 0, 0, volume, pitch, true);
+}
 
-void sound_engine_playui_stub(void *sound_engine, const char *sound_name, float volume)
-{
-    printf("%s\n", sound_name);
-    audio_engine_play(effect);
+void sound_engine_play(void *sound_engine, android_string *sound_name, float x, float y, float z, float volume, float pitch) {
+    audio_engine_play(&audio_engine, handle, sound_name->_M_start_of_storage, x, y, z, volume, pitch, false);
+}
+
+void sound_engine_update(void *sound_engine, unsigned char *mob, float listener_angle) {
+    float x = 0;
+    float y = 0;
+    float z = 0;
+    float yaw = 0;
+    if (mob != NULL) {
+        x = *(float *)(mob + 4);
+        y = *(float *)(mob + 8);
+        z = *(float *)(mob + 12);
+        yaw = *(float *)(mob + 64);
+    }
+    audio_engine_update(&audio_engine, 1, x, y, z, yaw);
 }
 
 android_string get_game_version() {
@@ -474,6 +488,7 @@ int main(int argc, char **argv)
     stub_symbols(android_symbols, (void *)android_stub);
     stub_symbols(egl_symbols, (void *)egl_stub);
     stub_symbols(sles_symbols, (void *)sles_stub);
+    
     int i;
     for (i = 0; i < 8; ++i)
     {
@@ -482,16 +497,11 @@ int main(int argc, char **argv)
     handle = load_minecraftpe();
 
     audio_engine_create_audio_device(&audio_engine);
-    char *buf = (char *) hybris_dlsym(handle, "PCM_click");
-    effect = audio_engine_create_sound_effect(buf);
     keyboard_inputs = (android_vector *)hybris_dlsym(handle, "_ZN8Keyboard7_inputsE");
     keyboard_states = (int *)hybris_dlsym(handle, "_ZN8Keyboard7_statesE");
     controller_states = (unsigned char *)hybris_dlsym(handle, "_ZN10Controller15isTouchedValuesE");
     controller_x_stick = (float *)hybris_dlsym(handle, "_ZN10Controller12stickValuesXE");
     controller_y_stick = (float *)hybris_dlsym(handle, "_ZN10Controller12stickValuesYE");
-
-    detour(hybris_dlsym(handle, "_ZN12MouseHandler4grabEv"), (void *)grab_mouse, true);
-    detour(hybris_dlsym(handle, "_ZN12MouseHandler7releaseEv"), (void *)release_mouse, true);
 
     detour(hybris_dlsym(handle, "_ZN6Screen20renderDirtBackgroundEi"), (void *)render_menu_background, true);
 
@@ -539,14 +549,15 @@ int main(int argc, char **argv)
     
     detour(hybris_dlsym(handle, "_ZN6Common20getGameVersionStringERKSs"), (void *)get_game_version, true);
 
+    
     detour(hybris_dlsym(handle, "_ZN11SoundEngineC1Ef"), (void *)sound_engine_stub, true);
     detour(hybris_dlsym(handle, "_ZN11SoundEngine4initEP9MinecraftP7Options"), (void *)sound_engine_stub, true);
     detour(hybris_dlsym(handle, "_ZN11SoundEngine14_getVolumeMultEfff"), (void *)sound_engine_stub, true);
     detour(hybris_dlsym(handle, "_ZN11SoundEngine7destroyEv"), (void *)sound_engine_stub, true);
     detour(hybris_dlsym(handle, "_ZN11SoundEngine6enableEb"), (void *)sound_engine_stub, true);
-    detour(hybris_dlsym(handle, "_ZN11SoundEngine4playERKSsfffff"), (void *)sound_engine_stub, true);
-    detour(hybris_dlsym(handle, "_ZN11SoundEngine6playUIERKSsff"), (void *)sound_engine_playui_stub, true);
-    detour(hybris_dlsym(handle, "_ZN11SoundEngine6updateEP3Mobf"), (void *)sound_engine_stub, true);
+    detour(hybris_dlsym(handle, "_ZN11SoundEngine4playERKSsfffff"), (void *)sound_engine_play, true);
+    detour(hybris_dlsym(handle, "_ZN11SoundEngine6playUIERKSsff"), (void *)sound_engine_playui, true);
+    detour(hybris_dlsym(handle, "_ZN11SoundEngine6updateEP3Mobf"), (void *)sound_engine_update, true);
     detour(hybris_dlsym(handle, "_ZN11SoundEngine13updateOptionsEv"), (void *)sound_engine_stub, true);
     detour(hybris_dlsym(handle, "_ZN11SoundEngineD1Ev"), (void *)sound_engine_stub, true);
     detour(hybris_dlsym(handle, "_ZN11SoundEngineD2Ev"), (void *)sound_engine_stub, true);
@@ -597,6 +608,15 @@ int main(int argc, char **argv)
     glfwSetWindowCloseCallback(_window, window_close_callback);
 
     while (true) {
+        if (*(bool *)(ninecraft_app+0xd98) == true) {
+            if (!mouse_pointer_hidden) {
+                grab_mouse();
+            }
+        } else {
+            if (mouse_pointer_hidden) {
+                release_mouse();
+            }
+        }
         if (mouse_pointer_hidden) {
             controller_states[1] = 1;
             controller_y_stick[1] = (float)(y_cam - 180.0) * 0.0055555557;
