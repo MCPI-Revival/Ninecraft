@@ -315,7 +315,7 @@ void audio_engine_play(audio_engine_t *audio_engine, void *handle, const char *n
 }
 
 void audio_engine_update(audio_engine_t *audio_engine, float volume, float x, float y, float z, float yaw) {
-    //alListenerf(AL_GAIN, volume);
+    alListenerf(AL_GAIN, volume);
     ALenum err = alGetError();
     if (err != AL_NO_ERROR) {
         puts("Failed to set listener volume");
