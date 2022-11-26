@@ -503,52 +503,14 @@ int main(int argc, char **argv)
     controller_x_stick = (float *)hybris_dlsym(handle, "_ZN10Controller12stickValuesXE");
     controller_y_stick = (float *)hybris_dlsym(handle, "_ZN10Controller12stickValuesYE");
 
-    detour(hybris_dlsym(handle, "_ZN6Screen20renderDirtBackgroundEi"), (void *)render_menu_background, true);
-
     unsigned char *dat = (unsigned char *)hybris_dlsym(handle, "_ZN15StartMenuScreenC1Ev");
     
     #ifdef __i386__
     dat[268] = 0xa0;
     #endif
-
-    unsigned char *dat2 = (unsigned char *)hybris_dlsym(handle, "_ZN17SelectWorldScreen4tickEv");
-    #ifdef __i386__
-    // found call of AppPlatform_linux::getUserInput at 0x101ea0
-    //dat2[(0x10216f-0x101ea0)] = 0x90;
-    //dat2[(0x10216f-0x101ea0)+1] = 0x90;
-    //dat2[(0x10216f-0x101ea0)+2] = 0x90;
-    #endif
-
-    unsigned char *dat3 = (unsigned char *)hybris_dlsym(handle, "_ZN17SelectWorldScreen4tickEv");
-    #ifdef __i386__
-    // found call of AppPlatform_linux::getUserInput at 0x101ea0
-    /*dat3[(0x0011fe1b-0x00101ea0)] = 0x90;
-    dat3[(0x0011fe1b-0x00101ea0)+1] = 0x90;
-    dat3[(0x0011fe1b-0x00101ea0)+2] = 0x90;
-    dat3[(0x0011fe1b-0x00101ea0)+3] = 0x90;
-    dat3[(0x0011fe1b-0x00101ea0)+4] = 0x90;
-
-    dat3[(0x0011fe4f-0x00101ea0)] = 0x90;
-    dat3[(0x0011fe4f-0x00101ea0)+1] = 0x90;
-    dat3[(0x0011fe4f-0x00101ea0)+2] = 0x90;
-    dat3[(0x0011fe4f-0x00101ea0)+3] = 0x90;
-    dat3[(0x0011fe4f-0x00101ea0)+4] = 0x90;
-
-    dat3[(0x0011fea4-0x00101ea0)] = 0x90;
-    dat3[(0x0011fea4-0x00101ea0)+1] = 0x90;
-    dat3[(0x0011fea4-0x00101ea0)+2] = 0x90;
-    dat3[(0x0011fea4-0x00101ea0)+3] = 0x90;
-    dat3[(0x0011fea4-0x00101ea0)+4] = 0x90;
-
-    dat3[(0x0011feb1-0x00101ea0)] = 0x90;
-    dat3[(0x0011feb1-0x00101ea0)+1] = 0x90;
-    dat3[(0x0011feb1-0x00101ea0)+2] = 0x90;
-    dat3[(0x0011feb1-0x00101ea0)+3] = 0x90;
-    dat3[(0x0011feb1-0x00101ea0)+4] = 0x90;*/
-    #endif
     
+    detour(hybris_dlsym(handle, "_ZN6Screen20renderDirtBackgroundEi"), (void *)render_menu_background, true);
     detour(hybris_dlsym(handle, "_ZN6Common20getGameVersionStringERKSs"), (void *)get_game_version, true);
-
     
     detour(hybris_dlsym(handle, "_ZN11SoundEngineC1Ef"), (void *)sound_engine_stub, true);
     detour(hybris_dlsym(handle, "_ZN11SoundEngine4initEP9MinecraftP7Options"), (void *)sound_engine_stub, true);
