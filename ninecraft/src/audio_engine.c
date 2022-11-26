@@ -58,6 +58,7 @@ size_t audio_engine_source_map_size(audio_engine_source_map_t *source_map) {
 }
 
 bool audio_engine_create_audio_device(audio_engine_t *audio_engine) {
+    audio_engine->is_initialized = false;
     audio_engine_source_map_init(&audio_engine->sources);
     audio_engine_source_map_init(&audio_engine->idle_sources);
     audio_engine->buffer_index = 0;
@@ -87,6 +88,7 @@ bool audio_engine_create_audio_device(audio_engine_t *audio_engine) {
         puts("Failed to enable the source distance model");
 		return false;
     }
+    audio_engine->is_initialized = true;
     return true;
 }
 
@@ -100,27 +102,32 @@ void audio_engine_delete_buffers(audio_engine_t *audio_engine) {
 }
 
 bool audio_engine_destroy_audio_device(audio_engine_t *audio_engine) {
-    audio_engine_source_map_destroy(&audio_engine->sources);
-    audio_engine_source_map_destroy(&audio_engine->idle_sources);
-    audio_engine_delete_buffers(audio_engine);
+    if (audio_engine->is_initialized) {
+        audio_engine->is_initialized = false;
+        audio_engine_source_map_destroy(&audio_engine->sources);
+        audio_engine_source_map_destroy(&audio_engine->idle_sources);
+        audio_engine_delete_buffers(audio_engine);
 
-    alcMakeContextCurrent(NULL);
-    ALCenum alc_err = alcGetError(audio_engine->device);
-	if (alc_err != ALC_NO_ERROR) {
-        puts("Failed to set audio context");
-		return false;
-    }
-	alcDestroyContext(audio_engine->context);
-	alc_err = alcGetError(audio_engine->device);
-	if (alc_err != ALC_NO_ERROR) {
-        puts("Failed to destroy audio context");
-		return false;
-    }
-	alcCloseDevice(audio_engine->device);
-    alc_err = alcGetError(audio_engine->device);
-	if (alc_err != ALC_NO_ERROR) {
-        puts("Failed to close audio device");
-		return false;
+        alcMakeContextCurrent(NULL);
+        ALCenum alc_err = alcGetError(audio_engine->device);
+	    if (alc_err != ALC_NO_ERROR) {
+            puts("Failed to set audio context");
+		    return false;
+        }
+	    alcDestroyContext(audio_engine->context);
+	    alc_err = alcGetError(audio_engine->device);
+	    if (alc_err != ALC_NO_ERROR) {
+            puts("Failed to destroy audio context");
+		    return false;
+        }
+	    alcCloseDevice(audio_engine->device);
+        alc_err = alcGetError(audio_engine->device);
+	    if (alc_err != ALC_NO_ERROR) {
+            puts("Failed to close audio device");
+		    return false;
+        }
+    } else {
+        return false;
     }
     return true;
 }
@@ -171,7 +178,7 @@ ALuint audio_engine_get_buffer(audio_engine_t *audio_engine, char *name, void *h
             }
         }
         ALuint buffer = audio_engine_load_sound(sample_name, handle);
-        if (buffer != 0) {
+        if (buffer != 0 && audio_engine->buffer_index < 100) {
             audio_engine->buffer_names[audio_engine->buffer_index] = sample_name;
             audio_engine->buffers[audio_engine->buffer_index++] = buffer;
         }
@@ -181,6 +188,9 @@ ALuint audio_engine_get_buffer(audio_engine_t *audio_engine, char *name, void *h
 }
 
 void audio_engine_play(audio_engine_t *audio_engine, void *handle, const char *name, float x, float y, float z, float volume, float pitch, bool is_ui) {
+    if (!audio_engine->is_initialized) {
+        return;
+    }
     if (pitch < 0.5f) {
         pitch = 0.5f;
     } else if (pitch > 2.0f) {
@@ -315,6 +325,9 @@ void audio_engine_play(audio_engine_t *audio_engine, void *handle, const char *n
 }
 
 void audio_engine_update(audio_engine_t *audio_engine, float volume, float x, float y, float z, float yaw) {
+    if (!audio_engine->is_initialized) {
+        return;
+    }
     alListenerf(AL_GAIN, volume);
     ALenum err = alGetError();
     if (err != AL_NO_ERROR) {

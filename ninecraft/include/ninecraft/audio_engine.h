@@ -23,6 +23,7 @@ typedef struct {
     size_t buffer_index;
     audio_engine_source_map_t sources;
     audio_engine_source_map_t idle_sources;
+    bool is_initialized;
 } audio_engine_t;
 
 typedef struct {
