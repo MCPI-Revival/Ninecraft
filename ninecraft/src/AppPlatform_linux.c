@@ -380,10 +380,10 @@ bool AppPlatform_linux$isTouchscreen(AppPlatform_linux *app_platform) {
     return false;
 }
 
-TextureData AppPlatform_linux$loadTexture(AppPlatform_linux *app_platform, void *path_str, bool alpha) {
+TextureData AppPlatform_linux$loadTexture(AppPlatform_linux *app_platform, android_string *path_str, bool alpha) {
     puts("debug: AppPlatform_linux::loadTexture");
     printf("%p\n", app_platform);
-    char *path = *(char **)(path_str + 20);
+    char *path = (char *)path_str->_M_start_of_storage;
     size_t pathlen = strlen(path);
     char *fullpath_original = (char *) malloc(10 + pathlen);
     memcpy(fullpath_original, "./assets/", 9);
@@ -413,10 +413,10 @@ void AppPlatform_linux$playSound(AppPlatform_linux *app_platform, android_string
     puts("debug: AppPlatform_linux::playSound");
 }
 
-asset_file AppPlatform_linux$readAssetFile(AppPlatform_linux *app_platform, void *path_str) {
+asset_file AppPlatform_linux$readAssetFile(AppPlatform_linux *app_platform, android_string *path_str) {
     puts("debug: AppPlatform_linux::readAssetFile");
     android_string str;
-    char *path = *(char **)(path_str + 20);
+    char *path = (char *)path_str->_M_start_of_storage;
     size_t pathlen = strlen(path);
     char *fullpath_original = (char *) malloc(10 + pathlen);
     memcpy(fullpath_original, "./assets/", 9);

@@ -74,11 +74,11 @@ bool AppPlatform_linux$isPowerVR(AppPlatform_linux *app_platform);
 
 bool AppPlatform_linux$isTouchscreen(AppPlatform_linux *app_platform);
 
-TextureData AppPlatform_linux$loadTexture(AppPlatform_linux *app_platform, void *path_str, bool alpha);
+TextureData AppPlatform_linux$loadTexture(AppPlatform_linux *app_platform, android_string *path_str, bool alpha);
 
 void AppPlatform_linux$playSound(AppPlatform_linux *app_platform, android_string *sound_name, float volume, float pitch);
 
-asset_file AppPlatform_linux$readAssetFile(AppPlatform_linux *app_platform, void *path_str);
+asset_file AppPlatform_linux$readAssetFile(AppPlatform_linux *app_platform, android_string *path_str);
 
 void AppPlatform_linux$saveScreenshot(AppPlatform_linux *app_platform, android_string *path, int32_t width, int32_t height);
 
