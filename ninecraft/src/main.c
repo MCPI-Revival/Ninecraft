@@ -383,7 +383,8 @@ void sound_engine_update(void *sound_engine, unsigned char *mob, float listener_
         z = *(float *)(mob + 12);
         yaw = *(float *)(mob + 64);
     }
-    audio_engine_update(&audio_engine, 1, x, y, z, yaw);
+    unsigned char *options = (unsigned char *)(ninecraft_app + 40);
+    audio_engine_update(&audio_engine, *(int *)(options + 4) ? 1 : 0, x, y, z, yaw);
 }
 
 android_string get_game_version() {
