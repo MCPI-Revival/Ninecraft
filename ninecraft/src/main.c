@@ -62,16 +62,12 @@ void detour(void *dst_addr, void *src_addr) {
 void detour(void *dst_addr, void *src_addr) {
     long page_size = sysconf(_SC_PAGESIZE);
     void *protect = (void *)(((uintptr_t)dst_addr & 0xFFFFFFFE) & -page_size);
-    mprotect(protect, 10, PROT_READ | PROT_WRITE | PROT_EXEC);
-    uint32_t i = 0;
-    if ((((uintptr_t)dst_addr & 0xFFFFFFFE) % 4) != 0) {
-        ((uint16_t *)((uintptr_t)dst_addr & 0xFFFFFFFE))[i++] = 0xBF00;
-    }
-    ((uint16_t *)((uintptr_t)dst_addr & 0xFFFFFFFE))[i++] = 0xF8DF;
-    ((uint16_t *)((uintptr_t)dst_addr & 0xFFFFFFFE))[i++] = 0xF000;
-    ((uint16_t *)((uintptr_t)dst_addr & 0xFFFFFFFE))[i++] = (uint16_t)((uintptr_t)src_addr & 0xFFFF);
-    ((uint16_t *)((uintptr_t)dst_addr & 0xFFFFFFFE))[i++] = (uint16_t)((uintptr_t)src_addr >> 16);
-    mprotect(protect, 10, PROT_EXEC);
+    mprotect(protect, 8, PROT_READ | PROT_WRITE | PROT_EXEC);
+    ((uint16_t *)((uintptr_t)dst_addr & 0xFFFFFFFE))[0] = 0xF8DF;
+    ((uint16_t *)((uintptr_t)dst_addr & 0xFFFFFFFE))[1] = ((((uintptr_t)dst_addr & 0xFFFFFFFE) % 4) != 0) ? 0xF002 : 0xF000;
+    ((uint16_t *)((uintptr_t)dst_addr & 0xFFFFFFFE))[2] = (uint16_t)((uintptr_t)src_addr & 0xFFFF);
+    ((uint16_t *)((uintptr_t)dst_addr & 0xFFFFFFFE))[3] = (uint16_t)((uintptr_t)src_addr >> 16);
+    mprotect(protect, 8, PROT_EXEC);
 }
 
 #else
