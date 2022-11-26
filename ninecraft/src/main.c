@@ -45,12 +45,12 @@ int window_height = 480;
 
 #ifdef __i386__
 
-void detour(void *dst_addr, void *src_addr, bool jump) {
+void detour(void *dst_addr, void *src_addr) {
     uint32_t page_size = sysconf(_SC_PAGESIZE);
     void *protect = (void *)((uintptr_t)(dst_addr) & -page_size);
     mprotect(protect, 5, PROT_READ | PROT_WRITE | PROT_EXEC);
     uint32_t addr = ((uint32_t)src_addr) - ((uint32_t)dst_addr) - 5;
-    *(uint8_t *)(dst_addr) = jump ? 0xE9 : 0xE8;
+    *(uint8_t *)(dst_addr) = 0xE9;
     *(uint32_t *)(((uint32_t)dst_addr) + 1) = addr;
     mprotect(protect, 5, PROT_EXEC);
 }
@@ -59,9 +59,9 @@ void detour(void *dst_addr, void *src_addr, bool jump) {
 
 #ifdef __arm__
 
-void detour(void *dst_addr, void *src_addr, bool jump) {
+void detour(void *dst_addr, void *src_addr) {
     long page_size = sysconf(_SC_PAGESIZE);
-    void *protect = (void *)(((uintptr_t)dst_addr-1) & -page_size);
+    void *protect = (void *)(((uintptr_t)dst_addr & 0xFFFFFFFE) & -page_size);
     mprotect(protect, 10, PROT_READ | PROT_WRITE | PROT_EXEC);
     uint32_t i = 0;
     if ((((uint32_t)dst_addr & 0xFFFFFFFE) % 4) != 0) {
@@ -76,7 +76,7 @@ void detour(void *dst_addr, void *src_addr, bool jump) {
 
 #else
 
-void detour(void *dst_addr, void *src_addr, bool jump);
+void detour(void *dst_addr, void *src_addr);
 
 #endif
 
@@ -510,20 +510,20 @@ int main(int argc, char **argv)
     dat[268] = 0xa0;
     #endif
     
-    detour(hybris_dlsym(handle, "_ZN6Screen20renderDirtBackgroundEi"), (void *)render_menu_background, true);
-    detour(hybris_dlsym(handle, "_ZN6Common20getGameVersionStringERKSs"), (void *)get_game_version, true);
+    detour(hybris_dlsym(handle, "_ZN6Screen20renderDirtBackgroundEi"), (void *)render_menu_background);
+    detour(hybris_dlsym(handle, "_ZN6Common20getGameVersionStringERKSs"), (void *)get_game_version);
     
-    detour(hybris_dlsym(handle, "_ZN11SoundEngineC1Ef"), (void *)sound_engine_stub, true);
-    detour(hybris_dlsym(handle, "_ZN11SoundEngine4initEP9MinecraftP7Options"), (void *)sound_engine_stub, true);
-    detour(hybris_dlsym(handle, "_ZN11SoundEngine14_getVolumeMultEfff"), (void *)sound_engine_stub, true);
-    detour(hybris_dlsym(handle, "_ZN11SoundEngine7destroyEv"), (void *)sound_engine_stub, true);
-    detour(hybris_dlsym(handle, "_ZN11SoundEngine6enableEb"), (void *)sound_engine_stub, true);
-    detour(hybris_dlsym(handle, "_ZN11SoundEngine4playERKSsfffff"), (void *)sound_engine_play, true);
-    detour(hybris_dlsym(handle, "_ZN11SoundEngine6playUIERKSsff"), (void *)sound_engine_playui, true);
-    detour(hybris_dlsym(handle, "_ZN11SoundEngine6updateEP3Mobf"), (void *)sound_engine_update, true);
-    detour(hybris_dlsym(handle, "_ZN11SoundEngine13updateOptionsEv"), (void *)sound_engine_stub, true);
-    detour(hybris_dlsym(handle, "_ZN11SoundEngineD1Ev"), (void *)sound_engine_stub, true);
-    detour(hybris_dlsym(handle, "_ZN11SoundEngineD2Ev"), (void *)sound_engine_stub, true);
+    detour(hybris_dlsym(handle, "_ZN11SoundEngineC1Ef"), (void *)sound_engine_stub);
+    detour(hybris_dlsym(handle, "_ZN11SoundEngine4initEP9MinecraftP7Options"), (void *)sound_engine_stub);
+    detour(hybris_dlsym(handle, "_ZN11SoundEngine14_getVolumeMultEfff"), (void *)sound_engine_stub);
+    detour(hybris_dlsym(handle, "_ZN11SoundEngine7destroyEv"), (void *)sound_engine_stub);
+    detour(hybris_dlsym(handle, "_ZN11SoundEngine6enableEb"), (void *)sound_engine_stub);
+    detour(hybris_dlsym(handle, "_ZN11SoundEngine4playERKSsfffff"), (void *)sound_engine_play);
+    detour(hybris_dlsym(handle, "_ZN11SoundEngine6playUIERKSsff"), (void *)sound_engine_playui);
+    detour(hybris_dlsym(handle, "_ZN11SoundEngine6updateEP3Mobf"), (void *)sound_engine_update);
+    detour(hybris_dlsym(handle, "_ZN11SoundEngine13updateOptionsEv"), (void *)sound_engine_stub);
+    detour(hybris_dlsym(handle, "_ZN11SoundEngineD1Ev"), (void *)sound_engine_stub);
+    detour(hybris_dlsym(handle, "_ZN11SoundEngineD2Ev"), (void *)sound_engine_stub);
     
     ninecraft_app = malloc(0xe6c);
 
