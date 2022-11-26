@@ -47,11 +47,11 @@ int window_height = 480;
 
 void detour(void *dst_addr, void *src_addr) {
     uint32_t page_size = sysconf(_SC_PAGESIZE);
-    void *protect = (void *)((uintptr_t)(dst_addr) & -page_size);
+    void *protect = (void *)((uintptr_t)dst_addr & -page_size);
     mprotect(protect, 5, PROT_READ | PROT_WRITE | PROT_EXEC);
-    uint32_t addr = ((uint32_t)src_addr) - ((uint32_t)dst_addr) - 5;
+    uintptr_t addr = (uintptr_t)src_addr - (uintptr_t)dst_addr - 5;
     *(uint8_t *)(dst_addr) = 0xE9;
-    *(uint32_t *)(((uint32_t)dst_addr) + 1) = addr;
+    *(uintptr_t *)(dst_addr + 1) = addr;
     mprotect(protect, 5, PROT_EXEC);
 }
 
