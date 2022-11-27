@@ -4,7 +4,7 @@
 
 ## Compile dependencies
 ```
-gcc gcc-multilib g++ g++-multilib libxcursor-dev:i386 libxi-dev:i386 libxinerama-dev:i386 libxrandr-dev:i386 libpng-dev:i386 zlib1g-dev:i386 libgl1-mesa-dev:i386 libopenal-dev:i386
+git make cmake gcc gcc-multilib g++ zlib1g-dev:i386 libpng-dev:i386 zlib1g-dev libpng-dev libopenal-dev:i386 libopenal-dev libx11-dev:i386 libx11-dev libxrandr-dev:i386 libxrandr-dev libxinerama-dev:i386 libxinerama-dev libxcursor-dev:i386 libxcursor-dev libxi-dev:i386 libxi-dev python3 zenity
 ```
 
 ## Compiling
