@@ -385,7 +385,7 @@ void sound_engine_update(void *sound_engine, unsigned char *mob, float listener_
 
 android_string get_game_version() {
     android_string out;
-    to_str(&out, "Ninecraft 1.0.0", handle);
+    to_str(&out, "Ninecraft 1.1.0", handle);
     return out;
 }
 
