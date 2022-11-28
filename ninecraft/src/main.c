@@ -351,11 +351,11 @@ void release_mouse() {
     glfwSetInputMode(_window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
 }
 
-void sound_engine_playui(void *sound_engine, android_string *sound_name, float volume, float pitch) {
+void sound_engine_playui(void *sound_engine, android_string_t *sound_name, float volume, float pitch) {
     audio_engine_play(&audio_engine, handle, sound_name->_M_start_of_storage, 0, 0, 0, volume, pitch, true);
 }
 
-void sound_engine_play(void *sound_engine, android_string *sound_name, float x, float y, float z, float volume, float pitch) {
+void sound_engine_play(void *sound_engine, android_string_t *sound_name, float x, float y, float z, float volume, float pitch) {
     audio_engine_play(&audio_engine, handle, sound_name->_M_start_of_storage, x, y, z, volume, pitch, false);
 }
 
@@ -374,9 +374,9 @@ void sound_engine_update(void *sound_engine, unsigned char *mob, float listener_
     audio_engine_update(&audio_engine, *(int *)(options + 4) ? 1 : 0, x, y, z, yaw);
 }
 
-android_string get_game_version() {
-    android_string out;
-    to_str(&out, "Ninecraft 1.1.0", handle);
+android_string_t get_game_version() {
+    android_string_t out;
+    android_string_cstr(&out, "Ninecraft 1.1.0", handle);
     return out;
 }
 
@@ -435,9 +435,9 @@ void gles_hook() {
 void render_menu_background(void *screen) {
     void *minecraft = *(void **)(screen + 20);
     void *textures = *(void **)(minecraft + 688);
-    android_string str;
-    to_str(&str, "gui/bg32.png", handle);
-    ((void (*)(void *, android_string *))hybris_dlsym(handle, "_ZN8Textures18loadAndBindTextureERKSs"))(textures, &str);
+    android_string_t str;
+    android_string_cstr(&str, "gui/bg32.png", handle);
+    ((void (*)(void *, android_string_t *))hybris_dlsym(handle, "_ZN8Textures18loadAndBindTextureERKSs"))(textures, &str);
     ((void (*)(void *, int, int, int, int, int, int, int, int))hybris_dlsym(handle, "_ZN12GuiComponent4blitEiiiiiiii"))(screen, 0, 0, 0, 0, *(int *)(screen+8), *(int *)(screen+12), 0x100, 0x100);
 }
 

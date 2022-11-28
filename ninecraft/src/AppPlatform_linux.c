@@ -64,9 +64,9 @@ void AppPlatform_linux$finish(AppPlatform_linux *app_platform) {
     puts("debug: AppPlatform_linux::finish");
 }
 
-android_string AppPlatform_linux$getDateString(AppPlatform_linux *app_platform, unsigned int seconds) {
+android_string_t AppPlatform_linux$getDateString(AppPlatform_linux *app_platform, unsigned int seconds) {
     puts("debug: AppPlatform_linux::getDateString");
-    android_string str;
+    android_string_t str;
 
     int daysOfMonth[] = { 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 };
     int currYear, daysTillNow, extraTime, extraDays, index, date, month, hours, minutes, secondss, flag = 0;
@@ -151,7 +151,7 @@ android_string AppPlatform_linux$getDateString(AppPlatform_linux *app_platform, 
     
     sprintf(ans, "%d/%d/%d %d:%d:%d", date, month, currYear, hours, minutes, secondss);
     
-    to_str(&str, (char *) ans, app_platform->handle);
+    android_string_cstr(&str, (char *) ans, app_platform->handle);
     return str;
 }
 
@@ -162,30 +162,30 @@ int AppPlatform_linux$getKeyFromKeyCode(AppPlatform_linux *app_platform, unsigne
 
 android_vector AppPlatform_linux$getOptionStrings(AppPlatform_linux *app_platform) {
     puts("debug: AppPlatform_linux::getOptionsStrings");
-    android_string username_name; // mp_username
-    android_string username_value; // Steve
-    android_string server_visible_name; // mp_server_visible_default
-    android_string server_visible_value; // true
-    android_string fancygraphics_name; // gfx_fancygraphics
-    android_string fancygraphics_value; // true
-    android_string lowquality_name; // gfx_lowquality
-    android_string lowquality_value; // false
-    android_string sensitivity_name; // ctrl_sensitivity
-    android_string sensitivity_value; // gcvt(0.01 * 100) 100
-    android_string invertmouse_name; // ctrl_invertmouse
-    android_string invertmouse_value; // false
-    android_string islefthanded_name; // ctrl_islefthanded
-    android_string islefthanded_value; // false
-    android_string usetouchscreen_name; // ctrl_usetouchscreen
-    android_string usetouchscreen_value; // false
-    android_string difficulty_name; // game_difficulty
-    android_string difficulty_value; // 0, 4
+    android_string_t username_name; // mp_username
+    android_string_t username_value; // Steve
+    android_string_t server_visible_name; // mp_server_visible_default
+    android_string_t server_visible_value; // true
+    android_string_t fancygraphics_name; // gfx_fancygraphics
+    android_string_t fancygraphics_value; // true
+    android_string_t lowquality_name; // gfx_lowquality
+    android_string_t lowquality_value; // false
+    android_string_t sensitivity_name; // ctrl_sensitivity
+    android_string_t sensitivity_value; // gcvt(0.01 * 100) 100
+    android_string_t invertmouse_name; // ctrl_invertmouse
+    android_string_t invertmouse_value; // false
+    android_string_t islefthanded_name; // ctrl_islefthanded
+    android_string_t islefthanded_value; // false
+    android_string_t usetouchscreen_name; // ctrl_usetouchscreen
+    android_string_t usetouchscreen_value; // false
+    android_string_t difficulty_name; // game_difficulty
+    android_string_t difficulty_value; // 0, 4
     unsigned int size = 24;
     char tmp[100];
-    to_str(&username_name, "mp_username", app_platform->handle);
+    android_string_cstr(&username_name, "mp_username", app_platform->handle);
     FILE *fp = popen("zenity --entry --title='Profile' --text='Enter Username:'", "r");
     if (fp == NULL) {
-        to_str(&username_value, "Steve", app_platform->handle);
+        android_string_cstr(&username_value, "Steve", app_platform->handle);
     } else {
         char input_value[100];
         for (int i = 0; i < 100; ++i) {
@@ -198,30 +198,30 @@ android_vector AppPlatform_linux$getOptionStrings(AppPlatform_linux *app_platfor
         }
         input_value[99] = '\0';
         if (input_value[0] != 0) {
-            to_str(&username_value, input_value, app_platform->handle);
+            android_string_cstr(&username_value, input_value, app_platform->handle);
         } else {
-            to_str(&username_value, "Steve", app_platform->handle);
+            android_string_cstr(&username_value, "Steve", app_platform->handle);
         }
         pclose(fp);
     }
-    to_str(&server_visible_name, "mp_server_visible_default", app_platform->handle);
-    to_str(&server_visible_value, "true", app_platform->handle);
-    to_str(&fancygraphics_name, "gfx_fancygraphics", app_platform->handle);
-    to_str(&fancygraphics_value, "true", app_platform->handle);
-    to_str(&lowquality_name, "gfx_lowquality", app_platform->handle);
-    to_str(&lowquality_value, "false", app_platform->handle);
-    to_str(&sensitivity_name, "ctrl_sensitivity", app_platform->handle);
-    to_str(&sensitivity_value, gcvt(0.01 * 100, 6, tmp), app_platform->handle);
-    to_str(&invertmouse_name, "ctrl_invertmouse", app_platform->handle);
-    to_str(&invertmouse_value, "false", app_platform->handle);
-    to_str(&islefthanded_name, "ctrl_islefthanded", app_platform->handle);
-    to_str(&islefthanded_value, "false", app_platform->handle);
-    to_str(&usetouchscreen_name, "ctrl_usetouchscreen", app_platform->handle);
-    to_str(&usetouchscreen_value, "false", app_platform->handle);
-    to_str(&difficulty_name, "game_difficulty", app_platform->handle);
-    to_str(&difficulty_value, "4", app_platform->handle);
+    android_string_cstr(&server_visible_name, "mp_server_visible_default", app_platform->handle);
+    android_string_cstr(&server_visible_value, "true", app_platform->handle);
+    android_string_cstr(&fancygraphics_name, "gfx_fancygraphics", app_platform->handle);
+    android_string_cstr(&fancygraphics_value, "true", app_platform->handle);
+    android_string_cstr(&lowquality_name, "gfx_lowquality", app_platform->handle);
+    android_string_cstr(&lowquality_value, "false", app_platform->handle);
+    android_string_cstr(&sensitivity_name, "ctrl_sensitivity", app_platform->handle);
+    android_string_cstr(&sensitivity_value, gcvt(0.01 * 100, 6, tmp), app_platform->handle);
+    android_string_cstr(&invertmouse_name, "ctrl_invertmouse", app_platform->handle);
+    android_string_cstr(&invertmouse_value, "false", app_platform->handle);
+    android_string_cstr(&islefthanded_name, "ctrl_islefthanded", app_platform->handle);
+    android_string_cstr(&islefthanded_value, "false", app_platform->handle);
+    android_string_cstr(&usetouchscreen_name, "ctrl_usetouchscreen", app_platform->handle);
+    android_string_cstr(&usetouchscreen_value, "false", app_platform->handle);
+    android_string_cstr(&difficulty_name, "game_difficulty", app_platform->handle);
+    android_string_cstr(&difficulty_value, "4", app_platform->handle);
     android_vector out;
-    out._M_start = (unsigned long)android_alloc$allocate(&size, app_platform->handle);
+    out._M_start = (unsigned long)android_alloc_allocate(&size, app_platform->handle);
     out._M_finish = out._M_start;
     out._M_end_of_storage = out._M_start + 24;
     android_vector$push_back(&out, &username_name, app_platform->handle);
@@ -251,10 +251,10 @@ float AppPlatform_linux$getPixelsPerMillimeter(AppPlatform_linux *app_platform) 
     return 1.f;
 }
 
-android_string AppPlatform_linux$getPlatformStringVar(AppPlatform_linux *app_platform, int zero) {
+android_string_t AppPlatform_linux$getPlatformStringVar(AppPlatform_linux *app_platform, int zero) {
     puts("debug: AppPlatform_linux::getPlatformStringVar");
-    android_string str;
-    to_str(&str, "Linux", app_platform->handle);
+    android_string_t str;
+    android_string_cstr(&str, "Linux", app_platform->handle);
     return str;
 }
 
@@ -270,12 +270,12 @@ int AppPlatform_linux$getScreenWidth(AppPlatform_linux *app_platform) {
 
 android_vector AppPlatform_linux$getUserInput(AppPlatform_linux *app_platform) {
     puts("debug: AppPlatform_linux::getUserInput");
-    android_string name;
-    android_string seed;
-    android_string gamemode;
+    android_string_t name;
+    android_string_t seed;
+    android_string_t gamemode;
     FILE *fp = popen("zenity --entry --title='Create New World' --text='Enter World Name:'", "r");
     if (fp == NULL) {
-        to_str(&name, "random world", app_platform->handle);
+        android_string_cstr(&name, "random world", app_platform->handle);
     } else {
         char input_value[100];
         for (int i = 0; i < 100; ++i) {
@@ -288,13 +288,13 @@ android_vector AppPlatform_linux$getUserInput(AppPlatform_linux *app_platform) {
         }
         input_value[99] = '\0';
         printf("%s\n", input_value);
-        to_str(&name, input_value, app_platform->handle);
+        android_string_cstr(&name, input_value, app_platform->handle);
         pclose(fp);
     }
 
     fp = popen("zenity --entry --title='Create New World' --text='Enter World Seed:'", "r");
     if (fp == NULL) {
-        to_str(&seed, "random world", app_platform->handle);
+        android_string_cstr(&seed, "random world", app_platform->handle);
     } else {
         char input_value[100];
         for (int i = 0; i < 100; ++i) {
@@ -310,13 +310,13 @@ android_vector AppPlatform_linux$getUserInput(AppPlatform_linux *app_platform) {
         }
         input_value[99] = '\0';
         printf("%s\n", input_value);
-        to_str(&seed, input_value, app_platform->handle);
+        android_string_cstr(&seed, input_value, app_platform->handle);
         pclose(fp);
     }
 
     fp = popen("zenity --entry --title='Create New World' --text='Enter World Gamemode:' 'creative' 'survival'", "r");
     if (fp == NULL) {
-        to_str(&seed, "random world", app_platform->handle);
+        android_string_cstr(&seed, "random world", app_platform->handle);
     } else {
         char input_value[100];
         for (int i = 0; i < 100; ++i) {
@@ -329,12 +329,12 @@ android_vector AppPlatform_linux$getUserInput(AppPlatform_linux *app_platform) {
         }
         input_value[99] = '\0';
         printf("%s\n", input_value);
-        to_str(&gamemode, input_value, app_platform->handle);
+        android_string_cstr(&gamemode, input_value, app_platform->handle);
         pclose(fp);
     }
     unsigned int size = 24;
     android_vector out;
-    out._M_start = (unsigned long)android_alloc$allocate(&size, app_platform->handle);
+    out._M_start = (unsigned long)android_alloc_allocate(&size, app_platform->handle);
     out._M_finish = out._M_start;
     out._M_end_of_storage = out._M_start + 24;
     puts("ok----");
@@ -380,7 +380,7 @@ bool AppPlatform_linux$isTouchscreen(AppPlatform_linux *app_platform) {
     return false;
 }
 
-TextureData AppPlatform_linux$loadTexture(AppPlatform_linux *app_platform, android_string *path_str, bool alpha) {
+TextureData AppPlatform_linux$loadTexture(AppPlatform_linux *app_platform, android_string_t *path_str, bool alpha) {
     puts("debug: AppPlatform_linux::loadTexture");
     printf("%p\n", app_platform);
     char *path = (char *)path_str->_M_start_of_storage;
@@ -409,13 +409,13 @@ TextureData AppPlatform_linux$loadTexture(AppPlatform_linux *app_platform, andro
     return texture_data;
 }
 
-void AppPlatform_linux$playSound(AppPlatform_linux *app_platform, android_string *sound_name, float volume, float pitch) {
+void AppPlatform_linux$playSound(AppPlatform_linux *app_platform, android_string_t *sound_name, float volume, float pitch) {
     puts("debug: AppPlatform_linux::playSound");
 }
 
-asset_file AppPlatform_linux$readAssetFile(AppPlatform_linux *app_platform, android_string *path_str) {
+asset_file AppPlatform_linux$readAssetFile(AppPlatform_linux *app_platform, android_string_t *path_str) {
     puts("debug: AppPlatform_linux::readAssetFile");
-    android_string str;
+    android_string_t str;
     char *path = (char *)path_str->_M_start_of_storage;
     size_t pathlen = strlen(path);
     char *fullpath_original = (char *) malloc(10 + pathlen);
@@ -440,7 +440,7 @@ asset_file AppPlatform_linux$readAssetFile(AppPlatform_linux *app_platform, andr
     FILE *file = fopen(fullpath, "r");
     if (!file) {
         printf("Error[%d] failed to read %s\n", errno, fullpath);
-        to_str(&str, "", app_platform->handle);
+        android_string_cstr(&str, "", app_platform->handle);
         asset.data = 0;
         asset.size = -1;
         return asset;
@@ -458,7 +458,7 @@ asset_file AppPlatform_linux$readAssetFile(AppPlatform_linux *app_platform, andr
     return asset;
 }
 
-void AppPlatform_linux$saveScreenshot(AppPlatform_linux *app_platform, android_string *path, int width, int height) {
+void AppPlatform_linux$saveScreenshot(AppPlatform_linux *app_platform, android_string_t *path, int width, int height) {
     puts("debug: AppPlatform_linux::saveScreenshot");
 }
 

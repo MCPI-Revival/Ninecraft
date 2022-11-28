@@ -1,7 +1,5 @@
 #pragma once
 
-#include <stdint.h>
-
 typedef union {
     void *_M_end_of_storage;
     char _M_static_buf[16];
@@ -11,16 +9,16 @@ typedef struct {
     buffers_t buffers;
     void *_M_finish;
     void *_M_start_of_storage;
-} android_string;
+} android_string_t;
 
-void *android_string$__ucopy_trivial(const void *__first, const void *__last, void *__result);
+void *android_string_ucopy_trivial(const void *__first, const void *__last, void *__result);
 
-void android_string$_M_allocate_block(android_string *__this, size_t __n, void *handle);
+void android_string_move_src(android_string_t *__this, android_string_t *__ps);
 
-void to_str(android_string *str, char *cstr, void *handle);
+void android_string_allocate_block(android_string_t *__this, size_t __n, void *handle);
 
-void android_string$string(android_string *__this, android_string *str, void *handle);
+void android_string_cstr(android_string_t *__this, char *__s, void *handle);
 
-void android_string$_M_deallocate_block(android_string *__this, void *handle);
+void android_string_clone(android_string_t *__this, android_string_t *__ps, void *handle);
 
-void android_string$_M_move_src(android_string *__this, android_string *src);
+void android_string_deallocate_block(android_string_t *__this, void *handle);

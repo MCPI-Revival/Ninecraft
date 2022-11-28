@@ -27,8 +27,8 @@ typedef enum {
 } platform_dialogue_id;
 
 typedef struct {
-    android_string name;
-    android_string seed;
+    android_string_t name;
+    android_string_t seed;
     char filler[0x1000];
 } user_input;
 
@@ -44,7 +44,7 @@ void AppPlatform_linux$createUserInput(AppPlatform_linux *app_platform);
 
 void AppPlatform_linux$finish(AppPlatform_linux *app_platform);
 
-android_string AppPlatform_linux$getDateString(AppPlatform_linux *app_platform, unsigned int seconds);
+android_string_t AppPlatform_linux$getDateString(AppPlatform_linux *app_platform, unsigned int seconds);
 
 int32_t AppPlatform_linux$getKeyFromKeyCode(AppPlatform_linux *app_platform, unsigned int key_code, unsigned int meta_state, unsigned int device_id);
 
@@ -52,7 +52,7 @@ android_vector AppPlatform_linux$getOptionStrings(AppPlatform_linux *app_platfor
 
 float AppPlatform_linux$getPixelsPerMillimeter(AppPlatform_linux *app_platform);
 
-android_string AppPlatform_linux$getPlatformStringVar(AppPlatform_linux *app_platform, int zero);
+android_string_t AppPlatform_linux$getPlatformStringVar(AppPlatform_linux *app_platform, int zero);
 
 int AppPlatform_linux$getScreenHeight(AppPlatform_linux *app_platform);
 
@@ -74,13 +74,13 @@ bool AppPlatform_linux$isPowerVR(AppPlatform_linux *app_platform);
 
 bool AppPlatform_linux$isTouchscreen(AppPlatform_linux *app_platform);
 
-TextureData AppPlatform_linux$loadTexture(AppPlatform_linux *app_platform, android_string *path_str, bool alpha);
+TextureData AppPlatform_linux$loadTexture(AppPlatform_linux *app_platform, android_string_t *path_str, bool alpha);
 
-void AppPlatform_linux$playSound(AppPlatform_linux *app_platform, android_string *sound_name, float volume, float pitch);
+void AppPlatform_linux$playSound(AppPlatform_linux *app_platform, android_string_t *sound_name, float volume, float pitch);
 
-asset_file AppPlatform_linux$readAssetFile(AppPlatform_linux *app_platform, android_string *path_str);
+asset_file AppPlatform_linux$readAssetFile(AppPlatform_linux *app_platform, android_string_t *path_str);
 
-void AppPlatform_linux$saveScreenshot(AppPlatform_linux *app_platform, android_string *path, int32_t width, int32_t height);
+void AppPlatform_linux$saveScreenshot(AppPlatform_linux *app_platform, android_string_t *path, int32_t width, int32_t height);
 
 void AppPlatform_linux$showDialog(AppPlatform_linux *app_platform, int32_t dialog_id);
 
