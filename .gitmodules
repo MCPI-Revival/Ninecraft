@@ -9,4 +9,4 @@
     url = https://github.com/minecraft-linux/osx-elf-header
 [submodule "epoll-shim"]
     path = epoll-shim
-    url = https://github.com/minecraft-linux/epoll-shim
+    url = https://github.com/jiixyj/epoll-shim
