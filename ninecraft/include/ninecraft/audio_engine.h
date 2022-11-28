@@ -53,6 +53,6 @@ ALuint audio_engine_load_sound(char *name, void *handle);
 
 ALuint audio_engine_get_buffer(audio_engine_t *audio_engine, char *name, void *handle);
 
-void audio_engine_play(audio_engine_t *audio_engine, void *handle, const char *name, float x, float y, float z, float volume, float pitch, bool is_ui);
+void audio_engine_play(audio_engine_t *audio_engine, void *handle, char *name, float x, float y, float z, float volume, float pitch, bool is_ui);
 
 void audio_engine_update(audio_engine_t *audio_engine, float volume, float x, float y, float z, float yaw);

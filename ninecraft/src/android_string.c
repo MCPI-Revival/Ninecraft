@@ -16,7 +16,7 @@ void android_string$_M_allocate_block(android_string *__this, size_t __n, void *
 
 void to_str(android_string *str, char *cstr, void *handle) {
     size_t length = strlen(cstr);
-    uintptr_t last = cstr + length;
+    void *last = cstr + length;
     android_string$_M_allocate_block(str, length + 1, handle);
     str->_M_finish = android_string$__ucopy_trivial(cstr, last, str->_M_start_of_storage);
     *(char *)str->_M_finish = 0;

@@ -1,5 +1,3 @@
-#pragma once
-
 #include <ninecraft/gles_compat.h>
 #include <GL/glext.h>
 

@@ -2,6 +2,8 @@ cmake_minimum_required (VERSION 3.1)
 
 project(ninecraft-core)
 
+set(OpenGL_GL_PREFERENCE GLVND)
+
 find_package(PNG REQUIRED)
 find_package(OpenAL REQUIRED)
 find_package(OpenGL REQUIRED)

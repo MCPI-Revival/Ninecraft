@@ -525,7 +525,7 @@ int main(int argc, char **argv)
     ((void (*)(int, const char *))hybris_dlsym(handle, "_ZNSsaSEPKc"))((int)ninecraft_app + 3568, "./storage/external/");
     AppPlatform_linux platform;
     AppPlatform_linux$AppPlatform_linux(&platform, handle);
-    *(void **)(ninecraft_app + 0x14) = (uintptr_t)&platform;
+    *(void **)(ninecraft_app + 0x14) = &platform;
     printf("%p\n", &platform);
     NinecraftApp$init ninecraft_app_init = (NinecraftApp$init)hybris_dlsym(handle, "_ZN12NinecraftApp4initEv");
     ninecraft_app_init(ninecraft_app);
