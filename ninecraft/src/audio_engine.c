@@ -170,9 +170,7 @@ ALuint audio_engine_get_buffer(audio_engine_t *audio_engine, char *name, void *h
     if ((int)sample_names[0] != 0) {
         srand(time(NULL));
         int sample_index = rand() % (((int)sample_names[0] + 1) - 1) + 1;
-        printf("%d\n", sample_index);
         char *sample_name = sample_names[sample_index];
-        printf("%s\n", sample_name);
         for (int i = 0; i < audio_engine->buffer_index; ++i) {
             if (strcmp(sample_name, audio_engine->buffer_names[i]) == 0) {
                 return audio_engine->buffers[i];
