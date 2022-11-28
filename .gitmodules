@@ -4,3 +4,9 @@
 [submodule "libhybris"]
 	path = libhybris
 	url = https://github.com/minecraft-linux/libhybris
+[submodule "osx-elf-header"]
+    path = osx-elf-header
+    url = https://github.com/minecraft-linux/osx-elf-header
+[submodule "epoll-shim"]
+    path = epoll-shim
+    url = https://github.com/minecraft-linux/epoll-shim
