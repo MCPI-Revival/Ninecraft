@@ -12,16 +12,13 @@ endif()
 set(GLFW_BUILD_X11 TRUE)
 
 add_subdirectory(libhybris)
-add_subdirectory(glad)
 add_subdirectory(glfw)
 add_subdirectory(ninecraft)
 
 include_directories(${PROJECT_SOURCE_DIR}/libhybris/include)
-include_directories(${GLAD_INCLUDE_DIRS})
 include_directories(${GLFW_SOURCE_DIR}/include)
 
 if (NOT ${IS_ARM_BUILD})
 set_target_properties(glfw PROPERTIES COMPILE_FLAGS "-m32" LINK_FLAGS "-m32")
-set_target_properties(glad PROPERTIES COMPILE_FLAGS "-m32" LINK_FLAGS "-m32")
 set_target_properties(hybris PROPERTIES COMPILE_FLAGS "-m32" LINK_FLAGS "-m32")
 endif()

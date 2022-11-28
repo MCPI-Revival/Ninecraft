@@ -1,6 +1,7 @@
 #pragma once
 
 #include <ninecraft/gles_compat.h>
+#include <GL/glext.h>
 
 void gl_alpha_func(GLenum func, GLclampf ref) {
     glAlphaFunc(func, ref);
@@ -63,7 +64,7 @@ void gl_depth_mask(GLboolean flag) {
 }
 
 void gl_depth_range_f(GLclampf zNear, GLclampf zFar) {
-    glDepthRangef(zNear, zFar);
+    glDepthRange((GLclampd)zNear, (GLclampd)zFar);
 }
 
 void gl_disable(GLenum cap) {

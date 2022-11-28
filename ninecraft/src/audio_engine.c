@@ -7,6 +7,7 @@
 #include <stdlib.h>
 #include <time.h>
 #include <math.h>
+#include <string.h>
 
 void audio_engine_source_map_init(audio_engine_source_map_t *source_map) {
     source_map->entries = NULL;

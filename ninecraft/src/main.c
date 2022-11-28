@@ -9,7 +9,6 @@
 #include <sys/mman.h>
 #include <sys/types.h>
 #include <sys/stat.h>
-#include <glad/glad.h>
 #include <GLFW/glfw3.h>
 #include <ninecraft/gles_compat.h>
 #include <ninecraft/minecraft_keys.h>
@@ -335,7 +334,7 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
     }
 }
 
-void window_close_callback(GLFWwindow* handle, GLFWwindowclosefun cbfun) {
+void window_close_callback(GLFWwindow* window) {
     audio_engine_destroy_audio_device(&audio_engine);
     exit(0);
 }
@@ -468,7 +467,6 @@ int main(int argc, char **argv)
         puts("cant create");
     }
     glfwMakeContextCurrent(_window);
-    gladLoadGLLoader((GLADloadproc)glfwGetProcAddress);
     glfwInit();
     glfwSetInputMode(_window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
 
