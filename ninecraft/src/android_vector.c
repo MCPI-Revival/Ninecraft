@@ -4,7 +4,7 @@
 #include <string.h>
 
 size_t android_vector$_M_compute_next_size(android_vector *__this, size_t __n) {
-    size_t __size = STLPORT_SIZE_TYPE(__this->_M_finish - __this->_M_start);
+    size_t __size = (__this->_M_finish - __this->_M_start) / 24;
     if (__n > STLPORT_MAX_SIZE - __size) {
         puts("Invalid vector length");
         abort();
@@ -17,10 +17,9 @@ size_t android_vector$_M_compute_next_size(android_vector *__this, size_t __n) {
 }
 
 uintptr_t android_vector$__uninitialized_fill(uintptr_t __first, size_t __n, uintptr_t __x, void *handle) {
-    size_t size = STLPORT_SIZE_TYPE(__n * 24);
-    while (size > 0) {
+    while (__n > 0) {
         android_string$string((android_string *)__first, (android_string *)__x, handle);
-        --size;
+        --__n;
         __first += 24;
     }
     return __first;
@@ -28,7 +27,7 @@ uintptr_t android_vector$__uninitialized_fill(uintptr_t __first, size_t __n, uin
 
 uintptr_t android_vector$__uninitialized_move(uintptr_t __first, uintptr_t __last, uintptr_t __result) {
     uint32_t __cur = (uint32_t)__result;
-    uint32_t diff = (uint32_t)STLPORT_SIZE_TYPE((uint32_t)__last - (uint32_t)__first);
+    uint32_t diff = ((uint32_t)__last - (uint32_t)__first) / 24;
     for (uint32_t __n = diff; __n > 0; --__n) {
         android_string$_M_move_src((android_string *)__cur, (android_string *)__first);
         __first += 24;

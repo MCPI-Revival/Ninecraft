@@ -301,14 +301,6 @@ static void char_callback(GLFWwindow* window, unsigned int codepoint) {
     ((void (*)(char))hybris_dlsym(handle, "_ZN8Keyboard8feedTextEc"))((char)codepoint);
 }
 
-void mcinit()
-{
-    if (!*((int *)ninecraft_app + 183))
-    {
-        ((void (*)(void *))hybris_dlsym(handle, "_ZN9Minecraft12_reloadInputEv"))(ninecraft_app);
-    }
-}
-
 int old_pos_x, old_pos_y, old_width, old_height;
 
 static void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods) {
@@ -535,26 +527,10 @@ int main(int argc, char **argv)
     ((void (*)(int, const char *))hybris_dlsym(handle, "_ZNSsaSEPKc"))((int)ninecraft_app + 3568, "./storage/external/");
     AppPlatform_linux platform;
     AppPlatform_linux$AppPlatform_linux(&platform, handle);
-    *(uintptr_t *)(((int)ninecraft_app) + 0x14) = (uintptr_t)&platform;
+    *(void **)(ninecraft_app + 0x14) = (uintptr_t)&platform;
     printf("%p\n", &platform);
     NinecraftApp$init ninecraft_app_init = (NinecraftApp$init)hybris_dlsym(handle, "_ZN12NinecraftApp4initEv");
     ninecraft_app_init(ninecraft_app);
-
-
-    printf("%d\n", *(char *)(ninecraft_app+84));
-    printf("%d\n", *(char *)(ninecraft_app+112));
-    printf("%d\n", *(char *)(ninecraft_app+280));
-    printf("%d\n", *(char *)(ninecraft_app+196));
-    printf("%d\n", *(char *)(ninecraft_app+140));
-    printf("%d\n", *(char *)(ninecraft_app+168));
-    printf("%d\n", *(char *)(ninecraft_app+224));
-    printf("%d\n", *(char *)(ninecraft_app+252));
-    printf("%d\n", *(char *)(ninecraft_app+336));
-    printf("%d\n", *(char *)(ninecraft_app+364));
-    printf("%d\n", *(char *)(ninecraft_app+392));
-    printf("%d\n", *(char *)(ninecraft_app+420));
-    printf("%d\n", *(char *)(ninecraft_app+448));
-    printf("%d\n", *(char *)(ninecraft_app+476));
 
     ((void (*)(void *, int, int))hybris_dlsym(handle, "_ZN9Minecraft7setSizeEii"))(ninecraft_app, 720, 480);
 

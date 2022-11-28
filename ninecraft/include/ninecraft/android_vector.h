@@ -8,7 +8,6 @@
 #include <stdbool.h>
 
 #define STLPORT_MAX_SIZE 178956970
-#define STLPORT_SIZE_TYPE(x) (-1431655765 * (x >> 3))
 
 typedef struct {
     uintptr_t _M_start;
