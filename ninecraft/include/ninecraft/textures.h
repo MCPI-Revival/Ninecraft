@@ -14,5 +14,3 @@ typedef struct {
 } TextureData;
 
 TextureData read_png(char *path, bool alpha, bool reverse_load);
-
-GLuint load_texture(TextureData texture);

@@ -189,6 +189,7 @@ void get_sound(char **arr, char *name) {
         arr[1] = "PCM_fuse";
     } else {
         arr[0] = 0;
+        arr[1] = 0;
     }
     return arr;
 }
