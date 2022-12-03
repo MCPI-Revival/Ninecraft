@@ -112,4 +112,35 @@ const char *gles_symbols[] = {
     0
 };
 
+const char *math_symbols[] = {
+    "atan2f",
+    "atanf",
+    "ceilf",
+    "cosf",
+    "floorf",
+    "fmodf",
+    "logf",
+    "powf",
+    "sinf",
+    "sqrtf",
+    0
+};
+
+const char *missing_symbols[] = {
+    "dl_iterate_phdr",
+    "wcscmp",
+    "wcsncpy",
+    "iswalpha",
+    "iswcntrl",
+    "iswdigit",
+    "iswlower",
+    "iswprint",
+    "iswpunct",
+    "iswupper",
+    "iswxdigit",
+    "__aeabi_atexit",
+    "__gnu_Unwind_Find_exidx",
+    0
+};
+
 #endif

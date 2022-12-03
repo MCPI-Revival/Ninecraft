@@ -18,6 +18,8 @@
 #include <ninecraft/audio_engine.h>
 #include <ninecraft/hooks.h>
 #include <math.h>
+#include <wchar.h>
+#include <wctype.h>
 
 #include <hybris/dlfcn.h>
 #include <hybris/hook.h>
@@ -432,6 +434,55 @@ void gles_hook() {
     hybris_hook("glViewport", (void *) gl_viewport);
 }
 
+void math_hook() {
+    hybris_hook("atan2f", atan2f);
+    hybris_hook("atanf", atanf);
+    hybris_hook("ceilf", ceilf);
+    hybris_hook("cosf", cosf);
+    hybris_hook("floorf", floorf);
+    hybris_hook("fmodf", fmodf);
+    hybris_hook("logf", logf);
+    hybris_hook("powf", powf);
+    hybris_hook("sinf", sinf);
+    hybris_hook("sqrtf", sqrtf);
+}
+
+#ifdef __i386__
+int android_dl_iterate_phdr(int (*cb)(struct dl_phdr_info *info, size_t size, void *data),void *data);
+#endif
+
+#ifdef __arm__
+
+long unsigned int *android_dl_unwind_find_exidx(long unsigned int *pc, int *pcount);
+
+extern int __cxa_atexit(void (*)(void*), void*, void*);
+
+int __aeabi_atexit_android(void *arg, void (*func) (void *), void *d) {
+  return __cxa_atexit(func, arg, d);
+}
+
+#endif
+
+void missing_hook() {
+    #ifdef __i386__
+    hybris_hook("dl_iterate_phdr", android_dl_iterate_phdr);
+    #endif
+    hybris_hook("wcscmp", wcscmp);
+    hybris_hook("wcsncpy", wcsncpy);
+    hybris_hook("iswalpha", iswalpha);
+    hybris_hook("iswcntrl", iswcntrl);
+    hybris_hook("iswdigit", iswdigit);
+    hybris_hook("iswlower", iswlower);
+    hybris_hook("iswprint", iswprint);
+    hybris_hook("iswpunct", iswpunct);
+    hybris_hook("iswupper", iswupper);
+    hybris_hook("iswxdigit", iswxdigit);
+    #ifdef __arm__
+    hybris_hook("__aeabi_atexit", __aeabi_atexit_android);
+    hybris_hook("__gnu_Unwind_Find_exidx", android_dl_unwind_find_exidx);
+    #endif
+}
+
 void render_menu_background(void *screen) {
     void *minecraft = *(void **)(screen + 20);
     void *textures = *(void **)(minecraft + 688);
@@ -470,7 +521,9 @@ int main(int argc, char **argv)
     glfwInit();
     glfwSetInputMode(_window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
 
+    math_hook();
     gles_hook();
+    missing_hook();
     hybris_hook("__android_log_print", (void *)__android_log_print);
     stub_symbols(android_symbols, (void *)android_stub);
     stub_symbols(egl_symbols, (void *)egl_stub);
