@@ -25,16 +25,6 @@
 #include <hybris/hook.h>
 #include <hybris/jb/linker.h>
 
-const char *libs[] = {
-    "libc.so",
-    "libstdc++.so",
-    "libm.so",
-    "libandroid.so",
-    "liblog.so",
-    "libEGL.so",
-    "libOpenSLES.so",
-    "libGLESv1_CM.so"};
-
 void *handle;
 GLFWwindow* _window;
 
@@ -79,47 +69,20 @@ void detour(void *dst_addr, void *src_addr);
 
 #endif
 
-bool load_library(const char *path) {
-    #ifdef __i386__
-    char *arch = "x86";
-    #else
-    #ifdef __arm__
-    char *arch = "arm";
-    #else
-    char *arch = "";
-    #endif
-    #endif
-    char fullpath[MAXPATHLEN];
-    getcwd(fullpath, MAXPATHLEN);
-    strcat(fullpath, "/libs/");
-    strcat(fullpath, arch);
-    strcat(fullpath, "/");
-    strcat(fullpath, path);
-
-    void *handle = hybris_dlopen(fullpath, RTLD_LAZY);
-    if (handle == NULL)
-    {
-        printf("failed to load library %s: %s\n", fullpath, hybris_dlerror());
-        return false;
-    }
-    printf("lib: %s: : %p\n", fullpath, handle);
-    return true;
-}
-
 void *load_minecraftpe()
 {
     #ifdef __i386__
     char *arch = "x86";
     #else
     #ifdef __arm__
-    char *arch = "arm";
+    char *arch = "armeabi-v7a";
     #else
     char *arch = "";
     #endif
     #endif
     char fullpath[MAXPATHLEN];
     getcwd(fullpath, MAXPATHLEN);
-    strcat(fullpath, "/libs/");
+    strcat(fullpath, "/lib/");
     strcat(fullpath, arch);
     strcat(fullpath, "/libminecraftpe.so");
     
@@ -529,11 +492,6 @@ int main(int argc, char **argv)
     stub_symbols(egl_symbols, (void *)egl_stub);
     stub_symbols(sles_symbols, (void *)sles_stub);
     
-    int i;
-    for (i = 0; i < 8; ++i)
-    {
-        load_library(libs[i]);
-    }
     handle = load_minecraftpe();
 
     audio_engine_create_audio_device(&audio_engine);

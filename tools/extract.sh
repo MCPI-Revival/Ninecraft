@@ -17,8 +17,4 @@ rm -rf assets/
 
 unzip ${1} "assets/*"
 
-if [[ ${2} = "arm" ]]; then
-unzip -p ${1} lib/armeabi-v7a/libminecraftpe.so > libs/arm/libminecraftpe.so
-else
-unzip -p ${1} lib/x86/libminecraftpe.so > libs/x86/libminecraftpe.so
-fi
+unzip ${1} "lib/*"
