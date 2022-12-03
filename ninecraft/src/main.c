@@ -10,6 +10,7 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <GLFW/glfw3.h>
+#include <ninecraft/detours.h>
 #include <ninecraft/gles_compat.h>
 #include <ninecraft/minecraft_keys.h>
 #include <ninecraft/android_string.h>
@@ -26,7 +27,7 @@
 #include <hybris/jb/linker.h>
 
 void *handle;
-GLFWwindow* _window;
+GLFWwindow *_window;
 
 float y_cam = 0.0;
 float x_cam = 0.0;
@@ -34,43 +35,7 @@ float x_cam = 0.0;
 int window_width = 720;
 int window_height = 480;
 
-#ifdef __i386__
-
-void detour(void *dst_addr, void *src_addr) {
-    uint32_t page_size = sysconf(_SC_PAGESIZE);
-    void *protect = (void *)((uintptr_t)dst_addr & -page_size);
-    mprotect(protect, 5, PROT_READ | PROT_WRITE | PROT_EXEC);
-    uintptr_t addr = (uintptr_t)src_addr - (uintptr_t)dst_addr - 5;
-    *(uint8_t *)(dst_addr) = 0xE9;
-    *(uintptr_t *)(dst_addr + 1) = addr;
-    mprotect(protect, 5, PROT_EXEC);
-}
-
-#else
-
-#ifdef __arm__
-
-void detour(void *dst_addr, void *src_addr) {
-    long page_size = sysconf(_SC_PAGESIZE);
-    void *protect = (void *)(((uintptr_t)dst_addr & 0xFFFFFFFE) & -page_size);
-    mprotect(protect, 8, PROT_READ | PROT_WRITE | PROT_EXEC);
-    ((uint16_t *)((uintptr_t)dst_addr & 0xFFFFFFFE))[0] = 0xF8DF;
-    ((uint16_t *)((uintptr_t)dst_addr & 0xFFFFFFFE))[1] = ((((uintptr_t)dst_addr & 0xFFFFFFFE) % 4) != 0) ? 0xF002 : 0xF000;
-    ((uint16_t *)((uintptr_t)dst_addr & 0xFFFFFFFE))[2] = (uint16_t)((uintptr_t)src_addr & 0xFFFF);
-    ((uint16_t *)((uintptr_t)dst_addr & 0xFFFFFFFE))[3] = (uint16_t)((uintptr_t)src_addr >> 16);
-    mprotect(protect, 8, PROT_EXEC);
-}
-
-#else
-
-void detour(void *dst_addr, void *src_addr);
-
-#endif
-
-#endif
-
-void *load_minecraftpe()
-{
+void *load_minecraftpe() {
     #ifdef __i386__
     char *arch = "x86";
     #else
@@ -507,20 +472,20 @@ int main(int argc, char **argv)
     dat[268] = 0xa0;
     #endif
     
-    detour(hybris_dlsym(handle, "_ZN6Screen20renderDirtBackgroundEi"), (void *)render_menu_background);
-    detour(hybris_dlsym(handle, "_ZN6Common20getGameVersionStringERKSs"), (void *)get_game_version);
+    DETOUR(hybris_dlsym(handle, "_ZN6Screen20renderDirtBackgroundEi"), (void *)render_menu_background);
+    DETOUR(hybris_dlsym(handle, "_ZN6Common20getGameVersionStringERKSs"), (void *)get_game_version);
     
-    detour(hybris_dlsym(handle, "_ZN11SoundEngineC1Ef"), (void *)sound_engine_stub);
-    detour(hybris_dlsym(handle, "_ZN11SoundEngine4initEP9MinecraftP7Options"), (void *)sound_engine_stub);
-    detour(hybris_dlsym(handle, "_ZN11SoundEngine14_getVolumeMultEfff"), (void *)sound_engine_stub);
-    detour(hybris_dlsym(handle, "_ZN11SoundEngine7destroyEv"), (void *)sound_engine_stub);
-    detour(hybris_dlsym(handle, "_ZN11SoundEngine6enableEb"), (void *)sound_engine_stub);
-    detour(hybris_dlsym(handle, "_ZN11SoundEngine4playERKSsfffff"), (void *)sound_engine_play);
-    detour(hybris_dlsym(handle, "_ZN11SoundEngine6playUIERKSsff"), (void *)sound_engine_playui);
-    detour(hybris_dlsym(handle, "_ZN11SoundEngine6updateEP3Mobf"), (void *)sound_engine_update);
-    detour(hybris_dlsym(handle, "_ZN11SoundEngine13updateOptionsEv"), (void *)sound_engine_stub);
-    detour(hybris_dlsym(handle, "_ZN11SoundEngineD1Ev"), (void *)sound_engine_stub);
-    detour(hybris_dlsym(handle, "_ZN11SoundEngineD2Ev"), (void *)sound_engine_stub);
+    DETOUR(hybris_dlsym(handle, "_ZN11SoundEngineC1Ef"), (void *)sound_engine_stub);
+    DETOUR(hybris_dlsym(handle, "_ZN11SoundEngine4initEP9MinecraftP7Options"), (void *)sound_engine_stub);
+    DETOUR(hybris_dlsym(handle, "_ZN11SoundEngine14_getVolumeMultEfff"), (void *)sound_engine_stub);
+    DETOUR(hybris_dlsym(handle, "_ZN11SoundEngine7destroyEv"), (void *)sound_engine_stub);
+    DETOUR(hybris_dlsym(handle, "_ZN11SoundEngine6enableEb"), (void *)sound_engine_stub);
+    DETOUR(hybris_dlsym(handle, "_ZN11SoundEngine4playERKSsfffff"), (void *)sound_engine_play);
+    DETOUR(hybris_dlsym(handle, "_ZN11SoundEngine6playUIERKSsff"), (void *)sound_engine_playui);
+    DETOUR(hybris_dlsym(handle, "_ZN11SoundEngine6updateEP3Mobf"), (void *)sound_engine_update);
+    DETOUR(hybris_dlsym(handle, "_ZN11SoundEngine13updateOptionsEv"), (void *)sound_engine_stub);
+    DETOUR(hybris_dlsym(handle, "_ZN11SoundEngineD1Ev"), (void *)sound_engine_stub);
+    DETOUR(hybris_dlsym(handle, "_ZN11SoundEngineD2Ev"), (void *)sound_engine_stub);
     
     ninecraft_app = malloc(0xe6c);
 

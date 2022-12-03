@@ -3,6 +3,7 @@ project(ninecraft)
 
 if(CMAKE_SYSTEM_PROCESSOR MATCHES "(arm)|(armhf)|(aarch64)|(arm64)")
     set(IS_ARM_BUILD TRUE)
+    set(IS_ARMHF_BUILD TRUE)
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -mthumb")
     set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -mthumb")
 else()
