@@ -18,7 +18,7 @@ void arm_detour(void *target_addr, void *replacement_addr) {
     }
 }
 
-void x86_detour(void *target_addr, void *replacement_addr) {
-    *(uint8_t *)(target_addr) = 0xE9;
+void x86_detour(void *target_addr, void *replacement_addr, bool jump) {
+    *(uint8_t *)(target_addr) = jump ? 0xe9 : 0xe8;
     *(uint32_t *)(target_addr + 1) = (uint32_t)replacement_addr - (uint32_t)target_addr - 5;
 }
