@@ -18,6 +18,6 @@ typedef struct {
     uint8_t alpha; // 16 0x10
     uint32_t texture_type; // 20 0x14
     uint32_t unknown2; // 24 0x18
-} TextureData;
+} texture_data_t;
 
-TextureData read_png(char *path, bool alpha, bool reverse_load);
+texture_data_t read_png(char *path, bool alpha, bool reverse_load);

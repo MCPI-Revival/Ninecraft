@@ -380,7 +380,7 @@ bool AppPlatform_linux$isTouchscreen(AppPlatform_linux *app_platform) {
     return false;
 }
 
-TextureData AppPlatform_linux$loadTexture(AppPlatform_linux *app_platform, android_string_t *path_str, bool alpha) {
+texture_data_t AppPlatform_linux$loadTexture(AppPlatform_linux *app_platform, android_string_t *path_str, bool alpha) {
     puts("debug: AppPlatform_linux::loadTexture");
     printf("%p\n", app_platform);
     char *path = (char *)path_str->_M_start_of_storage;
@@ -402,7 +402,7 @@ TextureData AppPlatform_linux$loadTexture(AppPlatform_linux *app_platform, andro
     } else if(access(fullpath_original, F_OK) == 0) {
         fullpath = fullpath_original;
     }
-    TextureData texture_data = read_png(fullpath, alpha, false);
+    texture_data_t texture_data = read_png(fullpath, alpha, false);
     free(fullpath_original);
     free(fullpath_internal_overrides);
     free(fullpath_overrides);

@@ -3,8 +3,8 @@
 #include <errno.h>
 #include <stdlib.h>
 
-TextureData read_png(char *path, bool alpha, bool reverse_load) {
-    TextureData texture_data;
+texture_data_t read_png(char *path, bool alpha, bool reverse_load) {
+    texture_data_t texture_data;
     FILE *file = fopen(path, "r");
 
     if (!file) {

@@ -74,7 +74,7 @@ bool AppPlatform_linux$isPowerVR(AppPlatform_linux *app_platform);
 
 bool AppPlatform_linux$isTouchscreen(AppPlatform_linux *app_platform);
 
-TextureData AppPlatform_linux$loadTexture(AppPlatform_linux *app_platform, android_string_t *path_str, bool alpha);
+texture_data_t AppPlatform_linux$loadTexture(AppPlatform_linux *app_platform, android_string_t *path_str, bool alpha);
 
 void AppPlatform_linux$playSound(AppPlatform_linux *app_platform, android_string_t *sound_name, float volume, float pitch);
 
