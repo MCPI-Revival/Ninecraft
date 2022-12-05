@@ -65,7 +65,9 @@ TextureData read_png(char *path, bool alpha, bool reverse_load) {
     png_read_image(png, row_pointers);
     fclose(file);
     free(row_pointers);
+    texture_data.texture_type = texture_type_ub;
     texture_data.alpha = alpha;
-    texture_data.mipmap_level = 0;
+    texture_data.unknown = 0;
+    texture_data.unknown2 = 0;
     return texture_data;
 }

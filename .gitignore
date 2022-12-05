@@ -4,5 +4,7 @@
 /lib
 /.vscode/
 /storage/
-test.c
-mcs.py
+/*.c
+/*.cpp
+/*.py
+a.out
