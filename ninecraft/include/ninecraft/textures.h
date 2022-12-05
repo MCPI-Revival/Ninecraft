@@ -16,6 +16,7 @@ typedef struct {
     uint8_t *pixels; // 8 0x08
     uint32_t unknown; // 12 0x0c
     uint8_t alpha; // 16 0x10
+    uint8_t unknown1; // 17 0x11
     uint32_t texture_type; // 20 0x14
     uint32_t unknown2; // 24 0x18
 } texture_data_t;
