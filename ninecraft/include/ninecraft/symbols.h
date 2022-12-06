@@ -140,6 +140,7 @@ const char *missing_symbols[] = {
     "iswxdigit",
     "__aeabi_atexit",
     "__gnu_Unwind_Find_exidx",
+    "__cxa_pure_virtual",
     0
 };
 

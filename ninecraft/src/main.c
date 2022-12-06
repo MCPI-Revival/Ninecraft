@@ -12,6 +12,7 @@
 #include <GLFW/glfw3.h>
 #include <ninecraft/detours.h>
 #include <ninecraft/gles_compat.h>
+#include <ninecraft/protocol_versions.h>
 #include <ninecraft/minecraft_keys.h>
 #include <ninecraft/android_string.h>
 #include <ninecraft/symbols.h>
@@ -29,6 +30,10 @@
 
 void *handle;
 GLFWwindow *_window;
+
+int default_mouse_mode = GLFW_CURSOR_NORMAL;
+
+int protocol_version = 9;
 
 float y_cam = 0.0;
 float x_cam = 0.0;
@@ -114,6 +119,25 @@ struct KeyboardAction
     int keyCode;
 };
 
+// isbutton
+// (unsigned __int8)(*((_BYTE *)this + 8) - 1) <= 1u;
+
+// getPointerId
+// *((unsigned __int8 *)a2 + 10)
+
+struct MouseAction
+{
+    short x;
+    short y;
+    short dx;
+    short dy;
+    char button;
+    char type;
+    char pointer_id;
+    char unknown0;
+    int unknown1;
+};
+
 android_vector *keyboard_inputs;
 static int *keyboard_states;
 
@@ -142,8 +166,10 @@ static void mouse_click_callback(GLFWwindow* window, int button, int action, int
     double xpos, ypos;
     glfwGetCursorPos(window, &xpos, &ypos);
     if (!mouse_pointer_hidden) {
-        int mc_button = (button == GLFW_MOUSE_BUTTON_LEFT ? 1 : (button == GLFW_MOUSE_BUTTON_RIGHT ? 2 : 0));
-        ((void (*)(char, char, short, short, short, short))hybris_dlsym(handle, "_ZN5Mouse4feedEccssss"))((char) mc_button, (char) (action == GLFW_PRESS ? 1 : 0), (short)xpos, (short)ypos, 0, 0);
+        if (protocol_version == protocol_version_0_6) {
+            int mc_button = (button == GLFW_MOUSE_BUTTON_LEFT ? 1 : (button == GLFW_MOUSE_BUTTON_RIGHT ? 2 : 0));
+            ((void (*)(char, char, short, short, short, short))hybris_dlsym(handle, "_ZN5Mouse4feedEccssss"))((char) mc_button, (char) (action == GLFW_PRESS ? 1 : 0), (short)xpos, (short)ypos, 0, 0);
+        }
     } else {
         int game_keycode = mouseToGameKeyCode(button);
         
@@ -178,7 +204,9 @@ static void mouse_scroll_callback(GLFWwindow* window, double xoffset, double yof
 
 static void mouse_pos_callback(GLFWwindow* window, double xpos, double ypos) {
     if (!mouse_pointer_hidden) {
-        ((void (*)(char, char, short, short, short, short))hybris_dlsym(handle, "_ZN5Mouse4feedEccssss"))(0, 0, (short)xpos, (short)ypos, 0, 0);
+        if (protocol_version == protocol_version_0_6) {
+            ((void (*)(char, char, short, short, short, short))hybris_dlsym(handle, "_ZN5Mouse4feedEccssss"))(0, 0, (short)xpos, (short)ypos, 0, 0);
+        }
     } else {
         int cx;
         int cy;
@@ -228,7 +256,9 @@ static void resize_callback(GLFWwindow* window, int width, int height) {
 }
 
 static void char_callback(GLFWwindow* window, unsigned int codepoint) {
-    ((void (*)(char))hybris_dlsym(handle, "_ZN8Keyboard8feedTextEc"))((char)codepoint);
+    if (protocol_version == protocol_version_0_6) {
+        ((void (*)(char))hybris_dlsym(handle, "_ZN8Keyboard8feedTextEc"))((char)codepoint);
+    }
 }
 
 int old_pos_x, old_pos_y, old_width, old_height;
@@ -279,7 +309,7 @@ void grab_mouse() {
 void release_mouse() {
     puts("release_mouse");
     mouse_pointer_hidden = false;
-    glfwSetInputMode(_window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
+    glfwSetInputMode(_window, GLFW_CURSOR, default_mouse_mode);
 }
 
 void sound_engine_playui(void *sound_engine, android_string_t *sound_name, float volume, float pitch) {
@@ -392,6 +422,8 @@ int __aeabi_atexit_android(void *arg, void (*func) (void *), void *d) {
 
 #endif
 
+int __cxa_pure_virtual() {}
+
 void missing_hook() {
     #ifdef __i386__
     hybris_hook("dl_iterate_phdr", android_dl_iterate_phdr);
@@ -406,6 +438,7 @@ void missing_hook() {
     hybris_hook("iswpunct", iswpunct);
     hybris_hook("iswupper", iswupper);
     hybris_hook("iswxdigit", iswxdigit);
+    hybris_hook("__cxa_pure_virtual", __cxa_pure_virtual);
     #ifdef __arm__
     hybris_hook("__aeabi_atexit", __aeabi_atexit_android);
     hybris_hook("__gnu_Unwind_Find_exidx", android_dl_unwind_find_exidx);
@@ -450,10 +483,11 @@ int main(int argc, char **argv)
 
     if (!glfwInit()) {
         // Initialization failed
+        puts("init failed");
     }
 
     glfwWindowHint(GLFW_CLIENT_API, GLFW_OPENGL_API);
-    glfwWindowHint(GLFW_CONTEXT_CREATION_API, GLFW_NATIVE_CONTEXT_API);
+    glfwWindowHint(GLFW_CONTEXT_CREATION_API, GLFW_EGL_CONTEXT_API);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
     _window = glfwCreateWindow(window_width, window_height, "Ninecraft", NULL, NULL);
@@ -461,8 +495,10 @@ int main(int argc, char **argv)
         puts("cant create");
     }
     glfwMakeContextCurrent(_window);
-    glfwInit();
-    glfwSetInputMode(_window, GLFW_CURSOR, GLFW_CURSOR_HIDDEN);
+    if (!glfwInit()) {
+        // Initialization failed
+        puts("init failed");
+    }
 
     math_hook();
     gles_hook();
@@ -482,15 +518,34 @@ int main(int argc, char **argv)
     controller_y_stick = (float *)hybris_dlsym(handle, "_ZN10Controller12stickValuesYE");
 
     unsigned char *dat = (unsigned char *)hybris_dlsym(handle, "_ZN15StartMenuScreenC1Ev");
-    
+
+    unsigned char *protocol_data = (unsigned char *)hybris_dlsym(handle, "_ZN24ClientSideNetworkHandler9onConnectERKN6RakNet10RakNetGUIDE");
+
     #ifdef __i386__
-    dat[268] = 0xa0;
-    DETOUR(hybris_dlsym(handle, "_ZN9Minecraft4tickEii") + 188, (void *)level_generated, false);
+    protocol_version = protocol_data[190];
+    if (protocol_version == protocol_version_0_6) {
+        dat[268] = 0xa0;
+        DETOUR(hybris_dlsym(handle, "_ZN9Minecraft4tickEii") + 188, (void *)level_generated, false);
+    } else if (protocol_version == protocol_version_0_5) {
+        dat[316] = 0xa0;
+        // unfortunately the CommandServer/MCPI-API doesnt exist in 0.5.0
+    }
     #endif
+
+    #ifdef __arm__
+    protocol_version = protocol_data[89];
+    #endif
+
+    if (protocol_version == protocol_version_0_6) {
+        default_mouse_mode = GLFW_CURSOR_HIDDEN;
+    }
+
+    glfwSetInputMode(_window, GLFW_CURSOR, default_mouse_mode);
+
+    printf("PROTOCOL VERSION: %d\n", protocol_version);
     
     DETOUR(hybris_dlsym(handle, "_ZN6Screen20renderDirtBackgroundEi"), (void *)render_menu_background, true);
     DETOUR(hybris_dlsym(handle, "_ZN6Common20getGameVersionStringERKSs"), (void *)get_game_version, true);
-    
     DETOUR(hybris_dlsym(handle, "_ZN11SoundEngineC1Ef"), (void *)sound_engine_stub, true);
     DETOUR(hybris_dlsym(handle, "_ZN11SoundEngine4initEP9MinecraftP7Options"), (void *)sound_engine_stub, true);
     DETOUR(hybris_dlsym(handle, "_ZN11SoundEngine14_getVolumeMultEfff"), (void *)sound_engine_stub, true);
@@ -513,10 +568,21 @@ int main(int argc, char **argv)
     printf("nine construct %p\n", ninecraft_app_construct);
     ninecraft_app_construct(ninecraft_app);
 
-    ((void (*)(int, const char *))hybris_dlsym(handle, "_ZNSsaSEPKc"))((int)ninecraft_app + 3544, "./storage/internal/");
-    ((void (*)(int, const char *))hybris_dlsym(handle, "_ZNSsaSEPKc"))((int)ninecraft_app + 3568, "./storage/external/");
+    const char *internal_storage_path = "./storage/internal/";
+    const char *external_storage_path = "./storage/external/";
+    ((void (*)(android_string_t *, const char *, const char *))hybris_dlsym(handle, "_ZNSs9_M_assignEPKcS0_"))(
+        (android_string_t *)(ninecraft_app + 3544),
+        internal_storage_path,
+        internal_storage_path + strlen(internal_storage_path)
+    );
+    ((void (*)(android_string_t *, const char *, const char *))hybris_dlsym(handle, "_ZNSs9_M_assignEPKcS0_"))(
+        (android_string_t *)(ninecraft_app + 3568),
+        external_storage_path,
+        external_storage_path + strlen(external_storage_path)
+    );
+
     AppPlatform_linux platform;
-    AppPlatform_linux$AppPlatform_linux(&platform, handle);
+    AppPlatform_linux$AppPlatform_linux(&platform, handle, protocol_version);
     *(void **)(ninecraft_app + 0x14) = &platform;
     printf("%p\n", &platform);
     NinecraftApp$init ninecraft_app_init = (NinecraftApp$init)hybris_dlsym(handle, "_ZN12NinecraftApp4initEv");
@@ -550,10 +616,14 @@ int main(int argc, char **argv)
         minecraft_draw();
         
         if (!mouse_pointer_hidden) {
-            float inv_gui_scale = *((float *)hybris_dlsym(handle, "_ZN3Gui11InvGuiScaleE"));
-            short cx = (short)((float)((short (*)())hybris_dlsym(handle, "_ZN5Mouse4getXEv"))() * inv_gui_scale);
-            short cy = (short)((float)((short (*)())hybris_dlsym(handle, "_ZN5Mouse4getYEv"))() * inv_gui_scale);
-            ((void (*)(float, float, void *))hybris_dlsym(handle, "_Z12renderCursorffP9Minecraft"))(cx, cy, ninecraft_app);
+            if (protocol_version == protocol_version_0_6) {
+                float inv_gui_scale = *((float *)hybris_dlsym(handle, "_ZN3Gui11InvGuiScaleE"));
+                double xpos, ypos;
+                glfwGetCursorPos(_window, &xpos, &ypos);
+                short cx = (short)(xpos * inv_gui_scale);
+                short cy = (short)(ypos * inv_gui_scale);
+                ((void (*)(float, float, void *))hybris_dlsym(handle, "_Z12renderCursorffP9Minecraft"))(cx, cy, ninecraft_app);
+            }
         }
         glfwSwapBuffers(_window);
         glfwPollEvents();

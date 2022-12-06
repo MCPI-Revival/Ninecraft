@@ -13,6 +13,7 @@ typedef struct {
     void **vtable;
     void *handle;
     int status;
+    int protocol_version;
 } AppPlatform_linux;
 
 typedef struct {
@@ -32,7 +33,7 @@ typedef struct {
     char filler[0x1000];
 } user_input;
 
-void AppPlatform_linux$AppPlatform_linux(AppPlatform_linux *app_platform, void *handle);
+void AppPlatform_linux$AppPlatform_linux(AppPlatform_linux *app_platform, void *handle, int protocol_version);
 
 void AppPlatform_linux$_tick(AppPlatform_linux *app_platform);
 
