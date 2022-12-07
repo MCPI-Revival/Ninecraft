@@ -520,13 +520,17 @@ int main(int argc, char **argv)
 
     unsigned char *protocol_data = (unsigned char *)hybris_dlsym(handle, "_ZN24ClientSideNetworkHandler9onConnectERKN6RakNet10RakNetGUIDE");
 
+    unsigned char *username_render = (unsigned char *)hybris_dlsym(handle, "_ZN14PlayerRenderer10renderNameEP3Mobfff");
+
     #ifdef __i386__
     protocol_version = protocol_data[190];
     if (protocol_version == protocol_version_0_6) {
         dat[268] = 0xa0;
+        *(short *)(username_render + 50) = 0x9090;
         DETOUR(hybris_dlsym(handle, "_ZN9Minecraft4tickEii") + 188, (void *)level_generated, false);
     } else if (protocol_version == protocol_version_0_5) {
         dat[316] = 0xa0;
+        *(short *)(username_render + 50) = 0x9090;
         // unfortunately the CommandServer/MCPI-API doesnt exist in 0.5.0
     }
     #endif
