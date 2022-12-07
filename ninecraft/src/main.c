@@ -20,6 +20,7 @@
 #include <ninecraft/audio_engine.h>
 #include <ninecraft/hooks.h>
 #include <ninecraft/minecraft.h>
+#include <ninecraft/actions.h>
 #include <math.h>
 #include <wchar.h>
 #include <wctype.h>
@@ -40,6 +41,19 @@ float x_cam = 0.0;
 
 int window_width = 720;
 int window_height = 480;
+
+void *ninecraft_app;
+
+android_vector *keyboard_inputs;
+static int *keyboard_states;
+
+static unsigned char *controller_states;
+static float *controller_x_stick;
+static float *controller_y_stick;
+
+audio_engine_t audio_engine;
+
+bool mouse_pointer_hidden = false;
 
 void *load_minecraftpe() {
     #ifdef __i386__
@@ -67,8 +81,7 @@ void *load_minecraftpe() {
     return handle;
 }
 
-void stub_symbols(const char **symbols, void *stub_func)
-{
+void stub_symbols(const char **symbols, void *stub_func) {
     int i = 0;
     while (true)
     {
@@ -91,68 +104,21 @@ void __android_log_print(int prio, const char *tag, const char *fmt, ...) {
     va_end(args);
 }
 
-void android_stub()
-{
+void android_stub() {
     puts("warn: android call");
 }
 
-void egl_stub()
-{
+void egl_stub() {
     //puts("warn: egl call");
 }
 
-void sles_stub()
-{
+void sles_stub() {
     puts("warn: sles call");
 }
 
-void sound_engine_stub()
-{
+void sound_engine_stub() {
     // puts("warn: sound engine");
 }
-
-void *ninecraft_app;
-
-struct KeyboardAction
-{
-    int action;
-    int keyCode;
-};
-
-// isbutton
-// (unsigned __int8)(*((_BYTE *)this + 8) - 1) <= 1u;
-
-// getPointerId
-// *((unsigned __int8 *)a2 + 10)
-
-struct MouseAction
-{
-    short x;
-    short y;
-    short dx;
-    short dy;
-    char button;
-    char type;
-    char pointer_id;
-    char unknown0;
-    int unknown1;
-};
-
-android_vector *keyboard_inputs;
-static int *keyboard_states;
-
-static unsigned char *controller_states;
-static float *controller_x_stick;
-static float *controller_y_stick;
-
-audio_engine_t audio_engine;
-
-static void minecraft_draw()
-{
-    ((void (*)(void *))hybris_dlsym(handle, "_ZN12NinecraftApp6updateEv"))(ninecraft_app);
-}
-
-bool mouse_pointer_hidden = false;
 
 int mouseToGameKeyCode(int keyCode) {
     if (keyCode == GLFW_MOUSE_BUTTON_LEFT) {
@@ -174,11 +140,11 @@ static void mouse_click_callback(GLFWwindow* window, int button, int action, int
         int game_keycode = mouseToGameKeyCode(button);
         
         if (action == GLFW_PRESS) {
-            struct KeyboardAction action = {1, game_keycode};
+            keyboard_action_t action = {1, game_keycode};
             android_vector$push_back_2(keyboard_inputs, &action, handle);
             keyboard_states[game_keycode] = 1;
         } else if (action == GLFW_RELEASE) {
-            struct KeyboardAction action = {0, game_keycode};
+            keyboard_action_t action = {0, game_keycode};
             android_vector$push_back_2(keyboard_inputs, &action, handle);
             keyboard_states[game_keycode] = 0;
         }
@@ -194,10 +160,10 @@ static void mouse_scroll_callback(GLFWwindow* window, double xoffset, double yof
     } else if (yoffset < 0) {
         key_code = MCKEY_HOTBAR_NEXT;
     }
-    struct KeyboardAction action1 = {1, key_code};
+    keyboard_action_t action1 = {1, key_code};
     android_vector$push_back_2(keyboard_inputs, &action1, handle);
     keyboard_states[key_code] = 1;
-    struct KeyboardAction action2 = {0, key_code};
+    keyboard_action_t action2 = {0, key_code};
     android_vector$push_back_2(keyboard_inputs, &action2, handle);
     keyboard_states[key_code] = 0;
 }
@@ -284,11 +250,11 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
                 controller_states[0] = 0;
             }
         } else if (action == GLFW_PRESS) {
-            struct KeyboardAction action = {1, game_keycode};
+            keyboard_action_t action = {1, game_keycode};
             android_vector$push_back_2(keyboard_inputs, &action, handle);
             keyboard_states[game_keycode] = 1;
         } else if (action == GLFW_RELEASE) {
-            struct KeyboardAction action = {0, game_keycode};
+            keyboard_action_t action = {0, game_keycode};
             android_vector$push_back_2(keyboard_inputs, &action, handle);
             keyboard_states[game_keycode] = 0;
         }
@@ -613,7 +579,7 @@ int main(int argc, char **argv)
             controller_y_stick[1] = (float)(y_cam - 180.0) * 0.0055555557;
             controller_x_stick[1] = ((float)((x_cam - 483.0)) * 0.0020703934);
         }
-        minecraft_draw();
+        ((void (*)(void *))hybris_dlsym(handle, "_ZN12NinecraftApp6updateEv"))(ninecraft_app);
         
         if (!mouse_pointer_hidden) {
             if (protocol_version == protocol_version_0_6) {
