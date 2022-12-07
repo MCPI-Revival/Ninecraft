@@ -129,7 +129,6 @@ int mouseToGameKeyCode(int keyCode) {
 }
 
 void mouse_device_feed_0_5(void *mouse_device, char button, char type, short x, short y) {
-    puts("ok");
     mouse_action_0_5_t action;
     action.x = x;
     action.y = y;
