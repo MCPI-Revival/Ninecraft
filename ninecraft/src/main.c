@@ -128,13 +128,45 @@ int mouseToGameKeyCode(int keyCode) {
     }
 }
 
+void mouse_device_feed_0_5(void *mouse_device, char button, char type, short x, short y) {
+    puts("ok");
+    mouse_action_0_5_t action;
+    action.x = x;
+    action.y = y;
+    action.button = button;
+    action.type = type;
+    action.pointer_id = 0;
+
+    android_vector *actions = (android_vector *)(mouse_device + 16);
+    android_vector$push_back_2(actions, &action, handle);
+    
+    if (button) {
+        ((char *)mouse_device + 12)[button] = type;
+        if (button == 1) {
+            *(int *)(mouse_device + 28) = -1;
+        }
+    } else {
+        *(int *)(mouse_device + 28) = *(int *)(mouse_device + 28) == -1;
+    }
+
+    short old_x = *(short *)(mouse_device + 4);
+    short old_y = *(short *)(mouse_device + 6);
+
+    *(short *)(mouse_device + 4) = x;
+    *(short *)(mouse_device + 6) = y;
+    *(short *)(mouse_device + 8) = old_x;
+    *(short *)(mouse_device + 10) = old_y;
+}
+
 static void mouse_click_callback(GLFWwindow* window, int button, int action, int mods) {
     double xpos, ypos;
     glfwGetCursorPos(window, &xpos, &ypos);
     if (!mouse_pointer_hidden) {
+        int mc_button = (button == GLFW_MOUSE_BUTTON_LEFT ? 1 : (button == GLFW_MOUSE_BUTTON_RIGHT ? 2 : 0));
         if (protocol_version == protocol_version_0_6) {
-            int mc_button = (button == GLFW_MOUSE_BUTTON_LEFT ? 1 : (button == GLFW_MOUSE_BUTTON_RIGHT ? 2 : 0));
             ((void (*)(char, char, short, short, short, short))hybris_dlsym(handle, "_ZN5Mouse4feedEccssss"))((char) mc_button, (char) (action == GLFW_PRESS ? 1 : 0), (short)xpos, (short)ypos, 0, 0);
+        } else if (protocol_version == protocol_version_0_5) {
+            mouse_device_feed_0_5(hybris_dlsym(handle, "_ZN5Mouse9_instanceE"), (char) mc_button, (char) (action == GLFW_PRESS ? 1 : 0), (short)xpos, (short)ypos);
         }
     } else {
         int game_keycode = mouseToGameKeyCode(button);
@@ -172,6 +204,8 @@ static void mouse_pos_callback(GLFWwindow* window, double xpos, double ypos) {
     if (!mouse_pointer_hidden) {
         if (protocol_version == protocol_version_0_6) {
             ((void (*)(char, char, short, short, short, short))hybris_dlsym(handle, "_ZN5Mouse4feedEccssss"))(0, 0, (short)xpos, (short)ypos, 0, 0);
+        } else if (protocol_version == protocol_version_0_5) {
+            mouse_device_feed_0_5(hybris_dlsym(handle, "_ZN5Mouse9_instanceE"), 0, 0, (short)xpos, (short)ypos);
         }
     } else {
         int cx;

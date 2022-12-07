@@ -13,4 +13,12 @@ typedef struct {
     char button;
     char type;
     char pointer_id;
-} mouse_action_t;
+} mouse_action_0_6_t;
+
+typedef struct {
+    short x;
+    short y;
+    char button;
+    char type;
+    char pointer_id;
+} mouse_action_0_5_t;
