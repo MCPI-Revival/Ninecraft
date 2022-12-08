@@ -39,9 +39,6 @@ int protocol_version = 9;
 float y_cam = 0.0;
 float x_cam = 0.0;
 
-int window_width = 720;
-int window_height = 480;
-
 void *ninecraft_app;
 
 android_vector *keyboard_inputs;
@@ -315,8 +312,6 @@ int getGameKeyCode(int keycode) {
 }
 
 static void resize_callback(GLFWwindow* window, int width, int height) {
-    window_width = width;
-    window_height = height;
     ((void (*)(void *, int, int))hybris_dlsym(handle, "_ZN9Minecraft7setSizeEii"))(ninecraft_app, width, height);
 }
 
@@ -559,7 +554,7 @@ int main(int argc, char **argv)
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
     glfwWindowHint(GLFW_CONTEXT_CREATION_API, GLFW_EGL_CONTEXT_API);
-    _window = glfwCreateWindow(window_width, window_height, "Ninecraft", NULL, NULL);
+    _window = glfwCreateWindow(720, 480, "Ninecraft", NULL, NULL);
     if (!_window) {
         puts("cant create");
     }
