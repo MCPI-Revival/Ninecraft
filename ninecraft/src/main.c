@@ -486,18 +486,23 @@ int main(int argc, char **argv)
     }
 
     glfwWindowHint(GLFW_CLIENT_API, GLFW_OPENGL_API);
-    glfwWindowHint(GLFW_CONTEXT_CREATION_API, GLFW_EGL_CONTEXT_API);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
+    glfwWindowHint(GLFW_CONTEXT_CREATION_API, GLFW_EGL_CONTEXT_API);
     _window = glfwCreateWindow(window_width, window_height, "Ninecraft", NULL, NULL);
     if (!_window) {
         puts("cant create");
     }
+
+    glfwSetKeyCallback(_window, key_callback);
+    glfwSetCharCallback(_window, char_callback);
+    glfwSetMouseButtonCallback(_window, mouse_click_callback);
+    glfwSetScrollCallback(_window, mouse_scroll_callback);
+    glfwSetCursorPosCallback(_window, mouse_pos_callback);
+    glfwSetWindowSizeCallback(_window, resize_callback);
+    glfwSetWindowCloseCallback(_window, window_close_callback);
+
     glfwMakeContextCurrent(_window);
-    if (!glfwInit()) {
-        // Initialization failed
-        puts("init failed");
-    }
 
     math_hook();
     gles_hook();
@@ -597,14 +602,6 @@ int main(int argc, char **argv)
     ninecraft_app_init(ninecraft_app);
 
     ((void (*)(void *, int, int))hybris_dlsym(handle, "_ZN9Minecraft7setSizeEii"))(ninecraft_app, 720, 480);
-
-    glfwSetKeyCallback(_window, key_callback);
-    glfwSetCharCallback(_window, char_callback);
-    glfwSetMouseButtonCallback(_window, mouse_click_callback);
-    glfwSetScrollCallback(_window, mouse_scroll_callback);
-    glfwSetCursorPosCallback(_window, mouse_pos_callback);
-    glfwSetWindowSizeCallback(_window, resize_callback);
-    glfwSetWindowCloseCallback(_window, window_close_callback);
 
     while (true) {
         if (*(bool *)(ninecraft_app+0xd98) == true) {
