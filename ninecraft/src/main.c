@@ -157,15 +157,79 @@ void mouse_device_feed_0_5(void *mouse_device, char button, char type, short x, 
     *(short *)(mouse_device + 10) = old_y;
 }
 
+void multitouch_feed_0_6(char button, char type, short x, short y, char pointer_id) {
+    void *pointers = hybris_dlsym(handle, "_ZN10Multitouch9_pointersE");
+    char *released = hybris_dlsym(handle, "_ZN10Multitouch12_wasReleasedE");
+    char *released_ut = hybris_dlsym(handle, "_ZN10Multitouch22_wasReleasedThisUpdateE");
+    char *pressed = hybris_dlsym(handle, "_ZN10Multitouch11_wasPressedE");
+    char *pressed_ut = hybris_dlsym(handle, "_ZN10Multitouch21_wasPressedThisUpdateE");
+    android_vector *inputs = (android_vector *)hybris_dlsym(handle, "_ZN10Multitouch7_inputsE");
+    
+    mouse_action_0_6_t action;
+    action.x = x;
+    action.y = y;
+    action.dx = 0;
+    action.dy = 0;
+    action.pointer_id = pointer_id;
+    action.button = button;
+    action.type = type;
+
+    android_vector$push_back_3(inputs, &action, handle);
+
+    ((void (*)(void *, char, char, short, short, short, short))hybris_dlsym(handle, "_ZN11MouseDevice4feedEccssss"))(pointers + (action.pointer_id * 36), action.button, action.type, action.x, action.y, action.dx, action.dy);
+    
+    if (action.button) {
+        if (action.type == 1) {
+            pressed[action.pointer_id] = 1;
+            pressed_ut[action.pointer_id] = 1;
+        } else if (action.type == 0) {
+            released[action.pointer_id] = 1;
+            released_ut[action.pointer_id] = 1;
+        }
+    }
+}
+
+void multitouch_feed_0_5(char button, char type, short x, short y, char pointer_id) {
+    void *pointers = hybris_dlsym(handle, "_ZN10Multitouch9_pointersE");
+    char *released = hybris_dlsym(handle, "_ZN10Multitouch12_wasReleasedE");
+    char *released_ut = hybris_dlsym(handle, "_ZN10Multitouch22_wasReleasedThisUpdateE");
+    char *pressed = hybris_dlsym(handle, "_ZN10Multitouch11_wasPressedE");
+    char *pressed_ut = hybris_dlsym(handle, "_ZN10Multitouch21_wasPressedThisUpdateE");
+    android_vector *inputs = (android_vector *)hybris_dlsym(handle, "_ZN10Multitouch7_inputsE");
+    
+    mouse_action_0_5_t action;
+    action.x = x;
+    action.y = y;
+    action.pointer_id = pointer_id;
+    action.button = button;
+    action.type = type;
+
+    android_vector$push_back_2(inputs, &action, handle);
+
+    mouse_device_feed_0_5(pointers + (action.pointer_id * 36), action.button, action.type, action.x, action.y);
+    
+    if (action.button) {
+        if (action.type == 1) {
+            pressed[action.pointer_id] = 1;
+            pressed_ut[action.pointer_id] = 1;
+        } else if (action.type == 0) {
+            released[action.pointer_id] = 1;
+            released_ut[action.pointer_id] = 1;
+        }
+    }
+}
+
 static void mouse_click_callback(GLFWwindow* window, int button, int action, int mods) {
     double xpos, ypos;
     glfwGetCursorPos(window, &xpos, &ypos);
     if (!mouse_pointer_hidden) {
         int mc_button = (button == GLFW_MOUSE_BUTTON_LEFT ? 1 : (button == GLFW_MOUSE_BUTTON_RIGHT ? 2 : 0));
         if (protocol_version == protocol_version_0_6) {
-            ((void (*)(char, char, short, short, short, short))hybris_dlsym(handle, "_ZN5Mouse4feedEccssss"))((char) mc_button, (char) (action == GLFW_PRESS ? 1 : 0), (short)xpos, (short)ypos, 0, 0);
+            ((void (*)(char, char, short, short, short, short))hybris_dlsym(handle, "_ZN5Mouse4feedEccssss"))((char)mc_button, (char)(action == GLFW_PRESS ? 1 : 0), (short)xpos, (short)ypos, 0, 0);
+            multitouch_feed_0_6((char)mc_button, (char)(action == GLFW_PRESS ? 1 : 0), (short)xpos, (short)ypos, 0);
         } else if (protocol_version == protocol_version_0_5) {
             mouse_device_feed_0_5(hybris_dlsym(handle, "_ZN5Mouse9_instanceE"), (char) mc_button, (char) (action == GLFW_PRESS ? 1 : 0), (short)xpos, (short)ypos);
+            multitouch_feed_0_5((char)mc_button, (char)(action == GLFW_PRESS ? 1 : 0), (short)xpos, (short)ypos, 0);
         }
     } else {
         int game_keycode = mouseToGameKeyCode(button);
@@ -203,8 +267,10 @@ static void mouse_pos_callback(GLFWwindow* window, double xpos, double ypos) {
     if (!mouse_pointer_hidden) {
         if (protocol_version == protocol_version_0_6) {
             ((void (*)(char, char, short, short, short, short))hybris_dlsym(handle, "_ZN5Mouse4feedEccssss"))(0, 0, (short)xpos, (short)ypos, 0, 0);
+            multitouch_feed_0_6(0, 0, (short)xpos, (short)ypos, 0);
         } else if (protocol_version == protocol_version_0_5) {
             mouse_device_feed_0_5(hybris_dlsym(handle, "_ZN5Mouse9_instanceE"), 0, 0, (short)xpos, (short)ypos);
+            multitouch_feed_0_5(0, 0, (short)xpos, (short)ypos, 0);
         }
     } else {
         int cx;
@@ -467,6 +533,10 @@ void level_generated(void *minecraft) {
     ((void (*)(void *, uint16_t))hybris_dlsym(handle, "_ZN13CommandServer4initEs"))(command_server, 4711);   
 }
 
+void remove_call(void *func) {
+    *(short *)(func - 1) = 0x4770;
+}
+
 int main(int argc, char **argv)
 {
     struct stat st = {0};
@@ -557,6 +627,7 @@ int main(int argc, char **argv)
 
     printf("PROTOCOL VERSION: %d\n", protocol_version);
     
+    #if __i386__
     DETOUR(hybris_dlsym(handle, "_ZN6Screen20renderDirtBackgroundEi"), (void *)render_menu_background, true);
     DETOUR(hybris_dlsym(handle, "_ZN6Common20getGameVersionStringERKSs"), (void *)get_game_version, true);
     DETOUR(hybris_dlsym(handle, "_ZN11SoundEngineC1Ef"), (void *)sound_engine_stub, true);
@@ -570,7 +641,22 @@ int main(int argc, char **argv)
     DETOUR(hybris_dlsym(handle, "_ZN11SoundEngine13updateOptionsEv"), (void *)sound_engine_stub, true);
     DETOUR(hybris_dlsym(handle, "_ZN11SoundEngineD1Ev"), (void *)sound_engine_stub, true);
     DETOUR(hybris_dlsym(handle, "_ZN11SoundEngineD2Ev"), (void *)sound_engine_stub, true);
-    
+    #endif
+
+    #if __arm__
+    remove_call(hybris_dlsym(handle, "_ZN11SoundEngineC1Ef"));
+    remove_call(hybris_dlsym(handle, "_ZN11SoundEngine4initEP9MinecraftP7Options"));
+    remove_call(hybris_dlsym(handle, "_ZN11SoundEngine14_getVolumeMultEfff"));
+    remove_call(hybris_dlsym(handle, "_ZN11SoundEngine7destroyEv"));
+    remove_call(hybris_dlsym(handle, "_ZN11SoundEngine6enableEb"));
+    remove_call(hybris_dlsym(handle, "_ZN11SoundEngine4playERKSsfffff"));
+    remove_call(hybris_dlsym(handle, "_ZN11SoundEngine6playUIERKSsff"));
+    remove_call(hybris_dlsym(handle, "_ZN11SoundEngine6updateEP3Mobf"));
+    remove_call(hybris_dlsym(handle, "_ZN11SoundEngine13updateOptionsEv"));
+    remove_call(hybris_dlsym(handle, "_ZN11SoundEngineD1Ev"));
+    remove_call(hybris_dlsym(handle, "_ZN11SoundEngineD2Ev"));
+    #endif
+
     ninecraft_app = malloc(0xe6c);
 
     printf("app: %p\n", ninecraft_app);
