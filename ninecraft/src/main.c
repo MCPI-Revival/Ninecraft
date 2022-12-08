@@ -516,7 +516,7 @@ int main(int argc, char **argv)
     controller_x_stick = (float *)hybris_dlsym(handle, "_ZN10Controller12stickValuesXE");
     controller_y_stick = (float *)hybris_dlsym(handle, "_ZN10Controller12stickValuesYE");
 
-    unsigned char *dat = (unsigned char *)hybris_dlsym(handle, "_ZN15StartMenuScreenC1Ev");
+    unsigned char *start_screen = (unsigned char *)hybris_dlsym(handle, "_ZN15StartMenuScreenC1Ev");
 
     unsigned char *protocol_data = (unsigned char *)hybris_dlsym(handle, "_ZN24ClientSideNetworkHandler9onConnectERKN6RakNet10RakNetGUIDE");
 
@@ -525,11 +525,11 @@ int main(int argc, char **argv)
     #ifdef __i386__
     protocol_version = protocol_data[190];
     if (protocol_version == protocol_version_0_6) {
-        dat[268] = 0xa0;
+        start_screen[268] = 0xa0;
         *(short *)(username_render + 50) = 0x9090;
         DETOUR(hybris_dlsym(handle, "_ZN9Minecraft4tickEii") + 188, (void *)level_generated, false);
     } else if (protocol_version == protocol_version_0_5) {
-        dat[316] = 0xa0;
+        start_screen[316] = 0xa0;
         *(short *)(username_render + 50) = 0x9090;
         // unfortunately the CommandServer/MCPI-API doesnt exist in 0.5.0
     }
@@ -537,6 +537,11 @@ int main(int argc, char **argv)
 
     #ifdef __arm__
     protocol_version = protocol_data[89];
+    if (protocol_version == protocol_version_0_6) {
+        start_screen[129] = 0xa0;
+    } else if (protocol_version == protocol_version_0_5) {
+        start_screen[177] = 0xa0;
+    }
     #endif
 
     if (protocol_version == protocol_version_0_6) {
