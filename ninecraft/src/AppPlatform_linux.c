@@ -174,6 +174,8 @@ android_vector AppPlatform_linux$getOptionStrings(AppPlatform_linux *app_platfor
     puts("debug: AppPlatform_linux::getOptionsStrings");
     android_string_t username_name; // mp_username
     android_string_t username_value; // Steve
+    android_string_t server_name; // mp_server
+    android_string_t server_value; // Ninecraft
     android_string_t server_visible_name; // mp_server_visible_default
     android_string_t server_visible_value; // true
     android_string_t fancygraphics_name; // gfx_fancygraphics
@@ -188,6 +190,10 @@ android_vector AppPlatform_linux$getOptionStrings(AppPlatform_linux *app_platfor
     android_string_t islefthanded_value; // false
     android_string_t usetouchscreen_name; // ctrl_usetouchscreen
     android_string_t usetouchscreen_value; // false
+    android_string_t usetouchjoypad_name; // ctrl_usetouchjoypad
+    android_string_t usetouchjoypad_value; // true
+    android_string_t vibration_name; // feedback_vibration
+    android_string_t vibration_value; // false
     android_string_t difficulty_name; // game_difficulty
     android_string_t difficulty_value; // 0, 4
     unsigned int size = 24;
@@ -214,6 +220,8 @@ android_vector AppPlatform_linux$getOptionStrings(AppPlatform_linux *app_platfor
         }
         pclose(fp);
     }
+    android_string_cstr(&server_name, "mp_server", app_platform->handle);
+    android_string_cstr(&server_value, "Ninecraft", app_platform->handle);
     android_string_cstr(&server_visible_name, "mp_server_visible_default", app_platform->handle);
     android_string_cstr(&server_visible_value, "true", app_platform->handle);
     android_string_cstr(&fancygraphics_name, "gfx_fancygraphics", app_platform->handle);
@@ -228,6 +236,10 @@ android_vector AppPlatform_linux$getOptionStrings(AppPlatform_linux *app_platfor
     android_string_cstr(&islefthanded_value, "false", app_platform->handle);
     android_string_cstr(&usetouchscreen_name, "ctrl_usetouchscreen", app_platform->handle);
     android_string_cstr(&usetouchscreen_value, "false", app_platform->handle);
+    android_string_cstr(&usetouchjoypad_name, "ctrl_usetouchjoypad", app_platform->handle);
+    android_string_cstr(&usetouchjoypad_value, "true", app_platform->handle);
+    android_string_cstr(&vibration_name, "feedback_vibration", app_platform->handle);
+    android_string_cstr(&vibration_value, "false", app_platform->handle);
     android_string_cstr(&difficulty_name, "game_difficulty", app_platform->handle);
     android_string_cstr(&difficulty_value, "4", app_platform->handle);
     android_vector out;
@@ -236,6 +248,8 @@ android_vector AppPlatform_linux$getOptionStrings(AppPlatform_linux *app_platfor
     out._M_end_of_storage = out._M_start + 24;
     android_vector$push_back(&out, &username_name, app_platform->handle);
     android_vector$push_back(&out, &username_value, app_platform->handle);
+    android_vector$push_back(&out, &server_name, app_platform->handle);
+    android_vector$push_back(&out, &server_value, app_platform->handle);
     android_vector$push_back(&out, &server_visible_name, app_platform->handle);
     android_vector$push_back(&out, &server_visible_value, app_platform->handle);
     android_vector$push_back(&out, &fancygraphics_name, app_platform->handle);
@@ -250,6 +264,10 @@ android_vector AppPlatform_linux$getOptionStrings(AppPlatform_linux *app_platfor
     android_vector$push_back(&out, &islefthanded_value, app_platform->handle);
     android_vector$push_back(&out, &usetouchscreen_name, app_platform->handle);
     android_vector$push_back(&out, &usetouchscreen_value, app_platform->handle);
+    android_vector$push_back(&out, &usetouchjoypad_name, app_platform->handle);
+    android_vector$push_back(&out, &usetouchjoypad_value, app_platform->handle);
+    android_vector$push_back(&out, &vibration_name, app_platform->handle);
+    android_vector$push_back(&out, &vibration_value, app_platform->handle);
     android_vector$push_back(&out, &difficulty_name, app_platform->handle);
     android_vector$push_back(&out, &difficulty_value, app_platform->handle);
     printf("start: %u; finish: %u; end: %u;\n", out._M_start, out._M_finish, out._M_end_of_storage);
