@@ -2,7 +2,7 @@
 #include <ninecraft/input/action/mouse_action.h>
 #include <ninecraft/input/mouse_device.h>
 
-void mouse_device_feed_0_5(mouse_device_0_5_t *mouse_device, char button, char type, short x, short y, void *handle) {
+void mouse_device_feed_0_5(mouse_device_0_5_t *mouse_device, char button, char type, short x, short y) {
     mouse_action_0_5_t action;
     action.x = x;
     action.y = y;
@@ -10,7 +10,7 @@ void mouse_device_feed_0_5(mouse_device_0_5_t *mouse_device, char button, char t
     action.type = type;
     action.pointer_id = 0;
 
-    android_vector_push_back(&mouse_device->actions, &action, sizeof(mouse_action_0_5_t), handle);
+    android_vector_push_back(&mouse_device->actions, &action, sizeof(mouse_action_0_5_t));
     
     if (button) {
         mouse_device->button_states[button] = type;
@@ -27,7 +27,7 @@ void mouse_device_feed_0_5(mouse_device_0_5_t *mouse_device, char button, char t
     mouse_device->y = y;
 }
 
-void mouse_device_feed_0_6(mouse_device_0_6_t *mouse_device, char button, char type, short x, short y, short dx, short dy, void *handle) {
+void mouse_device_feed_0_6(mouse_device_0_6_t *mouse_device, char button, char type, short x, short y, short dx, short dy) {
     mouse_action_0_6_t action;
     action.x = x;
     action.y = y;
@@ -37,7 +37,7 @@ void mouse_device_feed_0_6(mouse_device_0_6_t *mouse_device, char button, char t
     action.type = type;
     action.pointer_id = 0;
 
-    android_vector_push_back(&mouse_device->actions, &action, sizeof(mouse_action_0_6_t), handle);
+    android_vector_push_back(&mouse_device->actions, &action, sizeof(mouse_action_0_6_t));
     
     if (button) {
         mouse_device->button_states[button] = type;

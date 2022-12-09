@@ -20,8 +20,8 @@ uintptr_t android_vector_uninitialized_fill(uintptr_t __first, size_t __n, uintp
 
 uintptr_t android_vector_uninitialized_move(uintptr_t __first, uintptr_t __last, uintptr_t __result, size_t __entry_size);
 
-void android_vector_insert_overflow_aux(android_vector_t *__this, void *__pos, void *__x, void *reserved, size_t __fill_len, bool __atend, size_t __entry_size, void *handle);
+void android_vector_insert_overflow_aux(android_vector_t *__this, void *__pos, void *__x, void *reserved, size_t __fill_len, bool __atend, size_t __entry_size);
 
-void android_vector_push_back(android_vector_t *this_vector, void *item, size_t __entry_size, void *handle);
+void android_vector_push_back(android_vector_t *this_vector, void *item, size_t __entry_size);
 
 #endif

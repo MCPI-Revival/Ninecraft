@@ -27,8 +27,8 @@ typedef struct {
     int last_pressed;
 } mouse_device_0_6_t;
 
-void mouse_device_feed_0_5(mouse_device_0_5_t *mouse_device, char button, char type, short x, short y, void *handle);
+void mouse_device_feed_0_5(mouse_device_0_5_t *mouse_device, char button, char type, short x, short y);
 
-void mouse_device_feed_0_6(mouse_device_0_6_t *mouse_device, char button, char type, short x, short y, short dx, short dy, void *handle);
+void mouse_device_feed_0_6(mouse_device_0_6_t *mouse_device, char button, char type, short x, short y, short dx, short dy);
 
 #endif

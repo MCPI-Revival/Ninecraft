@@ -15,6 +15,7 @@
 #include <ninecraft/protocol_versions.h>
 #include <ninecraft/input/minecraft_keys.h>
 #include <ninecraft/android/android_string.h>
+#include <ninecraft/android/android_alloc.h>
 #include <ninecraft/symbols.h>
 #include <ninecraft/AppPlatform_linux.h>
 #include <ninecraft/audio/audio_engine.h>
@@ -130,19 +131,19 @@ static void mouse_click_callback(GLFWwindow* window, int button, int action, int
     if (!mouse_pointer_hidden) {
         int mc_button = (button == GLFW_MOUSE_BUTTON_LEFT ? 1 : (button == GLFW_MOUSE_BUTTON_RIGHT ? 2 : 0));
         if (protocol_version == protocol_version_0_6) {
-            mouse_device_feed_0_6(hybris_dlsym(handle, "_ZN5Mouse9_instanceE"), (char)mc_button, (char)(action == GLFW_PRESS ? 1 : 0), (short)xpos, (short)ypos, 0, 0, handle);
-            multitouch_feed_0_6((char)mc_button, (char)(action == GLFW_PRESS ? 1 : 0), (short)xpos, (short)ypos, 0, handle);
+            mouse_device_feed_0_6(hybris_dlsym(handle, "_ZN5Mouse9_instanceE"), (char)mc_button, (char)(action == GLFW_PRESS ? 1 : 0), (short)xpos, (short)ypos, 0, 0);
+            multitouch_feed_0_6((char)mc_button, (char)(action == GLFW_PRESS ? 1 : 0), (short)xpos, (short)ypos, 0);
         } else if (protocol_version == protocol_version_0_5) {
-            mouse_device_feed_0_5(hybris_dlsym(handle, "_ZN5Mouse9_instanceE"), (char) mc_button, (char) (action == GLFW_PRESS ? 1 : 0), (short)xpos, (short)ypos, handle);
-            multitouch_feed_0_5((char)mc_button, (char)(action == GLFW_PRESS ? 1 : 0), (short)xpos, (short)ypos, 0, handle);
+            mouse_device_feed_0_5(hybris_dlsym(handle, "_ZN5Mouse9_instanceE"), (char) mc_button, (char) (action == GLFW_PRESS ? 1 : 0), (short)xpos, (short)ypos);
+            multitouch_feed_0_5((char)mc_button, (char)(action == GLFW_PRESS ? 1 : 0), (short)xpos, (short)ypos, 0);
         }
     } else {
         int game_keycode = mouseToGameKeyCode(button);
         
         if (action == GLFW_PRESS) {
-            keyboard_feed(game_keycode, 1, handle);
+            keyboard_feed(game_keycode, 1);
         } else if (action == GLFW_RELEASE) {
-            keyboard_feed(game_keycode, 0, handle);
+            keyboard_feed(game_keycode, 0);
         }
     }
 }
@@ -156,18 +157,18 @@ static void mouse_scroll_callback(GLFWwindow* window, double xoffset, double yof
     } else if (yoffset < 0) {
         key_code = MCKEY_HOTBAR_NEXT;
     }
-    keyboard_feed(key_code, 1, handle);
-    keyboard_feed(key_code, 0, handle);
+    keyboard_feed(key_code, 1);
+    keyboard_feed(key_code, 0);
 }
 
 static void mouse_pos_callback(GLFWwindow* window, double xpos, double ypos) {
     if (!mouse_pointer_hidden) {
         if (protocol_version == protocol_version_0_6) {
-            mouse_device_feed_0_6(hybris_dlsym(handle, "_ZN5Mouse9_instanceE"), 0, 0, (short)xpos, (short)ypos, 0, 0, handle);
-            multitouch_feed_0_6(0, 0, (short)xpos, (short)ypos, 0, handle);
+            mouse_device_feed_0_6(hybris_dlsym(handle, "_ZN5Mouse9_instanceE"), 0, 0, (short)xpos, (short)ypos, 0, 0);
+            multitouch_feed_0_6(0, 0, (short)xpos, (short)ypos, 0);
         } else if (protocol_version == protocol_version_0_5) {
-            mouse_device_feed_0_5(hybris_dlsym(handle, "_ZN5Mouse9_instanceE"), 0, 0, (short)xpos, (short)ypos, handle);
-            multitouch_feed_0_5(0, 0, (short)xpos, (short)ypos, 0, handle);
+            mouse_device_feed_0_5(hybris_dlsym(handle, "_ZN5Mouse9_instanceE"), 0, 0, (short)xpos, (short)ypos);
+            multitouch_feed_0_5(0, 0, (short)xpos, (short)ypos, 0);
         }
     } else {
         int cx;
@@ -271,9 +272,9 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
                 controller_states[0] = 0;
             }
         } else if (action == GLFW_PRESS && game_keycode) {
-            keyboard_feed(game_keycode, 1, handle);
+            keyboard_feed(game_keycode, 1);
         } else if (action == GLFW_RELEASE && game_keycode) {
-            keyboard_feed(game_keycode, 0, handle);
+            keyboard_feed(game_keycode, 0);
         }
     }
 }
@@ -320,7 +321,7 @@ void sound_engine_update(void *sound_engine, unsigned char *mob, float listener_
 
 android_string_t get_game_version() {
     android_string_t out;
-    android_string_cstr(&out, "Ninecraft 1.1.0", handle);
+    android_string_cstr(&out, "Ninecraft 1.1.0");
     return out;
 }
 
@@ -432,7 +433,7 @@ void render_menu_background(void *screen) {
     void *minecraft = *(void **)(screen + 20);
     void *textures = *(void **)(minecraft + 688);
     android_string_t str;
-    android_string_cstr(&str, "gui/bg32.png", handle);
+    android_string_cstr(&str, "gui/bg32.png");
     ((void (*)(void *, android_string_t *))hybris_dlsym(handle, "_ZN8Textures18loadAndBindTextureERKSs"))(textures, &str);
     ((void (*)(void *, int, int, int, int, int, int, int, int))hybris_dlsym(handle, "_ZN12GuiComponent4blitEiiiiiiii"))(screen, 0, 0, 0, 0, *(int *)(screen+8), *(int *)(screen+12), 0x100, 0x100);
 }
@@ -502,9 +503,12 @@ int main(int argc, char **argv)
     
     handle = load_minecraftpe();
 
+    multitouch_setup_hooks(handle);
+    keyboard_setup_hooks(handle);
+    android_alloc_setup_hooks(handle);
+    android_string_setup_hooks(handle);
+
     audio_engine_create_audio_device(&audio_engine);
-    keyboard_inputs = (android_vector_t *)hybris_dlsym(handle, "_ZN8Keyboard7_inputsE");
-    keyboard_states = (int *)hybris_dlsym(handle, "_ZN8Keyboard7_statesE");
     controller_states = (unsigned char *)hybris_dlsym(handle, "_ZN10Controller15isTouchedValuesE");
     controller_x_stick = (float *)hybris_dlsym(handle, "_ZN10Controller12stickValuesXE");
     controller_y_stick = (float *)hybris_dlsym(handle, "_ZN10Controller12stickValuesYE");

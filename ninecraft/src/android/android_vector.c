@@ -36,10 +36,10 @@ uintptr_t android_vector_uninitialized_move(uintptr_t __first, uintptr_t __last,
     return __cur;
 }
 
-void android_vector_insert_overflow_aux(android_vector_t *__this, void *__pos, void *__x, void *reserved, size_t __fill_len, bool __atend, size_t __entry_size, void *handle) {
+void android_vector_insert_overflow_aux(android_vector_t *__this, void *__pos, void *__x, void *reserved, size_t __fill_len, bool __atend, size_t __entry_size) {
     size_t __len = android_vector_compute_next_size(__this, __fill_len, __entry_size);
     size_t __size = __len * __entry_size;
-    uintptr_t __new_start = (uintptr_t)android_alloc_allocate((uint32_t *)&__size, handle);
+    uintptr_t __new_start = (uintptr_t)android_alloc_allocate((uint32_t *)&__size);
     uintptr_t __new_finish = android_vector_uninitialized_move(__this->_M_start, (uintptr_t)__pos, __new_start, __entry_size);
     if (__fill_len == 1) {
         memcpy((void *)__new_finish, __x, __entry_size);
@@ -51,16 +51,16 @@ void android_vector_insert_overflow_aux(android_vector_t *__this, void *__pos, v
         __new_finish = android_vector_uninitialized_move((uintptr_t)__pos, __this->_M_finish, __new_finish, __entry_size);
     }
     if (__this->_M_start) {
-        android_alloc_deallocate((void *)__this->_M_start, (__this->_M_end_of_storage - __this->_M_start) & 0xFFFFFFF8, handle);
+        android_alloc_deallocate((void *)__this->_M_start, (__this->_M_end_of_storage - __this->_M_start) & 0xFFFFFFF8);
     }
     __this->_M_start = __new_start;
     __this->_M_finish = __new_finish;
     __this->_M_end_of_storage = __new_start + __len * __entry_size;
 }
 
-void android_vector_push_back(android_vector_t *this_vector, void *item, size_t __entry_size, void *handle) {
+void android_vector_push_back(android_vector_t *this_vector, void *item, size_t __entry_size) {
     if (this_vector->_M_finish == this_vector->_M_end_of_storage) {
-        android_vector_insert_overflow_aux(this_vector, (void *)this_vector->_M_finish, item, 0, 1, 1, __entry_size, handle);
+        android_vector_insert_overflow_aux(this_vector, (void *)this_vector->_M_finish, item, 0, 1, 1, __entry_size);
     } else {
         if (this_vector->_M_finish) {
             memcpy((void *)this_vector->_M_finish, item, __entry_size);
