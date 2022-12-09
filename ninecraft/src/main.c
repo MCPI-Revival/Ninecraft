@@ -171,14 +171,6 @@ void mouse_device_feed_0_6(void *mouse_device, char button, char type, short x, 
         ((char *)mouse_device + 16)[button] = type;
         if (button == 1) {
             *(int *)(mouse_device + 32) = -1;
-        } else {
-            short old_x = *(short *)(mouse_device + 4);
-            short old_y = *(short *)(mouse_device + 6);
-
-            *(short *)(mouse_device + 4) = x;
-            *(short *)(mouse_device + 6) = y;
-            *(short *)(mouse_device + 12) = old_x;
-            *(short *)(mouse_device + 14) = old_y;
         }
     } else {
         if (*(short *)(mouse_device + 8) == -9999) {
@@ -189,6 +181,14 @@ void mouse_device_feed_0_6(void *mouse_device, char button, char type, short x, 
         *(short *)(mouse_device + 10) += dy;
         *(int *)(mouse_device + 32) = *(int *)(mouse_device + 28) == -1;
     }
+    
+    short old_x = *(short *)(mouse_device + 4);
+    short old_y = *(short *)(mouse_device + 6);
+
+    *(short *)(mouse_device + 4) = x;
+    *(short *)(mouse_device + 6) = y;
+    *(short *)(mouse_device + 12) = old_x;
+    *(short *)(mouse_device + 14) = old_y;
 }
 
 void multitouch_feed_0_6(char button, char type, short x, short y, char pointer_id) {
