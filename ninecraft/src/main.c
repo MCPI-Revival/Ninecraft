@@ -20,7 +20,9 @@
 #include <ninecraft/audio_engine.h>
 #include <ninecraft/hooks.h>
 #include <ninecraft/minecraft.h>
-#include <ninecraft/inputs.h>
+#include <ninecraft/input/keyboard.h>
+#include <ninecraft/input/mouse_device.h>
+#include <ninecraft/input/multitouch.h>
 #include <math.h>
 #include <wchar.h>
 #include <wctype.h>
@@ -40,9 +42,6 @@ float y_cam = 0.0;
 float x_cam = 0.0;
 
 void *ninecraft_app;
-
-android_vector *keyboard_inputs;
-static int *keyboard_states;
 
 static unsigned char *controller_states;
 static float *controller_x_stick;
@@ -125,150 +124,25 @@ int mouseToGameKeyCode(int keyCode) {
     }
 }
 
-void mouse_device_feed_0_5(mouse_device_0_5_t *mouse_device, char button, char type, short x, short y) {
-    mouse_action_0_5_t action;
-    action.x = x;
-    action.y = y;
-    action.button = button;
-    action.type = type;
-    action.pointer_id = 0;
-
-    android_vector$push_back_2(&mouse_device->actions, &action, handle);
-    
-    if (button) {
-        mouse_device->button_states[button] = type;
-        if (button == 1) {
-            mouse_device->last_pressed = -1;
-        }
-    } else {
-        mouse_device->last_pressed = mouse_device->last_pressed == -1;
-    }
-
-    mouse_device->old_x = mouse_device->x;
-    mouse_device->old_y = mouse_device->y;
-    mouse_device->x = x;
-    mouse_device->y = y;
-}
-
-void mouse_device_feed_0_6(mouse_device_0_6_t *mouse_device, char button, char type, short x, short y, short dx, short dy) {
-    mouse_action_0_6_t action;
-    action.x = x;
-    action.y = y;
-    action.dx = dx;
-    action.dy = dy;
-    action.button = button;
-    action.type = type;
-    action.pointer_id = 0;
-
-    android_vector$push_back_3(&mouse_device->actions, &action, handle);
-    
-    if (button) {
-        mouse_device->button_states[button] = type;
-        if (button == 1) {
-            mouse_device->last_pressed = -1;
-        }
-    } else {
-        if (mouse_device->dx == -9999) {
-            mouse_device->dx = 0;
-            mouse_device->dy = 0;
-        }
-        mouse_device->dx += dx;
-        mouse_device->dy += dy;
-
-        mouse_device->last_pressed = mouse_device->last_pressed == -1;
-    }
-
-    mouse_device->old_x = mouse_device->x;
-    mouse_device->old_y = mouse_device->y;
-    mouse_device->x = x;
-    mouse_device->y = y;
-}
-
-void multitouch_feed_0_6(char button, char type, short x, short y, char pointer_id) {
-    void *pointers = hybris_dlsym(handle, "_ZN10Multitouch9_pointersE");
-    char *released = hybris_dlsym(handle, "_ZN10Multitouch12_wasReleasedE");
-    char *released_ut = hybris_dlsym(handle, "_ZN10Multitouch22_wasReleasedThisUpdateE");
-    char *pressed = hybris_dlsym(handle, "_ZN10Multitouch11_wasPressedE");
-    char *pressed_ut = hybris_dlsym(handle, "_ZN10Multitouch21_wasPressedThisUpdateE");
-    android_vector *inputs = (android_vector *)hybris_dlsym(handle, "_ZN10Multitouch7_inputsE");
-    
-    mouse_action_0_6_t action;
-    action.x = x;
-    action.y = y;
-    action.dx = 0;
-    action.dy = 0;
-    action.pointer_id = pointer_id;
-    action.button = button;
-    action.type = type;
-
-    android_vector$push_back_3(inputs, &action, handle);
-
-    mouse_device_feed_0_6(pointers + (action.pointer_id * sizeof(mouse_device_0_6_t)), action.button, action.type, action.x, action.y, action.dx, action.dy);
-    
-    if (action.button) {
-        if (action.type == 1) {
-            pressed[action.pointer_id] = 1;
-            pressed_ut[action.pointer_id] = 1;
-        } else if (action.type == 0) {
-            released[action.pointer_id] = 1;
-            released_ut[action.pointer_id] = 1;
-        }
-    }
-}
-
-void multitouch_feed_0_5(char button, char type, short x, short y, char pointer_id) {
-    void *pointers = hybris_dlsym(handle, "_ZN10Multitouch9_pointersE");
-    char *released = hybris_dlsym(handle, "_ZN10Multitouch12_wasReleasedE");
-    char *released_ut = hybris_dlsym(handle, "_ZN10Multitouch22_wasReleasedThisUpdateE");
-    char *pressed = hybris_dlsym(handle, "_ZN10Multitouch11_wasPressedE");
-    char *pressed_ut = hybris_dlsym(handle, "_ZN10Multitouch21_wasPressedThisUpdateE");
-    android_vector *inputs = (android_vector *)hybris_dlsym(handle, "_ZN10Multitouch7_inputsE");
-    
-    mouse_action_0_5_t action;
-    action.x = x;
-    action.y = y;
-    action.pointer_id = pointer_id;
-    action.button = button;
-    action.type = type;
-
-    android_vector$push_back_2(inputs, &action, handle);
-
-    mouse_device_feed_0_5(pointers + (action.pointer_id * sizeof(mouse_device_0_5_t)), action.button, action.type, action.x, action.y);
-    
-    if (action.button) {
-        if (action.type == 1) {
-            pressed[action.pointer_id] = 1;
-            pressed_ut[action.pointer_id] = 1;
-        } else if (action.type == 0) {
-            released[action.pointer_id] = 1;
-            released_ut[action.pointer_id] = 1;
-        }
-    }
-}
-
 static void mouse_click_callback(GLFWwindow* window, int button, int action, int mods) {
     double xpos, ypos;
     glfwGetCursorPos(window, &xpos, &ypos);
     if (!mouse_pointer_hidden) {
         int mc_button = (button == GLFW_MOUSE_BUTTON_LEFT ? 1 : (button == GLFW_MOUSE_BUTTON_RIGHT ? 2 : 0));
         if (protocol_version == protocol_version_0_6) {
-            mouse_device_feed_0_6(hybris_dlsym(handle, "_ZN5Mouse9_instanceE"), (char)mc_button, (char)(action == GLFW_PRESS ? 1 : 0), (short)xpos, (short)ypos, 0, 0);
-            multitouch_feed_0_6((char)mc_button, (char)(action == GLFW_PRESS ? 1 : 0), (short)xpos, (short)ypos, 0);
+            mouse_device_feed_0_6(hybris_dlsym(handle, "_ZN5Mouse9_instanceE"), (char)mc_button, (char)(action == GLFW_PRESS ? 1 : 0), (short)xpos, (short)ypos, 0, 0, handle);
+            multitouch_feed_0_6((char)mc_button, (char)(action == GLFW_PRESS ? 1 : 0), (short)xpos, (short)ypos, 0, handle);
         } else if (protocol_version == protocol_version_0_5) {
-            mouse_device_feed_0_5(hybris_dlsym(handle, "_ZN5Mouse9_instanceE"), (char) mc_button, (char) (action == GLFW_PRESS ? 1 : 0), (short)xpos, (short)ypos);
-            multitouch_feed_0_5((char)mc_button, (char)(action == GLFW_PRESS ? 1 : 0), (short)xpos, (short)ypos, 0);
+            mouse_device_feed_0_5(hybris_dlsym(handle, "_ZN5Mouse9_instanceE"), (char) mc_button, (char) (action == GLFW_PRESS ? 1 : 0), (short)xpos, (short)ypos, handle);
+            multitouch_feed_0_5((char)mc_button, (char)(action == GLFW_PRESS ? 1 : 0), (short)xpos, (short)ypos, 0, handle);
         }
     } else {
         int game_keycode = mouseToGameKeyCode(button);
         
         if (action == GLFW_PRESS) {
-            keyboard_action_t action = {1, game_keycode};
-            android_vector$push_back_2(keyboard_inputs, &action, handle);
-            keyboard_states[game_keycode] = 1;
+            keyboard_feed(game_keycode, 1, handle);
         } else if (action == GLFW_RELEASE) {
-            keyboard_action_t action = {0, game_keycode};
-            android_vector$push_back_2(keyboard_inputs, &action, handle);
-            keyboard_states[game_keycode] = 0;
+            keyboard_feed(game_keycode, 0, handle);
         }
     }
 }
@@ -282,22 +156,18 @@ static void mouse_scroll_callback(GLFWwindow* window, double xoffset, double yof
     } else if (yoffset < 0) {
         key_code = MCKEY_HOTBAR_NEXT;
     }
-    keyboard_action_t action1 = {1, key_code};
-    android_vector$push_back_2(keyboard_inputs, &action1, handle);
-    keyboard_states[key_code] = 1;
-    keyboard_action_t action2 = {0, key_code};
-    android_vector$push_back_2(keyboard_inputs, &action2, handle);
-    keyboard_states[key_code] = 0;
+    keyboard_feed(key_code, 1, handle);
+    keyboard_feed(key_code, 0, handle);
 }
 
 static void mouse_pos_callback(GLFWwindow* window, double xpos, double ypos) {
     if (!mouse_pointer_hidden) {
         if (protocol_version == protocol_version_0_6) {
-            mouse_device_feed_0_6(hybris_dlsym(handle, "_ZN5Mouse9_instanceE"), 0, 0, (short)xpos, (short)ypos, 0, 0);
-            multitouch_feed_0_6(0, 0, (short)xpos, (short)ypos, 0);
+            mouse_device_feed_0_6(hybris_dlsym(handle, "_ZN5Mouse9_instanceE"), 0, 0, (short)xpos, (short)ypos, 0, 0, handle);
+            multitouch_feed_0_6(0, 0, (short)xpos, (short)ypos, 0, handle);
         } else if (protocol_version == protocol_version_0_5) {
-            mouse_device_feed_0_5(hybris_dlsym(handle, "_ZN5Mouse9_instanceE"), 0, 0, (short)xpos, (short)ypos);
-            multitouch_feed_0_5(0, 0, (short)xpos, (short)ypos, 0);
+            mouse_device_feed_0_5(hybris_dlsym(handle, "_ZN5Mouse9_instanceE"), 0, 0, (short)xpos, (short)ypos, handle);
+            multitouch_feed_0_5(0, 0, (short)xpos, (short)ypos, 0, handle);
         }
     } else {
         int cx;
@@ -353,6 +223,22 @@ static void char_callback(GLFWwindow* window, unsigned int codepoint) {
 
 int old_pos_x, old_pos_y, old_width, old_height;
 
+typedef struct {
+    int count;
+    int id;
+    int meta;
+} item_instance_t;
+
+int get_selected_slot(void *inventory) {
+    int slot = *(int *)(inventory + INVENTORY_SELECTED_SLOT_OFFSET);
+    int count = *(int *)(inventory + FILLINGCONTAINER_LINKED_SLOTS_COUNT_OFFSET);
+    if (slot < count) {
+        int32_t *slots = *(int **)(inventory + FILLINGCONTAINER_LINKED_SLOTS_OFFSET);
+        slot = slots[slot];
+    }
+    return slot;
+}
+
 static void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods) {
     if (key == GLFW_KEY_F11) {
         if (action == GLFW_PRESS) {
@@ -365,6 +251,17 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
                 glfwSetWindowMonitor(_window, NULL, old_pos_x, old_pos_y, old_width, old_height, 0);
             }
         }
+    } else if (key == GLFW_KEY_Q) {
+        if (action == GLFW_PRESS) {
+            void *player = *(void **)(ninecraft_app + MINECRAFT_PLAYER_OFFSET);
+            void *inv = *(void **)(player + PLAYER_INVENTORY_OFFSET);
+            int slot = get_selected_slot(inv);
+            if (glfwGetKey(_window, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS) {
+                ((void (*)(int, int, char, char))hybris_dlsym(handle, "_ZN16FillingContainer8dropSlotEibb"))(inv, slot, 0, 0);
+            } else {
+            }
+            //audio_engine_play(&audio_engine, handle, "random.pop2", 0, 0, 0, 0.3, 1, 1);
+        }
     } else {
         int game_keycode = getGameKeyCode(key);
         if (mouse_pointer_hidden && key == GLFW_KEY_LEFT_SHIFT) {
@@ -373,14 +270,10 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
             } else if (action == GLFW_RELEASE) {
                 controller_states[0] = 0;
             }
-        } else if (action == GLFW_PRESS) {
-            keyboard_action_t action = {1, game_keycode};
-            android_vector$push_back_2(keyboard_inputs, &action, handle);
-            keyboard_states[game_keycode] = 1;
-        } else if (action == GLFW_RELEASE) {
-            keyboard_action_t action = {0, game_keycode};
-            android_vector$push_back_2(keyboard_inputs, &action, handle);
-            keyboard_states[game_keycode] = 0;
+        } else if (action == GLFW_PRESS && game_keycode) {
+            keyboard_feed(game_keycode, 1, handle);
+        } else if (action == GLFW_RELEASE && game_keycode) {
+            keyboard_feed(game_keycode, 0, handle);
         }
     }
 }

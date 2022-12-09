@@ -8,7 +8,7 @@ find_package(PNG REQUIRED)
 find_package(OpenAL REQUIRED)
 find_package(OpenGL REQUIRED)
 
-file(GLOB SOURCE_FILES src/*.c)
+file(GLOB_RECURSE SOURCE_FILES src/*.c)
 
 add_executable(ninecraft ${SOURCE_FILES})
 target_compile_definitions(ninecraft PRIVATE _GNU_SOURCE GL_GLEXT_PROTOTYPES)

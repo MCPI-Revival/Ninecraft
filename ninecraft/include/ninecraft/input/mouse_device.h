@@ -1,29 +1,7 @@
-#pragma once
+#ifndef NINECRAFT_INPUT_MOUSE_DEVICE_H
+#define NINECRAFT_INPUT_MOUSE_DEVICE_H
 
 #include <ninecraft/android_vector.h>
-
-typedef struct {
-    int action;
-    int keyCode;
-} keyboard_action_t;
-
-typedef struct {
-    short x;
-    short y;
-    short dx;
-    short dy;
-    char button;
-    char type;
-    char pointer_id;
-} mouse_action_0_6_t;
-
-typedef struct {
-    short x;
-    short y;
-    char button;
-    char type;
-    char pointer_id;
-} mouse_action_0_5_t;
 
 typedef struct {
     void *vtable;
@@ -48,3 +26,9 @@ typedef struct {
     android_vector actions;
     int last_pressed;
 } mouse_device_0_6_t;
+
+void mouse_device_feed_0_5(mouse_device_0_5_t *mouse_device, char button, char type, short x, short y, void *handle);
+
+void mouse_device_feed_0_6(mouse_device_0_6_t *mouse_device, char button, char type, short x, short y, short dx, short dy, void *handle);
+
+#endif
