@@ -1,6 +1,8 @@
 #ifndef NINECRAFT_ANDROID_ANDROID_ALLOC_H
 #define NINECRAFT_ANDROID_ANDROID_ALLOC_H
 
+#include <stddef.h>
+
 typedef void *(*android_alloc_node_alloc_t)(size_t *__np);
 typedef void *(*android_alloc_operator_new_t)(size_t __n);
 typedef void (*android_alloc_node_dealloc_t)(void *ptr, size_t __n);

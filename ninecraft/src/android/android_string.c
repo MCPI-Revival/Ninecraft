@@ -5,10 +5,12 @@
 
 android_string_clone_t android_string_clone = NULL;
 android_string_deallocate_block_t android_string_deallocate_block = NULL;
+android_string_assign_t android_string_assign = NULL;
 
 void android_string_setup_hooks(void *handle) {
     android_string_clone = (android_string_clone_t)hybris_dlsym(handle, "_ZNSsC2ERKSs");
     android_string_deallocate_block = (android_string_deallocate_block_t)hybris_dlsym(handle, "_ZNSt4priv12_String_baseIcSaIcEE19_M_deallocate_blockEv");
+    android_string_assign = (android_string_assign_t)hybris_dlsym(handle, "_ZNSs9_M_assignEPKcS0_");
 }
 
 void *android_string_ucopy_trivial(const void *__first, const void *__last, void *__result) {
@@ -41,4 +43,8 @@ void android_string_cstr(android_string_t *__this, char *__s) {
     android_string_allocate_block(__this, length + 1);
     __this->_M_finish = android_string_ucopy_trivial(__s, last, __this->_M_start_of_storage);
     *(char *)__this->_M_finish = 0;
+}
+
+void android_string_equ(android_string_t *__this, char *__s) {
+    android_string_assign(__this, __s, __s + strlen(__s));
 }

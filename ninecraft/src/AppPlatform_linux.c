@@ -3,9 +3,9 @@
 #include <errno.h>
 #include <stdio.h>
 #include <ninecraft/android/android_alloc.h>
-#include <ninecraft/protocol_versions.h>
+#include <ninecraft/version_ids.h>
 
-void AppPlatform_linux$AppPlatform_linux(AppPlatform_linux *app_platform, void *handle, int protocol_version) {
+void AppPlatform_linux$AppPlatform_linux(AppPlatform_linux *app_platform, void *handle, int version_id) {
     app_platform->vtable = (void **) malloc(31 * sizeof(void *));
     app_platform->vtable[0] = (void *) AppPlatform_linux$destroy;
     app_platform->vtable[1] = (void *) AppPlatform_linux$destroy;
@@ -28,7 +28,7 @@ void AppPlatform_linux$AppPlatform_linux(AppPlatform_linux *app_platform, void *
     app_platform->vtable[18] = (void *) AppPlatform_linux$isNetworkEnabled;
     app_platform->vtable[19] = (void *) AppPlatform_linux$getOptionStrings;
     app_platform->vtable[20] = (void *) AppPlatform_linux$isPowerVR;
-    if (protocol_version == protocol_version_0_6) {
+    if (version_id == version_id_0_6) {
         app_platform->vtable[21] = (void *) AppPlatform_linux$getKeyFromKeyCode;
         app_platform->vtable[22] = (void *) AppPlatform_linux$buyGame;
         app_platform->vtable[23] = (void *) AppPlatform_linux$finish;
@@ -39,7 +39,7 @@ void AppPlatform_linux$AppPlatform_linux(AppPlatform_linux *app_platform, void *
         app_platform->vtable[28] = (void *) AppPlatform_linux$hideKeyboard;
         app_platform->vtable[29] = (void *) AppPlatform_linux$isKeyboardVisible;
         app_platform->vtable[30] = (void *) AppPlatform_linux$showKeyboard;
-    } else if (protocol_version == protocol_version_0_5) {
+    } else if (version_id == version_id_0_5) {
         app_platform->vtable[21] = (void *) AppPlatform_linux$buyGame;
         app_platform->vtable[22] = (void *) AppPlatform_linux$finish;
         app_platform->vtable[23] = (void *) AppPlatform_linux$isTouchscreen;
@@ -48,7 +48,7 @@ void AppPlatform_linux$AppPlatform_linux(AppPlatform_linux *app_platform, void *
     }
     app_platform->handle = handle;
     app_platform->status = -1;
-    app_platform->protocol_version = protocol_version;
+    app_platform->version_id = version_id;
 }
 
 void AppPlatform_linux$_tick(AppPlatform_linux *app_platform) {
