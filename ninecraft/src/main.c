@@ -154,6 +154,43 @@ void mouse_device_feed_0_5(void *mouse_device, char button, char type, short x, 
     *(short *)(mouse_device + 10) = old_y;
 }
 
+void mouse_device_feed_0_6(void *mouse_device, char button, char type, short x, short y, short dx, short dy) {
+    mouse_action_0_6_t action;
+    action.x = x;
+    action.y = y;
+    action.dx = dx;
+    action.dy = dy;
+    action.button = button;
+    action.type = type;
+    action.pointer_id = 0;
+
+    android_vector *actions = (android_vector *)(mouse_device + 20);
+    android_vector$push_back_3(actions, &action, handle);
+    
+    if (button) {
+        ((char *)mouse_device + 16)[button] = type;
+        if (button == 1) {
+            *(int *)(mouse_device + 32) = -1;
+        } else {
+            short old_x = *(short *)(mouse_device + 4);
+            short old_y = *(short *)(mouse_device + 6);
+
+            *(short *)(mouse_device + 4) = x;
+            *(short *)(mouse_device + 6) = y;
+            *(short *)(mouse_device + 12) = old_x;
+            *(short *)(mouse_device + 14) = old_y;
+        }
+    } else {
+        if (*(short *)(mouse_device + 8) == -9999) {
+            *(short *)(mouse_device + 8) = 0;
+            *(short *)(mouse_device + 10) = 0;
+        }
+        *(short *)(mouse_device + 8) += dx;
+        *(short *)(mouse_device + 10) += dy;
+        *(int *)(mouse_device + 32) = *(int *)(mouse_device + 28) == -1;
+    }
+}
+
 void multitouch_feed_0_6(char button, char type, short x, short y, char pointer_id) {
     void *pointers = hybris_dlsym(handle, "_ZN10Multitouch9_pointersE");
     char *released = hybris_dlsym(handle, "_ZN10Multitouch12_wasReleasedE");
@@ -222,7 +259,7 @@ static void mouse_click_callback(GLFWwindow* window, int button, int action, int
     if (!mouse_pointer_hidden) {
         int mc_button = (button == GLFW_MOUSE_BUTTON_LEFT ? 1 : (button == GLFW_MOUSE_BUTTON_RIGHT ? 2 : 0));
         if (protocol_version == protocol_version_0_6) {
-            ((void (*)(char, char, short, short, short, short))hybris_dlsym(handle, "_ZN5Mouse4feedEccssss"))((char)mc_button, (char)(action == GLFW_PRESS ? 1 : 0), (short)xpos, (short)ypos, 0, 0);
+            mouse_device_feed_0_6(hybris_dlsym(handle, "_ZN5Mouse9_instanceE"), (char)mc_button, (char)(action == GLFW_PRESS ? 1 : 0), (short)xpos, (short)ypos, 0, 0);
             multitouch_feed_0_6((char)mc_button, (char)(action == GLFW_PRESS ? 1 : 0), (short)xpos, (short)ypos, 0);
         } else if (protocol_version == protocol_version_0_5) {
             mouse_device_feed_0_5(hybris_dlsym(handle, "_ZN5Mouse9_instanceE"), (char) mc_button, (char) (action == GLFW_PRESS ? 1 : 0), (short)xpos, (short)ypos);
@@ -263,7 +300,7 @@ static void mouse_scroll_callback(GLFWwindow* window, double xoffset, double yof
 static void mouse_pos_callback(GLFWwindow* window, double xpos, double ypos) {
     if (!mouse_pointer_hidden) {
         if (protocol_version == protocol_version_0_6) {
-            ((void (*)(char, char, short, short, short, short))hybris_dlsym(handle, "_ZN5Mouse4feedEccssss"))(0, 0, (short)xpos, (short)ypos, 0, 0);
+            mouse_device_feed_0_6(hybris_dlsym(handle, "_ZN5Mouse9_instanceE"), 0, 0, (short)xpos, (short)ypos, 0, 0);
             multitouch_feed_0_6(0, 0, (short)xpos, (short)ypos, 0);
         } else if (protocol_version == protocol_version_0_5) {
             mouse_device_feed_0_5(hybris_dlsym(handle, "_ZN5Mouse9_instanceE"), 0, 0, (short)xpos, (short)ypos);
