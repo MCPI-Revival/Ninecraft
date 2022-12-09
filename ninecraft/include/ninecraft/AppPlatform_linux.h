@@ -1,4 +1,5 @@
-#pragma once
+#ifndef NINECRAFT_APP_PLATFORM_H
+#define NINECRAFT_APP_PLATFORM_H
 
 #include <string.h>
 #include <dlfcn.h>
@@ -92,3 +93,5 @@ void AppPlatform_linux$uploadPlatformDependentData(AppPlatform_linux *app_platfo
 void AppPlatform_linux$vibrate(AppPlatform_linux *app_platform, int32_t milliseconds);
 
 void AppPlatform_linux$destroy(AppPlatform_linux *app_platform);
+
+#endif

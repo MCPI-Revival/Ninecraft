@@ -1,5 +1,5 @@
-#ifndef MCPER_SYMBOLS
-#define MCPER_SYMBOLS
+#ifndef NINECRAFT_SYMBOLS_H
+#define NINECRAFT_SYMBOLS_H
 
 const char *egl_symbols[] = {
     "eglChooseConfig",
