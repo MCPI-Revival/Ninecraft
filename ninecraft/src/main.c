@@ -20,7 +20,7 @@
 #include <ninecraft/audio_engine.h>
 #include <ninecraft/hooks.h>
 #include <ninecraft/minecraft.h>
-#include <ninecraft/actions.h>
+#include <ninecraft/inputs.h>
 #include <math.h>
 #include <wchar.h>
 #include <wctype.h>
@@ -125,7 +125,7 @@ int mouseToGameKeyCode(int keyCode) {
     }
 }
 
-void mouse_device_feed_0_5(void *mouse_device, char button, char type, short x, short y) {
+void mouse_device_feed_0_5(mouse_device_0_5_t *mouse_device, char button, char type, short x, short y) {
     mouse_action_0_5_t action;
     action.x = x;
     action.y = y;
@@ -133,28 +133,24 @@ void mouse_device_feed_0_5(void *mouse_device, char button, char type, short x, 
     action.type = type;
     action.pointer_id = 0;
 
-    android_vector *actions = (android_vector *)(mouse_device + 16);
-    android_vector$push_back_2(actions, &action, handle);
+    android_vector$push_back_2(&mouse_device->actions, &action, handle);
     
     if (button) {
-        ((char *)mouse_device + 12)[button] = type;
+        mouse_device->button_states[button] = type;
         if (button == 1) {
-            *(int *)(mouse_device + 28) = -1;
+            mouse_device->last_pressed = -1;
         }
     } else {
-        *(int *)(mouse_device + 28) = *(int *)(mouse_device + 28) == -1;
+        mouse_device->last_pressed = mouse_device->last_pressed == -1;
     }
 
-    short old_x = *(short *)(mouse_device + 4);
-    short old_y = *(short *)(mouse_device + 6);
-
-    *(short *)(mouse_device + 4) = x;
-    *(short *)(mouse_device + 6) = y;
-    *(short *)(mouse_device + 8) = old_x;
-    *(short *)(mouse_device + 10) = old_y;
+    mouse_device->old_x = mouse_device->x;
+    mouse_device->old_y = mouse_device->y;
+    mouse_device->x = x;
+    mouse_device->y = y;
 }
 
-void mouse_device_feed_0_6(void *mouse_device, char button, char type, short x, short y, short dx, short dy) {
+void mouse_device_feed_0_6(mouse_device_0_6_t *mouse_device, char button, char type, short x, short y, short dx, short dy) {
     mouse_action_0_6_t action;
     action.x = x;
     action.y = y;
@@ -164,31 +160,28 @@ void mouse_device_feed_0_6(void *mouse_device, char button, char type, short x, 
     action.type = type;
     action.pointer_id = 0;
 
-    android_vector *actions = (android_vector *)(mouse_device + 20);
-    android_vector$push_back_3(actions, &action, handle);
+    android_vector$push_back_3(&mouse_device->actions, &action, handle);
     
     if (button) {
-        ((char *)mouse_device + 16)[button] = type;
+        mouse_device->button_states[button] = type;
         if (button == 1) {
-            *(int *)(mouse_device + 32) = -1;
+            mouse_device->last_pressed = -1;
         }
     } else {
-        if (*(short *)(mouse_device + 8) == -9999) {
-            *(short *)(mouse_device + 8) = 0;
-            *(short *)(mouse_device + 10) = 0;
+        if (mouse_device->dx == -9999) {
+            mouse_device->dx = 0;
+            mouse_device->dy = 0;
         }
-        *(short *)(mouse_device + 8) += dx;
-        *(short *)(mouse_device + 10) += dy;
-        *(int *)(mouse_device + 32) = *(int *)(mouse_device + 28) == -1;
-    }
-    
-    short old_x = *(short *)(mouse_device + 4);
-    short old_y = *(short *)(mouse_device + 6);
+        mouse_device->dx += dx;
+        mouse_device->dy += dy;
 
-    *(short *)(mouse_device + 4) = x;
-    *(short *)(mouse_device + 6) = y;
-    *(short *)(mouse_device + 12) = old_x;
-    *(short *)(mouse_device + 14) = old_y;
+        mouse_device->last_pressed = mouse_device->last_pressed == -1;
+    }
+
+    mouse_device->old_x = mouse_device->x;
+    mouse_device->old_y = mouse_device->y;
+    mouse_device->x = x;
+    mouse_device->y = y;
 }
 
 void multitouch_feed_0_6(char button, char type, short x, short y, char pointer_id) {
@@ -210,7 +203,7 @@ void multitouch_feed_0_6(char button, char type, short x, short y, char pointer_
 
     android_vector$push_back_3(inputs, &action, handle);
 
-    ((void (*)(void *, char, char, short, short, short, short))hybris_dlsym(handle, "_ZN11MouseDevice4feedEccssss"))(pointers + (action.pointer_id * 36), action.button, action.type, action.x, action.y, action.dx, action.dy);
+    mouse_device_feed_0_6(pointers + (action.pointer_id * sizeof(mouse_device_0_6_t)), action.button, action.type, action.x, action.y, action.dx, action.dy);
     
     if (action.button) {
         if (action.type == 1) {
@@ -240,7 +233,7 @@ void multitouch_feed_0_5(char button, char type, short x, short y, char pointer_
 
     android_vector$push_back_2(inputs, &action, handle);
 
-    mouse_device_feed_0_5(pointers + (action.pointer_id * 36), action.button, action.type, action.x, action.y);
+    mouse_device_feed_0_5(pointers + (action.pointer_id * sizeof(mouse_device_0_5_t)), action.button, action.type, action.x, action.y);
     
     if (action.button) {
         if (action.type == 1) {
