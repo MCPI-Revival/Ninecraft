@@ -1,4 +1,5 @@
-#pragma once
+#ifndef NINECRAFT_AUDIO_AUDIO_ENGINE_H
+#define NINECRAFT_AUDIO_AUDIO_ENGINE_H
 
 #include <AL/al.h>
 #include <AL/alc.h>
@@ -56,3 +57,5 @@ ALuint audio_engine_get_buffer(audio_engine_t *audio_engine, char *name, void *h
 void audio_engine_play(audio_engine_t *audio_engine, void *handle, char *name, float x, float y, float z, float volume, float pitch, bool is_ui);
 
 void audio_engine_update(audio_engine_t *audio_engine, float volume, float x, float y, float z, float yaw);
+
+#endif

@@ -10,14 +10,14 @@
 #include <sys/types.h>
 #include <sys/stat.h>
 #include <GLFW/glfw3.h>
-#include <ninecraft/detours.h>
-#include <ninecraft/gles_compat.h>
+#include <ninecraft/patch/detours.h>
+#include <ninecraft/gfx/gles_compat.h>
 #include <ninecraft/protocol_versions.h>
-#include <ninecraft/minecraft_keys.h>
-#include <ninecraft/android_string.h>
+#include <ninecraft/input/minecraft_keys.h>
+#include <ninecraft/android/android_string.h>
 #include <ninecraft/symbols.h>
 #include <ninecraft/AppPlatform_linux.h>
-#include <ninecraft/audio_engine.h>
+#include <ninecraft/audio/audio_engine.h>
 #include <ninecraft/hooks.h>
 #include <ninecraft/minecraft.h>
 #include <ninecraft/input/keyboard.h>
@@ -257,7 +257,7 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
             void *inv = *(void **)(player + PLAYER_INVENTORY_OFFSET);
             int slot = get_selected_slot(inv);
             if (glfwGetKey(_window, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS) {
-                ((void (*)(int, int, char, char))hybris_dlsym(handle, "_ZN16FillingContainer8dropSlotEibb"))(inv, slot, 0, 0);
+                //((void (*)(int, int, char, char))hybris_dlsym(handle, "_ZN16FillingContainer8dropSlotEibb"))(inv, slot, 0, 0);
             } else {
             }
             //audio_engine_play(&audio_engine, handle, "random.pop2", 0, 0, 0, 0.3, 1, 1);
@@ -503,7 +503,7 @@ int main(int argc, char **argv)
     handle = load_minecraftpe();
 
     audio_engine_create_audio_device(&audio_engine);
-    keyboard_inputs = (android_vector *)hybris_dlsym(handle, "_ZN8Keyboard7_inputsE");
+    keyboard_inputs = (android_vector_t *)hybris_dlsym(handle, "_ZN8Keyboard7_inputsE");
     keyboard_states = (int *)hybris_dlsym(handle, "_ZN8Keyboard7_statesE");
     controller_states = (unsigned char *)hybris_dlsym(handle, "_ZN10Controller15isTouchedValuesE");
     controller_x_stick = (float *)hybris_dlsym(handle, "_ZN10Controller12stickValuesXE");

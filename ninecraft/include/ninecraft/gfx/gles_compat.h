@@ -1,4 +1,5 @@
-#pragma once
+#ifndef NINECRAFT_GFX_GLES_COMPAT_H
+#define NINECRAFT_GFX_GLES_COMPAT_H
 
 #include <GL/gl.h>
 
@@ -99,3 +100,5 @@ void gl_translate_f(GLfloat x, GLfloat y, GLfloat z);
 void gl_vertex_pointer(GLint size, GLenum type, GLsizei stride, const GLvoid *pointer);
 
 void gl_viewport(GLint x, GLint y, GLsizei width, GLsizei height);
+
+#endif

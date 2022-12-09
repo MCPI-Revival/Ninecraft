@@ -1,4 +1,4 @@
-#include <ninecraft/gles_compat.h>
+#include <ninecraft/gfx/gles_compat.h>
 #include <GL/glext.h>
 
 void gl_alpha_func(GLenum func, GLclampf ref) {

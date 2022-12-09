@@ -1,6 +1,6 @@
 #include <hybris/dlfcn.h>
-#include <ninecraft/android_alloc.h>
-#include <ninecraft/android_string.h>
+#include <ninecraft/android/android_alloc.h>
+#include <ninecraft/android/android_string.h>
 #include <string.h>
 
 void *android_string_ucopy_trivial(const void *__first, const void *__last, void *__result) {

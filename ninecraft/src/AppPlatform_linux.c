@@ -2,7 +2,7 @@
 #include <stdlib.h>
 #include <errno.h>
 #include <stdio.h>
-#include <ninecraft/android_alloc.h>
+#include <ninecraft/android/android_alloc.h>
 #include <ninecraft/protocol_versions.h>
 
 void AppPlatform_linux$AppPlatform_linux(AppPlatform_linux *app_platform, void *handle, int protocol_version) {
@@ -170,7 +170,7 @@ int AppPlatform_linux$getKeyFromKeyCode(AppPlatform_linux *app_platform, unsigne
     return 0;
 }
 
-android_vector AppPlatform_linux$getOptionStrings(AppPlatform_linux *app_platform) {
+android_vector_t AppPlatform_linux$getOptionStrings(AppPlatform_linux *app_platform) {
     puts("debug: AppPlatform_linux::getOptionsStrings");
     android_string_t username_name; // mp_username
     android_string_t username_value; // Steve
@@ -242,34 +242,34 @@ android_vector AppPlatform_linux$getOptionStrings(AppPlatform_linux *app_platfor
     android_string_cstr(&vibration_value, "false", app_platform->handle);
     android_string_cstr(&difficulty_name, "game_difficulty", app_platform->handle);
     android_string_cstr(&difficulty_value, "4", app_platform->handle);
-    android_vector out;
+    android_vector_t out;
     out._M_start = (unsigned long)android_alloc_allocate(&size, app_platform->handle);
     out._M_finish = out._M_start;
     out._M_end_of_storage = out._M_start + 24;
-    android_vector$push_back(&out, &username_name, app_platform->handle);
-    android_vector$push_back(&out, &username_value, app_platform->handle);
-    android_vector$push_back(&out, &server_name, app_platform->handle);
-    android_vector$push_back(&out, &server_value, app_platform->handle);
-    android_vector$push_back(&out, &server_visible_name, app_platform->handle);
-    android_vector$push_back(&out, &server_visible_value, app_platform->handle);
-    android_vector$push_back(&out, &fancygraphics_name, app_platform->handle);
-    android_vector$push_back(&out, &fancygraphics_value, app_platform->handle);
-    android_vector$push_back(&out, &lowquality_name, app_platform->handle);
-    android_vector$push_back(&out, &lowquality_value, app_platform->handle);
-    android_vector$push_back(&out, &sensitivity_name, app_platform->handle);
-    android_vector$push_back(&out, &sensitivity_value, app_platform->handle);
-    android_vector$push_back(&out, &invertmouse_name, app_platform->handle);
-    android_vector$push_back(&out, &invertmouse_value, app_platform->handle);
-    android_vector$push_back(&out, &islefthanded_name, app_platform->handle);
-    android_vector$push_back(&out, &islefthanded_value, app_platform->handle);
-    android_vector$push_back(&out, &usetouchscreen_name, app_platform->handle);
-    android_vector$push_back(&out, &usetouchscreen_value, app_platform->handle);
-    android_vector$push_back(&out, &usetouchjoypad_name, app_platform->handle);
-    android_vector$push_back(&out, &usetouchjoypad_value, app_platform->handle);
-    android_vector$push_back(&out, &vibration_name, app_platform->handle);
-    android_vector$push_back(&out, &vibration_value, app_platform->handle);
-    android_vector$push_back(&out, &difficulty_name, app_platform->handle);
-    android_vector$push_back(&out, &difficulty_value, app_platform->handle);
+    android_vector_push_back(&out, &username_name, sizeof(android_string_t), app_platform->handle);
+    android_vector_push_back(&out, &username_value, sizeof(android_string_t), app_platform->handle);
+    android_vector_push_back(&out, &server_name, sizeof(android_string_t), app_platform->handle);
+    android_vector_push_back(&out, &server_value, sizeof(android_string_t), app_platform->handle);
+    android_vector_push_back(&out, &server_visible_name, sizeof(android_string_t), app_platform->handle);
+    android_vector_push_back(&out, &server_visible_value, sizeof(android_string_t), app_platform->handle);
+    android_vector_push_back(&out, &fancygraphics_name, sizeof(android_string_t), app_platform->handle);
+    android_vector_push_back(&out, &fancygraphics_value, sizeof(android_string_t), app_platform->handle);
+    android_vector_push_back(&out, &lowquality_name, sizeof(android_string_t), app_platform->handle);
+    android_vector_push_back(&out, &lowquality_value, sizeof(android_string_t), app_platform->handle);
+    android_vector_push_back(&out, &sensitivity_name, sizeof(android_string_t), app_platform->handle);
+    android_vector_push_back(&out, &sensitivity_value, sizeof(android_string_t), app_platform->handle);
+    android_vector_push_back(&out, &invertmouse_name, sizeof(android_string_t), app_platform->handle);
+    android_vector_push_back(&out, &invertmouse_value, sizeof(android_string_t), app_platform->handle);
+    android_vector_push_back(&out, &islefthanded_name, sizeof(android_string_t), app_platform->handle);
+    android_vector_push_back(&out, &islefthanded_value, sizeof(android_string_t), app_platform->handle);
+    android_vector_push_back(&out, &usetouchscreen_name, sizeof(android_string_t), app_platform->handle);
+    android_vector_push_back(&out, &usetouchscreen_value, sizeof(android_string_t), app_platform->handle);
+    android_vector_push_back(&out, &usetouchjoypad_name, sizeof(android_string_t), app_platform->handle);
+    android_vector_push_back(&out, &usetouchjoypad_value, sizeof(android_string_t), app_platform->handle);
+    android_vector_push_back(&out, &vibration_name, sizeof(android_string_t), app_platform->handle);
+    android_vector_push_back(&out, &vibration_value, sizeof(android_string_t), app_platform->handle);
+    android_vector_push_back(&out, &difficulty_name, sizeof(android_string_t), app_platform->handle);
+    android_vector_push_back(&out, &difficulty_value, sizeof(android_string_t), app_platform->handle);
     printf("start: %u; finish: %u; end: %u;\n", out._M_start, out._M_finish, out._M_end_of_storage);
     return out;
 }
@@ -296,7 +296,7 @@ int AppPlatform_linux$getScreenWidth(AppPlatform_linux *app_platform) {
     return 900;
 }
 
-android_vector AppPlatform_linux$getUserInput(AppPlatform_linux *app_platform) {
+android_vector_t AppPlatform_linux$getUserInput(AppPlatform_linux *app_platform) {
     puts("debug: AppPlatform_linux::getUserInput");
     android_string_t name;
     android_string_t seed;
@@ -361,14 +361,14 @@ android_vector AppPlatform_linux$getUserInput(AppPlatform_linux *app_platform) {
         pclose(fp);
     }
     unsigned int size = 24;
-    android_vector out;
+    android_vector_t out;
     out._M_start = (unsigned long)android_alloc_allocate(&size, app_platform->handle);
     out._M_finish = out._M_start;
     out._M_end_of_storage = out._M_start + 24;
     puts("ok----");
-    android_vector$push_back(&out, &name, app_platform->handle);
-    android_vector$push_back(&out, &seed, app_platform->handle);
-    android_vector$push_back(&out, &gamemode, app_platform->handle);
+    android_vector_push_back(&out, &name, sizeof(android_string_t), app_platform->handle);
+    android_vector_push_back(&out, &seed, sizeof(android_string_t), app_platform->handle);
+    android_vector_push_back(&out, &gamemode, sizeof(android_string_t), app_platform->handle);
 
     printf("start: %u; finish: %u; end: %u;\n", out._M_start, out._M_finish, out._M_end_of_storage);
     return out;

@@ -1,6 +1,6 @@
 #include <string.h>
 
-#include <ninecraft/sound_repo.h>
+#include <ninecraft/audio/sound_repo.h>
 
 void get_sound(char **arr, char *name) {
     if (strcmp(name, "random.pop2") == 0) {

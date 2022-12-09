@@ -1,7 +1,7 @@
 #include <stddef.h>
 #include <AL/alext.h>
-#include <ninecraft/audio_engine.h>
-#include <ninecraft/sound_repo.h>
+#include <ninecraft/audio/audio_engine.h>
+#include <ninecraft/audio/sound_repo.h>
 #include <stdio.h>
 #include <hybris/dlfcn.h>
 #include <stdlib.h>

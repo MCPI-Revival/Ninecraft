@@ -1,7 +1,7 @@
 #ifndef NINECRAFT_INPUT_MOUSE_DEVICE_H
 #define NINECRAFT_INPUT_MOUSE_DEVICE_H
 
-#include <ninecraft/android_vector.h>
+#include <ninecraft/android/android_vector.h>
 
 typedef struct {
     void *vtable;
@@ -10,7 +10,7 @@ typedef struct {
     short old_x;
     short old_y;
     char button_states[4];
-    android_vector actions;
+    android_vector_t actions;
     int last_pressed;
 } mouse_device_0_5_t;
 
@@ -23,7 +23,7 @@ typedef struct {
     short old_x;
     short old_y;
     char button_states[4];
-    android_vector actions;
+    android_vector_t actions;
     int last_pressed;
 } mouse_device_0_6_t;
 

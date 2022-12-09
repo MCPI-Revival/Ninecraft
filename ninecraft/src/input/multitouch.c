@@ -8,7 +8,7 @@ void multitouch_feed_0_5(char button, char type, short x, short y, char pointer_
     char *released_ut = hybris_dlsym(handle, "_ZN10Multitouch22_wasReleasedThisUpdateE");
     char *pressed = hybris_dlsym(handle, "_ZN10Multitouch11_wasPressedE");
     char *pressed_ut = hybris_dlsym(handle, "_ZN10Multitouch21_wasPressedThisUpdateE");
-    android_vector *inputs = (android_vector *)hybris_dlsym(handle, "_ZN10Multitouch7_inputsE");
+    android_vector_t *inputs = (android_vector_t *)hybris_dlsym(handle, "_ZN10Multitouch7_inputsE");
     
     mouse_action_0_5_t action;
     action.x = x;
@@ -17,7 +17,7 @@ void multitouch_feed_0_5(char button, char type, short x, short y, char pointer_
     action.button = button;
     action.type = type;
 
-    android_vector$push_back_2(inputs, &action, handle);
+    android_vector_push_back(inputs, &action, sizeof(mouse_action_0_5_t), handle);
 
     mouse_device_feed_0_5(pointers + (action.pointer_id * sizeof(mouse_device_0_5_t)), action.button, action.type, action.x, action.y, handle);
     
@@ -38,7 +38,7 @@ void multitouch_feed_0_6(char button, char type, short x, short y, char pointer_
     char *released_ut = hybris_dlsym(handle, "_ZN10Multitouch22_wasReleasedThisUpdateE");
     char *pressed = hybris_dlsym(handle, "_ZN10Multitouch11_wasPressedE");
     char *pressed_ut = hybris_dlsym(handle, "_ZN10Multitouch21_wasPressedThisUpdateE");
-    android_vector *inputs = (android_vector *)hybris_dlsym(handle, "_ZN10Multitouch7_inputsE");
+    android_vector_t *inputs = (android_vector_t *)hybris_dlsym(handle, "_ZN10Multitouch7_inputsE");
     
     mouse_action_0_6_t action;
     action.x = x;
@@ -49,7 +49,7 @@ void multitouch_feed_0_6(char button, char type, short x, short y, char pointer_
     action.button = button;
     action.type = type;
 
-    android_vector$push_back_3(inputs, &action, handle);
+    android_vector_push_back(inputs, &action, sizeof(mouse_action_0_6_t), handle);
 
     mouse_device_feed_0_6(pointers + (action.pointer_id * sizeof(mouse_device_0_6_t)), action.button, action.type, action.x, action.y, action.dx, action.dy, handle);
     

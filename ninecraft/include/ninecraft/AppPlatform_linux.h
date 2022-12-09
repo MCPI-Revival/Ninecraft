@@ -5,9 +5,9 @@
 #include <hybris/dlfcn.h>
 #include <hybris/hook.h>
 #include <hybris/jb/linker.h>
-#include <ninecraft/textures.h>
-#include <ninecraft/android_string.h>
-#include <ninecraft/android_vector.h>
+#include <ninecraft/gfx/textures.h>
+#include <ninecraft/android/android_string.h>
+#include <ninecraft/android/android_vector.h>
 
 typedef struct {
     void **vtable;
@@ -49,7 +49,7 @@ android_string_t AppPlatform_linux$getDateString(AppPlatform_linux *app_platform
 
 int32_t AppPlatform_linux$getKeyFromKeyCode(AppPlatform_linux *app_platform, unsigned int key_code, unsigned int meta_state, unsigned int device_id);
 
-android_vector AppPlatform_linux$getOptionStrings(AppPlatform_linux *app_platform);
+android_vector_t AppPlatform_linux$getOptionStrings(AppPlatform_linux *app_platform);
 
 float AppPlatform_linux$getPixelsPerMillimeter(AppPlatform_linux *app_platform);
 
@@ -59,7 +59,7 @@ int AppPlatform_linux$getScreenHeight(AppPlatform_linux *app_platform);
 
 int AppPlatform_linux$getScreenWidth(AppPlatform_linux *app_platform);
 
-android_vector AppPlatform_linux$getUserInput(AppPlatform_linux *app_platform);
+android_vector_t AppPlatform_linux$getUserInput(AppPlatform_linux *app_platform);
 
 int AppPlatform_linux$getUserInputStatus(AppPlatform_linux *app_platform);
 

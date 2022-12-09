@@ -10,7 +10,7 @@ void mouse_device_feed_0_5(mouse_device_0_5_t *mouse_device, char button, char t
     action.type = type;
     action.pointer_id = 0;
 
-    android_vector$push_back_2(&mouse_device->actions, &action, handle);
+    android_vector_push_back(&mouse_device->actions, &action, sizeof(mouse_action_0_5_t), handle);
     
     if (button) {
         mouse_device->button_states[button] = type;
@@ -37,7 +37,7 @@ void mouse_device_feed_0_6(mouse_device_0_6_t *mouse_device, char button, char t
     action.type = type;
     action.pointer_id = 0;
 
-    android_vector$push_back_3(&mouse_device->actions, &action, handle);
+    android_vector_push_back(&mouse_device->actions, &action, sizeof(mouse_action_0_6_t), handle);
     
     if (button) {
         mouse_device->button_states[button] = type;

@@ -1,4 +1,5 @@
-#pragma once
+#ifndef NINECRAFT_INPUT_MINECRAFT_KEYS_H
+#define NINECRAFT_INPUT_MINECRAFT_KEYS_H
 
 /*
     key.forward - MCKEY_FORWARD
@@ -34,3 +35,5 @@
 #define MCKEY_BREAK 102
 #define MCKEY_PLACE 103
 #define MCKEY_CRAFTING 109
+
+#endif

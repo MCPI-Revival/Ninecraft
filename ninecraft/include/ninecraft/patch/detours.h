@@ -1,4 +1,5 @@
-#pragma once
+#ifndef NINECRAFT_PATCH_DETOURS_H
+#define NINECRAFT_PATCH_DETOURS_H
 
 #include <stdbool.h>
 
@@ -18,4 +19,6 @@ void x86_detour(void *target_addr, void *replacement_addr, bool jump);
 #else
 #define DETOUR(target_addr, replacement_addr, jump)
 #endif
+#endif
+
 #endif

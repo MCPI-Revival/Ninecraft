@@ -1,4 +1,5 @@
-#pragma once
+#ifndef NINECRAFT_ANDROID_ANDROID_STRING_H
+#define NINECRAFT_ANDROID_ANDROID_STRING_H
 
 typedef union {
     void *_M_end_of_storage;
@@ -22,3 +23,5 @@ void android_string_cstr(android_string_t *__this, char *__s, void *handle);
 void android_string_clone(android_string_t *__this, android_string_t *__ps, void *handle);
 
 void android_string_deallocate_block(android_string_t *__this, void *handle);
+
+#endif

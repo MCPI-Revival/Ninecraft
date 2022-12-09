@@ -1,4 +1,5 @@
-#pragma once
+#ifndef NINECRAFT_AUDIO_SOUND_REPO_H
+#define NINECRAFT_AUDIO_SOUND_REPO_H
 
 void get_sound(char **arr, char *name);
 
@@ -147,3 +148,5 @@ mob.creeperdeath
 random.eat
 random.fuse
 */
+
+#endif

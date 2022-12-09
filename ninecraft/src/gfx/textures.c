@@ -1,4 +1,4 @@
-#include <ninecraft/textures.h>
+#include <ninecraft/gfx/textures.h>
 #include <png.h>
 #include <errno.h>
 #include <stdlib.h>

@@ -1,4 +1,4 @@
-#include <ninecraft/detours.h>
+#include <ninecraft/patch/detours.h>
 #include <stdint.h>
 
 void arm_detour(void *target_addr, void *replacement_addr) {

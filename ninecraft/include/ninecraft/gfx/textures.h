@@ -1,4 +1,5 @@
-#pragma once
+#ifndef NINECRAFT_GFX_TEXTURES_H
+#define NINECRAFT_GFX_TEXTURES_H
 
 #include <stdbool.h>
 #include <stdint.h>
@@ -22,3 +23,5 @@ typedef struct {
 } texture_data_t;
 
 texture_data_t read_png(char *path, bool alpha, bool reverse_load);
+
+#endif

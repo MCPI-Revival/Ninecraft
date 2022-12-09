@@ -1,5 +1,5 @@
 #include <hybris/dlfcn.h>
-#include <ninecraft/android_alloc.h>
+#include <ninecraft/android/android_alloc.h>
 
 void *android_alloc_allocate(size_t *__np, void *handle) {
     size_t __n = *__np;
