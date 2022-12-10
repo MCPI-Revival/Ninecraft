@@ -4,6 +4,7 @@
 #include <stdio.h>
 #include <ninecraft/android/android_alloc.h>
 #include <ninecraft/version_ids.h>
+#include <unistd.h>
 
 void AppPlatform_linux$AppPlatform_linux(AppPlatform_linux *app_platform, void *handle, int version_id) {
     app_platform->vtable = (void **) malloc(31 * sizeof(void *));
