@@ -1,7 +1,7 @@
 #ifndef NINECRAFT_AUDIO_SOUND_REPO_H
 #define NINECRAFT_AUDIO_SOUND_REPO_H
 
-void get_sound(char **arr, char *name);
+extern void get_sound(char **arr, char *name);
 
 /*
 PCM_pop2

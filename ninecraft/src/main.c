@@ -25,6 +25,7 @@
 #include <ninecraft/input/mouse_device.h>
 #include <ninecraft/input/multitouch.h>
 #include <ninecraft/mods/inject.h>
+#include <ninecraft/mods/mod_loader.h>
 #include <math.h>
 #include <wchar.h>
 #include <wctype.h>
@@ -33,8 +34,8 @@
 #include <hybris/hook.h>
 #include <hybris/jb/linker.h>
 
-void *handle;
-GLFWwindow *_window;
+void *handle = NULL;
+GLFWwindow *_window = NULL;
 
 int default_mouse_mode = GLFW_CURSOR_NORMAL;
 
@@ -430,10 +431,6 @@ void missing_hook() {
     #endif
 }
 
-void remove_call(void *func) {
-    *(short *)(func - 1) = 0x4770;
-}
-
 int main(int argc, char **argv)
 {
     struct stat st = {0};
@@ -445,6 +442,9 @@ int main(int argc, char **argv)
         if (stat("storage/external", &st) == -1) {
             mkdir("storage/external", 0700);
         }
+    }
+    if (stat("mods", &st) == -1) {
+        mkdir("mods", 0700);
     }
 
     if (!glfwInit()) {
@@ -502,12 +502,14 @@ int main(int argc, char **argv)
 
     printf("Ninecraft is running Minecraft %s\n", game_version._M_start_of_storage);
 
+    audio_engine_create_audio_device(&audio_engine);
+
     multitouch_setup_hooks(handle);
     keyboard_setup_hooks(handle);
     minecraft_setup_hooks(handle);
     inject_mods(version_id);
+    mod_loader_load_all();
 
-    audio_engine_create_audio_device(&audio_engine);
     controller_states = (unsigned char *)hybris_dlsym(handle, "_ZN10Controller15isTouchedValuesE");
     controller_x_stick = (float *)hybris_dlsym(handle, "_ZN10Controller12stickValuesXE");
     controller_y_stick = (float *)hybris_dlsym(handle, "_ZN10Controller12stickValuesYE");
@@ -518,7 +520,6 @@ int main(int argc, char **argv)
 
     glfwSetInputMode(_window, GLFW_CURSOR, default_mouse_mode);
     
-    #ifdef __i386__
     DETOUR(hybris_dlsym(handle, "_ZN6Common20getGameVersionStringERKSs"), (void *)get_game_version, true);
     DETOUR(hybris_dlsym(handle, "_ZN11SoundEngineC1Ef"), (void *)sound_engine_stub, true);
     DETOUR(hybris_dlsym(handle, "_ZN11SoundEngine4initEP9MinecraftP7Options"), (void *)sound_engine_stub, true);
@@ -531,21 +532,6 @@ int main(int argc, char **argv)
     DETOUR(hybris_dlsym(handle, "_ZN11SoundEngine13updateOptionsEv"), (void *)sound_engine_stub, true);
     DETOUR(hybris_dlsym(handle, "_ZN11SoundEngineD1Ev"), (void *)sound_engine_stub, true);
     DETOUR(hybris_dlsym(handle, "_ZN11SoundEngineD2Ev"), (void *)sound_engine_stub, true);
-    #endif
-
-    #ifdef __arm__
-    remove_call(hybris_dlsym(handle, "_ZN11SoundEngineC1Ef"));
-    remove_call(hybris_dlsym(handle, "_ZN11SoundEngine4initEP9MinecraftP7Options"));
-    remove_call(hybris_dlsym(handle, "_ZN11SoundEngine14_getVolumeMultEfff"));
-    remove_call(hybris_dlsym(handle, "_ZN11SoundEngine7destroyEv"));
-    remove_call(hybris_dlsym(handle, "_ZN11SoundEngine6enableEb"));
-    remove_call(hybris_dlsym(handle, "_ZN11SoundEngine4playERKSsfffff"));
-    remove_call(hybris_dlsym(handle, "_ZN11SoundEngine6playUIERKSsff"));
-    remove_call(hybris_dlsym(handle, "_ZN11SoundEngine6updateEP3Mobf"));
-    remove_call(hybris_dlsym(handle, "_ZN11SoundEngine13updateOptionsEv"));
-    remove_call(hybris_dlsym(handle, "_ZN11SoundEngineD1Ev"));
-    remove_call(hybris_dlsym(handle, "_ZN11SoundEngineD2Ev"));
-    #endif
 
     printf("app: %p\n", ninecraft_app);
 

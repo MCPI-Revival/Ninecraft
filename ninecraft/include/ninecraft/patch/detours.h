@@ -7,9 +7,9 @@
 #define THUMB_CLEAR_BIT0(addr) (addr & 0xfffffffe)
 #define THUMB_TEST_BIT0(addr) (addr & 0x01)
 
-void arm_detour(void *target_addr, void *replacement_addr);
+extern void arm_detour(void *target_addr, void *replacement_addr);
 
-void x86_detour(void *target_addr, void *replacement_addr, bool jump);
+extern void x86_detour(void *target_addr, void *replacement_addr, bool jump);
 
 #ifdef __i386__
 #define DETOUR(target_addr, replacement_addr, jump) (x86_detour(target_addr, replacement_addr, jump))

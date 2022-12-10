@@ -22,16 +22,16 @@ extern android_string_clone_t android_string_clone;
 extern android_string_deallocate_block_t android_string_deallocate_block;
 extern android_string_assign_t android_string_assign;
 
-void android_string_setup_hooks(void *handle);
+extern void android_string_setup_hooks(void *handle);
 
-void *android_string_ucopy_trivial(const void *__first, const void *__last, void *__result);
+extern void *android_string_ucopy_trivial(const void *__first, const void *__last, void *__result);
 
-void android_string_move_src(android_string_t *__this, android_string_t *__ps);
+extern void android_string_move_src(android_string_t *__this, android_string_t *__ps);
 
-void android_string_allocate_block(android_string_t *__this, size_t __n);
+extern void android_string_allocate_block(android_string_t *__this, size_t __n);
 
-void android_string_cstr(android_string_t *__this, char *__s);
+extern void android_string_cstr(android_string_t *__this, char *__s);
 
-void android_string_equ(android_string_t *__this, char *__s);
+extern void android_string_equ(android_string_t *__this, char *__s);
 
 #endif

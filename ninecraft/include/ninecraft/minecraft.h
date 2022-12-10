@@ -66,6 +66,6 @@ typedef void (*minecraft_set_size_t)(void *minecraft, uint32_t width, uint32_t h
 
 extern minecraft_set_size_t minecraft_set_size;
 
-void minecraft_setup_hooks(void *handle);
+extern void minecraft_setup_hooks(void *handle);
 
 #endif

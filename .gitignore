@@ -1,6 +1,7 @@
 /build/
 /assets/
 /overrides/
+/mods/
 /lib
 /.vscode/
 /storage/
@@ -9,3 +10,5 @@
 /*.py
 /*.txt
 a.out
+*.so
+*.o

@@ -3,6 +3,6 @@
 
 #include <stdint.h>
 
-void wob_mod_inject(int version_id);
+extern void wob_mod_inject(int version_id);
 
 #endif
