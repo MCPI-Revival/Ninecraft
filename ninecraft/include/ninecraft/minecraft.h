@@ -54,6 +54,18 @@ typedef void (*screen_render_dirt_background_t)(void *screen, int32_t param_1);
 
 extern screen_render_dirt_background_t screen_render_dirt_background;
 
+typedef void (*ninecraft_app_construct_t)(void *ninecraft_app);
+
+extern ninecraft_app_construct_t ninecraft_app_construct;
+
+typedef void (*ninecraft_app_init_t)(void *ninecraft_app);
+
+extern ninecraft_app_init_t ninecraft_app_init;
+
+typedef void (*minecraft_set_size_t)(void *minecraft, uint32_t width, uint32_t height);
+
+extern minecraft_set_size_t minecraft_set_size;
+
 void minecraft_setup_hooks(void *handle);
 
 #endif

@@ -6,6 +6,10 @@
 #include <stddef.h>
 #include <stdbool.h>
 
+/*
+    This mod enables the Minecraft Pi Edition API.
+*/
+
 void piapi_mod_level_generated_injection(void *minecraft) {
     minecraft_level_generated(minecraft);
     void *command_server = *(void **)(minecraft + MINECRAFT_COMMANDSERVER_OFFSET);

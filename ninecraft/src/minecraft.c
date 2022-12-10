@@ -12,6 +12,9 @@ player_renderer_render_name_t player_renderer_render_name = NULL;
 textures_load_and_bind_texture_t textures_load_and_bind_texture = NULL;
 gui_component_blit_t gui_component_blit = NULL;
 screen_render_dirt_background_t screen_render_dirt_background = NULL;
+ninecraft_app_construct_t ninecraft_app_construct = NULL;
+ninecraft_app_init_t ninecraft_app_init = NULL;
+minecraft_set_size_t minecraft_set_size = NULL;
 
 void minecraft_setup_hooks(void *handle) {
     minecraft_level_generated = (minecraft_level_generated_t)hybris_dlsym(handle, "_ZN9Minecraft15_levelGeneratedEv");
@@ -24,4 +27,7 @@ void minecraft_setup_hooks(void *handle) {
     textures_load_and_bind_texture = (textures_load_and_bind_texture_t)hybris_dlsym(handle, "_ZN8Textures18loadAndBindTextureERKSs");
     gui_component_blit = (gui_component_blit_t)hybris_dlsym(handle, "_ZN12GuiComponent4blitEiiiiiiii");
     screen_render_dirt_background = (screen_render_dirt_background_t)hybris_dlsym(handle, "_ZN6Screen20renderDirtBackgroundEi");
+    ninecraft_app_construct = (ninecraft_app_construct_t)hybris_dlsym(handle, "_ZN12NinecraftAppC2Ev");
+    ninecraft_app_init = (ninecraft_app_init_t)hybris_dlsym(handle, "_ZN12NinecraftApp4initEv");
+    minecraft_set_size = (minecraft_set_size_t)hybris_dlsym(handle, "_ZN9Minecraft7setSizeEii");
 }

@@ -24,8 +24,7 @@
 #include <ninecraft/input/keyboard.h>
 #include <ninecraft/input/mouse_device.h>
 #include <ninecraft/input/multitouch.h>
-#include <ninecraft/mods/piapi_mod.h>
-#include <ninecraft/mods/misc_mod.h>
+#include <ninecraft/mods/inject.h>
 #include <math.h>
 #include <wchar.h>
 #include <wctype.h>
@@ -215,7 +214,7 @@ int getGameKeyCode(int keycode) {
 }
 
 static void resize_callback(GLFWwindow* window, int width, int height) {
-    ((void (*)(void *, int, int))hybris_dlsym(handle, "_ZN9Minecraft7setSizeEii"))(ninecraft_app, width, height);
+    minecraft_set_size(ninecraft_app, width, height);
 }
 
 static void char_callback(GLFWwindow* window, unsigned int codepoint) {
@@ -260,10 +259,10 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
             void *inv = *(void **)(player + PLAYER_INVENTORY_OFFSET);
             int slot = get_selected_slot(inv);
             if (glfwGetKey(_window, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS) {
-                //((void (*)(int, int, char, char))hybris_dlsym(handle, "_ZN16FillingContainer8dropSlotEibb"))(inv, slot, 0, 0);
+                ((void (*)(void *, int, char, char))hybris_dlsym(handle, "_ZN16FillingContainer8dropSlotEibb"))(inv, slot, 0, 0);
             } else {
             }
-            //audio_engine_play(&audio_engine, handle, "random.pop2", 0, 0, 0, 0.3, 1, 1);
+            audio_engine_play(&audio_engine, handle, "random.pop", 0, 0, 0, 0.3, 1, 1);
         }
     } else {
         int game_keycode = getGameKeyCode(key);
@@ -506,8 +505,7 @@ int main(int argc, char **argv)
     multitouch_setup_hooks(handle);
     keyboard_setup_hooks(handle);
     minecraft_setup_hooks(handle);
-    piapi_mod_inject(version_id);
-    misc_mod_inject(version_id);
+    inject_mods(version_id);
 
     audio_engine_create_audio_device(&audio_engine);
     controller_states = (unsigned char *)hybris_dlsym(handle, "_ZN10Controller15isTouchedValuesE");
@@ -549,14 +547,12 @@ int main(int argc, char **argv)
     remove_call(hybris_dlsym(handle, "_ZN11SoundEngineD2Ev"));
     #endif
 
-    ninecraft_app = malloc(0xe6c);
-
     printf("app: %p\n", ninecraft_app);
 
     printf("%s\n", glGetString(GL_VERSION));
 
-    NinecraftApp$construct ninecraft_app_construct = (NinecraftApp$construct)hybris_dlsym(handle, "_ZN12NinecraftAppC2Ev");
     printf("nine construct %p\n", ninecraft_app_construct);
+    ninecraft_app = android_alloc_operator_new(0xe6c);
     ninecraft_app_construct(ninecraft_app);
 
     android_string_equ((android_string_t *)(ninecraft_app + 3544), "./storage/internal/");
@@ -566,10 +562,9 @@ int main(int argc, char **argv)
     AppPlatform_linux$AppPlatform_linux(&platform, handle, version_id);
     *(void **)(ninecraft_app + 0x14) = &platform;
     printf("%p\n", &platform);
-    NinecraftApp$init ninecraft_app_init = (NinecraftApp$init)hybris_dlsym(handle, "_ZN12NinecraftApp4initEv");
     ninecraft_app_init(ninecraft_app);
 
-    ((void (*)(void *, int, int))hybris_dlsym(handle, "_ZN9Minecraft7setSizeEii"))(ninecraft_app, 720, 480);
+    minecraft_set_size(ninecraft_app, 720, 480);
 
     while (true) {
         if (*(bool *)(ninecraft_app+0xd98) == true) {
