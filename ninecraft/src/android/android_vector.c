@@ -1,5 +1,5 @@
 #include <ninecraft/android/android_vector.h>
-#include <hybris/dlfcn.h>
+#include <ninecraft/dlfcn_stub.h>
 #include <ninecraft/android/android_alloc.h>
 #include <string.h>
 

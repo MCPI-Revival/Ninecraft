@@ -1,4 +1,4 @@
-#include <hybris/dlfcn.h>
+#include <ninecraft/dlfcn_stub.h>
 #include <ninecraft/android/android_alloc.h>
 #include <ninecraft/android/android_string.h>
 #include <string.h>
@@ -8,9 +8,9 @@ android_string_deallocate_block_t android_string_deallocate_block = NULL;
 android_string_assign_t android_string_assign = NULL;
 
 void android_string_setup_hooks(void *handle) {
-    android_string_clone = (android_string_clone_t)hybris_dlsym(handle, "_ZNSsC2ERKSs");
-    android_string_deallocate_block = (android_string_deallocate_block_t)hybris_dlsym(handle, "_ZNSt4priv12_String_baseIcSaIcEE19_M_deallocate_blockEv");
-    android_string_assign = (android_string_assign_t)hybris_dlsym(handle, "_ZNSs9_M_assignEPKcS0_");
+    android_string_clone = (android_string_clone_t)internal_dlsym(handle, "_ZNSsC2ERKSs");
+    android_string_deallocate_block = (android_string_deallocate_block_t)internal_dlsym(handle, "_ZNSt4priv12_String_baseIcSaIcEE19_M_deallocate_blockEv");
+    android_string_assign = (android_string_assign_t)internal_dlsym(handle, "_ZNSs9_M_assignEPKcS0_");
 }
 
 void *android_string_ucopy_trivial(const void *__first, const void *__last, void *__result) {

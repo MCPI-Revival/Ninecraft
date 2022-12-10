@@ -3,9 +3,7 @@
 
 #include <string.h>
 #include <dlfcn.h>
-#include <hybris/dlfcn.h>
-#include <hybris/hook.h>
-#include <hybris/jb/linker.h>
+#include <ninecraft/dlfcn_stub.h>
 #include <ninecraft/gfx/textures.h>
 #include <ninecraft/android/android_string.h>
 #include <ninecraft/android/android_vector.h>

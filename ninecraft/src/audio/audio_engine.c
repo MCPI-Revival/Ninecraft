@@ -3,7 +3,7 @@
 #include <ninecraft/audio/audio_engine.h>
 #include <ninecraft/audio/sound_repo.h>
 #include <stdio.h>
-#include <hybris/dlfcn.h>
+#include <ninecraft/dlfcn_stub.h>
 #include <stdlib.h>
 #include <time.h>
 #include <math.h>
@@ -134,7 +134,7 @@ bool audio_engine_destroy_audio_device(audio_engine_t *audio_engine) {
 }
 
 ALuint audio_engine_load_sound(char *name, void *handle) {
-    audio_engine_pcm_metadata_t *meta = (audio_engine_pcm_metadata_t *) hybris_dlsym(handle, name);
+    audio_engine_pcm_metadata_t *meta = (audio_engine_pcm_metadata_t *) internal_dlsym(handle, name);
 
     ALenum format = AL_NONE;
     if (meta->channels == 1) {

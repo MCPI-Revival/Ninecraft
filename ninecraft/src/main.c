@@ -30,7 +30,7 @@
 #include <wchar.h>
 #include <wctype.h>
 
-#include <hybris/dlfcn.h>
+#include <ninecraft/dlfcn_stub.h>
 #include <hybris/hook.h>
 #include <hybris/jb/linker.h>
 
@@ -70,10 +70,10 @@ void *load_minecraftpe() {
     strcat(fullpath, arch);
     strcat(fullpath, "/libminecraftpe.so");
     
-    void *handle = hybris_dlopen(fullpath, RTLD_LAZY);
+    void *handle = internal_dlopen(fullpath, RTLD_LAZY);
     if (handle == NULL)
     {
-        printf("failed to load library %s: %s\n", fullpath, hybris_dlerror());
+        printf("failed to load library %s: %s\n", fullpath, internal_dlerror());
         return NULL;
     }
     printf("lib: %s: : %p\n", fullpath, handle);
@@ -133,10 +133,10 @@ static void mouse_click_callback(GLFWwindow* window, int button, int action, int
     if (!mouse_pointer_hidden) {
         int mc_button = (button == GLFW_MOUSE_BUTTON_LEFT ? 1 : (button == GLFW_MOUSE_BUTTON_RIGHT ? 2 : 0));
         if (version_id == version_id_0_6) {
-            mouse_device_feed_0_6(hybris_dlsym(handle, "_ZN5Mouse9_instanceE"), (char)mc_button, (char)(action == GLFW_PRESS ? 1 : 0), (short)xpos, (short)ypos, 0, 0);
+            mouse_device_feed_0_6(internal_dlsym(handle, "_ZN5Mouse9_instanceE"), (char)mc_button, (char)(action == GLFW_PRESS ? 1 : 0), (short)xpos, (short)ypos, 0, 0);
             multitouch_feed_0_6((char)mc_button, (char)(action == GLFW_PRESS ? 1 : 0), (short)xpos, (short)ypos, 0);
         } else if (version_id == version_id_0_5) {
-            mouse_device_feed_0_5(hybris_dlsym(handle, "_ZN5Mouse9_instanceE"), (char) mc_button, (char) (action == GLFW_PRESS ? 1 : 0), (short)xpos, (short)ypos);
+            mouse_device_feed_0_5(internal_dlsym(handle, "_ZN5Mouse9_instanceE"), (char) mc_button, (char) (action == GLFW_PRESS ? 1 : 0), (short)xpos, (short)ypos);
             multitouch_feed_0_5((char)mc_button, (char)(action == GLFW_PRESS ? 1 : 0), (short)xpos, (short)ypos, 0);
         }
     } else {
@@ -166,10 +166,10 @@ static void mouse_scroll_callback(GLFWwindow* window, double xoffset, double yof
 static void mouse_pos_callback(GLFWwindow* window, double xpos, double ypos) {
     if (!mouse_pointer_hidden) {
         if (version_id == version_id_0_6) {
-            mouse_device_feed_0_6(hybris_dlsym(handle, "_ZN5Mouse9_instanceE"), 0, 0, (short)xpos, (short)ypos, 0, 0);
+            mouse_device_feed_0_6(internal_dlsym(handle, "_ZN5Mouse9_instanceE"), 0, 0, (short)xpos, (short)ypos, 0, 0);
             multitouch_feed_0_6(0, 0, (short)xpos, (short)ypos, 0);
         } else if (version_id == version_id_0_5) {
-            mouse_device_feed_0_5(hybris_dlsym(handle, "_ZN5Mouse9_instanceE"), 0, 0, (short)xpos, (short)ypos);
+            mouse_device_feed_0_5(internal_dlsym(handle, "_ZN5Mouse9_instanceE"), 0, 0, (short)xpos, (short)ypos);
             multitouch_feed_0_5(0, 0, (short)xpos, (short)ypos, 0);
         }
     } else {
@@ -220,7 +220,7 @@ static void resize_callback(GLFWwindow* window, int width, int height) {
 
 static void char_callback(GLFWwindow* window, unsigned int codepoint) {
     if (version_id == version_id_0_6) {
-        ((void (*)(char))hybris_dlsym(handle, "_ZN8Keyboard8feedTextEc"))((char)codepoint);
+        ((void (*)(char))internal_dlsym(handle, "_ZN8Keyboard8feedTextEc"))((char)codepoint);
     }
 }
 
@@ -260,7 +260,7 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
             void *inv = *(void **)(player + PLAYER_INVENTORY_OFFSET);
             int slot = get_selected_slot(inv);
             if (glfwGetKey(_window, GLFW_KEY_LEFT_CONTROL) == GLFW_PRESS) {
-                ((void (*)(void *, int, char, char))hybris_dlsym(handle, "_ZN16FillingContainer8dropSlotEibb"))(inv, slot, 0, 0);
+                ((void (*)(void *, int, char, char))internal_dlsym(handle, "_ZN16FillingContainer8dropSlotEibb"))(inv, slot, 0, 0);
             } else {
             }
             audio_engine_play(&audio_engine, handle, "random.pop", 0, 0, 0, 0.3, 1, 1);
@@ -487,7 +487,7 @@ int main(int argc, char **argv)
     android_string_t in;
     android_string_cstr(&in, "");
 
-    android_string_t game_version = ((android_string_t (*)(android_string_t *))hybris_dlsym(handle, "_ZN6Common20getGameVersionStringERKSs"))(&in);
+    android_string_t game_version = ((android_string_t (*)(android_string_t *))internal_dlsym(handle, "_ZN6Common20getGameVersionStringERKSs"))(&in);
 
     if (strcmp(game_version._M_start_of_storage, "v0.6.1 alpha") == 0) {
         version_id = version_id_0_6;
@@ -510,9 +510,9 @@ int main(int argc, char **argv)
     inject_mods(version_id);
     mod_loader_load_all();
 
-    controller_states = (unsigned char *)hybris_dlsym(handle, "_ZN10Controller15isTouchedValuesE");
-    controller_x_stick = (float *)hybris_dlsym(handle, "_ZN10Controller12stickValuesXE");
-    controller_y_stick = (float *)hybris_dlsym(handle, "_ZN10Controller12stickValuesYE");
+    controller_states = (unsigned char *)internal_dlsym(handle, "_ZN10Controller15isTouchedValuesE");
+    controller_x_stick = (float *)internal_dlsym(handle, "_ZN10Controller12stickValuesXE");
+    controller_y_stick = (float *)internal_dlsym(handle, "_ZN10Controller12stickValuesYE");
 
     if (version_id == version_id_0_6) {
         default_mouse_mode = GLFW_CURSOR_HIDDEN;
@@ -520,18 +520,18 @@ int main(int argc, char **argv)
 
     glfwSetInputMode(_window, GLFW_CURSOR, default_mouse_mode);
     
-    DETOUR(hybris_dlsym(handle, "_ZN6Common20getGameVersionStringERKSs"), (void *)get_game_version, true);
-    DETOUR(hybris_dlsym(handle, "_ZN11SoundEngineC1Ef"), (void *)sound_engine_stub, true);
-    DETOUR(hybris_dlsym(handle, "_ZN11SoundEngine4initEP9MinecraftP7Options"), (void *)sound_engine_stub, true);
-    DETOUR(hybris_dlsym(handle, "_ZN11SoundEngine14_getVolumeMultEfff"), (void *)sound_engine_stub, true);
-    DETOUR(hybris_dlsym(handle, "_ZN11SoundEngine7destroyEv"), (void *)sound_engine_stub, true);
-    DETOUR(hybris_dlsym(handle, "_ZN11SoundEngine6enableEb"), (void *)sound_engine_stub, true);
-    DETOUR(hybris_dlsym(handle, "_ZN11SoundEngine4playERKSsfffff"), (void *)sound_engine_play, true);
-    DETOUR(hybris_dlsym(handle, "_ZN11SoundEngine6playUIERKSsff"), (void *)sound_engine_playui, true);
-    DETOUR(hybris_dlsym(handle, "_ZN11SoundEngine6updateEP3Mobf"), (void *)sound_engine_update, true);
-    DETOUR(hybris_dlsym(handle, "_ZN11SoundEngine13updateOptionsEv"), (void *)sound_engine_stub, true);
-    DETOUR(hybris_dlsym(handle, "_ZN11SoundEngineD1Ev"), (void *)sound_engine_stub, true);
-    DETOUR(hybris_dlsym(handle, "_ZN11SoundEngineD2Ev"), (void *)sound_engine_stub, true);
+    DETOUR(internal_dlsym(handle, "_ZN6Common20getGameVersionStringERKSs"), (void *)get_game_version, true);
+    DETOUR(internal_dlsym(handle, "_ZN11SoundEngineC1Ef"), (void *)sound_engine_stub, true);
+    DETOUR(internal_dlsym(handle, "_ZN11SoundEngine4initEP9MinecraftP7Options"), (void *)sound_engine_stub, true);
+    DETOUR(internal_dlsym(handle, "_ZN11SoundEngine14_getVolumeMultEfff"), (void *)sound_engine_stub, true);
+    DETOUR(internal_dlsym(handle, "_ZN11SoundEngine7destroyEv"), (void *)sound_engine_stub, true);
+    DETOUR(internal_dlsym(handle, "_ZN11SoundEngine6enableEb"), (void *)sound_engine_stub, true);
+    DETOUR(internal_dlsym(handle, "_ZN11SoundEngine4playERKSsfffff"), (void *)sound_engine_play, true);
+    DETOUR(internal_dlsym(handle, "_ZN11SoundEngine6playUIERKSsff"), (void *)sound_engine_playui, true);
+    DETOUR(internal_dlsym(handle, "_ZN11SoundEngine6updateEP3Mobf"), (void *)sound_engine_update, true);
+    DETOUR(internal_dlsym(handle, "_ZN11SoundEngine13updateOptionsEv"), (void *)sound_engine_stub, true);
+    DETOUR(internal_dlsym(handle, "_ZN11SoundEngineD1Ev"), (void *)sound_engine_stub, true);
+    DETOUR(internal_dlsym(handle, "_ZN11SoundEngineD2Ev"), (void *)sound_engine_stub, true);
 
     printf("app: %p\n", ninecraft_app);
 
@@ -567,16 +567,16 @@ int main(int argc, char **argv)
             controller_y_stick[1] = (float)(y_cam - 180.0) * 0.0055555557;
             controller_x_stick[1] = ((float)((x_cam - 483.0)) * 0.0020703934);
         }
-        ((void (*)(void *))hybris_dlsym(handle, "_ZN12NinecraftApp6updateEv"))(ninecraft_app);
+        ((void (*)(void *))internal_dlsym(handle, "_ZN12NinecraftApp6updateEv"))(ninecraft_app);
         
         if (!mouse_pointer_hidden) {
             if (version_id == version_id_0_6) {
-                float inv_gui_scale = *((float *)hybris_dlsym(handle, "_ZN3Gui11InvGuiScaleE"));
+                float inv_gui_scale = *((float *)internal_dlsym(handle, "_ZN3Gui11InvGuiScaleE"));
                 double xpos, ypos;
                 glfwGetCursorPos(_window, &xpos, &ypos);
                 short cx = (short)(xpos * inv_gui_scale);
                 short cy = (short)(ypos * inv_gui_scale);
-                ((void (*)(float, float, void *))hybris_dlsym(handle, "_Z12renderCursorffP9Minecraft"))(cx, cy, ninecraft_app);
+                ((void (*)(float, float, void *))internal_dlsym(handle, "_Z12renderCursorffP9Minecraft"))(cx, cy, ninecraft_app);
             }
         }
         glfwSwapBuffers(_window);

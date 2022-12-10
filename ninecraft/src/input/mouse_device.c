@@ -1,4 +1,4 @@
-#include <hybris/dlfcn.h>
+#include <ninecraft/dlfcn_stub.h>
 #include <ninecraft/input/action/mouse_action.h>
 #include <ninecraft/input/mouse_device.h>
 

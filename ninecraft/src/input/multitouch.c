@@ -1,4 +1,4 @@
-#include <hybris/dlfcn.h>
+#include <ninecraft/dlfcn_stub.h>
 #include <ninecraft/input/action/mouse_action.h>
 #include <ninecraft/input/mouse_device.h>
 #include <ninecraft/input/multitouch.h>
@@ -11,12 +11,12 @@ char *multitouch_pressed_ut = NULL;
 android_vector_t *multitouch_inputs = NULL;
 
 void multitouch_setup_hooks(void *handle) {
-    multitouch_pointers = (void *)hybris_dlsym(handle, "_ZN10Multitouch9_pointersE");
-    multitouch_released = (char *)hybris_dlsym(handle, "_ZN10Multitouch12_wasReleasedE");
-    multitouch_released_ut = (char *)hybris_dlsym(handle, "_ZN10Multitouch22_wasReleasedThisUpdateE");
-    multitouch_pressed = (char *)hybris_dlsym(handle, "_ZN10Multitouch11_wasPressedE");
-    multitouch_pressed_ut = (char *)hybris_dlsym(handle, "_ZN10Multitouch21_wasPressedThisUpdateE");
-    multitouch_inputs = (android_vector_t *)hybris_dlsym(handle, "_ZN10Multitouch7_inputsE");
+    multitouch_pointers = (void *)internal_dlsym(handle, "_ZN10Multitouch9_pointersE");
+    multitouch_released = (char *)internal_dlsym(handle, "_ZN10Multitouch12_wasReleasedE");
+    multitouch_released_ut = (char *)internal_dlsym(handle, "_ZN10Multitouch22_wasReleasedThisUpdateE");
+    multitouch_pressed = (char *)internal_dlsym(handle, "_ZN10Multitouch11_wasPressedE");
+    multitouch_pressed_ut = (char *)internal_dlsym(handle, "_ZN10Multitouch21_wasPressedThisUpdateE");
+    multitouch_inputs = (android_vector_t *)internal_dlsym(handle, "_ZN10Multitouch7_inputsE");
 }
 
 void multitouch_feed_0_5(char button, char type, short x, short y, char pointer_id) {
