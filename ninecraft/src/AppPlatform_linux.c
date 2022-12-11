@@ -5,6 +5,9 @@
 #include <ninecraft/android/android_alloc.h>
 #include <ninecraft/version_ids.h>
 #include <unistd.h>
+#include <GLFW/glfw3.h>
+
+extern GLFWwindow *_window;
 
 void AppPlatform_linux$AppPlatform_linux(AppPlatform_linux *app_platform, void *handle, int version_id) {
     app_platform->vtable = (void **) malloc(31 * sizeof(void *));
@@ -238,7 +241,7 @@ android_vector_t AppPlatform_linux$getOptionStrings(AppPlatform_linux *app_platf
     android_string_cstr(&usetouchscreen_name, "ctrl_usetouchscreen");
     android_string_cstr(&usetouchscreen_value, "false");
     android_string_cstr(&usetouchjoypad_name, "ctrl_usetouchjoypad");
-    android_string_cstr(&usetouchjoypad_value, "true");
+    android_string_cstr(&usetouchjoypad_value, "false");
     android_string_cstr(&vibration_name, "feedback_vibration");
     android_string_cstr(&vibration_value, "false");
     android_string_cstr(&difficulty_name, "game_difficulty");
@@ -277,7 +280,10 @@ android_vector_t AppPlatform_linux$getOptionStrings(AppPlatform_linux *app_platf
 
 float AppPlatform_linux$getPixelsPerMillimeter(AppPlatform_linux *app_platform) {
     puts("debug: AppPlatform_linux::getPixelsPerMillimeter");
-    return 1.f;
+    int cw;
+    int ch;
+    glfwGetWindowSize(_window, &cw, &ch);
+    return ((float)cw * (float)ch * 25.4 ) / 96;
 }
 
 android_string_t AppPlatform_linux$getPlatformStringVar(AppPlatform_linux *app_platform, int zero) {
@@ -289,12 +295,18 @@ android_string_t AppPlatform_linux$getPlatformStringVar(AppPlatform_linux *app_p
 
 int AppPlatform_linux$getScreenHeight(AppPlatform_linux *app_platform) {
     puts("debug: AppPlatform_linux::getScreenHeight");
-    return 1440;
+    int cw;
+    int ch;
+    glfwGetWindowSize(_window, &cw, &ch);
+    return ch;
 }
 
 int AppPlatform_linux$getScreenWidth(AppPlatform_linux *app_platform) {
     puts("debug: AppPlatform_linux::getScreenWidth");
-    return 900;
+    int cw;
+    int ch;
+    glfwGetWindowSize(_window, &cw, &ch);
+    return cw;
 }
 
 android_vector_t AppPlatform_linux$getUserInput(AppPlatform_linux *app_platform) {
