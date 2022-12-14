@@ -58,7 +58,7 @@ void *load_minecraftpe() {
     #ifdef __i386__
     char *arch = "x86";
     #else
-    #ifdef __arm__
+    #ifdef __thumb2__
     char *arch = "armeabi-v7a";
     #else
     char *arch = "";
@@ -392,18 +392,12 @@ void math_hook() {
     hybris_hook("sqrtf", sqrtf);
 }
 
-#ifdef __i386__
-int android_dl_iterate_phdr(int (*cb)(struct dl_phdr_info *info, size_t size, void *data),void *data);
-#endif
-
-#ifdef __arm__
-
-long unsigned int *android_dl_unwind_find_exidx(long unsigned int *pc, int *pcount);
+#ifdef __thumb2__
 
 extern int __cxa_atexit(void (*)(void*), void*, void*);
 
 int __aeabi_atexit_android(void *arg, void (*func) (void *), void *d) {
-  return __cxa_atexit(func, arg, d);
+    return __cxa_atexit(func, arg, d);
 }
 
 #endif
@@ -411,9 +405,6 @@ int __aeabi_atexit_android(void *arg, void (*func) (void *), void *d) {
 int __cxa_pure_virtual() {}
 
 void missing_hook() {
-    #ifdef __i386__
-    hybris_hook("dl_iterate_phdr", android_dl_iterate_phdr);
-    #endif
     hybris_hook("wcscmp", wcscmp);
     hybris_hook("wcsncpy", wcsncpy);
     hybris_hook("iswalpha", iswalpha);
@@ -425,9 +416,8 @@ void missing_hook() {
     hybris_hook("iswupper", iswupper);
     hybris_hook("iswxdigit", iswxdigit);
     hybris_hook("__cxa_pure_virtual", __cxa_pure_virtual);
-    #ifdef __arm__
+    #ifdef __thumb2__
     hybris_hook("__aeabi_atexit", __aeabi_atexit_android);
-    hybris_hook("__gnu_Unwind_Find_exidx", android_dl_unwind_find_exidx);
     #endif
 }
 

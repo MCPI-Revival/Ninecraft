@@ -14,7 +14,7 @@ extern void x86_detour(void *target_addr, void *replacement_addr, bool jump);
 #ifdef __i386__
 #define DETOUR(target_addr, replacement_addr, jump) (x86_detour(target_addr, replacement_addr, jump))
 #else
-#ifdef __arm__
+#ifdef __thumb2__
 #define DETOUR(target_addr, replacement_addr, jump) (arm_detour(target_addr, replacement_addr))
 #else
 #define DETOUR(target_addr, replacement_addr, jump)
