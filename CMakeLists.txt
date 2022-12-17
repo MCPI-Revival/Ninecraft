@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.1)
 project(ninecraft)
 
-set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -g")
+#set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -g")
 
 if(CMAKE_SYSTEM_PROCESSOR MATCHES "(arm)|(armhf)|(aarch64)|(arm64)")
     set(IS_ARM_BUILD TRUE)

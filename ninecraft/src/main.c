@@ -34,6 +34,8 @@
 #include <hybris/hook.h>
 #include <hybris/jb/linker.h>
 
+#include <ninecraft/gfx/gles_matrix.h>
+
 void *handle = NULL;
 GLFWwindow *_window = NULL;
 
@@ -421,8 +423,7 @@ void missing_hook() {
     #endif
 }
 
-int main(int argc, char **argv)
-{
+int main(int argc, char **argv) {
     struct stat st = {0};
     if (stat("storage", &st) == -1) {
         mkdir("storage", 0700);
@@ -442,8 +443,8 @@ int main(int argc, char **argv)
         puts("init failed");
     }
 
-    glfwWindowHint(GLFW_CLIENT_API, GLFW_OPENGL_API);
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
+    glfwWindowHint(GLFW_CLIENT_API, GLFW_OPENGL_ES_API);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 2);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
     glfwWindowHint(GLFW_CONTEXT_CREATION_API, GLFW_EGL_CONTEXT_API);
     _window = glfwCreateWindow(720, 480, "Ninecraft", NULL, NULL);
@@ -571,7 +572,10 @@ int main(int argc, char **argv)
         }
         glfwSwapBuffers(_window);
         glfwPollEvents();
+        GLenum err;
+        while((err = glGetError()) != GL_NO_ERROR) {
+            printf("errrr %u\n", err);
+        }
     }
-
     return 0;
 }

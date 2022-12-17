@@ -1,7 +1,7 @@
 #ifndef NINECRAFT_GFX_GLES_COMPAT_H
 #define NINECRAFT_GFX_GLES_COMPAT_H
 
-#include <GL/gl.h>
+#include <GLES/gl.h>
 
 extern void gl_alpha_func(GLenum func, GLclampf ref);
 
