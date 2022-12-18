@@ -3,6 +3,9 @@
 
 #include <GLES/gl.h>
 
+// Function documentation
+// https://registry.khronos.org/OpenGL-Refpages/es1.1/xhtml/
+
 extern void gl_alpha_func(GLenum func, GLclampf ref);
 
 extern void gl_bind_buffer(GLenum target, GLuint buffer);
@@ -15,7 +18,7 @@ extern void gl_buffer_data(GLenum target, GLsizeiptr size, const void *data, GLe
 
 extern void gl_clear(GLbitfield mask);
 
-extern void gl_clear_color(GLfloat red, GLfloat green, GLfloat blue, GLfloat alpha);
+extern void gl_clear_color(GLclampf red, GLclampf green, GLclampf blue, GLclampf alpha);
 
 extern void gl_color_4_f(GLfloat red, GLfloat green, GLfloat blue, GLfloat alpha);
 
@@ -25,7 +28,7 @@ extern void gl_color_pointer(GLint size, GLenum type, GLsizei stride, const void
 
 extern void gl_cull_face(GLenum mode);
 
-extern void gl_delete_buffers(GLsizei n,const GLuint *buffers);
+extern void gl_delete_buffers(GLsizei n, const GLuint *buffers);
 
 extern void gl_delete_textures(GLsizei n, const GLuint *textures);
 
@@ -33,7 +36,7 @@ extern void gl_depth_func(GLenum func);
 
 extern void gl_depth_mask(GLboolean flag);
 
-extern void gl_depth_range_f(GLclampf zNear, GLclampf zFar);
+extern void gl_depth_range_f(GLclampf near, GLclampf far);
 
 extern void gl_disable(GLenum cap);
 
@@ -69,7 +72,7 @@ extern void gl_mult_matrix_f(const GLfloat *m);
 
 extern void gl_normal_3_f(GLfloat nx, GLfloat ny, GLfloat nz);
 
-extern void gl_ortho_f(GLfloat left, GLfloat right, GLfloat bottom, GLfloat top, GLfloat zNear, GLfloat zFar);
+extern void gl_ortho_f(GLfloat left, GLfloat right, GLfloat bottom, GLfloat top, GLfloat near, GLfloat far);
 
 extern void gl_polygon_offset(GLfloat factor, GLfloat units);
 
@@ -89,7 +92,7 @@ extern void gl_shade_model(GLenum mode);
 
 extern void gl_tex_coord_pointer(GLint size, GLenum type, GLsizei stride, const GLvoid *pointer);
 
-extern void gl_tex_image_2_d(GLenum target, GLint level, GLint internalformat, GLsizei width, GLsizei height, GLint border, GLint format, GLenum type, const GLvoid *pixels);
+extern void gl_tex_image_2_d(GLenum target, GLint level, GLint internalformat, GLsizei width, GLsizei height, GLint border, GLenum format, GLenum type, const GLvoid *pixels);
 
 extern void gl_tex_parameter_i(GLenum target, GLenum pname, GLint param);
 

@@ -24,7 +24,7 @@ void gl_tex_parameter_i(GLenum target, GLenum pname, GLint param) {
     glTexParameteri(target, pname, param);
 }
 
-void gl_tex_image_2_d(GLenum target, GLint level, GLint internalformat, GLsizei width, GLsizei height, GLint border, GLint format, GLenum type, const GLvoid *pixels) {
+void gl_tex_image_2_d(GLenum target, GLint level, GLint internalformat, GLsizei width, GLsizei height, GLint border, GLenum format, GLenum type, const GLvoid *pixels) {
     glTexImage2D(target, level, internalformat, width, height, border, format, type, pixels);
 }
 
@@ -67,8 +67,8 @@ void gl_gen_textures(GLsizei n, GLuint *textures) {
     glGenTextures(n, textures);
 }
 
-void gl_depth_range_f(GLclampf zNear, GLclampf zFar) {
-    glDepthRangef(zNear, zFar);
+void gl_depth_range_f(GLclampf near, GLclampf far) {
+    glDepthRangef(near, far);
 }
 
 void gl_depth_mask(GLboolean flag) {
@@ -95,7 +95,7 @@ void gl_color_mask(GLboolean red, GLboolean green, GLboolean blue, GLboolean alp
     glColorMask(red, green, blue, alpha);
 }
 
-void gl_clear_color(GLfloat red, GLfloat green, GLfloat blue, GLfloat alpha) {
+void gl_clear_color(GLclampf red, GLclampf green, GLclampf blue, GLclampf alpha) {
     glClearColor(red, green, blue, alpha);
 }
 
