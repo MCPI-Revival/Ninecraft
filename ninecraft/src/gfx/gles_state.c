@@ -163,7 +163,7 @@ void gl_fog_f(GLenum pname, GLfloat param) {
             gl_state.fog.start = param;
             break;
         }
-        case GL_FOG_END: {
+        case GLES_GL_FOG_END: {
             gl_state.fog.end = param;
             break;
         }
