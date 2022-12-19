@@ -1,7 +1,7 @@
 #ifndef NINECRAFT_GFX_GLES_STATE_H
 #define NINECRAFT_GFX_GLES_STATE_H
 
-#include <GLES/gl.h>
+#include <GLES2/gl2.h>
 #include <ninecraft/gfx/gles_matrix.h>
 
 // Matrix Data

@@ -1,8 +1,9 @@
-#include <ninecraft/gfx/gles_state.h>
-#include <ninecraft/gfx/gles_matrix.h>
 #include <ninecraft/gfx/gles_compat.h>
-#include <string.h>
+#include <ninecraft/gfx/gles_defs.h>
+#include <ninecraft/gfx/gles_matrix.h>
+#include <ninecraft/gfx/gles_state.h>
 #include <stdio.h>
+#include <string.h>
 
 // Matrix Common
 static void gles_matrix_copy(gles_matrix_t *src, gles_matrix_t *dst) {
@@ -32,13 +33,13 @@ __attribute__((constructor)) static void gles_init_matrix_stacks() {
 // Matrix Mode
 static gles_matrix_stack_t *gles_get_matrix_stack() {
     switch (gl_state.matrix_stacks.mode) {
-        case GL_MODELVIEW: {
+        case GLES_GL_MODELVIEW: {
             return &gl_state.matrix_stacks.model_view;
         }
-        case GL_PROJECTION: {
+        case GLES_GL_PROJECTION: {
             return &gl_state.matrix_stacks.projection;
         }
-        case GL_TEXTURE: {
+        case GLES_GL_TEXTURE: {
             return &gl_state.matrix_stacks.texture;
         }
         default: {

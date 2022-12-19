@@ -1,7 +1,7 @@
 #ifndef NINECRAFT_GFX_GLES_COMPAT_H
 #define NINECRAFT_GFX_GLES_COMPAT_H
 
-#include <GLES/gl.h>
+#include <GLES2/gl2.h>
 
 // Function documentation
 // https://registry.khronos.org/OpenGL-Refpages/es1.1/xhtml/

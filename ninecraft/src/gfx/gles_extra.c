@@ -1,4 +1,5 @@
 #include <ninecraft/gfx/gles_compat.h>
+#include <ninecraft/gfx/gles_defs.h>
 
 void gl_bind_texture(GLenum target, GLuint texture) {
     glBindTexture(target, texture);
@@ -53,7 +54,7 @@ void gl_line_width(GLfloat width) {
 }
 
 void gl_hint(GLenum target, GLenum mode) {
-    if (target != GL_PERSPECTIVE_CORRECTION_HINT) {
+    if (target != GLES_GL_PERSPECTIVE_CORRECTION_HINT) {
         glHint(target, mode);
     } 
 }

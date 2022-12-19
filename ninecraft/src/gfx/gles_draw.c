@@ -1,56 +1,9 @@
-#include <ninecraft/gfx/gles_state.h>
-#include <ninecraft/gfx/gles_matrix.h>
 #include <ninecraft/gfx/gles_compat.h>
-#include <stdlib.h>
+#include <ninecraft/gfx/gles_defs.h>
+#include <ninecraft/gfx/gles_matrix.h>
+#include <ninecraft/gfx/gles_state.h>
 #include <stdio.h>
-
-// Shaders
-#define GL_FRAGMENT_SHADER 0x8b30
-#define GL_VERTEX_SHADER 0x8b31
-#define GL_INFO_LOG_LENGTH 0x8b84
-#define GL_COMPILE_STATUS 0x8b81
-
-typedef char GLchar;
-
-extern void glGetShaderiv(GLuint shader, GLenum pname, GLint *params);
-
-extern void glGetShaderInfoLog(GLuint shader, GLsizei maxLength, GLsizei *length, GLchar *infoLog);
-
-extern void glShaderSource(GLuint shader, GLsizei count, const GLchar * const *string, const GLint *length);
-
-extern void glCompileShader(GLuint shader);
-
-extern GLuint glCreateShader(GLenum shaderType);
-
-extern GLuint glCreateProgram(void);
-
-extern void glAttachShader(GLuint program, GLuint shader);
-
-extern void glLinkProgram(GLuint program);
-
-extern void glUseProgram(GLuint program);
-
-extern GLint glGetUniformLocation(GLuint program, const GLchar *name);
-
-extern void glUniformMatrix4fv(GLint location, GLsizei count, GLboolean transpose, const GLfloat *value);
-
-extern void glUniform1i(GLint location, GLint v0);
-
-extern GLint glGetAttribLocation(GLuint program, const GLchar *name);
-
-extern void glVertexAttribPointer(GLuint index, GLint size, GLenum type, GLboolean normalized, GLsizei stride, const void * pointer);
-
-extern void glEnableVertexAttribArray(GLuint index);
-
-extern void glDisableVertexAttribArray(GLuint index);
-
-extern void glVertexAttrib4f(GLuint index, GLfloat x, GLfloat y, GLfloat z, GLfloat w);
-
-extern void glVertexAttrib3f(GLuint index, GLfloat x, GLfloat y, GLfloat z);
-
-extern void glUniform4f(GLint location, GLfloat v0, GLfloat v1, GLfloat v2, GLfloat v3);
-
-extern void glUniform1f(GLint location, GLfloat v0);
+#include <stdlib.h>
 
 // Compile Shader
 static void gles_log_shader(GLuint shader, const char *name) {
@@ -124,17 +77,17 @@ static void gles_use_shader(GLuint program) {
 // Array Pointer Drawing
 void gl_draw_arrays(GLenum mode, GLint first, GLsizei count) {
     // Verify
-    if (gl_state.array_pointers.vertex.size != 3 || !gl_state.array_pointers.vertex.enabled || gl_state.array_pointers.vertex.type != GL_FLOAT) {
+    if (gl_state.array_pointers.vertex.size != 3 || !gl_state.array_pointers.vertex.enabled || gl_state.array_pointers.vertex.type != GLES_GL_FLOAT) {
         puts("Unsupported Vertex Conifguration");
     }
 
     // Check Mode
     int use_color_pointer = gl_state.array_pointers.color.enabled;
-    if (use_color_pointer && (gl_state.array_pointers.color.size != 4 || gl_state.array_pointers.color.type != GL_UNSIGNED_BYTE)) {
+    if (use_color_pointer && (gl_state.array_pointers.color.size != 4 || gl_state.array_pointers.color.type != GLES_GL_UNSIGNED_BYTE)) {
         puts("Unsupported Color Conifguration");
     }
     int use_texture = gl_state.texture_2d && gl_state.array_pointers.tex_coord.enabled;
-    if (use_texture && (gl_state.array_pointers.tex_coord.size != 2 || gl_state.array_pointers.tex_coord.type != GL_FLOAT)) {
+    if (use_texture && (gl_state.array_pointers.tex_coord.size != 2 || gl_state.array_pointers.tex_coord.type != GLES_GL_FLOAT)) {
         puts("Unsupported Texture Conifguration");
     }
 
@@ -212,7 +165,7 @@ void gl_draw_arrays(GLenum mode, GLint first, GLsizei count) {
         if (u_fog_is_linear_handle == -1) {
             u_fog_is_linear_handle = glGetUniformLocation(program, "u_fog_is_linear");
         }
-        glUniform1i(u_fog_is_linear_handle, gl_state.fog.mode == GL_LINEAR);
+        glUniform1i(u_fog_is_linear_handle, gl_state.fog.mode == GLES_GL_LINEAR);
         static GLint u_fog_start_handle = -1;
         if (u_fog_start_handle == -1) {
             u_fog_start_handle = glGetUniformLocation(program, "u_fog_start");

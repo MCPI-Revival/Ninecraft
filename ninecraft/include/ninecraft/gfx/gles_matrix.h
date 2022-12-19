@@ -1,7 +1,7 @@
 #ifndef NINECRAFT_GFX_GLES_MATRIX_H
 #define NINECRAFT_GFX_GLES_MATRIX_H
 
-#include <GLES/gl.h>
+#include <GLES2/gl2.h>
 
 // Matrix Common
 #define MATRIX_SIZE 4
