@@ -247,9 +247,9 @@ android_vector_t AppPlatform_linux$getOptionStrings(AppPlatform_linux *app_platf
     android_string_cstr(&difficulty_name, "game_difficulty");
     android_string_cstr(&difficulty_value, "4");
     android_vector_t out;
-    out._M_start = (unsigned long)android_alloc_allocate(&size);
-    out._M_finish = out._M_start;
-    out._M_end_of_storage = out._M_start + 24;
+    out._M_start = 0;
+    out._M_finish = 0;
+    out._M_end_of_storage = 0;
     android_vector_push_back(&out, &username_name, sizeof(android_string_t));
     android_vector_push_back(&out, &username_value, sizeof(android_string_t));
     android_vector_push_back(&out, &server_name, sizeof(android_string_t));
@@ -375,9 +375,9 @@ android_vector_t AppPlatform_linux$getUserInput(AppPlatform_linux *app_platform)
     }
     unsigned int size = 24;
     android_vector_t out;
-    out._M_start = (unsigned long)android_alloc_allocate(&size);
-    out._M_finish = out._M_start;
-    out._M_end_of_storage = out._M_start + 24;
+    out._M_start = 0;
+    out._M_finish = 0;
+    out._M_end_of_storage = 0;
     puts("ok----");
     android_vector_push_back(&out, &name, sizeof(android_string_t));
     android_vector_push_back(&out, &seed, sizeof(android_string_t));

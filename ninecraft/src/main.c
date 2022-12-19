@@ -110,7 +110,7 @@ void android_stub() {
 }
 
 void egl_stub() {
-    //puts("warn: egl call");
+    // puts("warn: egl call");
 }
 
 void sles_stub() {
@@ -524,8 +524,6 @@ int main(int argc, char **argv) {
     DETOUR(internal_dlsym(handle, "_ZN11SoundEngineD1Ev"), (void *)sound_engine_stub, true);
     DETOUR(internal_dlsym(handle, "_ZN11SoundEngineD2Ev"), (void *)sound_engine_stub, true);
 
-    printf("app: %p\n", ninecraft_app);
-
     printf("%s\n", glGetString(GL_VERSION));
 
     printf("nine construct %p\n", ninecraft_app_construct);
@@ -537,12 +535,17 @@ int main(int argc, char **argv) {
 
     AppPlatform_linux platform;
     AppPlatform_linux$AppPlatform_linux(&platform, handle, version_id);
-    *(void **)(ninecraft_app + 0x14) = &platform;
     printf("%p\n", &platform);
+    
+    *(void **)(ninecraft_app + 0x14) = &platform;
+    *(uint8_t *)(ninecraft_app + 0x18) = 1; // do_render
+    
     ninecraft_app_init(ninecraft_app);
 
-    minecraft_set_size(ninecraft_app, 720, 480);
+    *(uint8_t *)(ninecraft_app + 4) = 1; // unknown
 
+    minecraft_set_size(ninecraft_app, 720, 480);
+    
     while (true) {
         if (*(bool *)(ninecraft_app+0xd98) == true) {
             if (!mouse_pointer_hidden) {
@@ -558,7 +561,7 @@ int main(int argc, char **argv) {
             controller_y_stick[1] = (float)(y_cam - 180.0) * 0.0055555557;
             controller_x_stick[1] = ((float)((x_cam - 483.0)) * 0.0020703934);
         }
-        ((void (*)(void *))internal_dlsym(handle, "_ZN12NinecraftApp6updateEv"))(ninecraft_app);
+        ninecraft_app_update(ninecraft_app);
         
         if (!mouse_pointer_hidden) {
             if (version_id == version_id_0_6) {
@@ -570,12 +573,9 @@ int main(int argc, char **argv) {
                 ((void (*)(float, float, void *))internal_dlsym(handle, "_Z12renderCursorffP9Minecraft"))(cx, cy, ninecraft_app);
             }
         }
+        
         glfwSwapBuffers(_window);
         glfwPollEvents();
-        GLenum err;
-        while((err = glGetError()) != GL_NO_ERROR) {
-            printf("errrr %u\n", err);
-        }
     }
     return 0;
 }
