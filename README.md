@@ -5,11 +5,11 @@
 ## Compile dependencies
 ### Debian/Ubuntu:
 ```
-git make cmake gcc gcc-multilib g++ zlib1g-dev:i386 libpng-dev:i386 zlib1g-dev libpng-dev libopenal-dev:i386 libopenal-dev libx11-dev:i386 libx11-dev libxrandr-dev:i386 libxrandr-dev libxinerama-dev:i386 libxinerama-dev libxcursor-dev:i386 libxcursor-dev libxi-dev:i386 libxi-dev zenity patchelf
+git make cmake gcc gcc-multilib g++ zlib1g-dev:i386 libpng-dev:i386 zlib1g-dev libpng-dev libopenal-dev:i386 libopenal-dev libx11-dev:i386 libx11-dev libxrandr-dev:i386 libxrandr-dev libxinerama-dev:i386 libxinerama-dev libxcursor-dev:i386 libxcursor-dev libxi-dev:i386 libxi-dev libgles2-mesa-dev:i386 libgles2-mesa-dev zenity patchelf
 ```
 ### ArchLinux:
 ```
-git make cmake gcc gcc-multilib zlib lib32-zlib libpng lib32-libpng openal lib32-openal libx11 lib32-libx11 libxrandr lib32-libxrandr libxinerama lib32-libxinerama libxcursor lib32-libxcursor libxi lib32-libxi zenity patchelf
+git make cmake gcc gcc-multilib zlib lib32-zlib libpng lib32-libpng openal lib32-openal libx11 lib32-libx11 libxrandr lib32-libxrandr libxinerama lib32-libxinerama libxcursor lib32-libxcursor libxi lib32-libxi libglvnd lib32-libglvnd zenity patchelf
 ```
 
 ## Compiling
