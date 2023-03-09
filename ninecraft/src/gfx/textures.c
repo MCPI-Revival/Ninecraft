@@ -68,7 +68,7 @@ texture_data_t read_png(char *path, bool alpha, bool reverse_load) {
     texture_data.texture_type = texture_type_ub;
     texture_data.alpha = alpha;
     texture_data.unknown = 0;
-    texture_data.unknown1 = 0;
+    texture_data.keep_buffer_data = 0;
     texture_data.unknown2 = 0xfffffff;
     return texture_data;
 }
