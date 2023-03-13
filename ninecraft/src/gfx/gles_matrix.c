@@ -4,6 +4,7 @@
 #include <ninecraft/gfx/gles_state.h>
 #include <stdio.h>
 #include <string.h>
+#include <math.h>
 
 // Matrix Common
 static void gles_matrix_copy(gles_matrix_t *src, gles_matrix_t *dst) {

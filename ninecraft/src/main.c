@@ -18,7 +18,6 @@
 #include <ninecraft/android/android_alloc.h>
 #include <ninecraft/symbols.h>
 #include <ninecraft/AppPlatform_linux.h>
-#include <ninecraft/audio/audio_engine.h>
 #include <ninecraft/hooks.h>
 #include <ninecraft/minecraft.h>
 #include <ninecraft/input/keyboard.h>
@@ -29,6 +28,8 @@
 #include <math.h>
 #include <wchar.h>
 #include <wctype.h>
+#include <ninecraft/audio/sles.h>
+#include <ninecraft/audio/audio_engine.h>
 
 #include <ninecraft/dlfcn_stub.h>
 #include <hybris/hook.h>
@@ -51,8 +52,6 @@ void *ninecraft_app;
 static unsigned char *controller_states;
 static float *controller_x_stick;
 static float *controller_y_stick;
-
-audio_engine_t audio_engine;
 
 bool mouse_pointer_hidden = false;
 
@@ -265,7 +264,6 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
                 ((void (*)(void *, int, char, char))internal_dlsym(handle, "_ZN16FillingContainer8dropSlotEibb"))(inv, slot, 0, 0);
             } else {
             }
-            audio_engine_play(&audio_engine, handle, "random.pop", 0, 0, 0, 0.3, 1, 1);
         }
     } else {
         int game_keycode = getGameKeyCode(key);
@@ -284,7 +282,7 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
 }
 
 void window_close_callback(GLFWwindow* window) {
-    audio_engine_destroy_audio_device(&audio_engine);
+    audio_engine_destroy();
     exit(0);
 }
 
@@ -298,29 +296,6 @@ void release_mouse() {
     puts("release_mouse");
     mouse_pointer_hidden = false;
     glfwSetInputMode(_window, GLFW_CURSOR, default_mouse_mode);
-}
-
-void sound_engine_playui(void *sound_engine, android_string_t *sound_name, float volume, float pitch) {
-    audio_engine_play(&audio_engine, handle, sound_name->_M_start_of_storage, 0, 0, 0, volume, pitch, true);
-}
-
-void sound_engine_play(void *sound_engine, android_string_t *sound_name, float x, float y, float z, float volume, float pitch) {
-    audio_engine_play(&audio_engine, handle, sound_name->_M_start_of_storage, x, y, z, volume, pitch, false);
-}
-
-void sound_engine_update(void *sound_engine, unsigned char *mob, float listener_angle) {
-    float x = 0;
-    float y = 0;
-    float z = 0;
-    float yaw = 0;
-    if (mob != NULL) {
-        x = *(float *)(mob + 4);
-        y = *(float *)(mob + 8);
-        z = *(float *)(mob + 12);
-        yaw = *(float *)(mob + 64);
-    }
-    unsigned char *options = (unsigned char *)(ninecraft_app + MINECRAFT_OPTIONS_OFFSET);
-    audio_engine_update(&audio_engine, *(int *)(options + 4) ? 1 : 0, x, y, z, yaw);
 }
 
 android_string_t get_game_version() {
@@ -462,13 +437,20 @@ int main(int argc, char **argv) {
 
     glfwMakeContextCurrent(_window);
 
+    audio_engine_init();
+
     math_hook();
     gles_hook();
     missing_hook();
     hybris_hook("__android_log_print", (void *)__android_log_print);
     stub_symbols(android_symbols, (void *)android_stub);
     stub_symbols(egl_symbols, (void *)egl_stub);
-    stub_symbols(sles_symbols, (void *)sles_stub);
+
+    hybris_hook("SL_IID_VOLUME", &sles_iid_volume);
+    hybris_hook("SL_IID_ENGINE", &sles_iid_engine);
+    hybris_hook("SL_IID_BUFFERQUEUE", &sles_iid_bufferqueue);
+    hybris_hook("SL_IID_PLAY", &sles_iid_play);
+    hybris_hook("slCreateEngine", sles_create_engine);
     
     handle = load_minecraftpe();
 
@@ -493,8 +475,6 @@ int main(int argc, char **argv) {
 
     printf("Ninecraft is running Minecraft %s\n", game_version._M_start_of_storage);
 
-    audio_engine_create_audio_device(&audio_engine);
-
     multitouch_setup_hooks(handle);
     keyboard_setup_hooks(handle);
     minecraft_setup_hooks(handle);
@@ -512,17 +492,6 @@ int main(int argc, char **argv) {
     glfwSetInputMode(_window, GLFW_CURSOR, default_mouse_mode);
     
     DETOUR(internal_dlsym(handle, "_ZN6Common20getGameVersionStringERKSs"), (void *)get_game_version, true);
-    DETOUR(internal_dlsym(handle, "_ZN11SoundEngineC1Ef"), (void *)sound_engine_stub, true);
-    DETOUR(internal_dlsym(handle, "_ZN11SoundEngine4initEP9MinecraftP7Options"), (void *)sound_engine_stub, true);
-    DETOUR(internal_dlsym(handle, "_ZN11SoundEngine14_getVolumeMultEfff"), (void *)sound_engine_stub, true);
-    DETOUR(internal_dlsym(handle, "_ZN11SoundEngine7destroyEv"), (void *)sound_engine_stub, true);
-    DETOUR(internal_dlsym(handle, "_ZN11SoundEngine6enableEb"), (void *)sound_engine_stub, true);
-    DETOUR(internal_dlsym(handle, "_ZN11SoundEngine4playERKSsfffff"), (void *)sound_engine_play, true);
-    DETOUR(internal_dlsym(handle, "_ZN11SoundEngine6playUIERKSsff"), (void *)sound_engine_playui, true);
-    DETOUR(internal_dlsym(handle, "_ZN11SoundEngine6updateEP3Mobf"), (void *)sound_engine_update, true);
-    DETOUR(internal_dlsym(handle, "_ZN11SoundEngine13updateOptionsEv"), (void *)sound_engine_stub, true);
-    DETOUR(internal_dlsym(handle, "_ZN11SoundEngineD1Ev"), (void *)sound_engine_stub, true);
-    DETOUR(internal_dlsym(handle, "_ZN11SoundEngineD2Ev"), (void *)sound_engine_stub, true);
 
     printf("%s\n", glGetString(GL_VERSION));
 
@@ -573,7 +542,7 @@ int main(int argc, char **argv) {
                 ((void (*)(float, float, void *))internal_dlsym(handle, "_Z12renderCursorffP9Minecraft"))(cx, cy, ninecraft_app);
             }
         }
-        
+        audio_engine_tick();
         glfwSwapBuffers(_window);
         glfwPollEvents();
     }
