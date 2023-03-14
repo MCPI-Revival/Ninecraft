@@ -9,46 +9,74 @@
 
 extern GLFWwindow *_window;
 
+void *app_platform_vtable_0_5[] = {
+    (void *)AppPlatform_linux$destroy,
+    (void *)AppPlatform_linux$destroy,
+    (void *)AppPlatform_linux$saveScreenshot,
+    (void *)AppPlatform_linux$loadTexture,
+    (void *)AppPlatform_linux$playSound,
+    (void *)AppPlatform_linux$showDialog,
+    (void *)AppPlatform_linux$createUserInput,
+    (void *)AppPlatform_linux$getUserInputStatus,
+    (void *)AppPlatform_linux$getUserInput,
+    (void *)AppPlatform_linux$getDateString,
+    (void *)AppPlatform_linux$checkLicense,
+    (void *)AppPlatform_linux$hasBuyButtonWhenInvalidLicense,
+    (void *)AppPlatform_linux$uploadPlatformDependentData,
+    (void *)AppPlatform_linux$readAssetFile,
+    (void *)AppPlatform_linux$_tick,
+    (void *)AppPlatform_linux$getScreenWidth,
+    (void *)AppPlatform_linux$getScreenHeight,
+    (void *)AppPlatform_linux$getPixelsPerMillimeter,
+    (void *)AppPlatform_linux$isNetworkEnabled,
+    (void *)AppPlatform_linux$getOptionStrings,
+    (void *)AppPlatform_linux$isPowerVR,
+    (void *)AppPlatform_linux$buyGame,
+    (void *)AppPlatform_linux$finish,
+    (void *)AppPlatform_linux$isTouchscreen,
+    (void *)AppPlatform_linux$vibrate,
+    (void *)AppPlatform_linux$getPlatformStringVar
+};
+
+void *app_platform_vtable_0_6[] = {
+    (void *)AppPlatform_linux$destroy,
+    (void *)AppPlatform_linux$destroy,
+    (void *)AppPlatform_linux$saveScreenshot,
+    (void *)AppPlatform_linux$loadTexture,
+    (void *)AppPlatform_linux$playSound,
+    (void *)AppPlatform_linux$showDialog,
+    (void *)AppPlatform_linux$createUserInput,
+    (void *)AppPlatform_linux$getUserInputStatus,
+    (void *)AppPlatform_linux$getUserInput,
+    (void *)AppPlatform_linux$getDateString,
+    (void *)AppPlatform_linux$checkLicense,
+    (void *)AppPlatform_linux$hasBuyButtonWhenInvalidLicense,
+    (void *)AppPlatform_linux$uploadPlatformDependentData,
+    (void *)AppPlatform_linux$readAssetFile,
+    (void *)AppPlatform_linux$_tick,
+    (void *)AppPlatform_linux$getScreenWidth,
+    (void *)AppPlatform_linux$getScreenHeight,
+    (void *)AppPlatform_linux$getPixelsPerMillimeter,
+    (void *)AppPlatform_linux$isNetworkEnabled,
+    (void *)AppPlatform_linux$getOptionStrings,
+    (void *)AppPlatform_linux$isPowerVR,
+    (void *)AppPlatform_linux$getKeyFromKeyCode,
+    (void *)AppPlatform_linux$buyGame,
+    (void *)AppPlatform_linux$finish,
+    (void *)AppPlatform_linux$isTouchscreen,
+    (void *)AppPlatform_linux$vibrate,
+    (void *)AppPlatform_linux$getPlatformStringVar,
+    (void *)AppPlatform_linux$showKeyboard,
+    (void *)AppPlatform_linux$hideKeyboard,
+    (void *)AppPlatform_linux$isKeyboardVisible,
+    (void *)AppPlatform_linux$showKeyboard
+};
+
 void AppPlatform_linux$AppPlatform_linux(AppPlatform_linux *app_platform, void *handle, int version_id) {
-    app_platform->vtable = (void **) malloc(31 * sizeof(void *));
-    app_platform->vtable[0] = (void *) AppPlatform_linux$destroy;
-    app_platform->vtable[1] = (void *) AppPlatform_linux$destroy;
-    app_platform->vtable[2] = (void *) AppPlatform_linux$saveScreenshot;
-    app_platform->vtable[3] = (void *) AppPlatform_linux$loadTexture;
-    app_platform->vtable[4] = (void *) AppPlatform_linux$playSound;
-    app_platform->vtable[5] = (void *) AppPlatform_linux$showDialog;
-    app_platform->vtable[6] = (void *) AppPlatform_linux$createUserInput;
-    app_platform->vtable[7] = (void *) AppPlatform_linux$getUserInputStatus;
-    app_platform->vtable[8] = (void *) AppPlatform_linux$getUserInput;
-    app_platform->vtable[9] = (void *) AppPlatform_linux$getDateString;
-    app_platform->vtable[10] = (void *) AppPlatform_linux$checkLicense;
-    app_platform->vtable[11] = (void *) AppPlatform_linux$hasBuyButtonWhenInvalidLicense;
-    app_platform->vtable[12] = (void *) AppPlatform_linux$uploadPlatformDependentData;
-    app_platform->vtable[13] = (void *) AppPlatform_linux$readAssetFile;
-    app_platform->vtable[14] = (void *) AppPlatform_linux$_tick;
-    app_platform->vtable[15] = (void *) AppPlatform_linux$getScreenWidth;
-    app_platform->vtable[16] = (void *) AppPlatform_linux$getScreenHeight;
-    app_platform->vtable[17] = (void *) AppPlatform_linux$getPixelsPerMillimeter;
-    app_platform->vtable[18] = (void *) AppPlatform_linux$isNetworkEnabled;
-    app_platform->vtable[19] = (void *) AppPlatform_linux$getOptionStrings;
-    app_platform->vtable[20] = (void *) AppPlatform_linux$isPowerVR;
     if (version_id == version_id_0_6) {
-        app_platform->vtable[21] = (void *) AppPlatform_linux$getKeyFromKeyCode;
-        app_platform->vtable[22] = (void *) AppPlatform_linux$buyGame;
-        app_platform->vtable[23] = (void *) AppPlatform_linux$finish;
-        app_platform->vtable[24] = (void *) AppPlatform_linux$isTouchscreen;
-        app_platform->vtable[25] = (void *) AppPlatform_linux$vibrate;
-        app_platform->vtable[26] = (void *) AppPlatform_linux$getPlatformStringVar;
-        app_platform->vtable[27] = (void *) AppPlatform_linux$showKeyboard;
-        app_platform->vtable[28] = (void *) AppPlatform_linux$hideKeyboard;
-        app_platform->vtable[29] = (void *) AppPlatform_linux$isKeyboardVisible;
-        app_platform->vtable[30] = (void *) AppPlatform_linux$showKeyboard;
+        app_platform->vtable = app_platform_vtable_0_6;
     } else if (version_id == version_id_0_5) {
-        app_platform->vtable[21] = (void *) AppPlatform_linux$buyGame;
-        app_platform->vtable[22] = (void *) AppPlatform_linux$finish;
-        app_platform->vtable[23] = (void *) AppPlatform_linux$isTouchscreen;
-        app_platform->vtable[24] = (void *) AppPlatform_linux$vibrate;
-        app_platform->vtable[25] = (void *) AppPlatform_linux$getPlatformStringVar;
+        app_platform->vtable = app_platform_vtable_0_5;
     }
     app_platform->handle = handle;
     app_platform->status = -1;
@@ -529,5 +557,4 @@ void AppPlatform_linux$vibrate(AppPlatform_linux *app_platform, int milliseconds
 
 void AppPlatform_linux$destroy(AppPlatform_linux *app_platform) {
     puts("debug: AppPlatform_linux::destroy");
-    free(app_platform->vtable);
 }
