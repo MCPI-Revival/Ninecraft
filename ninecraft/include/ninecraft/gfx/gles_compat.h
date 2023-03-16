@@ -104,4 +104,6 @@ extern void gl_vertex_pointer(GLint size, GLenum type, GLsizei stride, const GLv
 
 extern void gl_viewport(GLint x, GLint y, GLsizei width, GLsizei height);
 
+extern void gl_draw_elements(GLenum mode, GLsizei count, GLenum type, const void *indices);
+
 #endif

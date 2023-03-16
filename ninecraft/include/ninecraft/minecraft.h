@@ -15,6 +15,15 @@
 #define FILLINGCONTAINER_LINKED_SLOTS_OFFSET 0x0c
 #define FILLINGCONTAINER_LINKED_SLOTS_COUNT_OFFSET 0x14
 
+#ifdef __i386__
+#define NINECRAFTAPP_SIZE_0_7 0xee0
+#else
+#ifdef __thumb2__
+#define NINECRAFTAPP_SIZE_0_7 0xee8
+#endif
+#endif
+#define NINECRAFTAPP_SIZE_0_6 0xe6c
+
 typedef void (*minecraft_level_generated_t)(void *minecraft);
 
 extern minecraft_level_generated_t minecraft_level_generated;

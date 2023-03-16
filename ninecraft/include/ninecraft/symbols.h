@@ -20,6 +20,10 @@ const char *egl_symbols[] = {
 };
 
 const char *android_symbols[] = {
+    "AAssetManager_open",
+    "AAsset_getLength",
+    "AAsset_getBuffer",
+    "AAsset_close",
     "AConfiguration_delete",
     "AConfiguration_fromAssetManager",
     "AConfiguration_getCountry",

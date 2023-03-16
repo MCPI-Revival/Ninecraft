@@ -31,6 +31,7 @@
 #include <wctype.h>
 #include <ninecraft/audio/sles.h>
 #include <ninecraft/audio/audio_engine.h>
+#include <zlib.h>
 
 #include <ninecraft/dlfcn_stub.h>
 #include <hybris/hook.h>
@@ -319,6 +320,7 @@ void gles_hook() {
     hybris_hook("glTranslatef", (void *) gl_translate_f);
     hybris_hook("glVertexPointer", (void *) gl_vertex_pointer);
     hybris_hook("glViewport", (void *) gl_viewport);
+    hybris_hook("glDrawElements", gl_draw_elements);
 }
 
 void math_hook() {
@@ -332,6 +334,15 @@ void math_hook() {
     hybris_hook("powf", powf);
     hybris_hook("sinf", sinf);
     hybris_hook("sqrtf", sqrtf);
+    hybris_hook("floor", floor);
+    hybris_hook("ceil", ceil);
+    hybris_hook("fmod", fmod);
+    hybris_hook("sin", sin);
+    hybris_hook("sqrt", sqrt);
+    hybris_hook("pow", pow);
+    hybris_hook("atan2", atan2);
+    hybris_hook("cos", cos);
+    hybris_hook("atan", atan);
 }
 
 #ifdef __thumb2__
@@ -357,6 +368,17 @@ void missing_hook() {
     hybris_hook("iswpunct", iswpunct);
     hybris_hook("iswupper", iswupper);
     hybris_hook("iswxdigit", iswxdigit);
+
+    hybris_hook("deflateInit_", deflateInit_);
+    hybris_hook("deflateInit2_", deflateInit2_);
+    hybris_hook("deflate", deflate);
+    hybris_hook("deflateEnd", deflateEnd);
+    hybris_hook("inflateInit_", inflateInit_);
+    hybris_hook("inflateInit2_", inflateInit2_);
+    hybris_hook("inflate", inflate);
+    hybris_hook("inflateEnd", inflateEnd);
+    hybris_hook("uncompress", uncompress);
+    hybris_hook("compress", compress);
 
     hybris_hook("ftime", ftime);
 
@@ -466,12 +488,19 @@ int main(int argc, char **argv) {
     printf("%s\n", glGetString(GL_VERSION));
 
     printf("nine construct %p\n", ninecraft_app_construct);
-    ninecraft_app = android_alloc_operator_new(version_id == version_id_0_7 ? 0xee8 : 0xe6c);
+    ninecraft_app = android_alloc_operator_new(version_id == version_id_0_7 ? NINECRAFTAPP_SIZE_0_7 : NINECRAFTAPP_SIZE_0_6);
     ninecraft_app_construct(ninecraft_app);
 
     if (version_id == version_id_0_7) {
+#ifdef __i386__
         android_string_equ((android_string_t *)(ninecraft_app + 3616), "./storage/internal/");
         android_string_equ((android_string_t *)(ninecraft_app + 3640), "./storage/external/");
+#else
+#ifdef __thumb2__
+        android_string_equ((android_string_t *)(ninecraft_app + 3620), "./storage/internal/");
+        android_string_equ((android_string_t *)(ninecraft_app + 3644), "./storage/external/");
+#endif
+#endif
     } else {
         android_string_equ((android_string_t *)(ninecraft_app + 3544), "./storage/internal/");
         android_string_equ((android_string_t *)(ninecraft_app + 3568), "./storage/external/");

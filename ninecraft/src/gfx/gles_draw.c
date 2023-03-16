@@ -204,3 +204,134 @@ void gl_draw_arrays(GLenum mode, GLint first, GLsizei count) {
         glDisableVertexAttribArray(a_texture_coords_handle);
     }
 }
+
+// Elements Drawing
+void gl_draw_elements(GLenum mode, GLsizei count, GLenum type, const void *indices) {
+    // Verify
+    if (gl_state.array_pointers.vertex.size != 3 || !gl_state.array_pointers.vertex.enabled || gl_state.array_pointers.vertex.type != GLES_GL_FLOAT) {
+        puts("Unsupported Vertex Conifguration");
+    }
+
+    // Check Mode
+    int use_color_pointer = gl_state.array_pointers.color.enabled;
+    if (use_color_pointer && (gl_state.array_pointers.color.size != 4 || gl_state.array_pointers.color.type != GLES_GL_UNSIGNED_BYTE)) {
+        puts("Unsupported Color Conifguration");
+    }
+    int use_texture = gl_state.texture_2d && gl_state.array_pointers.tex_coord.enabled;
+    if (use_texture && (gl_state.array_pointers.tex_coord.size != 2 || gl_state.array_pointers.tex_coord.type != GLES_GL_FLOAT)) {
+        puts("Unsupported Texture Conifguration");
+    }
+
+    // Load Shader
+    GLuint program = gles_get_shader();
+    gles_use_shader(program);
+
+    // Projection Matrix
+    static GLint u_projection_handle = -1;
+    if (u_projection_handle == -1) {
+        u_projection_handle = glGetUniformLocation(program, "u_projection");
+    }
+    gles_matrix_t *p = &gl_state.matrix_stacks.projection.stack[gl_state.matrix_stacks.projection.i];
+    glUniformMatrix4fv(u_projection_handle, 1, 0, (GLfloat *) &p->data[0][0]);
+
+    // Model View Matrix
+    static GLint u_model_view_handle = -1;
+    if (u_model_view_handle == -1) {
+        u_model_view_handle = glGetUniformLocation(program, "u_model_view");
+    }
+    p = &gl_state.matrix_stacks.model_view.stack[gl_state.matrix_stacks.model_view.i];
+    glUniformMatrix4fv(u_model_view_handle, 1, 0, (GLfloat *) &p->data[0][0]);
+
+    // Has Texture
+    static GLint u_has_texture_handle = -1;
+    if (u_has_texture_handle == -1) {
+        u_has_texture_handle = glGetUniformLocation(program, "u_has_texture");
+    }
+    glUniform1i(u_has_texture_handle, use_texture);
+
+    // Texture Matrix
+    static GLint u_texture_handle = -1;
+    if (u_texture_handle == -1) {
+        u_texture_handle = glGetUniformLocation(program, "u_texture");
+    }
+    p = &gl_state.matrix_stacks.texture.stack[gl_state.matrix_stacks.texture.i];
+    glUniformMatrix4fv(u_texture_handle, 1, 0, (GLfloat *) &p->data[0][0]);
+
+    // Texture Unit
+    static GLint u_texture_unit_handle = -1;
+    if (u_texture_unit_handle == -1) {
+        u_texture_unit_handle = glGetUniformLocation(program, "u_texture_unit");
+    }
+    glUniform1i(u_texture_unit_handle, 0);
+
+    // Alpha Test
+    static GLint u_alpha_test_handle = -1;
+    if (u_alpha_test_handle == -1) {
+        u_alpha_test_handle = glGetUniformLocation(program, "u_alpha_test");
+    }
+    glUniform1i(u_alpha_test_handle, gl_state.alpha_test);
+
+    // Color
+    GLint a_color_handle = glGetAttribLocation(program, "a_color");
+    if (use_color_pointer) {
+        glVertexAttribPointer(a_color_handle, gl_state.array_pointers.color.size, gl_state.array_pointers.color.type, 1, gl_state.array_pointers.color.stride, gl_state.array_pointers.color.pointer);
+        glEnableVertexAttribArray(a_color_handle);
+    } else {
+        glVertexAttrib4f(a_color_handle, gl_state.color.red, gl_state.color.green, gl_state.color.blue, gl_state.color.alpha);
+    }
+
+    // Fog
+    static GLint u_fog_handle = -1;
+    if (u_fog_handle == -1) {
+        u_fog_handle = glGetUniformLocation(program, "u_fog");
+    }
+    glUniform1i(u_fog_handle, gl_state.fog.enabled);
+    if (gl_state.fog.enabled) {
+        static GLint u_fog_color_handle = -1;
+        if (u_fog_color_handle == -1) {
+            u_fog_color_handle = glGetUniformLocation(program, "u_fog_color");
+        }
+        glUniform4f(u_fog_color_handle, gl_state.fog.color[0], gl_state.fog.color[1], gl_state.fog.color[2], gl_state.fog.color[3]);
+        static GLint u_fog_is_linear_handle = -1;
+        if (u_fog_is_linear_handle == -1) {
+            u_fog_is_linear_handle = glGetUniformLocation(program, "u_fog_is_linear");
+        }
+        glUniform1i(u_fog_is_linear_handle, gl_state.fog.mode == GLES_GL_LINEAR);
+        static GLint u_fog_start_handle = -1;
+        if (u_fog_start_handle == -1) {
+            u_fog_start_handle = glGetUniformLocation(program, "u_fog_start");
+        }
+        glUniform1f(u_fog_start_handle, gl_state.fog.start);
+        static GLint u_fog_end_handle = -1;
+        if (u_fog_end_handle == -1) {
+            u_fog_end_handle = glGetUniformLocation(program, "u_fog_end");
+        }
+        glUniform1f(u_fog_end_handle, gl_state.fog.end);
+    }
+
+    // Vertices
+    GLint a_vertex_coords_handle = glGetAttribLocation(program, "a_vertex_coords");
+    glVertexAttribPointer(a_vertex_coords_handle, gl_state.array_pointers.vertex.size, gl_state.array_pointers.vertex.type, 0, gl_state.array_pointers.vertex.stride, gl_state.array_pointers.vertex.pointer);
+    glEnableVertexAttribArray(a_vertex_coords_handle);
+
+    // Texture Coordinates
+    GLint a_texture_coords_handle = glGetAttribLocation(program, "a_texture_coords");
+    if (use_texture) {
+        glVertexAttribPointer(a_texture_coords_handle, gl_state.array_pointers.tex_coord.size, gl_state.array_pointers.tex_coord.type, 0, gl_state.array_pointers.tex_coord.stride, gl_state.array_pointers.tex_coord.pointer);
+        glEnableVertexAttribArray(a_texture_coords_handle);
+    } else {
+        glVertexAttrib3f(a_texture_coords_handle, 0, 0, 0);
+    }
+
+    // Draw
+    glDrawElements(mode, count, type, indices);
+
+    // Cleanup
+    if (use_color_pointer) {
+        glDisableVertexAttribArray(a_color_handle);
+    }
+    glDisableVertexAttribArray(a_vertex_coords_handle);
+    if (use_texture) {
+        glDisableVertexAttribArray(a_texture_coords_handle);
+    }
+}
