@@ -4,8 +4,9 @@
 #include <stdint.h>
 #include <ninecraft/android/android_string.h>
 
-#define MINECRAFT_COMMANDSERVER_OFFSET_0_6 0xe5c
-#define MINECRAFT_COMMANDSERVER_OFFSET_0_7 0xebc
+#define MINECRAFT_COMMANDSERVER_OFFSET_0_6_1 0xe5c
+#define MINECRAFT_COMMANDSERVER_OFFSET_0_7_0 0xebc
+#define MINECRAFT_COMMANDSERVER_OFFSET_0_7_2 0xec8
 #define MINECRAFT_OPTIONS_OFFSET 0x28
 #define MINECRAFT_GUI_OFFSET 0x2e4
 #define MINECRAFT_PLAYER_OFFSET 0x2d8
@@ -16,13 +17,19 @@
 #define FILLINGCONTAINER_LINKED_SLOTS_COUNT_OFFSET 0x14
 
 #ifdef __i386__
-#define NINECRAFTAPP_SIZE_0_7 0xee0
+#define NINECRAFTAPP_SIZE_0_7_0 0xee0
 #else
 #ifdef __thumb2__
-#define NINECRAFTAPP_SIZE_0_7 0xee8
+#define NINECRAFTAPP_SIZE_0_7_0 0xee8
 #endif
 #endif
-#define NINECRAFTAPP_SIZE_0_6 0xe6c
+#define NINECRAFTAPP_SIZE_0_6_1 0xe6c
+#define NINECRAFTAPP_SIZE_0_7_2 0xeec
+
+#define MINECRAFT_ISGRABBED_OFFSET_0_7_0 0xde0
+#define MINECRAFT_ISGRABBED_OFFSET_0_6_1 0xd98
+#define MINECRAFT_ISGRABBED_OFFSET_0_7_2 0xdec
+
 
 typedef void (*minecraft_level_generated_t)(void *minecraft);
 

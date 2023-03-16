@@ -32,6 +32,8 @@ typedef struct {
     char filler[0x1000];
 } user_input;
 
+void AppPlatform_linux$initWithActivity(AppPlatform_linux *app_platform, void *activity);
+
 void AppPlatform_linux$openLoginWindow(AppPlatform_linux *app_platform);
 
 bool AppPlatform_linux$supportsTouchscreen(AppPlatform_linux *app_platform);

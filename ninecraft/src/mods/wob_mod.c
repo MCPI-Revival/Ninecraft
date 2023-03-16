@@ -8,14 +8,14 @@
 */
 
 void wob_mod_inject(int version_id) { 
-    if (version_id == version_id_0_6) {
+    if (version_id == version_id_0_6_1) {
 #ifdef __i386__
         ((char *)start_menu_screen_construct)[268] = 0xa0;
 #endif
 #ifdef __thumb2__
         ((char *)start_menu_screen_construct)[129] = 0xa0;
 #endif
-    } else if (version_id == version_id_0_5) {
+    } else if (version_id == version_id_0_5_0) {
 #ifdef __i386__
         ((char *)start_menu_screen_construct)[316] = 0xa0;
 #endif

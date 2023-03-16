@@ -129,10 +129,10 @@ static void mouse_click_callback(GLFWwindow* window, int button, int action, int
     glfwGetCursorPos(window, &xpos, &ypos);
     if (!mouse_pointer_hidden) {
         int mc_button = (button == GLFW_MOUSE_BUTTON_LEFT ? 1 : (button == GLFW_MOUSE_BUTTON_RIGHT ? 2 : 0));
-        if (version_id == version_id_0_6 || version_id == version_id_0_7) {
+        if (version_id == version_id_0_6_1 || version_id == version_id_0_7_0 || version_id == version_id_0_7_2) {
             mouse_device_feed_0_6(internal_dlsym(handle, "_ZN5Mouse9_instanceE"), (char)mc_button, (char)(action == GLFW_PRESS ? 1 : 0), (short)xpos, (short)ypos, 0, 0);
             multitouch_feed_0_6((char)mc_button, (char)(action == GLFW_PRESS ? 1 : 0), (short)xpos, (short)ypos, 0);
-        } else if (version_id == version_id_0_5) {
+        } else if (version_id == version_id_0_5_0) {
             mouse_device_feed_0_5(internal_dlsym(handle, "_ZN5Mouse9_instanceE"), (char) mc_button, (char) (action == GLFW_PRESS ? 1 : 0), (short)xpos, (short)ypos);
             multitouch_feed_0_5((char)mc_button, (char)(action == GLFW_PRESS ? 1 : 0), (short)xpos, (short)ypos, 0);
         }
@@ -162,10 +162,10 @@ static void mouse_scroll_callback(GLFWwindow* window, double xoffset, double yof
 
 static void mouse_pos_callback(GLFWwindow* window, double xpos, double ypos) {
     if (!mouse_pointer_hidden) {
-        if (version_id == version_id_0_6 || version_id == version_id_0_7) {
+        if (version_id == version_id_0_6_1 || version_id == version_id_0_7_0 || version_id == version_id_0_7_2) {
             mouse_device_feed_0_6(internal_dlsym(handle, "_ZN5Mouse9_instanceE"), 0, 0, (short)xpos, (short)ypos, 0, 0);
             multitouch_feed_0_6(0, 0, (short)xpos, (short)ypos, 0);
-        } else if (version_id == version_id_0_5) {
+        } else if (version_id == version_id_0_5_0) {
             mouse_device_feed_0_5(internal_dlsym(handle, "_ZN5Mouse9_instanceE"), 0, 0, (short)xpos, (short)ypos);
             multitouch_feed_0_5(0, 0, (short)xpos, (short)ypos, 0);
         }
@@ -216,8 +216,14 @@ static void resize_callback(GLFWwindow* window, int width, int height) {
 }
 
 static void char_callback(GLFWwindow* window, unsigned int codepoint) {
-    if (version_id == version_id_0_6 || version_id == version_id_0_7) {
+    if (version_id == version_id_0_6_1 || version_id == version_id_0_7_0) {
         ((void (*)(char))internal_dlsym(handle, "_ZN8Keyboard8feedTextEc"))((char)codepoint);
+    } else if (version_id == version_id_0_7_2) {
+        char p_codepoint[2] = {(char)codepoint, '\0'};
+        android_string_t str;
+        android_string_cstr(&str, p_codepoint);
+        ((void (*)(android_string_t *, uint8_t))internal_dlsym(handle, "_ZN8Keyboard8feedTextERKSsb"))(&str, 0);
+        android_string_deallocate_block(&str);
     }
 }
 
@@ -242,8 +248,18 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
                 controller_states[0] = 0;
             }
         } else if (mouse_pointer_hidden && key == GLFW_KEY_T) {
-            if (action == GLFW_PRESS) {
-                ((void (*)(void *, int))internal_dlsym(handle, "_ZN13ScreenChooser9setScreenE8ScreenId"))(ninecraft_app + 0x2f0, 7);
+            if (version_id == version_id_0_7_0) {
+                if (action == GLFW_PRESS) {
+                    ((void (*)(void *, int))internal_dlsym(handle, "_ZN13ScreenChooser9setScreenE8ScreenId"))(ninecraft_app + 0x2f0, 7);
+                }
+            } else if (version_id == version_id_0_7_2) {
+                int w;
+                glfwGetWindowSize(_window, &w, NULL);
+                if (action == GLFW_PRESS) {
+                    mouse_device_feed_0_6(internal_dlsym(handle, "_ZN5Mouse9_instanceE"), 1, 1, (short)w, 0, 0, 0);
+                } else if (action == GLFW_RELEASE) {
+                    mouse_device_feed_0_6(internal_dlsym(handle, "_ZN5Mouse9_instanceE"), 1, 0, (short)w, 0, 0, 0);
+                }
             }
         } else if (action == GLFW_PRESS && game_keycode) {
             keyboard_feed(game_keycode, 1);
@@ -457,13 +473,17 @@ int main(int argc, char **argv) {
     printf("Ninecraft is running mcpe %.6s\n", (char *)game_version._M_start_of_storage);
 
     if (strncmp(game_version._M_start_of_storage, "v0.6.1", 6) == 0) {
-        version_id = version_id_0_6;
+        version_id = version_id_0_6_1;
     } else if (strncmp(game_version._M_start_of_storage, "v0.6.0", 6) == 0) {
-        version_id = version_id_0_6;
+        version_id = version_id_0_6_1;
     } else if (strncmp(game_version._M_start_of_storage, "v0.5.0", 6) == 0) {
-        version_id = version_id_0_5;
+        version_id = version_id_0_5_0;
     } else if (strncmp(game_version._M_start_of_storage, "v0.7.0", 6) == 0) {
-        version_id = version_id_0_7;
+        version_id = version_id_0_7_0;
+    } else if (strncmp(game_version._M_start_of_storage, "v0.7.1", 6) == 0) {
+        version_id = version_id_0_7_0;
+    } else if (strncmp(game_version._M_start_of_storage, "v0.7.2", 6) == 0) {
+        version_id = version_id_0_7_2;
     } else {
         puts("Unsupported Version!");
         abort();
@@ -479,7 +499,7 @@ int main(int argc, char **argv) {
     controller_x_stick = (float *)internal_dlsym(handle, "_ZN10Controller12stickValuesXE");
     controller_y_stick = (float *)internal_dlsym(handle, "_ZN10Controller12stickValuesYE");
 
-    if (version_id == version_id_0_6 || version_id == version_id_0_7) {
+    if (version_id == version_id_0_6_1 || version_id == version_id_0_7_0 || version_id == version_id_0_7_2) {
         default_mouse_mode = GLFW_CURSOR_HIDDEN;
     }
 
@@ -488,10 +508,20 @@ int main(int argc, char **argv) {
     printf("%s\n", glGetString(GL_VERSION));
 
     printf("nine construct %p\n", ninecraft_app_construct);
-    ninecraft_app = android_alloc_operator_new(version_id == version_id_0_7 ? NINECRAFTAPP_SIZE_0_7 : NINECRAFTAPP_SIZE_0_6);
+    size_t ninecraft_app_size;
+    if (version_id == version_id_0_6_1) {
+        ninecraft_app_size = NINECRAFTAPP_SIZE_0_6_1;
+    } else if (version_id == version_id_0_5_0) {
+        ninecraft_app_size = NINECRAFTAPP_SIZE_0_6_1;
+    } else if (version_id == version_id_0_7_0) {
+        ninecraft_app_size = NINECRAFTAPP_SIZE_0_7_0;
+    } else if (version_id == version_id_0_7_2) {
+        ninecraft_app_size = NINECRAFTAPP_SIZE_0_7_2;
+    }
+    ninecraft_app = android_alloc_operator_new(ninecraft_app_size);
     ninecraft_app_construct(ninecraft_app);
 
-    if (version_id == version_id_0_7) {
+    if (version_id == version_id_0_7_0) {
 #ifdef __i386__
         android_string_equ((android_string_t *)(ninecraft_app + 3616), "./storage/internal/");
         android_string_equ((android_string_t *)(ninecraft_app + 3640), "./storage/external/");
@@ -501,6 +531,9 @@ int main(int argc, char **argv) {
         android_string_equ((android_string_t *)(ninecraft_app + 3644), "./storage/external/");
 #endif
 #endif
+    } else if (version_id == version_id_0_7_2) {
+        android_string_equ((android_string_t *)(ninecraft_app + 3628), "./storage/internal/");
+        android_string_equ((android_string_t *)(ninecraft_app + 3652), "./storage/external/");
     } else {
         android_string_equ((android_string_t *)(ninecraft_app + 3544), "./storage/internal/");
         android_string_equ((android_string_t *)(ninecraft_app + 3568), "./storage/external/");
@@ -520,7 +553,17 @@ int main(int argc, char **argv) {
     minecraft_set_size(ninecraft_app, 720, 480);
 
     while (true) {
-        if (*(bool *)(version_id == version_id_0_7 ? (ninecraft_app+0xde0): (ninecraft_app+0xd98)) == true) {
+        size_t minecraft_isgrabbed_offset;
+        if (version_id == version_id_0_7_2) {
+            minecraft_isgrabbed_offset = MINECRAFT_ISGRABBED_OFFSET_0_7_2;
+        } else if (version_id == version_id_0_7_0) {
+            minecraft_isgrabbed_offset = MINECRAFT_ISGRABBED_OFFSET_0_7_0;
+        } else if (version_id == version_id_0_6_1) {
+            minecraft_isgrabbed_offset = MINECRAFT_ISGRABBED_OFFSET_0_6_1;
+        } else if (version_id == version_id_0_5_0) {
+            minecraft_isgrabbed_offset = MINECRAFT_ISGRABBED_OFFSET_0_6_1;
+        }
+        if (*(bool *)(ninecraft_app+minecraft_isgrabbed_offset)) {
             if (!mouse_pointer_hidden) {
                 grab_mouse();
             }
@@ -537,7 +580,7 @@ int main(int argc, char **argv) {
         ninecraft_app_update(ninecraft_app);
         
         if (!mouse_pointer_hidden) {
-            if (version_id == version_id_0_6 || version_id == version_id_0_7) {
+            if (version_id == version_id_0_6_1 || version_id == version_id_0_7_0 || version_id == version_id_0_7_2) {
                 float inv_gui_scale = *((float *)internal_dlsym(handle, "_ZN3Gui11InvGuiScaleE"));
                 double xpos, ypos;
                 glfwGetCursorPos(_window, &xpos, &ypos);

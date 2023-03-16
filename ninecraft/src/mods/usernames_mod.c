@@ -8,11 +8,11 @@
 */
 
 void usernames_mod_inject(int version_id) { 
-    if (version_id == version_id_0_6) {
+    if (version_id == version_id_0_6_1) {
 #ifdef __i386__
         *(short *)(player_renderer_render_name + 50) = 0x9090;
 #endif
-    } else if (version_id == version_id_0_5) {
+    } else if (version_id == version_id_0_5_0) {
 #ifdef __i386__
         *(short *)(player_renderer_render_name + 50) = 0x9090;
 #endif

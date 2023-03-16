@@ -14,8 +14,8 @@ typedef struct {
     void *_M_start_of_storage;
 } android_string_t;
 
-typedef void (*android_string_clone_t)(android_string_t *__this, android_string_t *__ps, void *handle);
-typedef void (*android_string_deallocate_block_t)(android_string_t *__this, void *handle);
+typedef void (*android_string_clone_t)(android_string_t *__this, android_string_t *__ps);
+typedef void (*android_string_deallocate_block_t)(android_string_t *__this);
 typedef void (*android_string_assign_t)(android_string_t *__this, const char *__first, const char *__last);
 
 extern android_string_clone_t android_string_clone;

@@ -9,7 +9,7 @@
 
 extern GLFWwindow *_window;
 
-void *app_platform_vtable_0_5[] = {
+void *app_platform_vtable_0_5_0[] = {
     (void *)AppPlatform_linux$destroy,
     (void *)AppPlatform_linux$destroy,
     (void *)AppPlatform_linux$saveScreenshot,
@@ -38,7 +38,7 @@ void *app_platform_vtable_0_5[] = {
     (void *)AppPlatform_linux$getPlatformStringVar
 };
 
-void *app_platform_vtable_0_6[] = {
+void *app_platform_vtable_0_6_1[] = {
     (void *)AppPlatform_linux$destroy,
     (void *)AppPlatform_linux$destroy,
     (void *)AppPlatform_linux$saveScreenshot,
@@ -72,7 +72,7 @@ void *app_platform_vtable_0_6[] = {
     (void *)AppPlatform_linux$showKeyboard2
 };
 
-void *app_platform_vtable_0_7[] = {
+void *app_platform_vtable_0_7_0[] = {
     (void *)AppPlatform_linux$destroy,
     (void *)AppPlatform_linux$destroy,
     (void *)AppPlatform_linux$saveScreenshot,
@@ -113,6 +113,52 @@ void *app_platform_vtable_0_7[] = {
     (void *)AppPlatform_linux$getWebRequestContent,
     (void *)AppPlatform_linux$abortWebRequest
 };
+
+void *app_platform_vtable_0_7_2[] = {
+    (void *)AppPlatform_linux$destroy,
+    (void *)AppPlatform_linux$destroy,
+    (void *)AppPlatform_linux$saveScreenshot,
+    (void *)AppPlatform_linux$loadTexture,
+    (void *)AppPlatform_linux$playSound,
+    (void *)AppPlatform_linux$showDialog,
+    (void *)AppPlatform_linux$createUserInput,
+    (void *)AppPlatform_linux$getUserInputStatus,
+    (void *)AppPlatform_linux$getUserInput,
+    (void *)AppPlatform_linux$getDateString,
+    (void *)AppPlatform_linux$checkLicense,
+    (void *)AppPlatform_linux$hasBuyButtonWhenInvalidLicense,
+    (void *)AppPlatform_linux$uploadPlatformDependentData,
+    (void *)AppPlatform_linux$readAssetFile,
+    (void *)AppPlatform_linux$_tick,
+    (void *)AppPlatform_linux$getScreenWidth,
+    (void *)AppPlatform_linux$getScreenHeight,
+    (void *)AppPlatform_linux$getPixelsPerMillimeter,
+    (void *)AppPlatform_linux$isNetworkEnabled,
+    (void *)AppPlatform_linux$openLoginWindow,
+    (void *)AppPlatform_linux$isPowerVR,
+    (void *)AppPlatform_linux$getKeyFromKeyCode,
+    (void *)AppPlatform_linux$buyGame,
+    (void *)AppPlatform_linux$finish,
+    (void *)AppPlatform_linux$supportsTouchscreen,
+    (void *)AppPlatform_linux$supportsVibration,
+    (void *)AppPlatform_linux$vibrate,
+    (void *)AppPlatform_linux$getPlatformStringVar,
+    (void *)AppPlatform_linux$showKeyboard,
+    (void *)AppPlatform_linux$hideKeyboard,
+    (void *)AppPlatform_linux$isKeyboardVisible,
+    (void *)AppPlatform_linux$getSessionIDAndRefreshToken,
+    (void *)AppPlatform_linux$setSessionIDAndRefreshToken,
+    (void *)AppPlatform_linux$clearSessionIDAndRefreshToken,
+    (void *)AppPlatform_linux$initWithActivity,
+    (void *)AppPlatform_linux$showKeyboard2,
+    (void *)AppPlatform_linux$webRequest,
+    (void *)AppPlatform_linux$getWebRequestStatus,
+    (void *)AppPlatform_linux$getWebRequestContent,
+    (void *)AppPlatform_linux$abortWebRequest
+};
+
+void AppPlatform_linux$initWithActivity(AppPlatform_linux *app_platform, void *activity) {
+}
 
 void AppPlatform_linux$openLoginWindow(AppPlatform_linux *app_platform) {
     puts("debug: AppPlatform_linux::openLoginWindow");
@@ -160,12 +206,14 @@ void AppPlatform_linux$abortWebRequest(AppPlatform_linux *app_platform, int unkn
 }
 
 void AppPlatform_linux$AppPlatform_linux(AppPlatform_linux *app_platform, void *handle, int version_id) {
-    if (version_id == version_id_0_6) {
-        app_platform->vtable = app_platform_vtable_0_6;
-    } else if (version_id == version_id_0_5) {
-        app_platform->vtable = app_platform_vtable_0_5;
-    } else if (version_id == version_id_0_7) {
-        app_platform->vtable = app_platform_vtable_0_7;
+    if (version_id == version_id_0_6_1) {
+        app_platform->vtable = app_platform_vtable_0_6_1;
+    } else if (version_id == version_id_0_5_0) {
+        app_platform->vtable = app_platform_vtable_0_5_0;
+    } else if (version_id == version_id_0_7_0) {
+        app_platform->vtable = app_platform_vtable_0_7_0;
+    } else if (version_id == version_id_0_7_2) {
+        app_platform->vtable = app_platform_vtable_0_7_2;
     }
     app_platform->handle = handle;
     app_platform->status = -1;
@@ -397,10 +445,9 @@ android_vector_t AppPlatform_linux$getOptionStrings(AppPlatform_linux *app_platf
 
 float AppPlatform_linux$getPixelsPerMillimeter(AppPlatform_linux *app_platform) {
     puts("debug: AppPlatform_linux::getPixelsPerMillimeter");
-    int cw;
-    int ch;
+    int cw, ch;
     glfwGetWindowSize(_window, &cw, &ch);
-    return ((float)cw * (float)ch * 25.4 ) / 96;
+    return (((float)cw + (float)ch) * 0.5f ) / 25.4f;
 }
 
 android_string_t AppPlatform_linux$getPlatformStringVar(AppPlatform_linux *app_platform, int zero) {
@@ -609,7 +656,6 @@ asset_file AppPlatform_linux$readAssetFile(AppPlatform_linux *app_platform, andr
     asset.data = (char *) malloc(asset.size);
     fseek(file, 0, SEEK_SET);
     fread(asset.data, 1, asset.size, file);
-    asset.size;
     free(fullpath_original);
     free(fullpath_internal_overrides);
     free(fullpath_overrides);
