@@ -39,16 +39,13 @@ make
 ## Creating mods
 ### Example mod
 ```c
-#include <ninecraft/audio/audio_engine.h>
 #include <stdio.h>
 
-extern audio_engine_t audio_engine;
 extern void *handle;
 extern void *ninecraft_app;
 
 int mod_init() {
-    puts("TEST > When the mod loads it will make a pop sound");
-    audio_engine_play(&audio_engine, handle, "random.pop", 0, 0, 0, 0.3, 1, 1);
+    puts("TEST > Loaded mod");
 }
 ```
 ### Compiling

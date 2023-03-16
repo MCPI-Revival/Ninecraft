@@ -21,4 +21,5 @@ patchelf \
     --remove-needed libOpenSLES.so \
     --remove-needed libstdc++.so \
     --remove-needed libGLESv1_CM.so \
+    --remove-needed libz.so \
     lib/${1}/libminecraftpe.so

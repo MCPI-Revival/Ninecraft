@@ -2,6 +2,7 @@
 #include <ninecraft/android/android_string.h>
 #include <ninecraft/minecraft.h>
 #include <ninecraft/patch/detours.h>
+#include <ninecraft/version_ids.h>
 
 /*
     This mod allows you to use images as full backgrounds,
@@ -19,5 +20,7 @@ void bg_mod_screen_render_dirt_background_injection(void *screen, uint32_t param
 
 
 void bg_mod_inject(int version_id) {
-    DETOUR(screen_render_dirt_background, bg_mod_screen_render_dirt_background_injection, true);
+    if (version_id == version_id_0_6 || version_id == version_id_0_5) { 
+        DETOUR(screen_render_dirt_background, bg_mod_screen_render_dirt_background_injection, true);
+    }
 }

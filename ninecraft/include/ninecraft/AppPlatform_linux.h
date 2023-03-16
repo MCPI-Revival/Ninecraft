@@ -32,6 +32,26 @@ typedef struct {
     char filler[0x1000];
 } user_input;
 
+void AppPlatform_linux$openLoginWindow(AppPlatform_linux *app_platform);
+
+bool AppPlatform_linux$supportsTouchscreen(AppPlatform_linux *app_platform);
+
+bool AppPlatform_linux$supportsVibration(AppPlatform_linux *app_platform);
+
+void AppPlatform_linux$getSessionIDAndRefreshToken(AppPlatform_linux *app_platform, android_string_t *session_id, android_string_t *refresh_token);
+
+void AppPlatform_linux$setSessionIDAndRefreshToken(AppPlatform_linux *app_platform, android_string_t *session_id, android_string_t *refresh_token);
+
+void AppPlatform_linux$clearSessionIDAndRefreshToken(AppPlatform_linux *app_platform);
+
+void AppPlatform_linux$webRequest(AppPlatform_linux *app_platform, int unknown0, long long unknown1, android_string_t *unknown2, android_string_t *unknown3, android_string_t *unknown4);
+
+int AppPlatform_linux$getWebRequestStatus(AppPlatform_linux *app_platform, int unknown0);
+
+void AppPlatform_linux$getWebRequestContent(AppPlatform_linux *app_platform, int unknown0);
+
+void AppPlatform_linux$abortWebRequest(AppPlatform_linux *app_platform, int unknown0);
+
 extern void AppPlatform_linux$AppPlatform_linux(AppPlatform_linux *app_platform, void *handle, int version_id);
 
 extern void AppPlatform_linux$_tick(AppPlatform_linux *app_platform);
@@ -85,6 +105,8 @@ extern void AppPlatform_linux$saveScreenshot(AppPlatform_linux *app_platform, an
 extern void AppPlatform_linux$showDialog(AppPlatform_linux *app_platform, int32_t dialog_id);
 
 extern void AppPlatform_linux$showKeyboard(AppPlatform_linux *app_platform);
+
+void AppPlatform_linux$showKeyboard2(AppPlatform_linux *app_platform, bool show);
 
 extern void AppPlatform_linux$uploadPlatformDependentData(AppPlatform_linux *app_platform, int32_t size, void *data);
 

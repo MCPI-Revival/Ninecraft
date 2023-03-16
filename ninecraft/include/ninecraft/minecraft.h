@@ -4,7 +4,8 @@
 #include <stdint.h>
 #include <ninecraft/android/android_string.h>
 
-#define MINECRAFT_COMMANDSERVER_OFFSET 0xe5c
+#define MINECRAFT_COMMANDSERVER_OFFSET_0_6 0xe5c
+#define MINECRAFT_COMMANDSERVER_OFFSET_0_7 0xebc
 #define MINECRAFT_OPTIONS_OFFSET 0x28
 #define MINECRAFT_GUI_OFFSET 0x2e4
 #define MINECRAFT_PLAYER_OFFSET 0x2d8

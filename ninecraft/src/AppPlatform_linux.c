@@ -69,14 +69,103 @@ void *app_platform_vtable_0_6[] = {
     (void *)AppPlatform_linux$showKeyboard,
     (void *)AppPlatform_linux$hideKeyboard,
     (void *)AppPlatform_linux$isKeyboardVisible,
-    (void *)AppPlatform_linux$showKeyboard
+    (void *)AppPlatform_linux$showKeyboard2
 };
+
+void *app_platform_vtable_0_7[] = {
+    (void *)AppPlatform_linux$destroy,
+    (void *)AppPlatform_linux$destroy,
+    (void *)AppPlatform_linux$saveScreenshot,
+    (void *)AppPlatform_linux$loadTexture,
+    (void *)AppPlatform_linux$playSound,
+    (void *)AppPlatform_linux$showDialog,
+    (void *)AppPlatform_linux$createUserInput,
+    (void *)AppPlatform_linux$getUserInputStatus,
+    (void *)AppPlatform_linux$getUserInput,
+    (void *)AppPlatform_linux$getDateString,
+    (void *)AppPlatform_linux$checkLicense,
+    (void *)AppPlatform_linux$hasBuyButtonWhenInvalidLicense,
+    (void *)AppPlatform_linux$uploadPlatformDependentData,
+    (void *)AppPlatform_linux$readAssetFile,
+    (void *)AppPlatform_linux$_tick,
+    (void *)AppPlatform_linux$getScreenWidth,
+    (void *)AppPlatform_linux$getScreenHeight,
+    (void *)AppPlatform_linux$getPixelsPerMillimeter,
+    (void *)AppPlatform_linux$isNetworkEnabled,
+    (void *)AppPlatform_linux$openLoginWindow,
+    (void *)AppPlatform_linux$isPowerVR,
+    (void *)AppPlatform_linux$getKeyFromKeyCode,
+    (void *)AppPlatform_linux$buyGame,
+    (void *)AppPlatform_linux$finish,
+    (void *)AppPlatform_linux$supportsTouchscreen,
+    (void *)AppPlatform_linux$supportsVibration,
+    (void *)AppPlatform_linux$vibrate,
+    (void *)AppPlatform_linux$getPlatformStringVar,
+    (void *)AppPlatform_linux$showKeyboard,
+    (void *)AppPlatform_linux$hideKeyboard,
+    (void *)AppPlatform_linux$isKeyboardVisible,
+    (void *)AppPlatform_linux$getSessionIDAndRefreshToken,
+    (void *)AppPlatform_linux$setSessionIDAndRefreshToken,
+    (void *)AppPlatform_linux$clearSessionIDAndRefreshToken,
+    (void *)AppPlatform_linux$showKeyboard2,
+    (void *)AppPlatform_linux$webRequest,
+    (void *)AppPlatform_linux$getWebRequestStatus,
+    (void *)AppPlatform_linux$getWebRequestContent,
+    (void *)AppPlatform_linux$abortWebRequest
+};
+
+void AppPlatform_linux$openLoginWindow(AppPlatform_linux *app_platform) {
+    puts("debug: AppPlatform_linux::openLoginWindow");
+}
+
+bool AppPlatform_linux$supportsTouchscreen(AppPlatform_linux *app_platform) {
+    puts("debug: AppPlatform_linux::supportsTouchscreen");
+    return false;
+}
+
+bool AppPlatform_linux$supportsVibration(AppPlatform_linux *app_platform) {
+    puts("debug: AppPlatform_linux::supportsVibration");
+    return false;
+}
+
+void AppPlatform_linux$getSessionIDAndRefreshToken(AppPlatform_linux *app_platform, android_string_t *session_id, android_string_t *refresh_token) {
+    puts("debug: AppPlatform_linux::getSessionIDAndRefreshToken");
+    android_string_equ(session_id, "");
+    android_string_equ(refresh_token, "");
+}
+
+void AppPlatform_linux$setSessionIDAndRefreshToken(AppPlatform_linux *app_platform, android_string_t *session_id, android_string_t *refresh_token) {
+    puts("debug: AppPlatform_linux::setSessionIDAndRefreshToken");
+}
+
+void AppPlatform_linux$clearSessionIDAndRefreshToken(AppPlatform_linux *app_platform) {
+    puts("debug: AppPlatform_linux::clearSessionIDAndRefreshToken");
+}
+
+void AppPlatform_linux$webRequest(AppPlatform_linux *app_platform, int unknown0, long long unknown1, android_string_t *unknown2, android_string_t *unknown3, android_string_t *unknown4) {
+    puts("debug: AppPlatform_linux::webRequest");
+}
+
+int AppPlatform_linux$getWebRequestStatus(AppPlatform_linux *app_platform, int unknown0) {
+    puts("debug: AppPlatform_linux::getWebRequestStatus");
+    return 0;
+}
+
+void AppPlatform_linux$getWebRequestContent(AppPlatform_linux *app_platform, int unknown0) {
+    puts("debug: AppPlatform_linux::getWebRequestContent");
+}
+
+void AppPlatform_linux$abortWebRequest(AppPlatform_linux *app_platform, int unknown0) {
+    puts("debug: AppPlatform_linux::abortWebRequest");
+}
 
 void AppPlatform_linux$AppPlatform_linux(AppPlatform_linux *app_platform, void *handle, int version_id) {
     if (version_id == version_id_0_6) {
         app_platform->vtable = app_platform_vtable_0_6;
     } else if (version_id == version_id_0_5) {
         app_platform->vtable = app_platform_vtable_0_5;
+    } else if (version_id == version_id_0_7) {
+        app_platform->vtable = app_platform_vtable_0_7;
     }
     app_platform->handle = handle;
     app_platform->status = -1;
@@ -93,7 +182,7 @@ void AppPlatform_linux$buyGame(AppPlatform_linux *app_platform) {
  
 int AppPlatform_linux$checkLicense(AppPlatform_linux *app_platform) {
     puts("debug: AppPlatform_linux::checkLicense");
-    return 0;
+    return 1;
 }
 
 void AppPlatform_linux$createUserInput(AppPlatform_linux *app_platform) {
@@ -545,6 +634,10 @@ void AppPlatform_linux$showDialog(AppPlatform_linux *app_platform, int dialog_id
 
 void AppPlatform_linux$showKeyboard(AppPlatform_linux *app_platform) {
     puts("debug: AppPlatform_linux::showKeyboard");
+}
+
+void AppPlatform_linux$showKeyboard2(AppPlatform_linux *app_platform, bool show) {
+    puts("debug: AppPlatform_linux::showKeyboard2");
 }
 
 void AppPlatform_linux$uploadPlatformDependentData(AppPlatform_linux *app_platform, int size, void *data) {
