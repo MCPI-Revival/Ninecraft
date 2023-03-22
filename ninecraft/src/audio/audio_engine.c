@@ -20,19 +20,14 @@ void audio_engine_delete_sources_callback(source_queue_entry_t *current, source_
 void audio_engine_tick_sources_callback(source_queue_entry_t *current, source_queue_entry_t *previous, bool *stop, bool *delete_entry) {
     ALint source_state;
     alGetSourcei(current->source, AL_SOURCE_STATE, &source_state);
-    if (source_state != AL_PLAYING)
-    {
+    if (source_state != AL_PLAYING) {
         alSourcei(current->source, AL_BUFFER, 0);
-        if (current->buffer && alIsBuffer(current->buffer))
-        {
+        if (current->buffer && alIsBuffer(current->buffer)) {
             alDeleteBuffers(1, &current->buffer);
         }
-        if (audio_engine_idle_sources.size < 50)
-        {
+        if (audio_engine_idle_sources.size < 50) {
             source_queue_push(&audio_engine_idle_sources, current->source, 0);
-        }
-        else
-        {
+        } else {
             alDeleteSources(1, &current->source);
         }
         *delete_entry = true;
@@ -130,8 +125,9 @@ void audio_engine_play(uint8_t *buffer, uint32_t buffer_size, uint32_t num_chann
             if (err != AL_NO_ERROR) {
                 puts("[AUDIO_ENGINE] Failed to generate source");
                 if (al_source || alIsSource(al_source)) {
-                    alDeleteSources(1, &al_buffer);
+                    alDeleteSources(1, &al_source);
                 }
+                alDeleteBuffers(1, &al_buffer);
                 return;
             }
         }
@@ -140,8 +136,9 @@ void audio_engine_play(uint8_t *buffer, uint32_t buffer_size, uint32_t num_chann
         if (err != AL_NO_ERROR) {
             puts("[AUDIO_ENGINE] Failed to disable looping on source");
             if (al_source || alIsSource(al_source)) {
-                alDeleteSources(1, &al_buffer);
+                alDeleteSources(1, &al_source);
             }
+            alDeleteBuffers(1, &al_buffer);
             return;
         }
         alSource3f(al_source, AL_POSITION, 0.0f, 0.0f, 0.0f);
@@ -149,8 +146,9 @@ void audio_engine_play(uint8_t *buffer, uint32_t buffer_size, uint32_t num_chann
         if (err != AL_NO_ERROR) {
             puts("[AUDIO_ENGINE] Failed to set position on source");
             if (al_source || alIsSource(al_source)) {
-                alDeleteSources(1, &al_buffer);
+                alDeleteSources(1, &al_source);
             }
+            alDeleteBuffers(1, &al_buffer);
             return;
         }
         alSource3f(al_source, AL_VELOCITY, 0.0f, 0.0f, 0.0f);
@@ -158,8 +156,9 @@ void audio_engine_play(uint8_t *buffer, uint32_t buffer_size, uint32_t num_chann
         if (err != AL_NO_ERROR) {
             puts("[AUDIO_ENGINE] Failed to set velocity on source");
             if (al_source || alIsSource(al_source)) {
-                alDeleteSources(1, &al_buffer);
+                alDeleteSources(1, &al_source);
             }
+            alDeleteBuffers(1, &al_buffer);
             return;
         }
         alSourcei(al_source, AL_SOURCE_RELATIVE, AL_TRUE);
@@ -167,8 +166,9 @@ void audio_engine_play(uint8_t *buffer, uint32_t buffer_size, uint32_t num_chann
         if (err != AL_NO_ERROR) {
             puts("[AUDIO_ENGINE] Failed to set relativity on source");
             if (al_source || alIsSource(al_source)) {
-                alDeleteSources(1, &al_buffer);
+                alDeleteSources(1, &al_source);
             }
+            alDeleteBuffers(1, &al_buffer);
             return;
         }
         alSourcef(al_source, AL_GAIN, gain);
@@ -176,8 +176,9 @@ void audio_engine_play(uint8_t *buffer, uint32_t buffer_size, uint32_t num_chann
         if (err != AL_NO_ERROR) {
             puts("[AUDIO_ENGINE] Failed to set gain on source");
             if (al_source || alIsSource(al_source)) {
-                alDeleteSources(1, &al_buffer);
+                alDeleteSources(1, &al_source);
             }
+            alDeleteBuffers(1, &al_buffer);
             return;
         }
         alSourcei(al_source, AL_BUFFER, al_buffer);
@@ -185,8 +186,9 @@ void audio_engine_play(uint8_t *buffer, uint32_t buffer_size, uint32_t num_chann
         if (err != AL_NO_ERROR) {
             puts("[AUDIO_ENGINE] Failed to set buffer on source");
             if (al_source || alIsSource(al_source)) {
-                alDeleteSources(1, &al_buffer);
+                alDeleteSources(1, &al_source);
             }
+            alDeleteBuffers(1, &al_buffer);
             return;
         }
         alSourcePlay(al_source);
@@ -194,8 +196,9 @@ void audio_engine_play(uint8_t *buffer, uint32_t buffer_size, uint32_t num_chann
         if (err != AL_NO_ERROR) {
             puts("[AUDIO_ENGINE] Failed to play on source");
             if (al_source || alIsSource(al_source)) {
-                alDeleteSources(1, &al_buffer);
+                alDeleteSources(1, &al_source);
             }
+            alDeleteBuffers(1, &al_buffer);
             return;
         }
         source_queue_push(&audio_engine_active_sources, al_source, al_buffer);
