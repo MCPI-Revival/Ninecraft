@@ -2,16 +2,18 @@
 #include <ninecraft/dlfcn_stub.h>
 #include <ninecraft/android/android_alloc.h>
 #include <string.h>
+#include <limits.h>
 
 size_t android_vector_compute_next_size(android_vector_t *__this, size_t __n, size_t __entry_size) {
     size_t __size = (__this->_M_finish - __this->_M_start) / __entry_size;
-    if (__n > (0xFFFFFFFC / __entry_size) - __size) {
+    size_t __max_size = (SIZE_MAX / __entry_size);
+    if (__n > __max_size - __size) {
         puts("Invalid vector length");
         abort();
     }
-    size_t __len = __size + MAX(__n, __size) + 1;
-    if (__len < __size) {
-        __len = 0xFFFFFFFC / __entry_size;
+    size_t __len = __size + MAX(__n, __size);
+    if (__len > __max_size || __len < __size) {
+        __len = __max_size;
     }
     return __len;
 }
@@ -51,7 +53,7 @@ void android_vector_insert_overflow_aux(android_vector_t *__this, void *__pos, v
         __new_finish = android_vector_uninitialized_move((uintptr_t)__pos, __this->_M_finish, __new_finish, __entry_size);
     }
     if (__this->_M_start) {
-        android_alloc_deallocate((void *)__this->_M_start, (__this->_M_end_of_storage - __this->_M_start) & 0xFFFFFFF8);
+        android_alloc_deallocate((void *)__this->_M_start, __this->_M_end_of_storage - __this->_M_start);
     }
     __this->_M_start = __new_start;
     __this->_M_finish = __new_finish;
