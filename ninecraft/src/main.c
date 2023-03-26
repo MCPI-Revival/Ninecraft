@@ -37,7 +37,8 @@
 #include <hybris/hook.h>
 #include <hybris/jb/linker.h>
 
-#include <ninecraft/gfx/gles_matrix.h>
+#include <ninecraft/math_compat.h>
+#include <ninecraft/ninecraft_defs.h>
 
 void *handle = NULL;
 GLFWwindow *_window = NULL;
@@ -59,7 +60,7 @@ bool mouse_pointer_hidden = false;
 
 int old_pos_x, old_pos_y, old_width, old_height;
 
-void *load_minecraftpe() {
+void *load_library(const char *name) {
     #ifdef __i386__
     char *arch = "x86";
     #else
@@ -73,7 +74,8 @@ void *load_minecraftpe() {
     getcwd(fullpath, MAXPATHLEN);
     strcat(fullpath, "/lib/");
     strcat(fullpath, arch);
-    strcat(fullpath, "/libminecraftpe.so");
+    strcat(fullpath, "/");
+    strcat(fullpath, name);
     
     void *handle = internal_dlopen(fullpath, RTLD_LAZY);
     if (handle == NULL)
@@ -217,7 +219,8 @@ static void resize_callback(GLFWwindow* window, int width, int height) {
 
 static void char_callback(GLFWwindow* window, unsigned int codepoint) {
     if (version_id == version_id_0_6_1 || version_id == version_id_0_7_0) {
-        ((void (*)(char))internal_dlsym(handle, "_ZN8Keyboard8feedTextEc"))((char)codepoint);
+        char c = (char)codepoint;
+        android_vector_push_back(keyboard_input_text, &c, 1);
     } else if (version_id == version_id_0_7_2) {
         char p_codepoint[2] = {(char)codepoint, '\0'};
         android_string_t str;
@@ -340,25 +343,25 @@ void gles_hook() {
 }
 
 void math_hook() {
-    hybris_hook("atan2f", atan2f);
-    hybris_hook("atanf", atanf);
-    hybris_hook("ceilf", ceilf);
-    hybris_hook("cosf", cosf);
-    hybris_hook("floorf", floorf);
-    hybris_hook("fmodf", fmodf);
-    hybris_hook("logf", logf);
-    hybris_hook("powf", powf);
-    hybris_hook("sinf", sinf);
-    hybris_hook("sqrtf", sqrtf);
-    hybris_hook("floor", floor);
-    hybris_hook("ceil", ceil);
-    hybris_hook("fmod", fmod);
-    hybris_hook("sin", sin);
-    hybris_hook("sqrt", sqrt);
-    hybris_hook("pow", pow);
-    hybris_hook("atan2", atan2);
-    hybris_hook("cos", cos);
-    hybris_hook("atan", atan);
+    hybris_hook("atan2f", math_atan2f);
+    hybris_hook("atanf", math_atanf);
+    hybris_hook("ceilf", math_ceilf);
+    hybris_hook("cosf", math_cosf);
+    hybris_hook("floorf", math_floorf);
+    hybris_hook("fmodf", math_fmodf);
+    hybris_hook("logf", math_logf);
+    hybris_hook("powf", math_powf);
+    hybris_hook("sinf", math_sinf);
+    hybris_hook("sqrtf", math_sqrtf);
+    hybris_hook("floor", math_floor);
+    hybris_hook("ceil", math_ceil);
+    hybris_hook("fmod", math_fmod);
+    hybris_hook("sin", math_sin);
+    hybris_hook("sqrt", math_sqrt);
+    hybris_hook("pow", math_pow);
+    hybris_hook("atan2", math_atan2);
+    hybris_hook("cos", math_cos);
+    hybris_hook("atan", math_atan);
 }
 
 #ifdef __thumb2__
@@ -425,8 +428,8 @@ int main(int argc, char **argv) {
     }
 
     glfwWindowHint(GLFW_CLIENT_API, GLFW_OPENGL_ES_API);
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 2);
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 1);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 1);
     glfwWindowHint(GLFW_CONTEXT_CREATION_API, GLFW_EGL_CONTEXT_API);
     _window = glfwCreateWindow(720, 480, "Ninecraft", NULL, NULL);
     if (!_window) {
@@ -457,13 +460,11 @@ int main(int argc, char **argv) {
     hybris_hook("SL_IID_BUFFERQUEUE", &sles_iid_bufferqueue);
     hybris_hook("SL_IID_PLAY", &sles_iid_play);
     hybris_hook("slCreateEngine", sles_create_engine);
-    
-    handle = load_minecraftpe();
+
+    handle = load_library("libminecraftpe.so");
 
     android_alloc_setup_hooks(handle);
     android_string_setup_hooks(handle);
-
-
     
     android_string_t in;
     android_string_cstr(&in, "v%d.%d.%d alpha");
@@ -482,8 +483,10 @@ int main(int argc, char **argv) {
         version_id = version_id_0_7_0;
     } else if (strncmp(game_version._M_start_of_storage, "v0.7.1", 6) == 0) {
         version_id = version_id_0_7_0;
+#ifdef __i386__
     } else if (strncmp(game_version._M_start_of_storage, "v0.7.2", 6) == 0) {
         version_id = version_id_0_7_2;
+#endif
     } else {
         puts("Unsupported Version!");
         abort();
@@ -535,8 +538,8 @@ int main(int argc, char **argv) {
         android_string_equ((android_string_t *)(ninecraft_app + 3628), "./storage/internal/");
         android_string_equ((android_string_t *)(ninecraft_app + 3652), "./storage/external/");
     } else {
-        android_string_equ((android_string_t *)(ninecraft_app + 3544), "./storage/internal/");
-        android_string_equ((android_string_t *)(ninecraft_app + 3568), "./storage/external/");
+        android_string_equ((android_string_t *)(ninecraft_app + 3544), "/home/alexander/Ninecraft/storage/internal/");
+        android_string_equ((android_string_t *)(ninecraft_app + 3568), "/home/alexander/Ninecraft/storage/external/");
     }
 
     AppPlatform_linux platform;
@@ -586,7 +589,7 @@ int main(int argc, char **argv) {
                 glfwGetCursorPos(_window, &xpos, &ypos);
                 short cx = (short)(xpos * inv_gui_scale);
                 short cy = (short)(ypos * inv_gui_scale);
-                ((void (*)(float, float, void *))internal_dlsym(handle, "_Z12renderCursorffP9Minecraft"))(cx, cy, ninecraft_app);
+                ((NINECRAFT_FLOAT_FUNC void (*)(float, float, void *))internal_dlsym(handle, "_Z12renderCursorffP9Minecraft"))(cx, cy, ninecraft_app);
             }
         }
         audio_engine_tick();

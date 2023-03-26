@@ -3,10 +3,12 @@
 #include <ninecraft/input/keyboard.h>
 
 android_vector_t *keyboard_inputs = NULL;
+android_vector_t *keyboard_input_text = NULL;
 int *keyboard_states = NULL;
 
 void keyboard_setup_hooks(void *handle) {
     keyboard_inputs = (android_vector_t *)internal_dlsym(handle, "_ZN8Keyboard7_inputsE");
+    keyboard_input_text = (android_vector_t *)internal_dlsym(handle, "_ZN8Keyboard10_inputTextE");
     keyboard_states = (int *)internal_dlsym(handle, "_ZN8Keyboard7_statesE");
 }
 

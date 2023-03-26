@@ -1,7 +1,7 @@
 #ifndef NINECRAFT_GFX_GLES_COMPAT_H
 #define NINECRAFT_GFX_GLES_COMPAT_H
 
-#include <GLES2/gl2.h>
+#include <GLES/gl.h>
 
 // Function documentation
 // https://registry.khronos.org/OpenGL-Refpages/es1.1/xhtml/
@@ -58,7 +58,7 @@ extern void gl_gen_textures(GLsizei n, GLuint *textures);
 
 extern void gl_get_float_v(GLenum pname, GLfloat *params);
 
-const GLubyte *gl_get_string(GLenum name);
+extern const GLubyte *gl_get_string(GLenum name);
 
 extern void gl_hint(GLenum target, GLenum mode);
 

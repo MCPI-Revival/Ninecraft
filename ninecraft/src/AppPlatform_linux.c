@@ -6,6 +6,7 @@
 #include <ninecraft/version_ids.h>
 #include <unistd.h>
 #include <GLFW/glfw3.h>
+#include <ninecraft/ninecraft_defs.h>
 
 extern GLFWwindow *_window;
 
@@ -443,7 +444,7 @@ android_vector_t AppPlatform_linux$getOptionStrings(AppPlatform_linux *app_platf
     return out;
 }
 
-float AppPlatform_linux$getPixelsPerMillimeter(AppPlatform_linux *app_platform) {
+NINECRAFT_FLOAT_FUNC float AppPlatform_linux$getPixelsPerMillimeter(AppPlatform_linux *app_platform) {
     puts("debug: AppPlatform_linux::getPixelsPerMillimeter");
     int cw, ch;
     glfwGetWindowSize(_window, &cw, &ch);
@@ -614,7 +615,7 @@ texture_data_t AppPlatform_linux$loadTexture(AppPlatform_linux *app_platform, an
     return texture_data;
 }
 
-void AppPlatform_linux$playSound(AppPlatform_linux *app_platform, android_string_t *sound_name, float volume, float pitch) {
+NINECRAFT_FLOAT_FUNC void AppPlatform_linux$playSound(AppPlatform_linux *app_platform, android_string_t *sound_name, float volume, float pitch) {
     puts("debug: AppPlatform_linux::playSound");
 }
 

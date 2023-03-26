@@ -26,7 +26,13 @@
 #define NINECRAFTAPP_SIZE_0_6_1 0xe6c
 #define NINECRAFTAPP_SIZE_0_7_2 0xeec
 
+#ifdef __i386__
 #define MINECRAFT_ISGRABBED_OFFSET_0_7_0 0xde0
+#else
+#ifdef __thumb2__
+#define MINECRAFT_ISGRABBED_OFFSET_0_7_0 0xde4
+#endif
+#endif
 #define MINECRAFT_ISGRABBED_OFFSET_0_6_1 0xd98
 #define MINECRAFT_ISGRABBED_OFFSET_0_7_2 0xdec
 
