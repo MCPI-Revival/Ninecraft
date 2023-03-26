@@ -106,4 +106,6 @@ extern void gl_viewport(GLint x, GLint y, GLsizei width, GLsizei height);
 
 extern void gl_draw_elements(GLenum mode, GLsizei count, GLenum type, const void *indices);
 
+extern GLenum gl_get_error();
+
 #endif

@@ -339,7 +339,8 @@ void gles_hook() {
     hybris_hook("glTranslatef", (void *) gl_translate_f);
     hybris_hook("glVertexPointer", (void *) gl_vertex_pointer);
     hybris_hook("glViewport", (void *) gl_viewport);
-    hybris_hook("glDrawElements", gl_draw_elements);
+    hybris_hook("glDrawElements", (void *) gl_draw_elements);
+    hybris_hook("glGetError", (void *) gl_get_error);    
 }
 
 void math_hook() {
@@ -473,7 +474,9 @@ int main(int argc, char **argv) {
 
     printf("Ninecraft is running mcpe %.6s\n", (char *)game_version._M_start_of_storage);
 
-    if (strncmp(game_version._M_start_of_storage, "v0.4.0", 6) == 0) {
+    if (strncmp(game_version._M_start_of_storage, "v0.3.3", 6) == 0) {
+        version_id = version_id_0_3_3;
+    } else if (strncmp(game_version._M_start_of_storage, "v0.4.0", 6) == 0) {
         version_id = version_id_0_4_0;
     } else if (strncmp(game_version._M_start_of_storage, "v0.5.0", 6) == 0) {
         version_id = version_id_0_5_0;
@@ -514,8 +517,10 @@ int main(int argc, char **argv) {
 
     printf("nine construct %p\n", ninecraft_app_construct);
     size_t ninecraft_app_size;
-    
-    if (version_id == version_id_0_4_0) {
+
+    if (version_id == version_id_0_3_3) {
+        ninecraft_app_size = NINECRAFTAPP_SIZE_0_3_3;
+    } else if (version_id == version_id_0_4_0) {
         ninecraft_app_size = NINECRAFTAPP_SIZE_0_4_0;
     } else if (version_id == version_id_0_6_1) {
         ninecraft_app_size = NINECRAFTAPP_SIZE_0_6_1;
@@ -545,9 +550,12 @@ int main(int argc, char **argv) {
     } else if (version_id == version_id_0_4_0) {
         android_string_equ((android_string_t *)(ninecraft_app + 3540), "./storage/internal/");
         android_string_equ((android_string_t *)(ninecraft_app + 3564), "./storage/external/");
+    } else if (version_id == version_id_0_3_3) {
+        android_string_equ((android_string_t *)(ninecraft_app + 3536), "./storage/internal/");
+        android_string_equ((android_string_t *)(ninecraft_app + 3560), "./storage/external/");
     } else {
-        android_string_equ((android_string_t *)(ninecraft_app + 3544), "/home/alexander/Ninecraft/storage/internal/");
-        android_string_equ((android_string_t *)(ninecraft_app + 3568), "/home/alexander/Ninecraft/storage/external/");
+        android_string_equ((android_string_t *)(ninecraft_app + 3544), "./storage/internal/");
+        android_string_equ((android_string_t *)(ninecraft_app + 3568), "./storage/external/");
     }
 
     AppPlatform_linux platform;
@@ -575,7 +583,10 @@ int main(int argc, char **argv) {
             minecraft_isgrabbed_offset = MINECRAFT_ISGRABBED_OFFSET_0_6_1;
         } else if (version_id == version_id_0_4_0) {
             minecraft_isgrabbed_offset = MINECRAFT_ISGRABBED_OFFSET_0_4_0;
+        } else if (version_id == version_id_0_3_3) {
+            minecraft_isgrabbed_offset = MINECRAFT_ISGRABBED_OFFSET_0_3_3;
         }
+        
         if (*(bool *)(ninecraft_app+minecraft_isgrabbed_offset)) {
             if (!mouse_pointer_hidden) {
                 grab_mouse();

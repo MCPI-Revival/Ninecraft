@@ -202,3 +202,6 @@ void gl_draw_elements(GLenum mode, GLsizei count, GLenum type, const void *indic
     glDrawElements(mode, count, type, indices);
 }
 
+GLenum gl_get_error() {
+    return glGetError();
+}
