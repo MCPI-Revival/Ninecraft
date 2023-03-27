@@ -10,6 +10,32 @@
 
 extern GLFWwindow *_window;
 
+void *app_platform_vtable_0_2_2[] = {
+    (void *)AppPlatform_linux$destroy,
+    (void *)AppPlatform_linux$destroy,
+    (void *)AppPlatform_linux$saveScreenshot,
+    (void *)AppPlatform_linux$loadTexture,
+    (void *)AppPlatform_linux$playSound,
+    (void *)AppPlatform_linux$showDialog,
+    (void *)AppPlatform_linux$createUserInput,
+    (void *)AppPlatform_linux$getUserInputStatus,
+    (void *)AppPlatform_linux$getUserInput,
+    (void *)AppPlatform_linux$getDateString,
+    (void *)AppPlatform_linux$checkLicense,
+    (void *)AppPlatform_linux$hasBuyButtonWhenInvalidLicense,
+    (void *)AppPlatform_linux$uploadPlatformDependentData,
+    (void *)AppPlatform_linux$_tick,
+    (void *)AppPlatform_linux$getScreenWidth,
+    (void *)AppPlatform_linux$getScreenHeight,
+    (void *)AppPlatform_linux$getPixelsPerMillimeter,
+    (void *)AppPlatform_linux$getOptionStrings,
+    (void *)AppPlatform_linux$isPowerVR,
+    (void *)AppPlatform_linux$buyGame,
+    (void *)AppPlatform_linux$finish,
+    (void *)AppPlatform_linux$isTouchscreen,
+    (void *)AppPlatform_linux$vibrate
+};
+
 void *app_platform_vtable_0_3_0[] = {
     (void *)AppPlatform_linux$destroy,
     (void *)AppPlatform_linux$destroy,
@@ -274,6 +300,8 @@ void AppPlatform_linux$AppPlatform_linux(AppPlatform_linux *app_platform, void *
         app_platform->vtable = app_platform_vtable_0_3_2;
     } else if (version_id == version_id_0_3_0) {
         app_platform->vtable = app_platform_vtable_0_3_0;
+    } else if (version_id == version_id_0_2_2) {
+        app_platform->vtable = app_platform_vtable_0_2_2;
     } else if (version_id == version_id_0_7_0) {
         app_platform->vtable = app_platform_vtable_0_7_0;
     } else if (version_id == version_id_0_7_2) {
