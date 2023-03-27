@@ -6,11 +6,11 @@
 ### Debian/Ubuntu:
 x86:
 ```
-git make cmake gcc gcc-multilib g++ zlib1g-dev:i386 libpng-dev:i386 zlib1g-dev libpng-dev libopenal-dev:i386 libopenal-dev libx11-dev:i386 libx11-dev libxrandr-dev:i386 libxrandr-dev libxinerama-dev:i386 libxinerama-dev libxcursor-dev:i386 libxcursor-dev libxi-dev:i386 libxi-dev libgles-dev:i386 libgles-dev libgles1:i386 libgles1 zenity patchelf
+git make cmake gcc gcc-multilib g++ zlib1g-dev:i386 libpng-dev:i386 zlib1g-dev libpng-dev libopenal-dev:i386 libopenal-dev libx11-dev:i386 libx11-dev libxrandr-dev:i386 libxrandr-dev libxinerama-dev:i386 libxinerama-dev libxcursor-dev:i386 libxcursor-dev libxi-dev:i386 libxi-dev libgles-dev:i386 libgles-dev zenity patchelf
 ```
 ARM:
 ```
-git make cmake gcc g++ zlib1g-dev:armhf libpng-dev:armhf zlib1g-dev libpng-dev libopenal-dev:armhf libopenal-dev libx11-dev:armhf libx11-dev libxrandr-dev:armhf libxrandr-dev libxinerama-dev:armhf libxinerama-dev libxcursor-dev:armhf libxcursor-dev libxi-dev:armhf libxi-dev libgles-dev:armhf libgles-dev libgles1:armhf libgles1 zenity patchelf
+git make cmake gcc g++ zlib1g-dev:armhf libpng-dev:armhf zlib1g-dev libpng-dev libopenal-dev:armhf libopenal-dev libx11-dev:armhf libx11-dev libxrandr-dev:armhf libxrandr-dev libxinerama-dev:armhf libxinerama-dev libxcursor-dev:armhf libxcursor-dev libxi-dev:armhf libxi-dev libgles-dev:armhf libgles-dev zenity patchelf
 ```
 ### ArchLinux:
 ```
