@@ -28,6 +28,7 @@
 #define NINECRAFTAPP_SIZE_0_4_0 0xe64
 #define NINECRAFTAPP_SIZE_0_3_3 0xe64
 #define NINECRAFTAPP_SIZE_0_3_2 0xe44
+#define NINECRAFTAPP_SIZE_0_3_0 0xe44
 
 #ifdef __i386__
 #define MINECRAFT_ISGRABBED_OFFSET_0_7_0 0xde0
@@ -41,7 +42,7 @@
 #define MINECRAFT_ISGRABBED_OFFSET_0_4_0 0xd94
 #define MINECRAFT_ISGRABBED_OFFSET_0_3_3 0xd90
 #define MINECRAFT_ISGRABBED_OFFSET_0_3_2 0xd88
-
+#define MINECRAFT_ISGRABBED_OFFSET_0_3_0 0xd88
 
 
 typedef void (*minecraft_level_generated_t)(void *minecraft);
