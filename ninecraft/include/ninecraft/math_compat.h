@@ -39,4 +39,26 @@ extern double math_sin(double __x);
 
 extern double math_sqrt(double __x);
 
+extern double math_cosh(double __x);
+
+extern double math_tan(double __x);
+
+extern double math_tanh(double __x);
+
+extern double math_asin(double __x);
+
+extern double math_log(double __x);
+
+extern double math_sinh(double __x);
+
+extern double math_modf(double __x, double *__iptr);
+
+extern double math_acos(double __x);
+
+extern double math_exp(double __x);
+
+extern double math_frexp(double __x, int *__exponent);
+
+extern double math_log10(double __x);
+
 #endif

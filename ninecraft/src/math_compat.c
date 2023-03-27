@@ -77,3 +77,47 @@ NINECRAFT_FLOAT_FUNC double math_sin(double __x) {
 NINECRAFT_FLOAT_FUNC double math_sqrt(double __x) {
     return sqrt(__x);
 }
+
+NINECRAFT_FLOAT_FUNC double math_cosh(double __x) {
+    return cosh(__x);
+}
+
+NINECRAFT_FLOAT_FUNC double math_tan(double __x) {
+    return tan(__x);
+}
+
+NINECRAFT_FLOAT_FUNC double math_tanh(double __x) {
+    return tanh(__x);
+}
+
+NINECRAFT_FLOAT_FUNC double math_asin(double __x) {
+    return asin(__x);
+}
+
+NINECRAFT_FLOAT_FUNC double math_log(double __x) {
+    return log(__x);
+}
+
+NINECRAFT_FLOAT_FUNC double math_sinh(double __x) {
+    return sinh(__x);
+}
+
+NINECRAFT_FLOAT_FUNC double math_modf(double __x, double *__iptr) {
+    return modf(__x, __iptr);
+}
+
+NINECRAFT_FLOAT_FUNC double math_acos(double __x) {
+    return acos(__x);
+}
+
+NINECRAFT_FLOAT_FUNC double math_exp(double __x) {
+    return exp(__x);
+}
+
+NINECRAFT_FLOAT_FUNC double math_frexp(double __x, int *__exponent) {
+    return frexp(__x, __exponent);
+}
+
+NINECRAFT_FLOAT_FUNC double math_log10(double __x) {
+    return log10(__x);
+}

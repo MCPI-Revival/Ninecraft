@@ -363,6 +363,17 @@ void math_hook() {
     hybris_hook("atan2", math_atan2);
     hybris_hook("cos", math_cos);
     hybris_hook("atan", math_atan);
+    hybris_hook("cosh", math_cosh);
+    hybris_hook("tan", math_tan);
+    hybris_hook("tanh", math_tanh);
+    hybris_hook("asin", math_asin);
+    hybris_hook("log", math_log);
+    hybris_hook("sinh", math_sinh);
+    hybris_hook("modf", math_modf);
+    hybris_hook("acos", math_acos);
+    hybris_hook("exp", math_exp);
+    hybris_hook("frexp", math_frexp);
+    hybris_hook("log10", math_log10);
 }
 
 #ifdef __thumb2__

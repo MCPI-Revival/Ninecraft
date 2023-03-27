@@ -20,6 +20,20 @@ const char *egl_symbols[] = {
 };
 
 const char *android_symbols[] = {
+    "AConfiguration_getNavHidden",
+    "AConfiguration_getUiModeType",
+    "AConfiguration_getUiModeNight",
+    "AConfiguration_getSdkVersion",
+    "AConfiguration_getScreenSize",
+    "AConfiguration_getScreenLong",
+    "AConfiguration_getDensity",
+    "AConfiguration_getKeyboard",
+    "AConfiguration_getNavigation",
+    "AConfiguration_getMnc",
+    "AConfiguration_getMcc",
+    "AConfiguration_getKeysHidden",
+    "AConfiguration_getTouchscreen",
+    "AConfiguration_getOrientation",
     "AAssetManager_open",
     "AAsset_getLength",
     "AAsset_getBuffer",
