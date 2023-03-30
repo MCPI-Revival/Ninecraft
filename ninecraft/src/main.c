@@ -340,7 +340,9 @@ void gles_hook() {
     hybris_hook("glVertexPointer", (void *) gl_vertex_pointer);
     hybris_hook("glViewport", (void *) gl_viewport);
     hybris_hook("glDrawElements", (void *) gl_draw_elements);
-    hybris_hook("glGetError", (void *) gl_get_error);    
+    hybris_hook("glGetError", (void *) gl_get_error);
+    hybris_hook("glGenBuffers", (void *) glGenBuffers);
+    
 }
 
 void math_hook() {
@@ -378,15 +380,27 @@ void math_hook() {
 
 #ifdef __thumb2__
 
-extern int __cxa_atexit(void (*)(void*), void*, void*);
+extern void __aeabi_uidiv();
 
-int __aeabi_atexit_android(void *arg, void (*func) (void *), void *d) {
-    return __cxa_atexit(func, arg, d);
-}
+extern void __aeabi_atexit();
+
+extern void __aeabi_d2ulz();
+
+extern void __aeabi_uidivmod();
+
+extern void __aeabi_uldivmod();
+
+extern void __aeabi_ldivmod();
+
+extern void __aeabi_ul2d();
+
+extern void __aeabi_idivmod();
+
+extern void __aeabi_idiv();
 
 #endif
 
-int __cxa_pure_virtual() {}
+int __my_cxa_pure_virtual() {}
 
 NINECRAFT_FLOAT_FUNC double io_strtod(const char *__nptr, char **__endptr) {
     return strtod(__nptr, __endptr);
@@ -418,15 +432,20 @@ void missing_hook() {
 
     hybris_hook("ftime", ftime);
 
-    hybris_hook("__cxa_pure_virtual", __cxa_pure_virtual);
+    hybris_hook("__cxa_pure_virtual", __my_cxa_pure_virtual);
+
     #ifdef __thumb2__
-    hybris_hook("__aeabi_atexit", __aeabi_atexit_android);
+    hybris_hook("__aeabi_atexit", __aeabi_atexit);
+    hybris_hook("__aeabi_uidiv", __aeabi_uidiv);
+    hybris_hook("__aeabi_d2ulz", __aeabi_d2ulz);
+    hybris_hook("__aeabi_uidivmod", __aeabi_uidivmod);
+    hybris_hook("__aeabi_uldivmod", __aeabi_uldivmod);
+    hybris_hook("__aeabi_ldivmod", __aeabi_ldivmod);
+    hybris_hook("__aeabi_ul2d", __aeabi_ul2d);
+    hybris_hook("__aeabi_idivmod", __aeabi_idivmod);
+    hybris_hook("__aeabi_idiv", __aeabi_idiv);
     #endif
 }
-
-void asdd() {}
-
-#include <stdatomic.h>
 
 int main(int argc, char **argv) {
     struct stat st = {0};
