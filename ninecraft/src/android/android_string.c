@@ -3,6 +3,7 @@
 #include <ninecraft/android/android_string.h>
 #include <string.h>
 #include <stdlib.h>
+#include <stdio.h>
 
 android_string_construct_t android_string_construct = NULL;
 android_string_clone_t android_string_clone = NULL;
@@ -59,15 +60,18 @@ size_t android_string_tsize() {
 }
 
 void android_string_cstr(android_string_t *__this, char *__s) {
-    if (android_alloc_node_alloc == NULL) { // just a small hack to allow gnu strings
-        android_string_construct(__this);
-        android_string_assign_2(__this, __s);
-    } else {
+    if (android_alloc_node_alloc != NULL) {
         size_t length = strlen(__s);
         void *last = __s + length;
         android_string_allocate_block(__this, length + 1);
         __this->_M_finish = android_string_ucopy_trivial(__s, last, __this->_M_start_of_storage);
         *(char *)__this->_M_finish = 0;
+    } else if (android_string_construct != NULL && android_string_assign_2 != NULL) { // just a small hack to allow gnu strings
+        android_string_construct(__this);
+        android_string_assign_2(__this, __s);
+    } else {
+        perror("Failed to construct android string");
+        abort();
     }
 }
 
@@ -77,7 +81,7 @@ void android_string_equ(android_string_t *__this, char *__s) {
     } else if (android_string_assign) {
         android_string_assign(__this, __s, __s + strlen(__s));
     } else {
-        perror("Failed to assing android string");
+        perror("Failed to assign android string");
         abort();
     }
 }
