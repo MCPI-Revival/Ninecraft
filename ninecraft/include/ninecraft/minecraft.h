@@ -46,6 +46,7 @@
 #define MINECRAFT_ISGRABBED_OFFSET_0_3_2 0xd88
 #define MINECRAFT_ISGRABBED_OFFSET_0_3_0 0xd88
 #define MINECRAFT_ISGRABBED_OFFSET_0_2_2 0xd64
+#define MINECRAFT_ISGRABBED_OFFSET_0_2_1 0xbe8
 
 typedef void (*minecraft_level_generated_t)(void *minecraft);
 

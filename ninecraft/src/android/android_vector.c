@@ -41,7 +41,7 @@ uintptr_t android_vector_uninitialized_move(uintptr_t __first, uintptr_t __last,
 void android_vector_insert_overflow_aux(android_vector_t *__this, void *__pos, void *__x, void *reserved, size_t __fill_len, bool __atend, size_t __entry_size) {
     size_t __len = android_vector_compute_next_size(__this, __fill_len, __entry_size);
     size_t __size = __len * __entry_size;
-    uintptr_t __new_start = (uintptr_t)android_alloc_allocate((uint32_t *)&__size);
+    uintptr_t __new_start =  (uintptr_t)android_alloc_allocate((uint32_t *)&__size);
     uintptr_t __new_finish = android_vector_uninitialized_move(__this->_M_start, (uintptr_t)__pos, __new_start, __entry_size);
     if (__fill_len == 1) {
         memcpy((void *)__new_finish, __x, __entry_size);

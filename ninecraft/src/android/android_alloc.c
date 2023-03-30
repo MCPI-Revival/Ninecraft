@@ -15,17 +15,25 @@ void android_alloc_setup_hooks(void *handle) {
 }
 
 void *android_alloc_allocate(size_t *__np) {
-    size_t __n = *__np;
-    if (__n < 0x81) {
-        return android_alloc_node_alloc(__np);
+    if (android_alloc_node_alloc == NULL) {
+        return malloc(*__np);
+    } else {
+        size_t __n = *__np;
+        if (__n < 0x81) {
+            return android_alloc_node_alloc(__np);
+        }
+        return android_alloc_operator_new(__n);
     }
-    return android_alloc_operator_new(__n);
 }
 
 void android_alloc_deallocate(void *ptr, size_t __n) {
-    if (__n < 0x81) {
-        android_alloc_node_dealloc(ptr, __n);
+    if (android_alloc_node_alloc == NULL) {
+        free(ptr);
     } else {
-        android_alloc_operator_delete(ptr);
+        if (__n < 0x81) {
+            android_alloc_node_dealloc(ptr, __n);
+        } else {
+            android_alloc_operator_delete(ptr);
+        }
     }
 }

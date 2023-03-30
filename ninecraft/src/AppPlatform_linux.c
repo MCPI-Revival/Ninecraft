@@ -10,7 +10,7 @@
 
 extern GLFWwindow *_window;
 
-void *app_platform_vtable_0_2_2[] = {
+void *app_platform_vtable_0_2_1[] = {
     (void *)AppPlatform_linux$destroy,
     (void *)AppPlatform_linux$destroy,
     (void *)AppPlatform_linux$saveScreenshot,
@@ -301,7 +301,9 @@ void AppPlatform_linux$AppPlatform_linux(AppPlatform_linux *app_platform, void *
     } else if (version_id == version_id_0_3_0) {
         app_platform->vtable = app_platform_vtable_0_3_0;
     } else if (version_id == version_id_0_2_2) {
-        app_platform->vtable = app_platform_vtable_0_2_2;
+        app_platform->vtable = app_platform_vtable_0_2_1;
+    } else if (version_id == version_id_0_2_1) {
+        app_platform->vtable = app_platform_vtable_0_2_1;
     } else if (version_id == version_id_0_7_0) {
         app_platform->vtable = app_platform_vtable_0_7_0;
     } else if (version_id == version_id_0_7_2) {
@@ -507,30 +509,30 @@ android_vector_t AppPlatform_linux$getOptionStrings(AppPlatform_linux *app_platf
     out._M_start = 0;
     out._M_finish = 0;
     out._M_end_of_storage = 0;
-    android_vector_push_back(&out, &username_name, sizeof(android_string_t));
-    android_vector_push_back(&out, &username_value, sizeof(android_string_t));
-    android_vector_push_back(&out, &server_name, sizeof(android_string_t));
-    android_vector_push_back(&out, &server_value, sizeof(android_string_t));
-    android_vector_push_back(&out, &server_visible_name, sizeof(android_string_t));
-    android_vector_push_back(&out, &server_visible_value, sizeof(android_string_t));
-    android_vector_push_back(&out, &fancygraphics_name, sizeof(android_string_t));
-    android_vector_push_back(&out, &fancygraphics_value, sizeof(android_string_t));
-    android_vector_push_back(&out, &lowquality_name, sizeof(android_string_t));
-    android_vector_push_back(&out, &lowquality_value, sizeof(android_string_t));
-    android_vector_push_back(&out, &sensitivity_name, sizeof(android_string_t));
-    android_vector_push_back(&out, &sensitivity_value, sizeof(android_string_t));
-    android_vector_push_back(&out, &invertmouse_name, sizeof(android_string_t));
-    android_vector_push_back(&out, &invertmouse_value, sizeof(android_string_t));
-    android_vector_push_back(&out, &islefthanded_name, sizeof(android_string_t));
-    android_vector_push_back(&out, &islefthanded_value, sizeof(android_string_t));
-    android_vector_push_back(&out, &usetouchscreen_name, sizeof(android_string_t));
-    android_vector_push_back(&out, &usetouchscreen_value, sizeof(android_string_t));
-    android_vector_push_back(&out, &usetouchjoypad_name, sizeof(android_string_t));
-    android_vector_push_back(&out, &usetouchjoypad_value, sizeof(android_string_t));
-    android_vector_push_back(&out, &vibration_name, sizeof(android_string_t));
-    android_vector_push_back(&out, &vibration_value, sizeof(android_string_t));
-    android_vector_push_back(&out, &difficulty_name, sizeof(android_string_t));
-    android_vector_push_back(&out, &difficulty_value, sizeof(android_string_t));
+    android_vector_push_back(&out, &username_name, android_string_tsize());
+    android_vector_push_back(&out, &username_value, android_string_tsize());
+    android_vector_push_back(&out, &server_name, android_string_tsize());
+    android_vector_push_back(&out, &server_value, android_string_tsize());
+    android_vector_push_back(&out, &server_visible_name, android_string_tsize());
+    android_vector_push_back(&out, &server_visible_value, android_string_tsize());
+    android_vector_push_back(&out, &fancygraphics_name, android_string_tsize());
+    android_vector_push_back(&out, &fancygraphics_value, android_string_tsize());
+    android_vector_push_back(&out, &lowquality_name, android_string_tsize());
+    android_vector_push_back(&out, &lowquality_value, android_string_tsize());
+    android_vector_push_back(&out, &sensitivity_name, android_string_tsize());
+    android_vector_push_back(&out, &sensitivity_value, android_string_tsize());
+    android_vector_push_back(&out, &invertmouse_name, android_string_tsize());
+    android_vector_push_back(&out, &invertmouse_value, android_string_tsize());
+    android_vector_push_back(&out, &islefthanded_name, android_string_tsize());
+    android_vector_push_back(&out, &islefthanded_value, android_string_tsize());
+    android_vector_push_back(&out, &usetouchscreen_name, android_string_tsize());
+    android_vector_push_back(&out, &usetouchscreen_value, android_string_tsize());
+    android_vector_push_back(&out, &usetouchjoypad_name, android_string_tsize());
+    android_vector_push_back(&out, &usetouchjoypad_value, android_string_tsize());
+    android_vector_push_back(&out, &vibration_name, android_string_tsize());
+    android_vector_push_back(&out, &vibration_value, android_string_tsize());
+    android_vector_push_back(&out, &difficulty_name, android_string_tsize());
+    android_vector_push_back(&out, &difficulty_value, android_string_tsize());
     printf("start: %u; finish: %u; end: %u;\n", out._M_start, out._M_finish, out._M_end_of_storage);
     return out;
 }
@@ -635,9 +637,9 @@ android_vector_t AppPlatform_linux$getUserInput(AppPlatform_linux *app_platform)
     out._M_finish = 0;
     out._M_end_of_storage = 0;
     puts("ok----");
-    android_vector_push_back(&out, &name, sizeof(android_string_t));
-    android_vector_push_back(&out, &seed, sizeof(android_string_t));
-    android_vector_push_back(&out, &gamemode, sizeof(android_string_t));
+    android_vector_push_back(&out, &name, android_string_tsize());
+    android_vector_push_back(&out, &seed, android_string_tsize());
+    android_vector_push_back(&out, &gamemode, android_string_tsize());
 
     printf("start: %u; finish: %u; end: %u;\n", out._M_start, out._M_finish, out._M_end_of_storage);
     return out;
@@ -680,7 +682,7 @@ bool AppPlatform_linux$isTouchscreen(AppPlatform_linux *app_platform) {
 texture_data_t AppPlatform_linux$loadTexture(AppPlatform_linux *app_platform, android_string_t *path_str, bool alpha) {
     puts("debug: AppPlatform_linux::loadTexture");
     printf("%p\n", app_platform);
-    char *path = (char *)path_str->_M_start_of_storage;
+    char *path = android_string_to_str(path_str);
     size_t pathlen = strlen(path);
     char *fullpath_original = (char *) malloc(10 + pathlen);
     memcpy(fullpath_original, "./assets/", 9);
@@ -713,7 +715,7 @@ NINECRAFT_FLOAT_FUNC void AppPlatform_linux$playSound(AppPlatform_linux *app_pla
 asset_file AppPlatform_linux$readAssetFile(AppPlatform_linux *app_platform, android_string_t *path_str) {
     puts("debug: AppPlatform_linux::readAssetFile");
     android_string_t str;
-    char *path = (char *)path_str->_M_start_of_storage;
+    char *path = android_string_to_str(path_str);
     size_t pathlen = strlen(path);
     char *fullpath_original = (char *) malloc(10 + pathlen);
     memcpy(fullpath_original, "./assets/", 9);
