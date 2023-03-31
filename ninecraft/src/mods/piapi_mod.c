@@ -26,9 +26,11 @@ void piapi_mod_level_generated_injection(void *minecraft) {
     void *command_server = *(void **)(minecraft + minecraft_command_server_offset);
     if (command_server != NULL) {
         command_server_deconstruct(command_server);
-        android_alloc_operator_delete(command_server);
+        if (command_server) {
+            free(command_server);
+        }
     }
-    command_server = android_alloc_operator_new(0x4c);
+    command_server = malloc(0x4c);
     command_server_construct(command_server, minecraft);
     *(void **)(minecraft + minecraft_command_server_offset) = command_server;
     command_server_init(command_server, 4711);

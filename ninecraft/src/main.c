@@ -41,6 +41,10 @@
 #include <ninecraft/ninecraft_defs.h>
 #include <hybris/dlfcn.h>
 
+#include <stdatomic.h>
+#include <linux/futex.h>
+#include <sys/syscall.h>
+
 void *handle = NULL;
 GLFWwindow *_window = NULL;
 
@@ -401,13 +405,87 @@ extern void __aeabi_idiv();
 
 #endif
 
-int __my_cxa_pure_virtual() {}
+void __my_cxa_pure_virtual() {
+    perror("Called none existant function");
+    abort();
+}
 
 NINECRAFT_FLOAT_FUNC double io_strtod(const char *__nptr, char **__endptr) {
     return strtod(__nptr, __endptr);
 }
 
+void *cpp_operator_new(size_t size) {
+    void *ptr = malloc(size);
+    if (ptr == NULL) {
+        perror("Failed to allocate memory");
+        abort();
+    }
+    return ptr;
+}
+
+void cpp_operator_delete(void *ptr) {
+    if (ptr) {
+        free(ptr);
+    }
+}
+
+extern void *__dso_handle;
+
+#define CONSTRUCTION_NOT_YET_STARTED 0
+#define CONSTRUCTION_COMPLETE 1
+#define CONSTRUCTION_UNDERWAY_WITHOUT_WAITER 0x100
+#define CONSTRUCTION_UNDERWAY_WITH_WAITER 0x200
+
+typedef union {
+  atomic_int state;
+  int32_t aligner;
+} my_guard_t;
+
+int __my_cxa_guard_acquire(my_guard_t *gv) {
+    int old_value = atomic_load_explicit(&gv->state, memory_order_relaxed);
+    while (true) {
+        if (old_value == CONSTRUCTION_COMPLETE) {
+            atomic_thread_fence(memory_order_acquire);
+            return 0;
+        } else if (old_value == CONSTRUCTION_NOT_YET_STARTED) {
+            if (!atomic_compare_exchange_weak_explicit(&gv->state, &old_value,
+                    CONSTRUCTION_UNDERWAY_WITHOUT_WAITER,
+                    memory_order_relaxed,
+                    memory_order_relaxed)) {
+                    continue;
+            }
+            atomic_thread_fence(memory_order_acquire);
+            return 1;
+        } else if (old_value == CONSTRUCTION_UNDERWAY_WITHOUT_WAITER) {
+            if (!atomic_compare_exchange_weak_explicit(&gv->state, &old_value,
+                    CONSTRUCTION_UNDERWAY_WITH_WAITER,
+                    memory_order_relaxed,
+                    memory_order_relaxed
+                )
+            ) {
+                continue;
+            }
+        }
+        syscall(SYS_futex, &gv->state, FUTEX_WAIT, CONSTRUCTION_UNDERWAY_WITH_WAITER, NULL, NULL, 0);
+        old_value = atomic_load_explicit(&gv->state, memory_order_relaxed);
+    }
+}
+
+void __my_cxa_guard_release(my_guard_t *gv) {
+    int old_value = atomic_exchange_explicit(&gv->state, CONSTRUCTION_COMPLETE, memory_order_release);
+    if (old_value == CONSTRUCTION_UNDERWAY_WITH_WAITER) {
+        syscall(SYS_futex, &gv->state, FUTEX_WAKE, INT_MAX, NULL, NULL, 0);
+    }
+}
+
 void missing_hook() {
+    hybris_hook("__cxa_guard_release", __my_cxa_guard_release);
+    hybris_hook("__cxa_guard_acquire", __my_cxa_guard_acquire);
+    hybris_hook("__dso_handle", &__dso_handle);
+    hybris_hook("_Znaj", cpp_operator_new);
+    hybris_hook("_ZdaPv", cpp_operator_delete);
+    hybris_hook("_Znwj", cpp_operator_new);
+    hybris_hook("_ZdlPv", cpp_operator_delete);
     hybris_hook("strtod", io_strtod);
     hybris_hook("wcscmp", wcscmp);
     hybris_hook("wcsncpy", wcsncpy);
@@ -552,6 +630,8 @@ int main(int argc, char **argv) {
         hybris_dladdr(internal_dlsym(handle, "_ZN12NinecraftAppC2Ev"), &info);
         if (strncmp(info.dli_fbase + 0x15d3a8, "v0.2.0", 6) == 0) {
             version_id = version_id_0_2_0;
+        } else if (strncmp(info.dli_fbase + 0xfca6c, "v0.1.3", 6) == 0) {
+            version_id = version_id_0_1_3;
         } else {
             puts("Unsupported Version!");
             return 1;
@@ -579,7 +659,9 @@ int main(int argc, char **argv) {
     printf("nine construct %p\n", ninecraft_app_construct);
     size_t ninecraft_app_size;
 
-    if (version_id == version_id_0_2_0) {
+    if (version_id == version_id_0_1_3) {
+        ninecraft_app_size = NINECRAFTAPP_SIZE_0_1_3;
+    } else if (version_id == version_id_0_2_0) {
         ninecraft_app_size = NINECRAFTAPP_SIZE_0_2_0;
     } else if (version_id == version_id_0_2_1) {
         ninecraft_app_size = NINECRAFTAPP_SIZE_0_2_1;
@@ -602,7 +684,7 @@ int main(int argc, char **argv) {
     } else if (version_id == version_id_0_7_2) {
         ninecraft_app_size = NINECRAFTAPP_SIZE_0_7_2;
     }
-    ninecraft_app = android_alloc_operator_new(ninecraft_app_size);
+    ninecraft_app = malloc(ninecraft_app_size);
     ninecraft_app_construct(ninecraft_app);
 
     if (version_id == version_id_0_7_0) {
@@ -635,7 +717,9 @@ int main(int argc, char **argv) {
         android_string_equ((android_string_t *)(ninecraft_app + 3112), "./storage/external/");
     } else if (version_id == version_id_0_2_0) {
         android_string_equ((android_string_t *)(ninecraft_app + 3060), "./storage/external/");
-    } 
+    } else if (version_id == version_id_0_1_3) {
+        android_string_equ((android_string_t *)(ninecraft_app + 3456), "./storage/external/");
+    }
 
     AppPlatform_linux platform;
     AppPlatform_linux$AppPlatform_linux(&platform, handle, version_id);
@@ -677,6 +761,8 @@ int main(int argc, char **argv) {
             minecraft_isgrabbed_offset = MINECRAFT_ISGRABBED_OFFSET_0_2_1;
         } else if (version_id == version_id_0_2_0) {
             minecraft_isgrabbed_offset = MINECRAFT_ISGRABBED_OFFSET_0_2_0;
+        } else if (version_id == version_id_0_1_3) {
+            minecraft_isgrabbed_offset = MINECRAFT_ISGRABBED_OFFSET_0_1_3;
         }
         
         if (*(bool *)(ninecraft_app+minecraft_isgrabbed_offset)) {

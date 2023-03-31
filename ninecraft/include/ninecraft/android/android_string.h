@@ -2,7 +2,6 @@
 #define NINECRAFT_ANDROID_ANDROID_STRING_H
 
 #include <stddef.h>
-#include <stdatomic.h>
 
 typedef union {
     void *_M_end_of_storage;
