@@ -39,6 +39,7 @@
 
 #include <ninecraft/math_compat.h>
 #include <ninecraft/ninecraft_defs.h>
+#include <hybris/dlfcn.h>
 
 void *handle = NULL;
 GLFWwindow *_window = NULL;
@@ -509,40 +510,52 @@ int main(int argc, char **argv) {
     android_string_t in;
     android_string_cstr(&in, "v%d.%d.%d alpha");
 
-    android_string_t game_version = ((android_string_t (*)(android_string_t *))internal_dlsym(handle, "_ZN6Common20getGameVersionStringERKSs"))(&in);
-    char *verstr = android_string_to_str(&game_version);
-    printf("Ninecraft is running mcpe %.6s\n", verstr);
-    printf("%s\n", verstr);
+    android_string_t (*get_game_version_string)(android_string_t *) = (android_string_t (*)(android_string_t *))internal_dlsym(handle, "_ZN6Common20getGameVersionStringERKSs");
+    if (get_game_version_string != NULL) {
+        android_string_t game_version = get_game_version_string(&in);
+        char *verstr = android_string_to_str(&game_version);
+        printf("Ninecraft is running mcpe %.6s\n", verstr);
+        printf("%s\n", verstr);
 
-    if (strncmp(verstr, "v0.2.1", 6) == 0) {
-        version_id = version_id_0_2_1;
-    } else if (strncmp(verstr, "v0.2.2", 6) == 0) {
-        version_id = version_id_0_2_2;
-    } else if (strncmp(verstr, "v0.3.0", 6) == 0) {
-        version_id = version_id_0_3_0;
-    } else if (strncmp(verstr, "v0.3.2", 6) == 0) {
-        version_id = version_id_0_3_2;
-    } else if (strncmp(verstr, "v0.3.3", 6) == 0) {
-        version_id = version_id_0_3_3;
-    } else if (strncmp(verstr, "v0.4.0", 6) == 0) {
-        version_id = version_id_0_4_0;
-    } else if (strncmp(verstr, "v0.5.0", 6) == 0) {
-        version_id = version_id_0_5_0;
-    } else if (strncmp(verstr, "v0.6.0", 6) == 0) {
-        version_id = version_id_0_6_1;
-    } else if (strncmp(verstr, "v0.6.1", 6) == 0) {
-        version_id = version_id_0_6_1;
-    } else if (strncmp(verstr, "v0.7.0", 6) == 0) {
-        version_id = version_id_0_7_0;
-    } else if (strncmp(verstr, "v0.7.1", 6) == 0) {
-        version_id = version_id_0_7_0;
+        if (strncmp(verstr, "v0.2.1", 6) == 0) {
+            version_id = version_id_0_2_1;
+        } else if (strncmp(verstr, "v0.2.2", 6) == 0) {
+            version_id = version_id_0_2_2;
+        } else if (strncmp(verstr, "v0.3.0", 6) == 0) {
+            version_id = version_id_0_3_0;
+        } else if (strncmp(verstr, "v0.3.2", 6) == 0) {
+            version_id = version_id_0_3_2;
+        } else if (strncmp(verstr, "v0.3.3", 6) == 0) {
+            version_id = version_id_0_3_3;
+        } else if (strncmp(verstr, "v0.4.0", 6) == 0) {
+            version_id = version_id_0_4_0;
+        } else if (strncmp(verstr, "v0.5.0", 6) == 0) {
+            version_id = version_id_0_5_0;
+        } else if (strncmp(verstr, "v0.6.0", 6) == 0) {
+            version_id = version_id_0_6_1;
+        } else if (strncmp(verstr, "v0.6.1", 6) == 0) {
+            version_id = version_id_0_6_1;
+        } else if (strncmp(verstr, "v0.7.0", 6) == 0) {
+            version_id = version_id_0_7_0;
+        } else if (strncmp(verstr, "v0.7.1", 6) == 0) {
+            version_id = version_id_0_7_0;
 #ifdef __i386__
-    } else if (strncmp(verstr, "v0.7.2", 6) == 0) {
+        } else if (strncmp(verstr, "v0.7.2", 6) == 0) {
         version_id = version_id_0_7_2;
 #endif
+        } else {
+            puts("Unsupported Version!");
+            return 1;
+        }
     } else {
-        puts("Unsupported Version!");
-        return 1;
+        Dl_info info;
+        hybris_dladdr(internal_dlsym(handle, "_ZN12NinecraftAppC2Ev"), &info);
+        if (strncmp(info.dli_fbase + 0x15d3a8, "v0.2.0", 6) == 0) {
+            version_id = version_id_0_2_0;
+        } else {
+            puts("Unsupported Version!");
+            return 1;
+        }
     }
 
     multitouch_setup_hooks(handle);
@@ -566,7 +579,9 @@ int main(int argc, char **argv) {
     printf("nine construct %p\n", ninecraft_app_construct);
     size_t ninecraft_app_size;
 
-    if (version_id == version_id_0_2_1) {
+    if (version_id == version_id_0_2_0) {
+        ninecraft_app_size = NINECRAFTAPP_SIZE_0_2_0;
+    } else if (version_id == version_id_0_2_1) {
         ninecraft_app_size = NINECRAFTAPP_SIZE_0_2_1;
     } else if (version_id == version_id_0_2_2) {
         ninecraft_app_size = NINECRAFTAPP_SIZE_0_2_2;
@@ -603,6 +618,9 @@ int main(int argc, char **argv) {
     } else if (version_id == version_id_0_7_2) {
         android_string_equ((android_string_t *)(ninecraft_app + 3628), "./storage/internal/");
         android_string_equ((android_string_t *)(ninecraft_app + 3652), "./storage/external/");
+    } else if (version_id >= version_id_0_5_0 && version_id <= version_id_0_6_1) {
+        android_string_equ((android_string_t *)(ninecraft_app + 3544), "./storage/internal/");
+        android_string_equ((android_string_t *)(ninecraft_app + 3568), "./storage/external/");
     } else if (version_id == version_id_0_4_0) {
         android_string_equ((android_string_t *)(ninecraft_app + 3540), "./storage/internal/");
         android_string_equ((android_string_t *)(ninecraft_app + 3564), "./storage/external/");
@@ -615,10 +633,9 @@ int main(int argc, char **argv) {
         android_string_equ((android_string_t *)(ninecraft_app + 3492), "./storage/external/");
     } else if (version_id == version_id_0_2_1) {
         android_string_equ((android_string_t *)(ninecraft_app + 3112), "./storage/external/");
-    } else if (version_id >= version_id_0_5_0 && version_id <= version_id_0_6_1) {
-        android_string_equ((android_string_t *)(ninecraft_app + 3544), "./storage/internal/");
-        android_string_equ((android_string_t *)(ninecraft_app + 3568), "./storage/external/");
-    }
+    } else if (version_id == version_id_0_2_0) {
+        android_string_equ((android_string_t *)(ninecraft_app + 3060), "./storage/external/");
+    } 
 
     AppPlatform_linux platform;
     AppPlatform_linux$AppPlatform_linux(&platform, handle, version_id);
@@ -658,6 +675,8 @@ int main(int argc, char **argv) {
             minecraft_isgrabbed_offset = MINECRAFT_ISGRABBED_OFFSET_0_2_2;
         } else if (version_id == version_id_0_2_1) {
             minecraft_isgrabbed_offset = MINECRAFT_ISGRABBED_OFFSET_0_2_1;
+        } else if (version_id == version_id_0_2_0) {
+            minecraft_isgrabbed_offset = MINECRAFT_ISGRABBED_OFFSET_0_2_0;
         }
         
         if (*(bool *)(ninecraft_app+minecraft_isgrabbed_offset)) {

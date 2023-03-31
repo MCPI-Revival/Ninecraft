@@ -10,7 +10,7 @@
 
 extern GLFWwindow *_window;
 
-void *app_platform_vtable_0_2_1[] = {
+void *app_platform_vtable_0_2_0[] = {
     (void *)AppPlatform_linux$destroy,
     (void *)AppPlatform_linux$destroy,
     (void *)AppPlatform_linux$saveScreenshot,
@@ -301,9 +301,11 @@ void AppPlatform_linux$AppPlatform_linux(AppPlatform_linux *app_platform, void *
     } else if (version_id == version_id_0_3_0) {
         app_platform->vtable = app_platform_vtable_0_3_0;
     } else if (version_id == version_id_0_2_2) {
-        app_platform->vtable = app_platform_vtable_0_2_1;
+        app_platform->vtable = app_platform_vtable_0_2_0;
     } else if (version_id == version_id_0_2_1) {
-        app_platform->vtable = app_platform_vtable_0_2_1;
+        app_platform->vtable = app_platform_vtable_0_2_0;
+    } else if (version_id == version_id_0_2_0) {
+        app_platform->vtable = app_platform_vtable_0_2_0;
     } else if (version_id == version_id_0_7_0) {
         app_platform->vtable = app_platform_vtable_0_7_0;
     } else if (version_id == version_id_0_7_2) {
