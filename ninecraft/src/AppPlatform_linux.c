@@ -10,6 +10,28 @@
 
 extern GLFWwindow *_window;
 
+void *app_platform_vtable_0_1_0[] = {
+    (void *)AppPlatform_linux$saveScreenshot,
+    (void *)AppPlatform_linux$loadTexture,
+    (void *)AppPlatform_linux$playSound,
+    (void *)AppPlatform_linux$showDialog,
+    (void *)AppPlatform_linux$createUserInput,
+    (void *)AppPlatform_linux$getUserInputStatus,
+    (void *)AppPlatform_linux$getUserInput,
+    (void *)AppPlatform_linux$getDateString,
+    (void *)AppPlatform_linux$checkLicense,
+    (void *)AppPlatform_linux$hasBuyButtonWhenInvalidLicense,
+    (void *)AppPlatform_linux$uploadPlatformDependentData,
+    (void *)AppPlatform_linux$_tick,
+    (void *)AppPlatform_linux$getScreenWidth,
+    (void *)AppPlatform_linux$getScreenHeight,
+    (void *)AppPlatform_linux$getOptionStrings,
+    (void *)AppPlatform_linux$buyGame,
+    (void *)AppPlatform_linux$finish,
+    (void *)AppPlatform_linux$isTouchscreen,
+    (void *)AppPlatform_linux$vibrate
+};
+
 void *app_platform_vtable_0_1_1[] = {
     (void *)AppPlatform_linux$saveScreenshot,
     (void *)AppPlatform_linux$loadTexture,
@@ -339,6 +361,8 @@ void AppPlatform_linux$AppPlatform_linux(AppPlatform_linux *app_platform, void *
         app_platform->vtable = app_platform_vtable_0_1_1;
     } else if (version_id == version_id_0_1_1) {
         app_platform->vtable = app_platform_vtable_0_1_1;
+    } else if (version_id == version_id_0_1_0) {
+        app_platform->vtable = app_platform_vtable_0_1_0;
     }
     app_platform->handle = handle;
     app_platform->status = -1;
