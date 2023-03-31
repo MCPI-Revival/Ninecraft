@@ -630,7 +630,9 @@ int main(int argc, char **argv) {
         hybris_dladdr(internal_dlsym(handle, "_ZN12NinecraftAppC2Ev"), &info);
         if (strncmp(info.dli_fbase + 0x15d3a8, "v0.2.0", 6) == 0) {
             version_id = version_id_0_2_0;
-        } else if (strncmp(info.dli_fbase + 0xfca6c, "v0.1.3", 6) == 0) {
+        } else if (strncmp(info.dli_fbase + 0xfca6c, "v0.1.3", 6) == 0) { // v0.1.3-2
+            version_id = version_id_0_1_3;
+        } else if (strncmp(info.dli_fbase + 0xfca2c, "v0.1.3", 6) == 0) { // v0.1.3-1
             version_id = version_id_0_1_3;
         } else {
             puts("Unsupported Version!");
