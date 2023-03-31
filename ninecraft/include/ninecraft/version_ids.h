@@ -2,6 +2,7 @@
 #define NINECRAFT_VERSION_IDS_H
 
 enum {
+    version_id_0_1_2,
     version_id_0_1_3,
     version_id_0_2_0,
     version_id_0_2_1,

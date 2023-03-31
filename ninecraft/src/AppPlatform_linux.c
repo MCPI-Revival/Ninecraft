@@ -10,6 +10,29 @@
 
 extern GLFWwindow *_window;
 
+void *app_platform_vtable_0_1_2[] = {
+    (void *)AppPlatform_linux$saveScreenshot,
+    (void *)AppPlatform_linux$loadTexture,
+    (void *)AppPlatform_linux$playSound,
+    (void *)AppPlatform_linux$showDialog,
+    (void *)AppPlatform_linux$createUserInput,
+    (void *)AppPlatform_linux$getUserInputStatus,
+    (void *)AppPlatform_linux$getUserInput,
+    (void *)AppPlatform_linux$getDateString,
+    (void *)AppPlatform_linux$checkLicense,
+    (void *)AppPlatform_linux$hasBuyButtonWhenInvalidLicense,
+    (void *)AppPlatform_linux$uploadPlatformDependentData,
+    (void *)AppPlatform_linux$_tick,
+    (void *)AppPlatform_linux$getScreenWidth,
+    (void *)AppPlatform_linux$getScreenHeight,
+    (void *)AppPlatform_linux$getOptionStrings,
+    (void *)AppPlatform_linux$isPowerVR,
+    (void *)AppPlatform_linux$buyGame,
+    (void *)AppPlatform_linux$finish,
+    (void *)AppPlatform_linux$isTouchscreen,
+    (void *)AppPlatform_linux$vibrate
+};
+
 void *app_platform_vtable_0_1_3[] = {
     (void *)AppPlatform_linux$destroy,
     (void *)AppPlatform_linux$destroy,
@@ -312,6 +335,8 @@ void AppPlatform_linux$AppPlatform_linux(AppPlatform_linux *app_platform, void *
         app_platform->vtable = app_platform_vtable_0_1_3;
     } else if (version_id == version_id_0_1_3) {
         app_platform->vtable = app_platform_vtable_0_1_3;
+    } else if (version_id == version_id_0_1_2) {
+        app_platform->vtable = app_platform_vtable_0_1_2;
     }
     app_platform->handle = handle;
     app_platform->status = -1;
@@ -705,10 +730,14 @@ texture_data_t AppPlatform_linux$loadTexture(AppPlatform_linux *app_platform, an
     } else if(access(fullpath_original, F_OK) == 0) {
         fullpath = fullpath_original;
     }
-    texture_data_t texture_data = read_png(fullpath, alpha, false);
+    texture_data_t texture_data = read_png(fullpath, alpha);
     free(fullpath_original);
     free(fullpath_internal_overrides);
     free(fullpath_overrides);
+    if (app_platform->version_id <= version_id_0_1_2) {
+        ((uint8_t *)&texture_data.unknown)[0] = texture_data.alpha;
+        ((uint8_t *)&texture_data.unknown)[1] = texture_data.keep_buffer_data;
+    }
     return texture_data;
 }
 

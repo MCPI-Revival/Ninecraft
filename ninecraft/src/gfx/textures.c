@@ -3,7 +3,7 @@
 #include <errno.h>
 #include <stdlib.h>
 
-texture_data_t read_png(char *path, bool alpha, bool reverse_load) {
+texture_data_t read_png(char *path, bool alpha) {
     texture_data_t texture_data;
     FILE *file = fopen(path, "r");
 
@@ -56,11 +56,7 @@ texture_data_t read_png(char *path, bool alpha, bool reverse_load) {
     texture_data.pixels = (unsigned char *)malloc(rowbytes * texture_data.height);
     png_bytep *row_pointers = (png_bytep*)malloc(sizeof(png_bytep) * texture_data.height);
     for (unsigned int y = 0; y < texture_data.height; ++y) {
-        if (!reverse_load) {
-            row_pointers[y] = (png_byte *)&texture_data.pixels[y * rowbytes];
-        } else {
-            row_pointers[y] = (png_byte *)&texture_data.pixels[((texture_data.height - 1 - y) * rowbytes)];
-        }
+        row_pointers[y] = (png_byte *)&texture_data.pixels[y * rowbytes];
     }
     png_read_image(png, row_pointers);
     fclose(file);

@@ -22,6 +22,6 @@ typedef struct {
     uint32_t unknown2; // 24 0x18
 } texture_data_t;
 
-extern texture_data_t read_png(char *path, bool alpha, bool reverse_load);
+extern texture_data_t read_png(char *path, bool alpha);
 
 #endif
