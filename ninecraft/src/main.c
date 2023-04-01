@@ -699,6 +699,10 @@ int main(int argc, char **argv) {
             version_id = version_id_0_1_0_touch;
         } else if (strncmp(info.dli_fbase + 0x131480, "v0.1.0", 6) == 0) { // v0.1.0
             version_id = version_id_0_1_0;
+        } else if (strncmp(info.dli_fbase + 0x12f938, "v0.1.0", 6) == 0) { // v0.1.0 demo canada
+            version_id = version_id_0_1_0;
+        } else if (strncmp(info.dli_fbase + 0x12f968, "v0.1.0", 6) == 0) { // v0.1.0 demo
+            version_id = version_id_0_1_0;
         } else {
             puts("Unsupported Version!");
             return 1;
