@@ -3,8 +3,8 @@
 #include <errno.h>
 #include <stdlib.h>
 
-texture_data_t read_png(char *path, bool alpha) {
-    texture_data_t texture_data;
+png_data_t read_png(char *path) {
+    png_data_t texture_data;
     FILE *file = fopen(path, "r");
 
     if (!file) {
@@ -18,12 +18,14 @@ texture_data_t read_png(char *path, bool alpha) {
     if (!png) {
         texture_data.height = 0;
         texture_data.width = 0;
+        texture_data.pixels = NULL;
         return texture_data;
     }
     png_infop info = png_create_info_struct(png);
     if (!info) {
         texture_data.height = 0;
         texture_data.width = 0;
+        texture_data.pixels = NULL;
         return texture_data;
     }
     if (setjmp(png_jmpbuf(png))) {
@@ -61,10 +63,5 @@ texture_data_t read_png(char *path, bool alpha) {
     png_read_image(png, row_pointers);
     fclose(file);
     free(row_pointers);
-    texture_data.texture_type = texture_type_ub;
-    texture_data.alpha = alpha;
-    texture_data.unknown = 0;
-    texture_data.keep_buffer_data = 0;
-    texture_data.unknown2 = 0xfffffff;
     return texture_data;
 }

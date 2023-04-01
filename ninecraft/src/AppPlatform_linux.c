@@ -12,7 +12,26 @@ extern GLFWwindow *_window;
 
 void *app_platform_vtable_0_1_0[] = {
     (void *)AppPlatform_linux$saveScreenshot,
-    (void *)AppPlatform_linux$loadTexture,
+    (void *)AppPlatform_linux$loadTextureOld,
+    (void *)AppPlatform_linux$showDialog,
+    (void *)AppPlatform_linux$createUserInput,
+    (void *)AppPlatform_linux$getUserInputStatus,
+    (void *)AppPlatform_linux$getUserInput,
+    (void *)AppPlatform_linux$getDateString,
+    (void *)AppPlatform_linux$checkLicense,
+    (void *)AppPlatform_linux$hasBuyButtonWhenInvalidLicense,
+    (void *)AppPlatform_linux$uploadPlatformDependentData,
+    (void *)AppPlatform_linux$_tick,
+    (void *)AppPlatform_linux$getScreenWidth,
+    (void *)AppPlatform_linux$getScreenHeight,
+    (void *)AppPlatform_linux$getOptionStrings,
+    (void *)AppPlatform_linux$buyGame,
+    (void *)AppPlatform_linux$finish
+};
+
+void *app_platform_vtable_0_1_0_touch[] = {
+    (void *)AppPlatform_linux$saveScreenshot,
+    (void *)AppPlatform_linux$loadTextureOld,
     (void *)AppPlatform_linux$playSound,
     (void *)AppPlatform_linux$showDialog,
     (void *)AppPlatform_linux$createUserInput,
@@ -34,7 +53,7 @@ void *app_platform_vtable_0_1_0[] = {
 
 void *app_platform_vtable_0_1_1[] = {
     (void *)AppPlatform_linux$saveScreenshot,
-    (void *)AppPlatform_linux$loadTexture,
+    (void *)AppPlatform_linux$loadTextureOld,
     (void *)AppPlatform_linux$playSound,
     (void *)AppPlatform_linux$showDialog,
     (void *)AppPlatform_linux$createUserInput,
@@ -361,9 +380,12 @@ void AppPlatform_linux$AppPlatform_linux(AppPlatform_linux *app_platform, void *
         app_platform->vtable = app_platform_vtable_0_1_1;
     } else if (version_id == version_id_0_1_1) {
         app_platform->vtable = app_platform_vtable_0_1_1;
+    } else if (version_id == version_id_0_1_0_touch) {
+        app_platform->vtable = app_platform_vtable_0_1_0_touch;
     } else if (version_id == version_id_0_1_0) {
         app_platform->vtable = app_platform_vtable_0_1_0;
     }
+    
     app_platform->handle = handle;
     app_platform->status = -1;
     app_platform->version_id = version_id;
@@ -756,14 +778,56 @@ texture_data_t AppPlatform_linux$loadTexture(AppPlatform_linux *app_platform, an
     } else if(access(fullpath_original, F_OK) == 0) {
         fullpath = fullpath_original;
     }
-    texture_data_t texture_data = read_png(fullpath, alpha);
+    png_data_t png_data = read_png(fullpath);
     free(fullpath_original);
     free(fullpath_internal_overrides);
     free(fullpath_overrides);
-    if (app_platform->version_id <= version_id_0_1_2) {
-        ((uint8_t *)&texture_data.unknown)[0] = texture_data.alpha;
-        ((uint8_t *)&texture_data.unknown)[1] = texture_data.keep_buffer_data;
+    texture_data_t texture_data = {
+        .width = png_data.width,
+        .height = png_data.height,
+        .pixels = png_data.pixels,
+        .unknown = 0,
+        .alpha = 1,
+        .keep_buffer_data = 0,
+        .texture_type = texture_type_ub,
+        .unknown2 = 0xffffffff
+    };
+    return texture_data;
+}
+
+texture_data_old_t AppPlatform_linux$loadTextureOld(AppPlatform_linux *app_platform, android_string_t *path_str, bool alpha) {
+    puts("debug: AppPlatform_linux::loadTexture");
+    printf("%p\n", app_platform);
+    char *path = android_string_to_str(path_str);
+    size_t pathlen = strlen(path);
+    char *fullpath_original = (char *) malloc(10 + pathlen);
+    memcpy(fullpath_original, "./assets/", 9);
+    memcpy(fullpath_original+9, path, pathlen+1);
+    char *fullpath_internal_overrides = (char *) malloc(29 + pathlen);
+    memcpy(fullpath_internal_overrides, "./internal_overrides/assets/", 28);
+    memcpy(fullpath_internal_overrides+28, path, pathlen+1);
+    char *fullpath_overrides = (char *) malloc(20 + pathlen);
+    memcpy(fullpath_overrides, "./overrides/assets/", 19);
+    memcpy(fullpath_overrides+19, path, pathlen+1);
+    char *fullpath = NULL;
+    if(access(fullpath_overrides, F_OK) == 0) {
+        fullpath = fullpath_overrides;
+    } else if(access(fullpath_internal_overrides, F_OK) == 0) {
+        fullpath = fullpath_internal_overrides;
+    } else if(access(fullpath_original, F_OK) == 0) {
+        fullpath = fullpath_original;
     }
+    png_data_t png_data = read_png(fullpath);
+    free(fullpath_original);
+    free(fullpath_internal_overrides);
+    free(fullpath_overrides);
+    texture_data_old_t texture_data = {
+        .width = png_data.width,
+        .height = png_data.height,
+        .pixels = png_data.pixels,
+        .alpha = 1,
+        .keep_buffer_data = 0
+    };
     return texture_data;
 }
 
