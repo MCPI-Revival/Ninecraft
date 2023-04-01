@@ -685,23 +685,33 @@ int main(int argc, char **argv) {
     } else {
         Dl_info info;
         hybris_dladdr(internal_dlsym(handle, "_ZN12NinecraftAppC2Ev"), &info);
-        if (strncmp(info.dli_fbase + 0x15d3a8, "v0.2.0", 6) == 0) {
+        if (strncmp(info.dli_fbase + 0x15d3a8, "v0.2.0", 6) == 0) { // v0.2.0
+            version_id = version_id_0_2_0;
+        } else if (strncmp(info.dli_fbase + 0x15a480, "v0.2.0", 6) == 0) { // v0.2.0-demo
             version_id = version_id_0_2_0;
         } else if (strncmp(info.dli_fbase + 0xfca6c, "v0.1.3", 6) == 0) { // v0.1.3-2
             version_id = version_id_0_1_3;
         } else if (strncmp(info.dli_fbase + 0xfca2c, "v0.1.3", 6) == 0) { // v0.1.3-1
             version_id = version_id_0_1_3;
-        } else if (strncmp(info.dli_fbase + 0xf799c, "v0.1.2", 6) == 0) {
+        } else if (strncmp(info.dli_fbase + 0xfae24, "v0.1.3", 6) == 0) { // v0.1.3-2-demo
+            version_id = version_id_0_1_3;
+        } else if (strncmp(info.dli_fbase + 0xfade4, "v0.1.3", 6) == 0) { // v0.1.3-1-demo
+            version_id = version_id_0_1_3;
+        } else if (strncmp(info.dli_fbase + 0xf799c, "v0.1.2", 6) == 0) { // v0.1.2
             version_id = version_id_0_1_2;
-        } else if (strncmp(info.dli_fbase + 0xf6d30, "v0.1.1", 6) == 0) {
+        } else if (strncmp(info.dli_fbase + 0xf5dc8, "v0.1.2", 6) == 0) { // v0.1.2-demo
+            version_id = version_id_0_1_2;
+        } else if (strncmp(info.dli_fbase + 0xf6d30, "v0.1.1", 6) == 0) { // v0.1.1
+            version_id = version_id_0_1_1;
+        } else if (strncmp(info.dli_fbase + 0xf5154, "v0.1.1", 6) == 0) { // v0.1.1-demo
             version_id = version_id_0_1_1;
         } else if (strncmp(info.dli_fbase + 0x119c64, "v0.1.0", 6) == 0) { // v0.1.0-touch
             version_id = version_id_0_1_0_touch;
         } else if (strncmp(info.dli_fbase + 0x131480, "v0.1.0", 6) == 0) { // v0.1.0
             version_id = version_id_0_1_0;
-        } else if (strncmp(info.dli_fbase + 0x12f938, "v0.1.0", 6) == 0) { // v0.1.0 demo canada
+        } else if (strncmp(info.dli_fbase + 0x12f938, "v0.1.0", 6) == 0) { // v0.1.0-demo-canada
             version_id = version_id_0_1_0;
-        } else if (strncmp(info.dli_fbase + 0x12f968, "v0.1.0", 6) == 0) { // v0.1.0 demo
+        } else if (strncmp(info.dli_fbase + 0x12f968, "v0.1.0", 6) == 0) { // v0.1.0-demo
             version_id = version_id_0_1_0;
         } else {
             puts("Unsupported Version!");
