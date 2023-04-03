@@ -12,19 +12,22 @@ typedef struct {
     buffers_t buffers;
     void *_M_finish;
     void *_M_start_of_storage;
+} android_string_stlp_t;
+
+typedef struct {
+    char *data;
+} android_string_gnu_t;
+
+typedef union {
+    android_string_stlp_t stlp;
+    android_string_gnu_t gnu;
 } android_string_t;
 
-typedef void (*android_string_construct_t)(android_string_t *__this);
-typedef void (*android_string_clone_t)(android_string_t *__this, android_string_t *__ps);
 typedef void (*android_string_deallocate_block_t)(android_string_t *__this);
 typedef void (*android_string_assign_t)(android_string_t *__this, const char *__first, const char *__last);
-typedef void (*android_string_assign_2_t)(android_string_t *__this, const char *__s);
 
-extern android_string_construct_t android_string_construct;
-extern android_string_clone_t android_string_clone;
 extern android_string_deallocate_block_t android_string_deallocate_block;
 extern android_string_assign_t android_string_assign;
-extern android_string_assign_2_t android_string_assign_2;
 
 extern void android_string_setup_hooks(void *handle);
 

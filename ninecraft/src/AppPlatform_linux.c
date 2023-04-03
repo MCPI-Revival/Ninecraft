@@ -351,7 +351,7 @@ void AppPlatform_linux$abortWebRequest(AppPlatform_linux *app_platform, int unkn
     puts("debug: AppPlatform_linux::abortWebRequest");
 }
 
-void AppPlatform_linux$AppPlatform_linux(AppPlatform_linux *app_platform, void *handle, int version_id) {
+void AppPlatform_linux$AppPlatform_linux(AppPlatform_linux *app_platform, void *handle, int version_id, ninecraft_options_t *options) {
     if (version_id == version_id_0_7_2) {
         app_platform->vtable = app_platform_vtable_0_7_2;
     } else if (version_id == version_id_0_7_0) {
@@ -359,6 +359,8 @@ void AppPlatform_linux$AppPlatform_linux(AppPlatform_linux *app_platform, void *
     } else if (version_id == version_id_0_6_1) {
         app_platform->vtable = app_platform_vtable_0_6_0;
     } else if (version_id == version_id_0_5_0) {
+        app_platform->vtable = app_platform_vtable_0_4_0;
+    } else if (version_id == version_id_0_5_0_j) {
         app_platform->vtable = app_platform_vtable_0_4_0;
     } else if (version_id == version_id_0_4_0) {
         app_platform->vtable = app_platform_vtable_0_4_0;
@@ -389,6 +391,7 @@ void AppPlatform_linux$AppPlatform_linux(AppPlatform_linux *app_platform, void *
     app_platform->handle = handle;
     app_platform->status = -1;
     app_platform->version_id = version_id;
+    app_platform->options = options;
 }
 
 void AppPlatform_linux$_tick(AppPlatform_linux *app_platform) {
@@ -414,9 +417,8 @@ void AppPlatform_linux$finish(AppPlatform_linux *app_platform) {
     puts("debug: AppPlatform_linux::finish");
 }
 
-android_string_t AppPlatform_linux$getDateString(AppPlatform_linux *app_platform, unsigned int seconds) {
+void AppPlatform_linux$getDateString(android_string_t *return_value, AppPlatform_linux *app_platform, unsigned int seconds) {
     puts("debug: AppPlatform_linux::getDateString");
-    android_string_t str;
 
     int daysOfMonth[] = { 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 };
     int currYear, daysTillNow, extraTime, extraDays, index, date, month, hours, minutes, secondss, flag = 0;
@@ -501,8 +503,7 @@ android_string_t AppPlatform_linux$getDateString(AppPlatform_linux *app_platform
     
     sprintf(ans, "%d/%d/%d %d:%d:%d", date, month, currYear, hours, minutes, secondss);
     
-    android_string_cstr(&str, (char *) ans);
-    return str;
+    android_string_cstr(return_value, (char *) ans);
 }
 
 int AppPlatform_linux$getKeyFromKeyCode(AppPlatform_linux *app_platform, unsigned int key_code, unsigned int meta_state, unsigned int device_id) {
@@ -512,105 +513,19 @@ int AppPlatform_linux$getKeyFromKeyCode(AppPlatform_linux *app_platform, unsigne
 
 android_vector_t AppPlatform_linux$getOptionStrings(AppPlatform_linux *app_platform) {
     puts("debug: AppPlatform_linux::getOptionsStrings");
-    android_string_t username_name; // mp_username
-    android_string_t username_value; // Steve
-    android_string_t server_name; // mp_server
-    android_string_t server_value; // Ninecraft
-    android_string_t server_visible_name; // mp_server_visible_default
-    android_string_t server_visible_value; // true
-    android_string_t fancygraphics_name; // gfx_fancygraphics
-    android_string_t fancygraphics_value; // true
-    android_string_t lowquality_name; // gfx_lowquality
-    android_string_t lowquality_value; // false
-    android_string_t sensitivity_name; // ctrl_sensitivity
-    android_string_t sensitivity_value; // gcvt(0.01 * 100) 100
-    android_string_t invertmouse_name; // ctrl_invertmouse
-    android_string_t invertmouse_value; // false
-    android_string_t islefthanded_name; // ctrl_islefthanded
-    android_string_t islefthanded_value; // false
-    android_string_t usetouchscreen_name; // ctrl_usetouchscreen
-    android_string_t usetouchscreen_value; // false
-    android_string_t usetouchjoypad_name; // ctrl_usetouchjoypad
-    android_string_t usetouchjoypad_value; // true
-    android_string_t vibration_name; // feedback_vibration
-    android_string_t vibration_value; // false
-    android_string_t difficulty_name; // game_difficulty
-    android_string_t difficulty_value; // 0, 4
-    unsigned int size = 24;
-    char tmp[100];
-    android_string_cstr(&username_name, "mp_username");
-    FILE *fp = popen("zenity --entry --title='Profile' --text='Enter Username:'", "r");
-    if (fp == NULL) {
-        android_string_cstr(&username_value, "Steve");
-    } else {
-        char input_value[100];
-        for (int i = 0; i < 100; ++i) {
-            char c = fgetc(fp);
-            if (c == '\n' || c == '\0' || c == EOF) {
-                input_value[i] = '\0';
-                break;
-            }
-            input_value[i] = c;
-        }
-        input_value[99] = '\0';
-        if (input_value[0] != 0) {
-            android_string_cstr(&username_value, input_value);
-        } else {
-            android_string_cstr(&username_value, "Steve");
-        }
-        pclose(fp);
-    }
-    android_string_cstr(&server_name, "mp_server");
-    android_string_cstr(&server_value, "Ninecraft");
-    android_string_cstr(&server_visible_name, "mp_server_visible_default");
-    android_string_cstr(&server_visible_value, "true");
-    android_string_cstr(&fancygraphics_name, "gfx_fancygraphics");
-    android_string_cstr(&fancygraphics_value, "true");
-    android_string_cstr(&lowquality_name, "gfx_lowquality");
-    android_string_cstr(&lowquality_value, "false");
-    android_string_cstr(&sensitivity_name, "ctrl_sensitivity");
-    android_string_cstr(&sensitivity_value, gcvt(0.01 * 100, 6, tmp));
-    android_string_cstr(&invertmouse_name, "ctrl_invertmouse");
-    android_string_cstr(&invertmouse_value, "false");
-    android_string_cstr(&islefthanded_name, "ctrl_islefthanded");
-    android_string_cstr(&islefthanded_value, "false");
-    android_string_cstr(&usetouchscreen_name, "ctrl_usetouchscreen");
-    android_string_cstr(&usetouchscreen_value, "false");
-    android_string_cstr(&usetouchjoypad_name, "ctrl_usetouchjoypad");
-    android_string_cstr(&usetouchjoypad_value, "false");
-    android_string_cstr(&vibration_name, "feedback_vibration");
-    android_string_cstr(&vibration_value, "false");
-    android_string_cstr(&difficulty_name, "game_difficulty");
-    android_string_cstr(&difficulty_value, "4");
     android_vector_t out;
     out._M_start = 0;
     out._M_finish = 0;
     out._M_end_of_storage = 0;
-    android_vector_push_back(&out, &username_name, android_string_tsize());
-    android_vector_push_back(&out, &username_value, android_string_tsize());
-    android_vector_push_back(&out, &server_name, android_string_tsize());
-    android_vector_push_back(&out, &server_value, android_string_tsize());
-    android_vector_push_back(&out, &server_visible_name, android_string_tsize());
-    android_vector_push_back(&out, &server_visible_value, android_string_tsize());
-    android_vector_push_back(&out, &fancygraphics_name, android_string_tsize());
-    android_vector_push_back(&out, &fancygraphics_value, android_string_tsize());
-    android_vector_push_back(&out, &lowquality_name, android_string_tsize());
-    android_vector_push_back(&out, &lowquality_value, android_string_tsize());
-    android_vector_push_back(&out, &sensitivity_name, android_string_tsize());
-    android_vector_push_back(&out, &sensitivity_value, android_string_tsize());
-    android_vector_push_back(&out, &invertmouse_name, android_string_tsize());
-    android_vector_push_back(&out, &invertmouse_value, android_string_tsize());
-    android_vector_push_back(&out, &islefthanded_name, android_string_tsize());
-    android_vector_push_back(&out, &islefthanded_value, android_string_tsize());
-    android_vector_push_back(&out, &usetouchscreen_name, android_string_tsize());
-    android_vector_push_back(&out, &usetouchscreen_value, android_string_tsize());
-    android_vector_push_back(&out, &usetouchjoypad_name, android_string_tsize());
-    android_vector_push_back(&out, &usetouchjoypad_value, android_string_tsize());
-    android_vector_push_back(&out, &vibration_name, android_string_tsize());
-    android_vector_push_back(&out, &vibration_value, android_string_tsize());
-    android_vector_push_back(&out, &difficulty_name, android_string_tsize());
-    android_vector_push_back(&out, &difficulty_value, android_string_tsize());
-    printf("start: %u; finish: %u; end: %u;\n", out._M_start, out._M_finish, out._M_end_of_storage);
+    for (int i = 0; i < app_platform->options->length; ++i) {
+        ninecraft_option_t option = app_platform->options->options[i];
+        android_string_t name;
+        android_string_cstr(&name, option.name);
+        android_vector_push_back(&out, &name, android_string_tsize());
+        android_string_t value;
+        android_string_cstr(&value, option.value);
+        android_vector_push_back(&out, &value, android_string_tsize());
+    }
     return out;
 }
 
@@ -621,11 +536,9 @@ NINECRAFT_FLOAT_FUNC float AppPlatform_linux$getPixelsPerMillimeter(AppPlatform_
     return (((float)cw + (float)ch) * 0.5f ) / 25.4f;
 }
 
-android_string_t AppPlatform_linux$getPlatformStringVar(AppPlatform_linux *app_platform, int zero) {
+void AppPlatform_linux$getPlatformStringVar(android_string_t *return_value, AppPlatform_linux *app_platform, int zero) {
     puts("debug: AppPlatform_linux::getPlatformStringVar");
-    android_string_t str;
-    android_string_cstr(&str, "Linux");
-    return str;
+    android_string_cstr(return_value, "Linux");
 }
 
 int AppPlatform_linux$getScreenHeight(AppPlatform_linux *app_platform) {

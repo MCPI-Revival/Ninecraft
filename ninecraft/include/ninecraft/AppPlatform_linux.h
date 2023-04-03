@@ -7,12 +7,14 @@
 #include <ninecraft/gfx/textures.h>
 #include <ninecraft/android/android_string.h>
 #include <ninecraft/android/android_vector.h>
+#include <ninecraft/options.h>
 
 typedef struct {
     void **vtable;
     void *handle;
     int status;
     int version_id;
+    ninecraft_options_t *options;
 } AppPlatform_linux;
 
 typedef struct {
@@ -54,7 +56,7 @@ void AppPlatform_linux$getWebRequestContent(AppPlatform_linux *app_platform, int
 
 void AppPlatform_linux$abortWebRequest(AppPlatform_linux *app_platform, int unknown0);
 
-extern void AppPlatform_linux$AppPlatform_linux(AppPlatform_linux *app_platform, void *handle, int version_id);
+extern void AppPlatform_linux$AppPlatform_linux(AppPlatform_linux *app_platform, void *handle, int version_id, ninecraft_options_t *options);
 
 extern void AppPlatform_linux$_tick(AppPlatform_linux *app_platform);
 
@@ -66,7 +68,7 @@ extern void AppPlatform_linux$createUserInput(AppPlatform_linux *app_platform);
 
 extern void AppPlatform_linux$finish(AppPlatform_linux *app_platform);
 
-extern android_string_t AppPlatform_linux$getDateString(AppPlatform_linux *app_platform, unsigned int seconds);
+extern void AppPlatform_linux$getDateString(android_string_t *return_value, AppPlatform_linux *app_platform, unsigned int seconds);
 
 extern int32_t AppPlatform_linux$getKeyFromKeyCode(AppPlatform_linux *app_platform, unsigned int key_code, unsigned int meta_state, unsigned int device_id);
 
@@ -74,7 +76,7 @@ extern android_vector_t AppPlatform_linux$getOptionStrings(AppPlatform_linux *ap
 
 extern float AppPlatform_linux$getPixelsPerMillimeter(AppPlatform_linux *app_platform);
 
-extern android_string_t AppPlatform_linux$getPlatformStringVar(AppPlatform_linux *app_platform, int zero);
+extern void AppPlatform_linux$getPlatformStringVar(android_string_t *return_value, AppPlatform_linux *app_platform, int zero);
 
 extern int AppPlatform_linux$getScreenHeight(AppPlatform_linux *app_platform);
 
