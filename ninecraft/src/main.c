@@ -685,7 +685,7 @@ int main(int argc, char **argv) {
         } else if (strncmp(verstr, "v0.4.0", 6) == 0) {
             version_id = version_id_0_4_0;
         } else if (strncmp(verstr, "v0.5.0", 6) == 0) {
-            if (internal_dlsym(handle, "SL_IID_ENGINE") != NULL) { // just a hacky way to check if its a j version
+            if (android_alloc_node_alloc != NULL) { // just a hacky way to check if its a j version
                 version_id = version_id_0_5_0;
             } else {
                 version_id = version_id_0_5_0_j;

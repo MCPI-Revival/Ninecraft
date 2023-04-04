@@ -18,7 +18,7 @@ sles_data_t *sles_data_source;
 uint32_t sles_bufferqueue_interface_enquire(struct sles_bufferqueue_interface **self, void *buffer, uint32_t size) {
     float gain = 1.0f - (((float)sles_volume_level * (-1.0f)) / 2000.0f);
     sles_pcm_format_t *metadata = (sles_pcm_format_t *)sles_data_source->format;
-    audio_engine_play(buffer, size, metadata->num_channels, metadata->bits_per_sample, metadata->samples_per_sec / 1000, gain);
+    audio_engine_play(buffer, size, metadata->num_channels, metadata->bits_per_sample, metadata->samples_per_sec / 1000, gain, 1.0f);
     return 0;
 }
 

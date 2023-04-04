@@ -89,7 +89,7 @@ void audio_engine_tick() {
     }
 }
 
-void audio_engine_play(uint8_t *buffer, uint32_t buffer_size, uint32_t num_channels, uint32_t bits_per_sample, uint32_t freq, float gain) {
+void audio_engine_play(uint8_t *buffer, uint32_t buffer_size, uint32_t num_channels, uint32_t bits_per_sample, uint32_t freq, float gain, float pitch) {
     if (audio_engine_is_inited) {
         ALuint al_buffer;
         alGenBuffers(1, &al_buffer);
@@ -181,6 +181,18 @@ void audio_engine_play(uint8_t *buffer, uint32_t buffer_size, uint32_t num_chann
             alDeleteBuffers(1, &al_buffer);
             return;
         }
+
+        alSourcef(al_source, AL_PITCH, pitch);
+        err = alGetError();
+        if (err != AL_NO_ERROR) {
+            puts("[AUDIO_ENGINE] Failed to set gain on source");
+            if (al_source || alIsSource(al_source)) {
+                alDeleteSources(1, &al_source);
+            }
+            alDeleteBuffers(1, &al_buffer);
+            return;
+        }
+
         alSourcei(al_source, AL_BUFFER, al_buffer);
         err = alGetError();
         if (err != AL_NO_ERROR) {

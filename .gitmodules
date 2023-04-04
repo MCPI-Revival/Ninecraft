@@ -10,3 +10,6 @@
 [submodule "epoll-shim"]
     path = epoll-shim
     url = https://github.com/jiixyj/epoll-shim
+[submodule "minivorbis"]
+	path = minivorbis
+	url = https://github.com/edubart/minivorbis

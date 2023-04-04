@@ -7,6 +7,8 @@
 #include <unistd.h>
 #include <GLFW/glfw3.h>
 #include <ninecraft/ninecraft_defs.h>
+#include <ninecraft/audio/sound_repository.h>
+#include <ninecraft/audio/audio_engine.h>
 
 extern GLFWwindow *_window;
 
@@ -666,6 +668,15 @@ bool AppPlatform_linux$isPowerVR(AppPlatform_linux *app_platform) {
 
 bool AppPlatform_linux$isTouchscreen(AppPlatform_linux *app_platform) {
     puts("debug: AppPlatform_linux::isTouchscreen");
+    for (size_t i = 0; i < app_platform->options->length; ++i) {
+        if (strcmp(app_platform->options->options[i].name, "ctrl_usetouchscreen") == 0) {
+            if (strcmp(app_platform->options->options[i].value, "true") == 0) {
+                return true;
+            } else {
+                return false;
+            }
+        }
+    }
     return false;
 }
 
@@ -746,6 +757,8 @@ texture_data_old_t AppPlatform_linux$loadTextureOld(AppPlatform_linux *app_platf
 
 NINECRAFT_FLOAT_FUNC void AppPlatform_linux$playSound(AppPlatform_linux *app_platform, android_string_t *sound_name, float volume, float pitch) {
     puts("debug: AppPlatform_linux::playSound");
+    ninecraft_sound_resource_t *res = ninecraft_get_sound_buffer(android_string_to_str(sound_name));
+    audio_engine_play(res->buffer, res->buffer_size, res->num_channels, res->bits_per_sample, res->freq, volume, pitch);
 }
 
 asset_file AppPlatform_linux$readAssetFile(AppPlatform_linux *app_platform, android_string_t *path_str) {
