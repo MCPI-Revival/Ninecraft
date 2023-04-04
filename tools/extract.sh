@@ -17,4 +17,6 @@ rm -rf assets/
 
 unzip ${1} "assets/*"
 
+unzip ${1} "res/*"
+
 unzip ${1} "lib/*"
