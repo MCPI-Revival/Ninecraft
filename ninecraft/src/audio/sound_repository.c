@@ -67,18 +67,14 @@ static ninecraft_sound_t ninecraft_sound_repository[] = {
         .resources_count = 4,
         .resources = {
             .a = {
-                .name = "gravel1.ogg",
-                .buffer = NULL
-            },
-            .b = {
                 .name = "gravel2.ogg",
                 .buffer = NULL
             },
-            .c = {
+            .b = {
                 .name = "gravel3.ogg",
                 .buffer = NULL
             },
-            .d = {
+            .c = {
                 .name = "gravel4.ogg",
                 .buffer = NULL
             }
