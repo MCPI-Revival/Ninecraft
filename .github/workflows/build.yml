@@ -1,0 +1,29 @@
+name: C/C++ CI
+
+on:
+  push:
+    branches: [ "master" ]
+  pull_request:
+    branches: [ "master" ]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v3
+    - name: Add armhf architecture
+      run: sudo dpkg --add-architecture armhf
+    - name: Add i386 architecture
+      run: sudo dpkg --add-architecture i386
+    - name: Update apt repositories
+      run: sudo apt update
+    - name: Install dependencies
+      run: sudo apt install git make cmake gcc-i686-linux-gnu g++-i686-linux-gnu gcc-arm-linux-gnueabihf g++-arm-linux-gnueabihf zlib1g-dev:armhf libpng-dev:armhf zlib1g-dev:i386 libpng-dev:i386 libopenal-dev:armhf libopenal-dev:i386 libx11-dev:armhf libx11-dev:i386 libxrandr-dev:armhf libxrandr-dev:i386 libxinerama-dev:armhf libxinerama-dev:i386 libxcursor-dev:armhf libxcursor-dev:i386 libxi-dev:armhf libxi-dev:i386 libgles-dev:armhf libgles-dev:i386 zenity patchelf unzip
+    - name: Clone git repository
+      run: git clone --recursive http://github.com/MCPI-Revival/Ninecraft.git
+    - name: Get inside the directory of the git repository
+      run: cd Ninecraft
+    - name: Compile
+      run: make
