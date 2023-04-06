@@ -627,6 +627,14 @@ int main(int argc, char **argv) {
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 1);
     glfwWindowHint(GLFW_CONTEXT_CREATION_API, GLFW_EGL_CONTEXT_API);
     _window = glfwCreateWindow(720, 480, "Ninecraft", NULL, NULL);
+    png_data_t icon = read_png("./res/drawable/iconx.png");
+    GLFWimage icon_glfw = {
+        .width = icon.width,
+        .height = icon.height,
+        .pixels = icon.pixels
+    };
+    glfwSetWindowIcon(_window, 1, &icon_glfw); 
+    free(icon.pixels);
     if (!_window) {
         puts("cant create");
     }
