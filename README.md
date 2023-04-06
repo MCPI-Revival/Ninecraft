@@ -2,19 +2,26 @@
 
 ![alt screenshot](https://raw.githubusercontent.com/MCPI-Revival/Ninecraft/master/screenshots/Screenshot%20from%202022-09-10%2000-45-48.png)
 
-## Compile dependencies
+## Installing compile dependencies
 ### Debian/Ubuntu:
+x86_64 & arm64:
+```
+sudo dpkg --add-architecture armhf
+sudo dpkg --add-architecture i386
+sudo apt update
+sudo apt install git make cmake gcc-i686-linux-gnu g++-i686-linux-gnu gcc-arm-linux-gnueabihf g++-arm-linux-gnueabihf zlib1g-dev:armhf libpng-dev:armhf zlib1g-dev:i386 libpng-dev:i386 libopenal-dev:armhf libopenal-dev:i386 libx11-dev:armhf libx11-dev:i386 libxrandr-dev:armhf libxrandr-dev:i386 libxinerama-dev:armhf libxinerama-dev:i386 libxcursor-dev:armhf libxcursor-dev:i386 libxi-dev:armhf libxi-dev:i386 libgles-dev:armhf libgles-dev:i386 zenity patchelf
+```
 x86:
 ```
-git make cmake gcc gcc-multilib g++ zlib1g-dev:i386 libpng-dev:i386 zlib1g-dev libpng-dev libopenal-dev:i386 libopenal-dev libx11-dev:i386 libx11-dev libxrandr-dev:i386 libxrandr-dev libxinerama-dev:i386 libxinerama-dev libxcursor-dev:i386 libxcursor-dev libxi-dev:i386 libxi-dev libgles-dev:i386 libgles-dev zenity patchelf
+sudo dpkg --add-architecture armhf
+sudo apt update
+sudo apt install git make cmake gcc g++ gcc-arm-linux-gnueabihf g++-arm-linux-gnueabihf zlib1g-dev:armhf libpng-dev:armhf zlib1g-dev libpng-dev libopenal-dev:armhf libopenal-dev libx11-dev:armhf libx11-dev libxrandr-dev:armhf libxrandr-dev libxinerama-dev:armhf libxinerama-dev libxcursor-dev:armhf libxcursor-dev libxi-dev:armhf libxi-dev libgles-dev:armhf libgles-dev zenity patchelf
 ```
-ARM:
+arm:
 ```
-git make cmake gcc g++ zlib1g-dev:armhf libpng-dev:armhf zlib1g-dev libpng-dev libopenal-dev:armhf libopenal-dev libx11-dev:armhf libx11-dev libxrandr-dev:armhf libxrandr-dev libxinerama-dev:armhf libxinerama-dev libxcursor-dev:armhf libxcursor-dev libxi-dev:armhf libxi-dev libgles-dev:armhf libgles-dev zenity patchelf
-```
-### ArchLinux:
-```
-git make cmake gcc gcc-multilib zlib lib32-zlib libpng lib32-libpng openal lib32-openal libx11 lib32-libx11 libxrandr lib32-libxrandr libxinerama lib32-libxinerama libxcursor lib32-libxcursor libxi lib32-libxi libglvnd lib32-libglvnd zenity patchelf
+sudo dpkg --add-architecture i386
+sudo apt update
+sudo apt install git make cmake gcc g++ gcc-i686-linux-gnu g++-i686-linux-gnu zlib1g-dev:i386 libpng-dev:i386 zlib1g-dev libpng-dev libopenal-dev:i386 libopenal-dev libx11-dev:i386 libx11-dev libxrandr-dev:i386 libxrandr-dev libxinerama-dev:i386 libxinerama-dev libxcursor-dev:i386 libxcursor-dev libxi-dev:i386 libxi-dev libgles-dev:i386 libgles-dev zenity patchelf
 ```
 
 ## Compiling
@@ -25,20 +32,25 @@ make
 ```    
 
 ## Before running for the first time
-### x86:
+### x86_64 & x86:
 ```
 ./tools/extract.sh /path/to/your/apk
 ./tools/patch.sh x86
 ```
-### ARM
+### arm64 & arm
 ```
 ./tools/extract.sh /path/to/your/apk
 ./tools/patch.sh armeabi-v7a
 ```
 
 ## Running
+### x86_64 & x86:
 ```
-./build/ninecraft/ninecraft
+./build-i686/ninecraft/ninecraft
+```
+### arm64 & arm
+```
+./build-arm/ninecraft/ninecraft
 ```
 
 ## Creating mods

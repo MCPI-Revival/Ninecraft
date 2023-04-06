@@ -1,6 +1,8 @@
 build/
 buil/
 build2/
+build-arm/
+build-i686/
 assets3/
 lib3/
 lib4/
