@@ -15,9 +15,9 @@ extern int version_id;
 void piapi_mod_level_generated_injection(void *minecraft) {
     minecraft_level_generated(minecraft);
     size_t minecraft_command_server_offset;
-    if (version_id == version_id_0_7_0) {
+    if (version_id == version_id_0_7_0 || version_id == version_id_0_7_1) {
         minecraft_command_server_offset = MINECRAFT_COMMANDSERVER_OFFSET_0_7_0;
-    } else if (version_id == version_id_0_6_1) {
+    } else if (version_id == version_id_0_6_1 || version_id == version_id_0_6_0) {
         minecraft_command_server_offset = MINECRAFT_COMMANDSERVER_OFFSET_0_6_1;
     } else if (version_id == version_id_0_7_2) {
         puts("yes");
@@ -38,7 +38,7 @@ void piapi_mod_level_generated_injection(void *minecraft) {
 
 void piapi_mod_inject(int version_id) {
 #ifdef __i386__
-    if (version_id == version_id_0_6_1 || version_id == version_id_0_7_0) {
+    if (version_id >= version_id_0_6_0 && version_id <= version_id_0_7_1) {
         DETOUR(minecraft_tick + 188, (void *)piapi_mod_level_generated_injection, false);
     } else if (version_id == version_id_0_7_2) {
         DETOUR(minecraft_tick + 197, (void *)piapi_mod_level_generated_injection, false);

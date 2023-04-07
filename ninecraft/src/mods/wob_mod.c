@@ -8,7 +8,7 @@
 */
 
 void wob_mod_inject(int version_id) { 
-    if (version_id == version_id_0_6_1) {
+    if (version_id == version_id_0_6_1 || version_id == version_id_0_6_0) {
 #ifdef __i386__
         ((char *)start_menu_screen_construct)[268] = 0xa0;
 #endif

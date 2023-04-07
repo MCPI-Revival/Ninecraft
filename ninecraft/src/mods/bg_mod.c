@@ -20,7 +20,7 @@ void bg_mod_screen_render_dirt_background_injection(void *screen, uint32_t param
 
 
 void bg_mod_inject(int version_id) {
-    if (version_id == version_id_0_6_1 || version_id == version_id_0_5_0) { 
+    if (version_id == version_id_0_6_1 || version_id == version_id_0_6_0 || version_id == version_id_0_5_0) { 
         DETOUR(screen_render_dirt_background, bg_mod_screen_render_dirt_background_injection, true);
     }
 }

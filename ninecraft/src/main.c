@@ -705,7 +705,7 @@ int main(int argc, char **argv) {
         } else if (strncmp(verstr, "v0.7.0", 6) == 0) {
             version_id = version_id_0_7_0;
         } else if (strncmp(verstr, "v0.7.1", 6) == 0) {
-            version_id = version_id_0_7_0;
+            version_id = version_id_0_7_1;
 #ifdef __i386__
         } else if (strncmp(verstr, "v0.7.2", 6) == 0) {
         version_id = version_id_0_7_2;
@@ -806,13 +806,15 @@ int main(int argc, char **argv) {
         ninecraft_app_size = NINECRAFTAPP_SIZE_0_6_1;
     } else if (version_id == version_id_0_7_0) {
         ninecraft_app_size = NINECRAFTAPP_SIZE_0_7_0;
+    } else if (version_id == version_id_0_7_1) {
+        ninecraft_app_size = NINECRAFTAPP_SIZE_0_7_1;
     } else if (version_id == version_id_0_7_2) {
         ninecraft_app_size = NINECRAFTAPP_SIZE_0_7_2;
     }
     ninecraft_app = malloc(ninecraft_app_size);
     ninecraft_app_construct(ninecraft_app);
 
-    if (version_id == version_id_0_7_0) {
+    if (version_id == version_id_0_7_0 || version_id == version_id_0_7_1) {
 #ifdef __i386__
         android_string_equ((android_string_t *)(ninecraft_app + 3616), "./storage/internal/");
         android_string_equ((android_string_t *)(ninecraft_app + 3640), "./storage/external/");
@@ -882,6 +884,8 @@ int main(int argc, char **argv) {
     size_t minecraft_isgrabbed_offset;
     if (version_id == version_id_0_7_2) {
         minecraft_isgrabbed_offset = MINECRAFT_ISGRABBED_OFFSET_0_7_2;
+    } else if (version_id == version_id_0_7_1) {
+        minecraft_isgrabbed_offset = MINECRAFT_ISGRABBED_OFFSET_0_7_1;
     } else if (version_id == version_id_0_7_0) {
         minecraft_isgrabbed_offset = MINECRAFT_ISGRABBED_OFFSET_0_7_0;
     } else if (version_id == version_id_0_6_1) {

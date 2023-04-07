@@ -18,9 +18,11 @@
 
 #define NINECRAFTAPP_SIZE_0_7_2 0xeec
 #ifdef __i386__
+#define NINECRAFTAPP_SIZE_0_7_1 0xee0
 #define NINECRAFTAPP_SIZE_0_7_0 0xee0
 #else
 #ifdef __thumb2__
+#define NINECRAFTAPP_SIZE_0_7_1 0xee8
 #define NINECRAFTAPP_SIZE_0_7_0 0xee8
 #endif
 #endif
@@ -43,9 +45,11 @@
 
 #define MINECRAFT_ISGRABBED_OFFSET_0_7_2 0xdec
 #ifdef __i386__
+#define MINECRAFT_ISGRABBED_OFFSET_0_7_1 0xde0
 #define MINECRAFT_ISGRABBED_OFFSET_0_7_0 0xde0
 #else
 #ifdef __thumb2__
+#define MINECRAFT_ISGRABBED_OFFSET_0_7_1 0xde4
 #define MINECRAFT_ISGRABBED_OFFSET_0_7_0 0xde4
 #endif
 #endif
