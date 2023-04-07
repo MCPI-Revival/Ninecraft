@@ -706,10 +706,8 @@ int main(int argc, char **argv) {
             version_id = version_id_0_7_0;
         } else if (strncmp(verstr, "v0.7.1", 6) == 0) {
             version_id = version_id_0_7_1;
-#ifdef __i386__
         } else if (strncmp(verstr, "v0.7.2", 6) == 0) {
-        version_id = version_id_0_7_2;
-#endif
+            version_id = version_id_0_7_2;
         } else {
             puts("Unsupported Version!");
             return 1;
@@ -825,8 +823,15 @@ int main(int argc, char **argv) {
 #endif
 #endif
     } else if (version_id == version_id_0_7_2) {
+#ifdef __i386__
         android_string_equ((android_string_t *)(ninecraft_app + 3628), "./storage/internal/");
         android_string_equ((android_string_t *)(ninecraft_app + 3652), "./storage/external/");
+#else
+#ifdef __thumb2__
+        android_string_equ((android_string_t *)(ninecraft_app + 3636), "./storage/internal/");
+        android_string_equ((android_string_t *)(ninecraft_app + 3660), "./storage/external/");
+#endif
+#endif
     } else if (version_id == version_id_0_5_0_j) {
         android_string_equ((android_string_t *)(ninecraft_app + 3144), "./storage/internal/");
         android_string_equ((android_string_t *)(ninecraft_app + 3148), "./storage/external/");
