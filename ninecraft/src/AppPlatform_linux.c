@@ -415,6 +415,8 @@ void AppPlatform_linux$AppPlatform_linux(AppPlatform_linux *app_platform, void *
         app_platform->vtable = app_platform_vtable_0_7_0;
     } else if (version_id == version_id_0_6_1) {
         app_platform->vtable = app_platform_vtable_0_6_0;
+    } else if (version_id == version_id_0_6_0) {
+        app_platform->vtable = app_platform_vtable_0_6_0;
     } else if (version_id == version_id_0_5_0) {
         app_platform->vtable = app_platform_vtable_0_4_0_stlp;
     } else if (version_id == version_id_0_5_0_j) {
