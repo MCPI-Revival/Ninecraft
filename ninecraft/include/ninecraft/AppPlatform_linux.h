@@ -8,8 +8,10 @@
 #include <ninecraft/android/android_string.h>
 #include <ninecraft/android/android_vector.h>
 #include <ninecraft/options.h>
+#include <ninecraft/ninecraft_defs.h>
 
-typedef struct {
+typedef struct
+{
     void **vtable;
     void *handle;
     int status;
@@ -17,18 +19,21 @@ typedef struct {
     ninecraft_options_t *options;
 } AppPlatform_linux;
 
-typedef struct {
+typedef struct
+{
     char *data;
     int size;
 } asset_file;
 
-typedef enum {
+typedef enum
+{
     did_new_world = 1,
     did_options = 3,
     did_rename_world = 4
 } platform_dialogue_id;
 
-typedef struct {
+typedef struct
+{
     android_string_t name;
     android_string_t seed;
     char filler[0x1000];
@@ -61,14 +66,16 @@ extern void AppPlatform_linux$AppPlatform_linux(AppPlatform_linux *app_platform,
 extern void AppPlatform_linux$_tick(AppPlatform_linux *app_platform);
 
 extern void AppPlatform_linux$buyGame(AppPlatform_linux *app_platform);
- 
+
 extern int32_t AppPlatform_linux$checkLicense(AppPlatform_linux *app_platform);
 
 extern void AppPlatform_linux$createUserInput(AppPlatform_linux *app_platform);
 
 extern void AppPlatform_linux$finish(AppPlatform_linux *app_platform);
 
-extern void AppPlatform_linux$getDateString(android_string_t *return_value, AppPlatform_linux *app_platform, unsigned int seconds);
+extern NINECRAFT_CSR_FUNCDEF(android_string_stlp_t, AppPlatform_linux$getDateStringSTLP, AppPlatform_linux *app_platform, unsigned int seconds);
+
+extern NINECRAFT_CSR_FUNCDEF(android_string_gnu_t, AppPlatform_linux$getDateStringGNU, AppPlatform_linux *app_platform, unsigned int seconds);
 
 extern int32_t AppPlatform_linux$getKeyFromKeyCode(AppPlatform_linux *app_platform, unsigned int key_code, unsigned int meta_state, unsigned int device_id);
 
@@ -76,7 +83,9 @@ extern android_vector_t AppPlatform_linux$getOptionStrings(AppPlatform_linux *ap
 
 extern float AppPlatform_linux$getPixelsPerMillimeter(AppPlatform_linux *app_platform);
 
-extern void AppPlatform_linux$getPlatformStringVar(android_string_t *return_value, AppPlatform_linux *app_platform, int zero);
+extern NINECRAFT_CSR_FUNCDEF(android_string_stlp_t, AppPlatform_linux$getPlatformStringVarSTLP, AppPlatform_linux *app_platform, int zero);
+
+extern NINECRAFT_CSR_FUNCDEF(android_string_gnu_t, AppPlatform_linux$getPlatformStringVarGNU, AppPlatform_linux *app_platform, int zero);
 
 extern int AppPlatform_linux$getScreenHeight(AppPlatform_linux *app_platform);
 

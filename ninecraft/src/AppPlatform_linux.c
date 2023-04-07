@@ -6,9 +6,9 @@
 #include <ninecraft/version_ids.h>
 #include <unistd.h>
 #include <GLFW/glfw3.h>
-#include <ninecraft/ninecraft_defs.h>
 #include <ninecraft/audio/sound_repository.h>
 #include <ninecraft/audio/audio_engine.h>
+#include <ninecraft/utils.h>
 
 extern GLFWwindow *_window;
 
@@ -19,7 +19,7 @@ void *app_platform_vtable_0_1_0[] = {
     (void *)AppPlatform_linux$createUserInput,
     (void *)AppPlatform_linux$getUserInputStatus,
     (void *)AppPlatform_linux$getUserInput,
-    (void *)AppPlatform_linux$getDateString,
+    (void *)AppPlatform_linux$getDateStringSTLP,
     (void *)AppPlatform_linux$checkLicense,
     (void *)AppPlatform_linux$hasBuyButtonWhenInvalidLicense,
     (void *)AppPlatform_linux$uploadPlatformDependentData,
@@ -39,7 +39,7 @@ void *app_platform_vtable_0_1_0_touch[] = {
     (void *)AppPlatform_linux$createUserInput,
     (void *)AppPlatform_linux$getUserInputStatus,
     (void *)AppPlatform_linux$getUserInput,
-    (void *)AppPlatform_linux$getDateString,
+    (void *)AppPlatform_linux$getDateStringSTLP,
     (void *)AppPlatform_linux$checkLicense,
     (void *)AppPlatform_linux$hasBuyButtonWhenInvalidLicense,
     (void *)AppPlatform_linux$uploadPlatformDependentData,
@@ -61,7 +61,7 @@ void *app_platform_vtable_0_1_1[] = {
     (void *)AppPlatform_linux$createUserInput,
     (void *)AppPlatform_linux$getUserInputStatus,
     (void *)AppPlatform_linux$getUserInput,
-    (void *)AppPlatform_linux$getDateString,
+    (void *)AppPlatform_linux$getDateStringSTLP,
     (void *)AppPlatform_linux$checkLicense,
     (void *)AppPlatform_linux$hasBuyButtonWhenInvalidLicense,
     (void *)AppPlatform_linux$uploadPlatformDependentData,
@@ -76,7 +76,7 @@ void *app_platform_vtable_0_1_1[] = {
     (void *)AppPlatform_linux$vibrate
 };
 
-void *app_platform_vtable_0_1_3[] = {
+void *app_platform_vtable_0_1_3_stlp[] = {
     (void *)AppPlatform_linux$destroy,
     (void *)AppPlatform_linux$destroy,
     (void *)AppPlatform_linux$saveScreenshot,
@@ -86,7 +86,33 @@ void *app_platform_vtable_0_1_3[] = {
     (void *)AppPlatform_linux$createUserInput,
     (void *)AppPlatform_linux$getUserInputStatus,
     (void *)AppPlatform_linux$getUserInput,
-    (void *)AppPlatform_linux$getDateString,
+    (void *)AppPlatform_linux$getDateStringSTLP,
+    (void *)AppPlatform_linux$checkLicense,
+    (void *)AppPlatform_linux$hasBuyButtonWhenInvalidLicense,
+    (void *)AppPlatform_linux$uploadPlatformDependentData,
+    (void *)AppPlatform_linux$_tick,
+    (void *)AppPlatform_linux$getScreenWidth,
+    (void *)AppPlatform_linux$getScreenHeight,
+    (void *)AppPlatform_linux$getPixelsPerMillimeter,
+    (void *)AppPlatform_linux$getOptionStrings,
+    (void *)AppPlatform_linux$isPowerVR,
+    (void *)AppPlatform_linux$buyGame,
+    (void *)AppPlatform_linux$finish,
+    (void *)AppPlatform_linux$isTouchscreen,
+    (void *)AppPlatform_linux$vibrate
+};
+
+void *app_platform_vtable_0_1_3_gnu[] = {
+    (void *)AppPlatform_linux$destroy,
+    (void *)AppPlatform_linux$destroy,
+    (void *)AppPlatform_linux$saveScreenshot,
+    (void *)AppPlatform_linux$loadTexture,
+    (void *)AppPlatform_linux$playSound,
+    (void *)AppPlatform_linux$showDialog,
+    (void *)AppPlatform_linux$createUserInput,
+    (void *)AppPlatform_linux$getUserInputStatus,
+    (void *)AppPlatform_linux$getUserInput,
+    (void *)AppPlatform_linux$getDateStringGNU,
     (void *)AppPlatform_linux$checkLicense,
     (void *)AppPlatform_linux$hasBuyButtonWhenInvalidLicense,
     (void *)AppPlatform_linux$uploadPlatformDependentData,
@@ -112,7 +138,7 @@ void *app_platform_vtable_0_3_0[] = {
     (void *)AppPlatform_linux$createUserInput,
     (void *)AppPlatform_linux$getUserInputStatus,
     (void *)AppPlatform_linux$getUserInput,
-    (void *)AppPlatform_linux$getDateString,
+    (void *)AppPlatform_linux$getDateStringSTLP,
     (void *)AppPlatform_linux$checkLicense,
     (void *)AppPlatform_linux$hasBuyButtonWhenInvalidLicense,
     (void *)AppPlatform_linux$uploadPlatformDependentData,
@@ -139,7 +165,7 @@ void *app_platform_vtable_0_3_2[] = {
     (void *)AppPlatform_linux$createUserInput,
     (void *)AppPlatform_linux$getUserInputStatus,
     (void *)AppPlatform_linux$getUserInput,
-    (void *)AppPlatform_linux$getDateString,
+    (void *)AppPlatform_linux$getDateStringSTLP,
     (void *)AppPlatform_linux$checkLicense,
     (void *)AppPlatform_linux$hasBuyButtonWhenInvalidLicense,
     (void *)AppPlatform_linux$uploadPlatformDependentData,
@@ -154,10 +180,10 @@ void *app_platform_vtable_0_3_2[] = {
     (void *)AppPlatform_linux$finish,
     (void *)AppPlatform_linux$isTouchscreen,
     (void *)AppPlatform_linux$vibrate,
-    (void *)AppPlatform_linux$getPlatformStringVar
+    (void *)AppPlatform_linux$getPlatformStringVarSTLP
 };
 
-void *app_platform_vtable_0_4_0[] = {
+void *app_platform_vtable_0_4_0_stlp[] = {
     (void *)AppPlatform_linux$destroy,
     (void *)AppPlatform_linux$destroy,
     (void *)AppPlatform_linux$saveScreenshot,
@@ -167,7 +193,7 @@ void *app_platform_vtable_0_4_0[] = {
     (void *)AppPlatform_linux$createUserInput,
     (void *)AppPlatform_linux$getUserInputStatus,
     (void *)AppPlatform_linux$getUserInput,
-    (void *)AppPlatform_linux$getDateString,
+    (void *)AppPlatform_linux$getDateStringSTLP,
     (void *)AppPlatform_linux$checkLicense,
     (void *)AppPlatform_linux$hasBuyButtonWhenInvalidLicense,
     (void *)AppPlatform_linux$uploadPlatformDependentData,
@@ -183,7 +209,36 @@ void *app_platform_vtable_0_4_0[] = {
     (void *)AppPlatform_linux$finish,
     (void *)AppPlatform_linux$isTouchscreen,
     (void *)AppPlatform_linux$vibrate,
-    (void *)AppPlatform_linux$getPlatformStringVar
+    (void *)AppPlatform_linux$getPlatformStringVarSTLP
+};
+
+void *app_platform_vtable_0_4_0_gnu[] = {
+    (void *)AppPlatform_linux$destroy,
+    (void *)AppPlatform_linux$destroy,
+    (void *)AppPlatform_linux$saveScreenshot,
+    (void *)AppPlatform_linux$loadTexture,
+    (void *)AppPlatform_linux$playSound,
+    (void *)AppPlatform_linux$showDialog,
+    (void *)AppPlatform_linux$createUserInput,
+    (void *)AppPlatform_linux$getUserInputStatus,
+    (void *)AppPlatform_linux$getUserInput,
+    (void *)AppPlatform_linux$getDateStringGNU,
+    (void *)AppPlatform_linux$checkLicense,
+    (void *)AppPlatform_linux$hasBuyButtonWhenInvalidLicense,
+    (void *)AppPlatform_linux$uploadPlatformDependentData,
+    (void *)AppPlatform_linux$readAssetFile,
+    (void *)AppPlatform_linux$_tick,
+    (void *)AppPlatform_linux$getScreenWidth,
+    (void *)AppPlatform_linux$getScreenHeight,
+    (void *)AppPlatform_linux$getPixelsPerMillimeter,
+    (void *)AppPlatform_linux$isNetworkEnabled,
+    (void *)AppPlatform_linux$getOptionStrings,
+    (void *)AppPlatform_linux$isPowerVR,
+    (void *)AppPlatform_linux$buyGame,
+    (void *)AppPlatform_linux$finish,
+    (void *)AppPlatform_linux$isTouchscreen,
+    (void *)AppPlatform_linux$vibrate,
+    (void *)AppPlatform_linux$getPlatformStringVarGNU
 };
 
 void *app_platform_vtable_0_6_0[] = {
@@ -196,7 +251,7 @@ void *app_platform_vtable_0_6_0[] = {
     (void *)AppPlatform_linux$createUserInput,
     (void *)AppPlatform_linux$getUserInputStatus,
     (void *)AppPlatform_linux$getUserInput,
-    (void *)AppPlatform_linux$getDateString,
+    (void *)AppPlatform_linux$getDateStringSTLP,
     (void *)AppPlatform_linux$checkLicense,
     (void *)AppPlatform_linux$hasBuyButtonWhenInvalidLicense,
     (void *)AppPlatform_linux$uploadPlatformDependentData,
@@ -213,7 +268,7 @@ void *app_platform_vtable_0_6_0[] = {
     (void *)AppPlatform_linux$finish,
     (void *)AppPlatform_linux$isTouchscreen,
     (void *)AppPlatform_linux$vibrate,
-    (void *)AppPlatform_linux$getPlatformStringVar,
+    (void *)AppPlatform_linux$getPlatformStringVarSTLP,
     (void *)AppPlatform_linux$showKeyboard,
     (void *)AppPlatform_linux$hideKeyboard,
     (void *)AppPlatform_linux$isKeyboardVisible,
@@ -230,7 +285,7 @@ void *app_platform_vtable_0_7_0[] = {
     (void *)AppPlatform_linux$createUserInput,
     (void *)AppPlatform_linux$getUserInputStatus,
     (void *)AppPlatform_linux$getUserInput,
-    (void *)AppPlatform_linux$getDateString,
+    (void *)AppPlatform_linux$getDateStringSTLP,
     (void *)AppPlatform_linux$checkLicense,
     (void *)AppPlatform_linux$hasBuyButtonWhenInvalidLicense,
     (void *)AppPlatform_linux$uploadPlatformDependentData,
@@ -248,7 +303,7 @@ void *app_platform_vtable_0_7_0[] = {
     (void *)AppPlatform_linux$supportsTouchscreen,
     (void *)AppPlatform_linux$supportsVibration,
     (void *)AppPlatform_linux$vibrate,
-    (void *)AppPlatform_linux$getPlatformStringVar,
+    (void *)AppPlatform_linux$getPlatformStringVarSTLP,
     (void *)AppPlatform_linux$showKeyboard,
     (void *)AppPlatform_linux$hideKeyboard,
     (void *)AppPlatform_linux$isKeyboardVisible,
@@ -272,7 +327,7 @@ void *app_platform_vtable_0_7_2[] = {
     (void *)AppPlatform_linux$createUserInput,
     (void *)AppPlatform_linux$getUserInputStatus,
     (void *)AppPlatform_linux$getUserInput,
-    (void *)AppPlatform_linux$getDateString,
+    (void *)AppPlatform_linux$getDateStringSTLP,
     (void *)AppPlatform_linux$checkLicense,
     (void *)AppPlatform_linux$hasBuyButtonWhenInvalidLicense,
     (void *)AppPlatform_linux$uploadPlatformDependentData,
@@ -290,7 +345,7 @@ void *app_platform_vtable_0_7_2[] = {
     (void *)AppPlatform_linux$supportsTouchscreen,
     (void *)AppPlatform_linux$supportsVibration,
     (void *)AppPlatform_linux$vibrate,
-    (void *)AppPlatform_linux$getPlatformStringVar,
+    (void *)AppPlatform_linux$getPlatformStringVarSTLP,
     (void *)AppPlatform_linux$showKeyboard,
     (void *)AppPlatform_linux$hideKeyboard,
     (void *)AppPlatform_linux$isKeyboardVisible,
@@ -361,11 +416,11 @@ void AppPlatform_linux$AppPlatform_linux(AppPlatform_linux *app_platform, void *
     } else if (version_id == version_id_0_6_1) {
         app_platform->vtable = app_platform_vtable_0_6_0;
     } else if (version_id == version_id_0_5_0) {
-        app_platform->vtable = app_platform_vtable_0_4_0;
+        app_platform->vtable = app_platform_vtable_0_4_0_stlp;
     } else if (version_id == version_id_0_5_0_j) {
-        app_platform->vtable = app_platform_vtable_0_4_0;
+        app_platform->vtable = app_platform_vtable_0_4_0_gnu;
     } else if (version_id == version_id_0_4_0) {
-        app_platform->vtable = app_platform_vtable_0_4_0;
+        app_platform->vtable = app_platform_vtable_0_4_0_stlp;
     } else if (version_id == version_id_0_3_3) {
         app_platform->vtable = app_platform_vtable_0_3_2;
     } else if (version_id == version_id_0_3_2) {
@@ -373,15 +428,13 @@ void AppPlatform_linux$AppPlatform_linux(AppPlatform_linux *app_platform, void *
     } else if (version_id == version_id_0_3_0) {
         app_platform->vtable = app_platform_vtable_0_3_0;
     } else if (version_id == version_id_0_2_2) {
-        app_platform->vtable = app_platform_vtable_0_1_3;
+        app_platform->vtable = app_platform_vtable_0_1_3_stlp;
     } else if (version_id == version_id_0_2_1) {
-        app_platform->vtable = app_platform_vtable_0_1_3;
+        app_platform->vtable = app_platform_vtable_0_1_3_gnu;
     } else if (version_id == version_id_0_2_0) {
-        app_platform->vtable = app_platform_vtable_0_1_3;
+        app_platform->vtable = app_platform_vtable_0_1_3_gnu;
     } else if (version_id == version_id_0_1_3) {
-        app_platform->vtable = app_platform_vtable_0_1_3;
-    } else if (version_id == version_id_0_1_2) {
-        app_platform->vtable = app_platform_vtable_0_1_1;
+        app_platform->vtable = app_platform_vtable_0_1_3_stlp;
     } else if (version_id == version_id_0_1_1) {
         app_platform->vtable = app_platform_vtable_0_1_1;
     } else if (version_id == version_id_0_1_0_touch) {
@@ -419,93 +472,22 @@ void AppPlatform_linux$finish(AppPlatform_linux *app_platform) {
     puts("debug: AppPlatform_linux::finish");
 }
 
-void AppPlatform_linux$getDateString(android_string_t *return_value, AppPlatform_linux *app_platform, unsigned int seconds) {
+NINECRAFT_CSR_FUNCDEF(android_string_stlp_t, AppPlatform_linux$getDateStringSTLP, AppPlatform_linux *app_platform, unsigned int seconds) {
     puts("debug: AppPlatform_linux::getDateString");
+    android_string_stlp_t str;
+    char date[200];
+    date_str(date, seconds);
+    android_string_cstr((android_string_t *)&str, date);
+    NINECRAFT_CSR_RETURN(str);
+}
 
-    int daysOfMonth[] = { 31, 28, 31, 30, 31, 30, 31, 31, 30, 31, 30, 31 };
-    int currYear, daysTillNow, extraTime, extraDays, index, date, month, hours, minutes, secondss, flag = 0;
- 
-    daysTillNow = seconds / (24 * 60 * 60);
-    extraTime = seconds % (24 * 60 * 60);
-    currYear = 1970;
- 
-    // Calculating current year
-    while (daysTillNow >= 365) {
-        if (currYear % 400 == 0
-            || (currYear % 4 == 0
-                && currYear % 100 != 0)) {
-            daysTillNow -= 366;
-        }
-        else {
-            daysTillNow -= 365;
-        }
-        currYear += 1;
-    }
-
-    extraDays = daysTillNow + 1;
- 
-    if (currYear % 400 == 0
-        || (currYear % 4 == 0
-            && currYear % 100 != 0))
-        flag = 1;
- 
-    month = 0, index = 0;
-    if (flag == 1) {
-        while (true) {
- 
-            if (index == 1) {
-                if (extraDays - 29 < 0)
-                    break;
-                month += 1;
-                extraDays -= 29;
-            }
-            else {
-                if (extraDays
-                        - daysOfMonth[index]
-                    < 0) {
-                    break;
-                }
-                month += 1;
-                extraDays -= daysOfMonth[index];
-            }
-            index += 1;
-        }
-    }
-    else {
-        while (true) {
- 
-            if (extraDays
-                    - daysOfMonth[index]
-                < 0) {
-                break;
-            }
-            month += 1;
-            extraDays -= daysOfMonth[index];
-            index += 1;
-        }
-    }
- 
-    if (extraDays > 0) {
-        month += 1;
-        date = extraDays;
-    }
-    else {
-        if (month == 2 && flag == 1)
-            date = 29;
-        else {
-            date = daysOfMonth[month - 1];
-        }
-    }
- 
-    hours = extraTime / 3600;
-    minutes = (extraTime % 3600) / 60;
-    secondss = (extraTime % 3600) % 60;
-
-    char ans[200];
-    
-    sprintf(ans, "%d/%d/%d %d:%d:%d", date, month, currYear, hours, minutes, secondss);
-    
-    android_string_cstr(return_value, (char *) ans);
+NINECRAFT_CSR_FUNCDEF(android_string_gnu_t, AppPlatform_linux$getDateStringGNU, AppPlatform_linux *app_platform, unsigned int seconds) {
+    puts("debug: AppPlatform_linux::getDateString");
+    android_string_gnu_t str;
+    char date[200];
+    date_str(date, seconds);
+    android_string_cstr((android_string_t *)&str, date);
+    NINECRAFT_CSR_RETURN(str);
 }
 
 int AppPlatform_linux$getKeyFromKeyCode(AppPlatform_linux *app_platform, unsigned int key_code, unsigned int meta_state, unsigned int device_id) {
@@ -538,9 +520,18 @@ NINECRAFT_FLOAT_FUNC float AppPlatform_linux$getPixelsPerMillimeter(AppPlatform_
     return (((float)cw + (float)ch) * 0.5f ) / 25.4f;
 }
 
-void AppPlatform_linux$getPlatformStringVar(android_string_t *return_value, AppPlatform_linux *app_platform, int zero) {
+NINECRAFT_CSR_FUNCDEF(android_string_stlp_t, AppPlatform_linux$getPlatformStringVarSTLP, AppPlatform_linux *app_platform, int zero) {
     puts("debug: AppPlatform_linux::getPlatformStringVar");
-    android_string_cstr(return_value, "Linux");
+    android_string_stlp_t str;
+    android_string_cstr((android_string_t *)&str, "Linux");
+    NINECRAFT_CSR_RETURN(str);
+}
+
+NINECRAFT_CSR_FUNCDEF(android_string_gnu_t, AppPlatform_linux$getPlatformStringVarGNU, AppPlatform_linux *app_platform, int zero) {
+    puts("debug: AppPlatform_linux::getPlatformStringVar");
+    android_string_gnu_t str;
+    android_string_cstr((android_string_t *)&str, "Linux");
+    NINECRAFT_CSR_RETURN(str);
 }
 
 int AppPlatform_linux$getScreenHeight(AppPlatform_linux *app_platform) {

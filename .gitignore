@@ -18,6 +18,7 @@ lib2/
 /*.cpp
 /*.py
 /*.txt
+!stl_notes.txt
 a.out
 *.so
 *.o
