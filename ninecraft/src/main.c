@@ -691,7 +691,11 @@ int main(int argc, char **argv) {
         } else if (strncmp(verstr, "v0.3.3", 6) == 0) {
             version_id = version_id_0_3_3;
         } else if (strncmp(verstr, "v0.4.0", 6) == 0) {
-            version_id = version_id_0_4_0;
+            if (android_alloc_node_alloc != NULL) { // just a hacky way to check if its a j version
+                version_id = version_id_0_4_0;
+            } else {
+                version_id = version_id_0_4_0_j;
+            }
         } else if (strncmp(verstr, "v0.5.0", 6) == 0) {
             if (android_alloc_node_alloc != NULL) { // just a hacky way to check if its a j version
                 version_id = version_id_0_5_0;
@@ -838,6 +842,9 @@ int main(int argc, char **argv) {
     } else if (version_id == version_id_0_5_0 || version_id == version_id_0_6_0 || version_id == version_id_0_6_1) {
         android_string_equ((android_string_t *)(ninecraft_app + 3544), "./storage/internal/");
         android_string_equ((android_string_t *)(ninecraft_app + 3568), "./storage/external/");
+    } else if (version_id == version_id_0_4_0_j) {
+        android_string_equ((android_string_t *)(ninecraft_app + 3140), "./storage/internal/");
+        android_string_equ((android_string_t *)(ninecraft_app + 3144), "./storage/external/");
     } else if (version_id == version_id_0_4_0) {
         android_string_equ((android_string_t *)(ninecraft_app + 3540), "./storage/internal/");
         android_string_equ((android_string_t *)(ninecraft_app + 3564), "./storage/external/");
@@ -903,6 +910,8 @@ int main(int argc, char **argv) {
         minecraft_isgrabbed_offset = MINECRAFT_ISGRABBED_OFFSET_0_5_0_J;
     } else if (version_id == version_id_0_4_0) {
         minecraft_isgrabbed_offset = MINECRAFT_ISGRABBED_OFFSET_0_4_0;
+    } else if (version_id == version_id_0_4_0_j) {
+        minecraft_isgrabbed_offset = MINECRAFT_ISGRABBED_OFFSET_0_4_0_J;
     } else if (version_id == version_id_0_3_3) {
         minecraft_isgrabbed_offset = MINECRAFT_ISGRABBED_OFFSET_0_3_3;
     } else if (version_id == version_id_0_3_2) {
