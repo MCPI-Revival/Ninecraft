@@ -128,7 +128,7 @@ void *app_platform_vtable_0_1_3_gnu[] = {
     (void *)AppPlatform_linux$vibrate
 };
 
-void *app_platform_vtable_0_3_0[] = {
+void *app_platform_vtable_0_3_0_stlp[] = {
     (void *)AppPlatform_linux$destroy,
     (void *)AppPlatform_linux$destroy,
     (void *)AppPlatform_linux$saveScreenshot,
@@ -139,6 +139,33 @@ void *app_platform_vtable_0_3_0[] = {
     (void *)AppPlatform_linux$getUserInputStatus,
     (void *)AppPlatform_linux$getUserInput,
     (void *)AppPlatform_linux$getDateStringSTLP,
+    (void *)AppPlatform_linux$checkLicense,
+    (void *)AppPlatform_linux$hasBuyButtonWhenInvalidLicense,
+    (void *)AppPlatform_linux$uploadPlatformDependentData,
+    (void *)AppPlatform_linux$readAssetFile,
+    (void *)AppPlatform_linux$_tick,
+    (void *)AppPlatform_linux$getScreenWidth,
+    (void *)AppPlatform_linux$getScreenHeight,
+    (void *)AppPlatform_linux$getPixelsPerMillimeter,
+    (void *)AppPlatform_linux$getOptionStrings,
+    (void *)AppPlatform_linux$isPowerVR,
+    (void *)AppPlatform_linux$buyGame,
+    (void *)AppPlatform_linux$finish,
+    (void *)AppPlatform_linux$isTouchscreen,
+    (void *)AppPlatform_linux$vibrate
+};
+
+void *app_platform_vtable_0_3_0_gnu[] = {
+    (void *)AppPlatform_linux$destroy,
+    (void *)AppPlatform_linux$destroy,
+    (void *)AppPlatform_linux$saveScreenshot,
+    (void *)AppPlatform_linux$loadTexture,
+    (void *)AppPlatform_linux$playSound,
+    (void *)AppPlatform_linux$showDialog,
+    (void *)AppPlatform_linux$createUserInput,
+    (void *)AppPlatform_linux$getUserInputStatus,
+    (void *)AppPlatform_linux$getUserInput,
+    (void *)AppPlatform_linux$getDateStringGNU,
     (void *)AppPlatform_linux$checkLicense,
     (void *)AppPlatform_linux$hasBuyButtonWhenInvalidLicense,
     (void *)AppPlatform_linux$uploadPlatformDependentData,
@@ -464,7 +491,9 @@ void AppPlatform_linux$AppPlatform_linux(AppPlatform_linux *app_platform, void *
     } else if (version_id == version_id_0_3_2_j) {
         app_platform->vtable = app_platform_vtable_0_3_2_gnu;
     } else if (version_id == version_id_0_3_0) {
-        app_platform->vtable = app_platform_vtable_0_3_0;
+        app_platform->vtable = app_platform_vtable_0_3_0_stlp;
+    } else if (version_id == version_id_0_3_0_j) {
+        app_platform->vtable = app_platform_vtable_0_3_0_gnu;
     } else if (version_id == version_id_0_2_2) {
         app_platform->vtable = app_platform_vtable_0_1_3_stlp;
     } else if (version_id == version_id_0_2_1) {
