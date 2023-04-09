@@ -769,6 +769,10 @@ int main(int argc, char **argv) {
             version_id = version_id_0_1_1;
         } else if (strncmp(info.dli_fbase + 0xf5154, "v0.1.1", 6) == 0) { // v0.1.1-demo
             version_id = version_id_0_1_1;
+        } else if (strncmp(info.dli_fbase + 0x19557c, "v0.1.1", 6) == 0) { // v0.1.1j
+            version_id = version_id_0_1_1_j;
+        } else if (strncmp(info.dli_fbase + 0x191ce4, "v0.1.1", 6) == 0) { // v0.1.1j-demo
+            version_id = version_id_0_1_1_j;
         } else if (strncmp(info.dli_fbase + 0x119c64, "v0.1.0", 6) == 0) { // v0.1.0-touch
             version_id = version_id_0_1_0_touch;
         } else if (strncmp(info.dli_fbase + 0x131480, "v0.1.0", 6) == 0) { // v0.1.0
@@ -810,6 +814,8 @@ int main(int argc, char **argv) {
         ninecraft_app_size = NINECRAFTAPP_SIZE_0_1_0_TOUCH;
     } else if (version_id == version_id_0_1_1) {
         ninecraft_app_size = NINECRAFTAPP_SIZE_0_1_1;
+    } else if (version_id == version_id_0_1_1_j) {
+        ninecraft_app_size = NINECRAFTAPP_SIZE_0_1_1_J;
     } else if (version_id == version_id_0_1_2) {
         ninecraft_app_size = NINECRAFTAPP_SIZE_0_1_2;
     } else if (version_id == version_id_0_1_2_j) {
@@ -910,7 +916,7 @@ int main(int argc, char **argv) {
         android_string_equ((android_string_t *)(ninecraft_app + 3060), "./storage/external/");
     } else if (version_id == version_id_0_1_3 || version_id == version_id_0_1_3_j) {
         android_string_equ((android_string_t *)(ninecraft_app + 3456), "./storage/external/");
-    } else if (version_id == version_id_0_1_2 || version_id == version_id_0_1_1 || version_id == version_id_0_1_2_j) {
+    } else if (version_id == version_id_0_1_2 || version_id == version_id_0_1_1 || version_id == version_id_0_1_2_j || version_id == version_id_0_1_1_j) {
         android_string_equ((android_string_t *)(ninecraft_app + 3440), "./storage/external/");
     } else if (version_id == version_id_0_1_0_touch) {
         android_string_equ((android_string_t *)(ninecraft_app + 3432), "./storage/external/");
@@ -993,6 +999,8 @@ int main(int argc, char **argv) {
         minecraft_isgrabbed_offset = MINECRAFT_ISGRABBED_OFFSET_0_1_2_J;
     } else if (version_id == version_id_0_1_1) {
         minecraft_isgrabbed_offset = MINECRAFT_ISGRABBED_OFFSET_0_1_1;
+    } else if (version_id == version_id_0_1_1_j) {
+        minecraft_isgrabbed_offset = MINECRAFT_ISGRABBED_OFFSET_0_1_1_J;
     } else if (version_id == version_id_0_1_0_touch) {
         minecraft_isgrabbed_offset = MINECRAFT_ISGRABBED_OFFSET_0_1_0_TOUCH;
     } else if (version_id == version_id_0_1_0) {

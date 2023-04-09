@@ -514,6 +514,8 @@ void AppPlatform_linux$AppPlatform_linux(AppPlatform_linux *app_platform, void *
         app_platform->vtable = app_platform_vtable_0_1_1;
     } else if (version_id == version_id_0_1_1) {
         app_platform->vtable = app_platform_vtable_0_1_1;
+    } else if (version_id == version_id_0_1_1_j) {
+        app_platform->vtable = app_platform_vtable_0_1_1;
     } else if (version_id == version_id_0_1_0_touch) {
         app_platform->vtable = app_platform_vtable_0_1_0_touch;
     } else if (version_id == version_id_0_1_0) {

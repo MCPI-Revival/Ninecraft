@@ -5,6 +5,7 @@ enum {
     version_id_0_1_0,
     version_id_0_1_0_touch,
     version_id_0_1_1,
+    version_id_0_1_1_j,
     version_id_0_1_2,
     version_id_0_1_2_j,
     version_id_0_1_3,
