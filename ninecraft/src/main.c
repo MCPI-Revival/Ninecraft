@@ -687,7 +687,11 @@ int main(int argc, char **argv) {
         } else if (strncmp(verstr, "v0.3.0", 6) == 0) {
             version_id = version_id_0_3_0;
         } else if (strncmp(verstr, "v0.3.2", 6) == 0) {
-            version_id = version_id_0_3_2;
+            if (android_alloc_node_alloc != NULL) { // just a hacky way to check if its a j version
+                version_id = version_id_0_3_2;
+            } else {
+                version_id = version_id_0_3_2_j;
+            }
         } else if (strncmp(verstr, "v0.3.3", 6) == 0) {
             if (android_alloc_node_alloc != NULL) { // just a hacky way to check if its a j version
                 version_id = version_id_0_3_3;
@@ -798,6 +802,8 @@ int main(int argc, char **argv) {
         ninecraft_app_size = NINECRAFTAPP_SIZE_0_3_0;
     } else if (version_id == version_id_0_3_2) {
         ninecraft_app_size = NINECRAFTAPP_SIZE_0_3_2;
+    } else if (version_id == version_id_0_3_2_j) {
+        ninecraft_app_size = NINECRAFTAPP_SIZE_0_3_2_J;
     } else if (version_id == version_id_0_3_3) {
         ninecraft_app_size = NINECRAFTAPP_SIZE_0_3_3;
     } else if (version_id == version_id_0_3_3_j) {
@@ -860,6 +866,8 @@ int main(int argc, char **argv) {
     } else if (version_id == version_id_0_3_3) {
         android_string_equ((android_string_t *)(ninecraft_app + 3536), "./storage/internal/");
         android_string_equ((android_string_t *)(ninecraft_app + 3560), "./storage/external/");
+    } else if (version_id == version_id_0_3_2_j) {
+        android_string_equ((android_string_t *)(ninecraft_app + 3128), "./storage/external/");
     } else if (version_id == version_id_0_3_2 || version_id == version_id_0_3_0) {
         android_string_equ((android_string_t *)(ninecraft_app + 3528), "./storage/external/");
     } else if (version_id == version_id_0_2_2) {
@@ -927,6 +935,8 @@ int main(int argc, char **argv) {
         minecraft_isgrabbed_offset = MINECRAFT_ISGRABBED_OFFSET_0_3_3_J;
     } else if (version_id == version_id_0_3_2) {
         minecraft_isgrabbed_offset = MINECRAFT_ISGRABBED_OFFSET_0_3_2;
+    } else if (version_id == version_id_0_3_2_j) {
+        minecraft_isgrabbed_offset = MINECRAFT_ISGRABBED_OFFSET_0_3_2_J;
     } else if (version_id == version_id_0_3_0) {
         minecraft_isgrabbed_offset = MINECRAFT_ISGRABBED_OFFSET_0_3_0;
     } else if (version_id == version_id_0_2_2) {

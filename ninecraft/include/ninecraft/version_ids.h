@@ -12,6 +12,7 @@ enum {
     version_id_0_2_2,
     version_id_0_3_0,
     version_id_0_3_2,
+    version_id_0_3_2_j,
     version_id_0_3_3,
     version_id_0_3_3_j,
     version_id_0_4_0,
