@@ -507,7 +507,11 @@ void AppPlatform_linux$AppPlatform_linux(AppPlatform_linux *app_platform, void *
     } else if (version_id == version_id_0_1_3) {
         app_platform->vtable = app_platform_vtable_0_1_3_stlp;
     } else if (version_id == version_id_0_1_3_j) {
-        app_platform->vtable = app_platform_vtable_0_1_3_gnu;
+        app_platform->vtable = app_platform_vtable_0_1_3_stlp;
+    } else if (version_id == version_id_0_1_2) {
+        app_platform->vtable = app_platform_vtable_0_1_1;
+    } else if (version_id == version_id_0_1_2_j) {
+        app_platform->vtable = app_platform_vtable_0_1_1;
     } else if (version_id == version_id_0_1_1) {
         app_platform->vtable = app_platform_vtable_0_1_1;
     } else if (version_id == version_id_0_1_0_touch) {
