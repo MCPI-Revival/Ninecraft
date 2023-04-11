@@ -43,6 +43,8 @@ size_t android_string_tsize();
 
 extern void android_string_cstr(android_string_t *__this, char *__s);
 
+void android_string_destroy(android_string_t *__this);
+
 extern void android_string_equ(android_string_t *__this, char *__s);
 
 #endif

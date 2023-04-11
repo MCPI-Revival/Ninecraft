@@ -10,8 +10,7 @@
 #include <ninecraft/options.h>
 #include <ninecraft/ninecraft_defs.h>
 
-typedef struct
-{
+typedef struct {
     void **vtable;
     void *handle;
     int status;
@@ -19,25 +18,37 @@ typedef struct
     ninecraft_options_t *options;
 } AppPlatform_linux;
 
-typedef struct
-{
+typedef struct {
     char *data;
     int size;
 } asset_file;
 
-typedef enum
-{
+typedef enum {
     did_new_world = 1,
     did_options = 3,
     did_rename_world = 4
 } platform_dialogue_id;
 
-typedef struct
-{
+typedef struct {
     android_string_t name;
     android_string_t seed;
     char filler[0x1000];
 } user_input;
+
+typedef struct {
+    android_string_gnu_t unknown0;
+    android_string_gnu_t unknown1;
+    android_string_gnu_t unknown2;
+    android_string_gnu_t unknown3;
+} login_information_t;
+
+login_information_t AppPlatform_linux$getLoginInformation(AppPlatform_linux *app_platform);
+
+void AppPlatform_linux$setLoginInformation(AppPlatform_linux *app_platform, login_information_t *info);
+
+void AppPlatform_linux$statsTrackData(AppPlatform_linux *app_platform, android_string_t *unknown0, android_string_t *unknown1);
+
+void AppPlatform_linux$updateStatsUserData(AppPlatform_linux *app_platform, android_string_t *unknown0, android_string_t *unknown1);
 
 void AppPlatform_linux$initWithActivity(AppPlatform_linux *app_platform, void *activity);
 

@@ -72,6 +72,14 @@ void android_string_cstr(android_string_t *__this, char *__s) {
     }
 }
 
+void android_string_destroy(android_string_t *__this) {
+    if (android_alloc_node_alloc != NULL) {
+        android_string_deallocate_block(__this);
+    } else {
+        free(__this->gnu.data - 0x0c);
+    }
+}
+
 void android_string_equ(android_string_t *__this, char *__s) {
     if (android_string_assign) {
         android_string_assign(__this, __s, __s + strlen(__s));
