@@ -121,3 +121,7 @@ NINECRAFT_FLOAT_FUNC double math_frexp(double __x, int *__exponent) {
 NINECRAFT_FLOAT_FUNC double math_log10(double __x) {
     return log10(__x);
 }
+
+NINECRAFT_FLOAT_FUNC float math_modff(float __x, float *__iptr) {
+    return modff(__x, __iptr);   
+}

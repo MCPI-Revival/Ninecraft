@@ -1,6 +1,5 @@
 #include <ninecraft/gfx/gles_compat.h>
 #include <GLES/gl.h>
-#include <ninecraft/ninecraft_defs.h>
 
 NINECRAFT_FLOAT_FUNC void gl_alpha_func(GLenum func, GLclampf ref) {
     glAlphaFunc(func, ref);
@@ -204,4 +203,32 @@ void gl_draw_elements(GLenum mode, GLsizei count, GLenum type, const void *indic
 
 GLenum gl_get_error() {
     return glGetError();
+}
+
+void gl_gen_buffers(GLsizei n, GLuint *buffers) {
+    glGenBuffers(n, buffers);
+}
+
+void gl_stencil_func(GLenum func, GLint ref, GLuint mask) {
+    glStencilFunc(func, ref, mask);
+}
+
+void gl_stencil_mask(GLuint mask) {
+    glStencilMask(mask);
+}
+
+NINECRAFT_FLOAT_FUNC void gl_light_model_f(GLenum pname, GLfloat param) {
+    glLightModelf(pname, param);
+}
+
+NINECRAFT_FLOAT_FUNC void gl_light_f_v(GLenum light, GLenum pname, const GLfloat *params) {
+    glLightfv(light, pname, params);
+}
+
+void gl_normal_pointer(GLenum type, GLsizei stride, const GLvoid *pointer) {
+    glNormalPointer(type, stride, pointer);
+}
+
+void gl_stencil_op(GLenum fail, GLenum zfail, GLenum zpass) {
+    glStencilOp(fail, zfail, zpass);
 }

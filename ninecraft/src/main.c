@@ -391,8 +391,13 @@ void gles_hook() {
     hybris_hook("glViewport", (void *) gl_viewport);
     hybris_hook("glDrawElements", (void *) gl_draw_elements);
     hybris_hook("glGetError", (void *) gl_get_error);
-    hybris_hook("glGenBuffers", (void *) glGenBuffers);
-    
+    hybris_hook("glGenBuffers", (void *) gl_gen_buffers);
+    hybris_hook("glStencilFunc", (void *) gl_stencil_func);
+    hybris_hook("glStencilMask", (void *) gl_stencil_mask);
+    hybris_hook("glLightModelf", (void *) gl_light_model_f);
+    hybris_hook("glLightfv", (void *) gl_light_f_v);
+    hybris_hook("glNormalPointer", (void *) gl_normal_pointer);
+    hybris_hook("glStencilOp", (void *) gl_stencil_op);
 }
 
 void math_hook() {
@@ -426,6 +431,7 @@ void math_hook() {
     hybris_hook("exp", math_exp);
     hybris_hook("frexp", math_frexp);
     hybris_hook("log10", math_log10);
+    hybris_hook("modff", math_modff);
 }
 
 #ifdef __thumb2__
