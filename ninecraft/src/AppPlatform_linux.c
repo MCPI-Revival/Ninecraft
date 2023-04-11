@@ -532,7 +532,9 @@ void AppPlatform_linux$abortWebRequest(AppPlatform_linux *app_platform, int unkn
 }
 
 void AppPlatform_linux$AppPlatform_linux(AppPlatform_linux *app_platform, void *handle, int version_id, ninecraft_options_t *options) {
-    if (version_id == version_id_0_7_4) {
+    if (version_id == version_id_0_7_5) {
+        app_platform->vtable = app_platform_vtable_0_7_3;
+    } else if (version_id == version_id_0_7_4) {
         app_platform->vtable = app_platform_vtable_0_7_3;
     } else if (version_id == version_id_0_7_3) {
         app_platform->vtable = app_platform_vtable_0_7_3;
