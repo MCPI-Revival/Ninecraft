@@ -16,6 +16,7 @@ ninecraft_app_construct_t ninecraft_app_construct = NULL;
 ninecraft_app_init_t ninecraft_app_init = NULL;
 minecraft_set_size_t minecraft_set_size = NULL;
 ninecraft_app_update_t ninecraft_app_update = NULL;
+ninecraft_app_handle_back_t ninecraft_app_handle_back = NULL;
 
 void minecraft_setup_hooks(void *handle) {
     minecraft_level_generated = (minecraft_level_generated_t)internal_dlsym(handle, "_ZN9Minecraft15_levelGeneratedEv");
@@ -32,4 +33,5 @@ void minecraft_setup_hooks(void *handle) {
     ninecraft_app_init = (ninecraft_app_init_t)internal_dlsym(handle, "_ZN12NinecraftApp4initEv");
     minecraft_set_size = (minecraft_set_size_t)internal_dlsym(handle, "_ZN9Minecraft7setSizeEii");
     ninecraft_app_update = (ninecraft_app_update_t)internal_dlsym(handle, "_ZN12NinecraftApp6updateEv");
+    ninecraft_app_handle_back = (ninecraft_app_handle_back_t)internal_dlsym(handle, "_ZN12NinecraftApp10handleBackEb");
 }
