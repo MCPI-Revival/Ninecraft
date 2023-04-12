@@ -11,6 +11,14 @@ enum texture_type {
     texture_type_us4444 = 3
 };
 
+enum image_format {
+    image_format_u8888,
+    image_format_u888,
+    image_format_u565,
+    image_format_u5551,
+    image_format_u4444
+};
+
 typedef struct {
     uint32_t width;
     uint32_t height;
@@ -35,6 +43,15 @@ typedef struct {
     uint8_t alpha; // 12 0x0c
     uint8_t keep_buffer_data; // 13 0x0d
 } texture_data_old_t;
+
+typedef struct {
+    uint32_t width;
+    uint32_t height;
+    uint8_t *pixels;
+    int format;
+    int unknown0;
+    int mipmap_level;
+} image_data_t;
 
 extern png_data_t read_png(char *path);
 

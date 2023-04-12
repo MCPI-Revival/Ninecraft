@@ -42,6 +42,16 @@ typedef struct {
     android_string_gnu_t unknown3;
 } login_information_t;
 
+void AppPlatform_linux$updateTextBoxText(AppPlatform_linux *app_platform, android_string_t *text);
+
+bool AppPlatform_linux$hasIDEProfiler(AppPlatform_linux *app_platform);
+
+void AppPlatform_linux$loadTGA(AppPlatform_linux *app_platform, image_data_t *image, android_string_t *resource_path, bool alpha);
+
+NINECRAFT_CSR_FUNCDEF(android_string_gnu_t, AppPlatform_linux$getImagePath, AppPlatform_linux *app_platform, android_string_t *resource_path, bool is_full);
+
+void AppPlatform_linux$loadPNG(AppPlatform_linux *app_platform, image_data_t *image, android_string_t *resource_path, bool alpha);
+
 login_information_t AppPlatform_linux$getLoginInformation(AppPlatform_linux *app_platform);
 
 void AppPlatform_linux$setLoginInformation(AppPlatform_linux *app_platform, login_information_t *info);

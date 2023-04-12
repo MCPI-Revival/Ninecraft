@@ -9,6 +9,8 @@
 #include <ninecraft/audio/sound_repository.h>
 #include <ninecraft/audio/audio_engine.h>
 #include <ninecraft/utils.h>
+#define STB_IMAGE_IMPLEMENTATION
+#include <stb_image.h>
 
 extern GLFWwindow *_window;
 
@@ -460,6 +462,89 @@ void *app_platform_vtable_0_7_3[] = {
     (void *)AppPlatform_linux$abortWebRequest
 };
 
+void *app_platform_vtable_0_8_0[] = {
+    (void *)AppPlatform_linux$destroy,
+    (void *)AppPlatform_linux$destroy,
+    (void *)AppPlatform_linux$saveScreenshot,
+    (void *)AppPlatform_linux$getImagePath,
+    (void *)AppPlatform_linux$loadPNG,
+    (void *)AppPlatform_linux$loadTGA,
+    (void *)AppPlatform_linux$playSound,
+    (void *)AppPlatform_linux$showDialog,
+    (void *)AppPlatform_linux$createUserInput,
+    (void *)AppPlatform_linux$getUserInputStatus,
+    (void *)AppPlatform_linux$getUserInput,
+    (void *)AppPlatform_linux$getDateStringGNU,
+    (void *)AppPlatform_linux$checkLicense,
+    (void *)AppPlatform_linux$hasBuyButtonWhenInvalidLicense,
+    (void *)AppPlatform_linux$uploadPlatformDependentData,
+    (void *)AppPlatform_linux$readAssetFile,
+    (void *)AppPlatform_linux$_tick,
+    (void *)AppPlatform_linux$getScreenWidth,
+    (void *)AppPlatform_linux$getScreenHeight,
+    (void *)AppPlatform_linux$getPixelsPerMillimeter,
+    (void *)AppPlatform_linux$isNetworkEnabled,
+    (void *)AppPlatform_linux$openLoginWindow,
+    (void *)AppPlatform_linux$isPowerVR,
+    (void *)AppPlatform_linux$getKeyFromKeyCode,
+    (void *)AppPlatform_linux$buyGame,
+    (void *)AppPlatform_linux$finish,
+    (void *)AppPlatform_linux$supportsTouchscreen,
+    (void *)AppPlatform_linux$hasIDEProfiler,
+    (void *)AppPlatform_linux$supportsVibration,
+    (void *)AppPlatform_linux$vibrate,
+    (void *)AppPlatform_linux$getPlatformStringVarGNU,
+    (void *)AppPlatform_linux$showKeyboard,
+    (void *)AppPlatform_linux$hideKeyboard,
+    (void *)AppPlatform_linux$updateTextBoxText,
+    (void *)AppPlatform_linux$isKeyboardVisible,
+    (void *)AppPlatform_linux$getLoginInformation,
+    (void *)AppPlatform_linux$setLoginInformation,
+    (void *)AppPlatform_linux$clearSessionIDAndRefreshToken,
+    (void *)AppPlatform_linux$statsTrackData,
+    (void *)AppPlatform_linux$updateStatsUserData,
+    (void *)AppPlatform_linux$initWithActivity,
+    (void *)AppPlatform_linux$webRequest,
+    (void *)AppPlatform_linux$getWebRequestStatus,
+    (void *)AppPlatform_linux$getWebRequestContent,
+    (void *)AppPlatform_linux$abortWebRequest
+};
+
+void AppPlatform_linux$updateTextBoxText(AppPlatform_linux *app_platform, android_string_t *text) {
+    puts("debug: AppPlatform_linux::updateTextBoxText");
+}
+
+bool AppPlatform_linux$hasIDEProfiler(AppPlatform_linux *app_platform) {
+    puts("debug: AppPlatform_linux::hasIDEProfiler");
+    return false;
+}
+
+void AppPlatform_linux$loadTGA(AppPlatform_linux *app_platform, image_data_t *image, android_string_t *resource_path, bool alpha) {
+    puts("debug: AppPlatform_linux::loadTGA");
+    int channels;
+    image->pixels = stbi_load(android_string_to_str(resource_path), &image->width, &image->height, &channels, 0);
+}
+
+NINECRAFT_CSR_FUNCDEF(android_string_gnu_t, AppPlatform_linux$getImagePath, AppPlatform_linux *app_platform, android_string_t *resource_path, bool is_full) {
+    puts("debug: AppPlatform_linux::getImagePath");
+    if (is_full) {
+        char str[MAXPATHLEN];
+        getcwd(str, MAXPATHLEN);
+        strcat(str, "/assets/images/");
+        strcat(str, android_string_to_str(resource_path));
+        android_string_t out;
+        android_string_cstr(&out, str);
+        NINECRAFT_CSR_RETURN(out.gnu);
+    } else {
+        NINECRAFT_CSR_RETURN(resource_path->gnu);
+    }
+}
+
+void AppPlatform_linux$loadPNG(AppPlatform_linux *app_platform, image_data_t *image, android_string_t *resource_path, bool alpha) {
+    puts("debug: AppPlatform_linux::loadPNG");
+    image->pixels = stbi_load(android_string_to_str(resource_path), &image->width, &image->height, NULL, STBI_rgb_alpha);
+}
+
 login_information_t AppPlatform_linux$getLoginInformation(AppPlatform_linux *app_platform) {
     puts("debug: AppPlatform_linux::getLoginInformation");
     login_information_t info;
@@ -532,7 +617,9 @@ void AppPlatform_linux$abortWebRequest(AppPlatform_linux *app_platform, int unkn
 }
 
 void AppPlatform_linux$AppPlatform_linux(AppPlatform_linux *app_platform, void *handle, int version_id, ninecraft_options_t *options) {
-    if (version_id == version_id_0_7_6) {
+    if (version_id == version_id_0_8_0) {
+        app_platform->vtable = app_platform_vtable_0_8_0;
+    } else if (version_id == version_id_0_7_6) {
         app_platform->vtable = app_platform_vtable_0_7_3;
     } else if (version_id == version_id_0_7_5) {
         app_platform->vtable = app_platform_vtable_0_7_3;

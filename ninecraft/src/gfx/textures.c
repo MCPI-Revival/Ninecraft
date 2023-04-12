@@ -28,17 +28,35 @@ png_data_t read_png(char *path) {
         texture_data.pixels = NULL;
         return texture_data;
     }
+
+    unsigned char header[8];
+    if(fread(header, 8, 1, file) != 1) {
+        texture_data.height = 0;
+        texture_data.width = 0;
+        texture_data.pixels = NULL;
+        return texture_data;
+    }
+
+    if(png_sig_cmp(header, 0, 8)) {
+        texture_data.height = 0;
+        texture_data.width = 0;
+        texture_data.pixels = NULL;
+        return texture_data;
+    }
+
     if (setjmp(png_jmpbuf(png))) {
         texture_data.height = 0;
         texture_data.width = 0;
         return texture_data;
     }
     png_init_io(png, file);
+    png_set_sig_bytes(png, 8);
     png_read_info(png, info);
     texture_data.width = png_get_image_width(png, info);
     texture_data.height = png_get_image_height(png, info);
     png_byte color_type = png_get_color_type(png, info);
     png_byte bit_depth = png_get_bit_depth(png, info);
+
     if (bit_depth == 16)
         png_set_strip_16(png);
     if (color_type == PNG_COLOR_TYPE_PALETTE)
