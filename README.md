@@ -9,6 +9,7 @@ x86_64:
 sudo dpkg --add-architecture i386
 sudo apt update
 sudo apt install git make cmake gcc-i686-linux-gnu g++-i686-linux-gnu libopenal-dev:i386 libx11-dev:i386 libxrandr-dev:i386 libxinerama-dev:i386 libxcursor-dev:i386 libxi-dev:i386 libgles-dev:i386 zenity patchelf
+```
 arm64:
 ```
 sudo dpkg --add-architecture armhf
