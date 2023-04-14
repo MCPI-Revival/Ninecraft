@@ -439,6 +439,7 @@ void math_hook() {
     hybris_hook("frexp", math_frexp);
     hybris_hook("log10", math_log10);
     hybris_hook("modff", math_modff);
+    hybris_hook("ldexpf", math_ldexpf);
 }
 
 #ifdef __thumb2__
