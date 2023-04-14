@@ -31,7 +31,7 @@
 #include <wctype.h>
 #include <ninecraft/audio/sles.h>
 #include <ninecraft/audio/audio_engine.h>
-#include <zlib.h>
+#include <miniz.h>
 #include <fnmatch.h>
 
 #include <ninecraft/dlfcn_stub.h>
@@ -46,6 +46,9 @@
 #include <linux/futex.h>
 #include <sys/syscall.h>
 #include <ninecraft/options.h>
+
+#define STB_IMAGE_IMPLEMENTATION
+#include <stb_image.h>
 
 void *handle = NULL;
 GLFWwindow *_window = NULL;
@@ -565,12 +568,12 @@ void missing_hook() {
     hybris_hook("fnmatch", fnmatch);
     hybris_hook("__srget", __my_srget);
 
-    hybris_hook("deflateInit_", deflateInit_);
-    hybris_hook("deflateInit2_", deflateInit2_);
+    hybris_hook("deflateInit_", deflateInit);
+    hybris_hook("deflateInit2_", deflateInit2);
     hybris_hook("deflate", deflate);
     hybris_hook("deflateEnd", deflateEnd);
-    hybris_hook("inflateInit_", inflateInit_);
-    hybris_hook("inflateInit2_", inflateInit2_);
+    hybris_hook("inflateInit_", inflateInit);
+    hybris_hook("inflateInit2_", inflateInit2);
     hybris_hook("inflate", inflate);
     hybris_hook("inflateEnd", inflateEnd);
     hybris_hook("uncompress", uncompress);
@@ -637,14 +640,10 @@ int main(int argc, char **argv) {
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 1);
     glfwWindowHint(GLFW_CONTEXT_CREATION_API, GLFW_EGL_CONTEXT_API);
     _window = glfwCreateWindow(720, 480, "Ninecraft", NULL, NULL);
-    png_data_t icon = read_png("./res/drawable/iconx.png");
-    GLFWimage icon_glfw = {
-        .width = icon.width,
-        .height = icon.height,
-        .pixels = icon.pixels
-    };
-    glfwSetWindowIcon(_window, 1, &icon_glfw); 
-    free(icon.pixels);
+    GLFWimage icon;
+    icon.pixels = stbi_load("./res/drawable/iconx.png", &icon.width, &icon.height, NULL, STBI_rgb_alpha);
+    glfwSetWindowIcon(_window, 1, &icon); 
+    stbi_image_free(icon.pixels);
     if (!_window) {
         puts("cant create");
     }

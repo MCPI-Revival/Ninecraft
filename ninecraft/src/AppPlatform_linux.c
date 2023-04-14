@@ -9,7 +9,6 @@
 #include <ninecraft/audio/sound_repository.h>
 #include <ninecraft/audio/audio_engine.h>
 #include <ninecraft/utils.h>
-#define STB_IMAGE_IMPLEMENTATION
 #include <stb_image.h>
 
 extern GLFWwindow *_window;
@@ -915,76 +914,54 @@ bool AppPlatform_linux$isTouchscreen(AppPlatform_linux *app_platform) {
 
 texture_data_t AppPlatform_linux$loadTexture(AppPlatform_linux *app_platform, android_string_t *path_str, bool alpha) {
     puts("debug: AppPlatform_linux::loadTexture");
-    printf("%p\n", app_platform);
-    char *path = android_string_to_str(path_str);
-    size_t pathlen = strlen(path);
-    char *fullpath_original = (char *) malloc(10 + pathlen);
-    memcpy(fullpath_original, "./assets/", 9);
-    memcpy(fullpath_original+9, path, pathlen+1);
-    char *fullpath_internal_overrides = (char *) malloc(29 + pathlen);
-    memcpy(fullpath_internal_overrides, "./internal_overrides/assets/", 28);
-    memcpy(fullpath_internal_overrides+28, path, pathlen+1);
-    char *fullpath_overrides = (char *) malloc(20 + pathlen);
-    memcpy(fullpath_overrides, "./overrides/assets/", 19);
-    memcpy(fullpath_overrides+19, path, pathlen+1);
-    char *fullpath = NULL;
-    if(access(fullpath_overrides, F_OK) == 0) {
-        fullpath = fullpath_overrides;
-    } else if(access(fullpath_internal_overrides, F_OK) == 0) {
-        fullpath = fullpath_internal_overrides;
-    } else if(access(fullpath_original, F_OK) == 0) {
-        fullpath = fullpath_original;
+    char *resource = android_string_to_str(path_str);
+    char path[MAXPATHLEN];
+    getcwd(path, MAXPATHLEN);
+    strcat(path, "/overrides/assets/");
+    strcat(path, resource);
+    if (access(path, F_OK) != 0) {
+        getcwd(path, MAXPATHLEN);
+        strcat(path, "/internal_overrides/assets/");
+        strcat(path, resource);
+        if (access(path, F_OK) != 0) {
+            getcwd(path, MAXPATHLEN);
+            strcat(path, "/assets/");
+            strcat(path, resource);
+        }
     }
-    png_data_t png_data = read_png(fullpath);
-    free(fullpath_original);
-    free(fullpath_internal_overrides);
-    free(fullpath_overrides);
     texture_data_t texture_data = {
-        .width = png_data.width,
-        .height = png_data.height,
-        .pixels = png_data.pixels,
         .unknown = 0,
         .alpha = 1,
         .keep_buffer_data = 0,
         .texture_type = texture_type_ub,
         .unknown2 = 0xffffffff
     };
+    texture_data.pixels = stbi_load(path, &texture_data.width, &texture_data.height, NULL, STBI_rgb_alpha);
     return texture_data;
 }
 
 texture_data_old_t AppPlatform_linux$loadTextureOld(AppPlatform_linux *app_platform, android_string_t *path_str, bool alpha) {
     puts("debug: AppPlatform_linux::loadTexture");
-    printf("%p\n", app_platform);
-    char *path = android_string_to_str(path_str);
-    size_t pathlen = strlen(path);
-    char *fullpath_original = (char *) malloc(10 + pathlen);
-    memcpy(fullpath_original, "./assets/", 9);
-    memcpy(fullpath_original+9, path, pathlen+1);
-    char *fullpath_internal_overrides = (char *) malloc(29 + pathlen);
-    memcpy(fullpath_internal_overrides, "./internal_overrides/assets/", 28);
-    memcpy(fullpath_internal_overrides+28, path, pathlen+1);
-    char *fullpath_overrides = (char *) malloc(20 + pathlen);
-    memcpy(fullpath_overrides, "./overrides/assets/", 19);
-    memcpy(fullpath_overrides+19, path, pathlen+1);
-    char *fullpath = NULL;
-    if(access(fullpath_overrides, F_OK) == 0) {
-        fullpath = fullpath_overrides;
-    } else if(access(fullpath_internal_overrides, F_OK) == 0) {
-        fullpath = fullpath_internal_overrides;
-    } else if(access(fullpath_original, F_OK) == 0) {
-        fullpath = fullpath_original;
+    char *resource = android_string_to_str(path_str);
+    char path[MAXPATHLEN];
+    getcwd(path, MAXPATHLEN);
+    strcat(path, "/overrides/assets/");
+    strcat(path, resource);
+    if (access(path, F_OK) != 0) {
+        getcwd(path, MAXPATHLEN);
+        strcat(path, "/internal_overrides/assets/");
+        strcat(path, resource);
+        if (access(path, F_OK) != 0) {
+            getcwd(path, MAXPATHLEN);
+            strcat(path, "/assets/");
+            strcat(path, resource);
+        }
     }
-    png_data_t png_data = read_png(fullpath);
-    free(fullpath_original);
-    free(fullpath_internal_overrides);
-    free(fullpath_overrides);
     texture_data_old_t texture_data = {
-        .width = png_data.width,
-        .height = png_data.height,
-        .pixels = png_data.pixels,
         .alpha = 1,
         .keep_buffer_data = 0
     };
+    texture_data.pixels = stbi_load(path, &texture_data.width, &texture_data.height, NULL, STBI_rgb_alpha);
     return texture_data;
 }
 

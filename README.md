@@ -9,19 +9,19 @@ x86_64 & arm64:
 sudo dpkg --add-architecture armhf
 sudo dpkg --add-architecture i386
 sudo apt update
-sudo apt install git make cmake gcc-i686-linux-gnu g++-i686-linux-gnu gcc-arm-linux-gnueabihf g++-arm-linux-gnueabihf zlib1g-dev:armhf libpng-dev:armhf zlib1g-dev:i386 libpng-dev:i386 libopenal-dev:armhf libopenal-dev:i386 libx11-dev:armhf libx11-dev:i386 libxrandr-dev:armhf libxrandr-dev:i386 libxinerama-dev:armhf libxinerama-dev:i386 libxcursor-dev:armhf libxcursor-dev:i386 libxi-dev:armhf libxi-dev:i386 libgles-dev:armhf libgles-dev:i386 zenity patchelf
+sudo apt install git make cmake gcc-i686-linux-gnu g++-i686-linux-gnu gcc-arm-linux-gnueabihf g++-arm-linux-gnueabihf libopenal-dev:armhf libopenal-dev:i386 libx11-dev:armhf libx11-dev:i386 libxrandr-dev:armhf libxrandr-dev:i386 libxinerama-dev:armhf libxinerama-dev:i386 libxcursor-dev:armhf libxcursor-dev:i386 libxi-dev:armhf libxi-dev:i386 libgles-dev:armhf libgles-dev:i386 zenity patchelf
 ```
 x86:
 ```
 sudo dpkg --add-architecture armhf
 sudo apt update
-sudo apt install git make cmake gcc g++ gcc-arm-linux-gnueabihf g++-arm-linux-gnueabihf zlib1g-dev:armhf libpng-dev:armhf zlib1g-dev libpng-dev libopenal-dev:armhf libopenal-dev libx11-dev:armhf libx11-dev libxrandr-dev:armhf libxrandr-dev libxinerama-dev:armhf libxinerama-dev libxcursor-dev:armhf libxcursor-dev libxi-dev:armhf libxi-dev libgles-dev:armhf libgles-dev zenity patchelf
+sudo apt install git make cmake gcc g++ gcc-arm-linux-gnueabihf g++-arm-linux-gnueabihf libopenal-dev:armhf libopenal-dev libx11-dev:armhf libx11-dev libxrandr-dev:armhf libxrandr-dev libxinerama-dev:armhf libxinerama-dev libxcursor-dev:armhf libxcursor-dev libxi-dev:armhf libxi-dev libgles-dev:armhf libgles-dev zenity patchelf
 ```
 arm:
 ```
 sudo dpkg --add-architecture i386
 sudo apt update
-sudo apt install git make cmake gcc g++ gcc-i686-linux-gnu g++-i686-linux-gnu zlib1g-dev:i386 libpng-dev:i386 zlib1g-dev libpng-dev libopenal-dev:i386 libopenal-dev libx11-dev:i386 libx11-dev libxrandr-dev:i386 libxrandr-dev libxinerama-dev:i386 libxinerama-dev libxcursor-dev:i386 libxcursor-dev libxi-dev:i386 libxi-dev libgles-dev:i386 libgles-dev zenity patchelf
+sudo apt install git make cmake gcc g++ gcc-i686-linux-gnu g++-i686-linux-gnu libopenal-dev:i386 libopenal-dev libx11-dev:i386 libx11-dev libxrandr-dev:i386 libxrandr-dev libxinerama-dev:i386 libxinerama-dev libxcursor-dev:i386 libxcursor-dev libxi-dev:i386 libxi-dev libgles-dev:i386 libgles-dev zenity patchelf
 ```
 
 ## Compiling

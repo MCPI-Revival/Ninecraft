@@ -14,6 +14,7 @@ include_directories(${GLFW_SOURCE_DIR}/include)
 include_directories(${PROJECT_SOURCE_DIR}/minivorbis)
 include_directories(${PROJECT_SOURCE_DIR}/stb)
 
+add_subdirectory(miniz)
 add_subdirectory(libhybris)
 add_subdirectory(glfw)
 add_subdirectory(ninecraft)

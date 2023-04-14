@@ -20,12 +20,6 @@ enum image_format {
 };
 
 typedef struct {
-    uint32_t width;
-    uint32_t height;
-    uint8_t *pixels;
-} png_data_t;
-
-typedef struct {
     uint32_t width;// 0 0x00
     uint32_t height; // 4 0x04
     uint8_t *pixels; // 8 0x08
@@ -52,7 +46,5 @@ typedef struct {
     int unknown0;
     int mipmap_level;
 } image_data_t;
-
-extern png_data_t read_png(char *path);
 
 #endif
