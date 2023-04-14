@@ -15,6 +15,11 @@ build-arm:
 	cmake -B ${ARM_BUILD_DIR} -DCMAKE_TOOLCHAIN_FILE=./cmake/arm_toolchain.cmake
 	cmake --build ${ARM_BUILD_DIR}
 
+.PHONY: build
+build:
+	build-arm
+	build-i686
+
 .PHONY: clean
 clean:
 	rm -rf $(ARM_BUILD_DIR)
