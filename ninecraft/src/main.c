@@ -262,11 +262,16 @@ void set_ninecraft_size_0_1_0(int width, int height) {
     }
 }
 
+static void set_ninecraft_size(int width, int height) {
+    glClear(GL_DEPTH_BUFFER_BIT);
+    minecraft_set_size(ninecraft_app, width, height);
+}
+
 static void resize_callback(GLFWwindow* window, int width, int height) {
     if (version_id == version_id_0_1_0) {
         set_ninecraft_size_0_1_0(width, height);
     } else {
-        minecraft_set_size(ninecraft_app, width, height);
+        set_ninecraft_size(width, height);
     }
 }
 
@@ -1021,7 +1026,7 @@ int main(int argc, char **argv) {
     }
     
     if (version_id >= version_id_0_1_0_touch) {
-        minecraft_set_size(ninecraft_app, 720, 480);
+        set_ninecraft_size(720, 480);
     } else {
         set_ninecraft_size_0_1_0(720, 480);
     }
