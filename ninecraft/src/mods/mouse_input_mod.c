@@ -18,8 +18,8 @@ struct turn_delta {
 };
 struct turn_delta controller_turn_input_get_turn_delta(void *turn_input) {
     struct turn_delta ret;
-    ret.x = mouse_get_dx();
-    ret.y = mouse_get_dy();
+    ret.x = mouse_get_dx() * 0.4f;
+    ret.y = mouse_get_dy() * 0.4f;
     return ret;
 }
 
