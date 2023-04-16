@@ -175,12 +175,18 @@ static void mouse_scroll_callback(GLFWwindow* window, double xoffset, double yof
     keyboard_feed(key_code, 0);
 }
 
+static double last_mouse_x = 0;
+static double last_mouse_y = 0;
+static bool ignore_relative_motion = false;
 static void mouse_pos_callback(GLFWwindow* window, double xpos, double ypos) {
-    if (!mouse_pointer_hidden) {
+    if (!mouse_pointer_hidden || version_id >= version_id_0_6_0) {
         if (version_id == version_id_0_1_0) {
             ((void (*)(int, int, int, int))internal_dlsym(handle, "_ZN5Mouse4feedEiiii"))(0, 0, (int)xpos, (int)ypos);
         } else if (version_id >= version_id_0_6_0) {
-            mouse_device_feed_0_6(internal_dlsym(handle, "_ZN5Mouse9_instanceE"), 0, 0, (short)xpos, (short)ypos, 0, 0);
+            mouse_device_feed_0_6(internal_dlsym(handle, "_ZN5Mouse9_instanceE"), 0, 0, (short)xpos, (short)ypos, (short)(!ignore_relative_motion ? (xpos - last_mouse_x) : 0), (short)(!ignore_relative_motion ? (ypos - last_mouse_y) : 0));
+            ignore_relative_motion = false;
+            last_mouse_x = xpos;
+            last_mouse_y = ypos;
             multitouch_feed_0_6(0, 0, (short)xpos, (short)ypos, 0);
         } else if (version_id <= version_id_0_5_0_j) {
             mouse_device_feed_0_5(internal_dlsym(handle, "_ZN5Mouse9_instanceE"), 0, 0, (short)xpos, (short)ypos);
@@ -342,13 +348,20 @@ void window_close_callback(GLFWwindow* window) {
 void grab_mouse() {
     puts("grab_mouse");
     mouse_pointer_hidden = true;
+    ignore_relative_motion = true;
     glfwSetInputMode(_window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
+    glfwSetInputMode(_window, GLFW_RAW_MOUSE_MOTION, GLFW_TRUE);
 }
 
 void release_mouse() {
     puts("release_mouse");
     mouse_pointer_hidden = false;
     glfwSetInputMode(_window, GLFW_CURSOR, default_mouse_mode);
+    glfwSetInputMode(_window, GLFW_RAW_MOUSE_MOTION, GLFW_TRUE);
+    double cursor_x;
+    double cursor_y;
+    glfwGetCursorPos(_window, &cursor_x, &cursor_y);
+    mouse_pos_callback(_window, cursor_x, cursor_y);
 }
 
 void gles_hook() {
@@ -831,7 +844,7 @@ int main(int argc, char **argv) {
     multitouch_setup_hooks(handle);
     keyboard_setup_hooks(handle);
     minecraft_setup_hooks(handle);
-    inject_mods(version_id);
+    inject_mods(handle, version_id);
     mod_loader_load_all();
 
     controller_states = (unsigned char *)internal_dlsym(handle, "_ZN10Controller15isTouchedValuesE");

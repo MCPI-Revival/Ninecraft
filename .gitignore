@@ -22,3 +22,5 @@ lib2/
 a.out
 *.so
 *.o
+/*.apk
+/*.trace
