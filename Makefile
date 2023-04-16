@@ -16,9 +16,7 @@ build-arm:
 	cmake --build ${ARM_BUILD_DIR}
 
 .PHONY: build
-build:
-	build-arm
-	build-i686
+build: build-arm build-i686
 
 .PHONY: clean
 clean:
