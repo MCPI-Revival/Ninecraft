@@ -26,6 +26,11 @@ arm:
 sudo apt update
 sudo apt install git make cmake gcc g++ libopenal-dev libx11-dev libxrandr-dev libxinerama-dev libxcursor-dev libxi-dev libgles-dev zenity patchelf
 ```
+### ArchLinux
+```
+sudo pacman -Syu
+sudo pacman -S git make cmake i686-elf-gcc lib32-openal lib32-libx11 lib32-libxrandr lib32-libxinerama lib32-libxcursor lib32-libxi lib32-libglvnd zenity patchelf
+```
 
 ## Compiling
 ### x86_64 & x86:
