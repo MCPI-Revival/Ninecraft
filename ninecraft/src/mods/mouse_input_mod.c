@@ -3,6 +3,7 @@
 #include <ninecraft/patch/detours.h>
 #include <ninecraft/dlfcn_stub.h>
 #include <ninecraft/mods/mouse_input_mod.h>
+#include <ninecraft/ninecraft_defs.h>
 
 /*
     This mod makes mouse control work more reliably.
@@ -16,10 +17,10 @@ struct turn_delta {
     float x;
     float y;
 };
-struct turn_delta controller_turn_input_get_turn_delta(void *turn_input) {
+NINECRAFT_FLOAT_FUNC struct turn_delta controller_turn_input_get_turn_delta(void *turn_input) {
     struct turn_delta ret;
-    ret.x = mouse_get_dx() * 0.4f;
-    ret.y = mouse_get_dy() * 0.4f;
+    ret.x = mouse_get_dx() * 0.3;
+    ret.y = mouse_get_dy() * 0.3;
     return ret;
 }
 
