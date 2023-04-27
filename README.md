@@ -8,35 +8,35 @@ x86_64:
 ```
 sudo dpkg --add-architecture i386
 sudo apt update
-sudo apt install git make cmake gcc-i686-linux-gnu g++-i686-linux-gnu libopenal-dev:i386 libx11-dev:i386 libxrandr-dev:i386 libxinerama-dev:i386 libxcursor-dev:i386 libxi-dev:i386 libgles-dev:i386 zenity patchelf unzip
+sudo apt install git make cmake gcc-i686-linux-gnu g++-i686-linux-gnu libopenal-dev:i386 libx11-dev:i386 libxrandr-dev:i386 libxinerama-dev:i386 libxcursor-dev:i386 libxi-dev:i386 libgles-dev:i386 zenity unzip
 ```
 arm64:
 ```
 sudo dpkg --add-architecture armhf
 sudo apt update
-sudo apt install git make cmake gcc-arm-linux-gnueabihf g++-arm-linux-gnueabihf libopenal-dev:armhf libx11-dev:armhf libxrandr-dev:armhf libxinerama-dev:armhf libxcursor-dev:armhf libxi-dev:armhf libgles-dev:armhf zenity patchelf unzip
+sudo apt install git make cmake gcc-arm-linux-gnueabihf g++-arm-linux-gnueabihf libopenal-dev:armhf libx11-dev:armhf libxrandr-dev:armhf libxinerama-dev:armhf libxcursor-dev:armhf libxi-dev:armhf libgles-dev:armhf zenity unzip
 ```
 x86:
 ```
 sudo apt update
-sudo apt install git make cmake gcc g++ libopenal-dev libx11-dev libxrandr-dev libxinerama-dev libxcursor-dev libxi-dev libgles-dev zenity patchelf unzip
+sudo apt install git make cmake gcc g++ libopenal-dev libx11-dev libxrandr-dev libxinerama-dev libxcursor-dev libxi-dev libgles-dev zenity unzip
 ```
 arm:
 ```
 sudo apt update
-sudo apt install git make cmake gcc g++ libopenal-dev libx11-dev libxrandr-dev libxinerama-dev libxcursor-dev libxi-dev libgles-dev zenity patchelf unzip
+sudo apt install git make cmake gcc g++ libopenal-dev libx11-dev libxrandr-dev libxinerama-dev libxcursor-dev libxi-dev libgles-dev zenity unzip
 ```
 ### ArchLinux
 x86_64:
 ```
 sudo pacman -Syu
-sudo pacman -S git make cmake i686-elf-gcc lib32-openal lib32-libx11 lib32-libxrandr lib32-libxinerama lib32-libxcursor lib32-libxi lib32-libglvnd zenity patchelf unzip
+sudo pacman -S git make cmake i686-elf-gcc lib32-openal lib32-libx11 lib32-libxrandr lib32-libxinerama lib32-libxcursor lib32-libxi lib32-libglvnd zenity unzip
 ```
 ### AlpineLinux
 x86:
 ```
 apk update
-apk add git make cmake gcc g++ openal-soft-dev libx11-dev libxrandr-dev libxinerama-dev libxcursor-dev libxi-dev mesa-dev zenity patchelf unzip
+apk add git make cmake gcc g++ openal-soft-dev libx11-dev libxrandr-dev libxinerama-dev libxcursor-dev libxi-dev mesa-dev zenity unzip
 ```
 
 ## Compiling
@@ -54,15 +54,8 @@ make build-arm
 ```
 
 ## Before running for the first time
-### x86_64 & x86:
 ```
 ./tools/extract.sh /path/to/your/apk
-./tools/patch.sh x86
-```
-### arm64 & arm
-```
-./tools/extract.sh /path/to/your/apk
-./tools/patch.sh armeabi-v7a
 ```
 
 ## Running
