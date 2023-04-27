@@ -1,9 +1,6 @@
 [submodule "glfw"]
 	path = glfw
 	url = https://github.com/glfw/glfw.git
-[submodule "libhybris"]
-	path = libhybris
-	url = https://github.com/minecraft-linux/libhybris
 [submodule "osx-elf-header"]
     path = osx-elf-header
     url = https://github.com/MCPI-Revival/osx-elf-header
@@ -19,3 +16,6 @@
 [submodule "miniz"]
 	path = miniz
 	url = https://github.com/richgel999/miniz.git
+[submodule "libhybris"]
+	path = libhybris
+	url = https://github.com/MCPI-Revival/libhybris
