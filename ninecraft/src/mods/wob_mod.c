@@ -12,14 +12,14 @@ void wob_mod_inject(int version_id) {
 #ifdef __i386__
         ((char *)start_menu_screen_construct)[268] = 0xa0;
 #endif
-#ifdef __thumb2__
+#ifdef __arm__
         ((char *)start_menu_screen_construct)[129] = 0xa0;
 #endif
     } else if (version_id == version_id_0_5_0) {
 #ifdef __i386__
         ((char *)start_menu_screen_construct)[316] = 0xa0;
 #endif
-#ifdef __thumb2__
+#ifdef __arm__
         ((char *)start_menu_screen_construct)[177] = 0xa0;
 #endif
     }

@@ -28,7 +28,7 @@
 #define NINECRAFTAPP_SIZE_0_7_1 0xee0
 #define NINECRAFTAPP_SIZE_0_7_0 0xee0
 #else
-#ifdef __thumb2__
+#ifdef __arm__
 #define NINECRAFTAPP_SIZE_0_8_1 0xd70
 #define NINECRAFTAPP_SIZE_0_8_0 0xD60
 #define NINECRAFTAPP_SIZE_0_7_6 0xd30
@@ -77,7 +77,7 @@
 #define MINECRAFT_ISGRABBED_OFFSET_0_7_1 0xde0
 #define MINECRAFT_ISGRABBED_OFFSET_0_7_0 0xde0
 #else
-#ifdef __thumb2__
+#ifdef __arm__
 #define MINECRAFT_ISGRABBED_OFFSET_0_8_1 0xc80
 #define MINECRAFT_ISGRABBED_OFFSET_0_8_0 0xc70
 #define MINECRAFT_ISGRABBED_OFFSET_0_7_6 0xc58

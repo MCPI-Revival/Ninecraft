@@ -74,7 +74,7 @@ void *load_library(const char *name) {
     #ifdef __i386__
     char *arch = "x86";
     #else
-    #ifdef __thumb2__
+    #ifdef __arm__
     char *arch = "armeabi-v7a";
     #else
     char *arch = "";
@@ -460,7 +460,7 @@ void math_hook() {
     hybris_hook("ldexpf", math_ldexpf);
 }
 
-#ifdef __thumb2__
+#ifdef __arm__
 
 extern void __aeabi_uidiv();
 
@@ -602,7 +602,7 @@ void missing_hook() {
 
     hybris_hook("__cxa_pure_virtual", __my_cxa_pure_virtual);
 
-    #ifdef __thumb2__
+    #ifdef __arm__
     hybris_hook("__aeabi_atexit", __aeabi_atexit);
     hybris_hook("__aeabi_uidiv", __aeabi_uidiv);
     hybris_hook("__aeabi_d2ulz", __aeabi_d2ulz);
@@ -937,7 +937,7 @@ int main(int argc, char **argv) {
         android_string_equ((android_string_t *)(ninecraft_app + 3256), "./storage/internal/");
         android_string_equ((android_string_t *)(ninecraft_app + 3260), "./storage/external/");
 #else
-#ifdef __thumb2__
+#ifdef __arm__
         android_string_equ((android_string_t *)(ninecraft_app + 3264), "./storage/internal/");
         android_string_equ((android_string_t *)(ninecraft_app + 3268), "./storage/external/");
 #endif
@@ -947,7 +947,7 @@ int main(int argc, char **argv) {
         android_string_equ((android_string_t *)(ninecraft_app + 3240), "./storage/internal/");
         android_string_equ((android_string_t *)(ninecraft_app + 3244), "./storage/external/");
 #else
-#ifdef __thumb2__
+#ifdef __arm__
         android_string_equ((android_string_t *)(ninecraft_app + 3248), "./storage/internal/");
         android_string_equ((android_string_t *)(ninecraft_app + 3252), "./storage/external/");
 #endif
@@ -957,7 +957,7 @@ int main(int argc, char **argv) {
         android_string_equ((android_string_t *)(ninecraft_app + 3216), "./storage/internal/");
         android_string_equ((android_string_t *)(ninecraft_app + 3220), "./storage/external/");
 #else
-#ifdef __thumb2__
+#ifdef __arm__
         android_string_equ((android_string_t *)(ninecraft_app + 3224), "./storage/internal/");
         android_string_equ((android_string_t *)(ninecraft_app + 3228), "./storage/external/");
 #endif
@@ -967,7 +967,7 @@ int main(int argc, char **argv) {
         android_string_equ((android_string_t *)(ninecraft_app + 3616), "./storage/internal/");
         android_string_equ((android_string_t *)(ninecraft_app + 3640), "./storage/external/");
 #else
-#ifdef __thumb2__
+#ifdef __arm__
         android_string_equ((android_string_t *)(ninecraft_app + 3620), "./storage/internal/");
         android_string_equ((android_string_t *)(ninecraft_app + 3644), "./storage/external/");
 #endif
@@ -977,7 +977,7 @@ int main(int argc, char **argv) {
         android_string_equ((android_string_t *)(ninecraft_app + 3628), "./storage/internal/");
         android_string_equ((android_string_t *)(ninecraft_app + 3652), "./storage/external/");
 #else
-#ifdef __thumb2__
+#ifdef __arm__
         android_string_equ((android_string_t *)(ninecraft_app + 3636), "./storage/internal/");
         android_string_equ((android_string_t *)(ninecraft_app + 3660), "./storage/external/");
 #endif
