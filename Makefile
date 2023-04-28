@@ -6,14 +6,12 @@ I686_BUILD_DIR ?= build-i686/
 .PHONY: build-i686
 build-i686:
 	mkdir -p ${I686_BUILD_DIR}
-	cmake -B ${I686_BUILD_DIR} -DCMAKE_TOOLCHAIN_FILE=./cmake/i686_toolchain.cmake
-	cmake --build ${I686_BUILD_DIR}
+	cd ${I686_BUILD_DIR}; cmake -DCMAKE_TOOLCHAIN_FILE=../cmake/i686_toolchain.cmake ..; make
 
 .PHONY: build-arm
 build-arm:
 	mkdir -p ${ARM_BUILD_DIR}
-	cmake -B ${ARM_BUILD_DIR} -DCMAKE_TOOLCHAIN_FILE=./cmake/arm_toolchain.cmake
-	cmake --build ${ARM_BUILD_DIR}
+	cd ${ARM_BUILD_DIR}; cmake -DCMAKE_TOOLCHAIN_FILE=../cmake/arm_toolchain.cmake ..; make
 
 .PHONY: build
 build: build-arm build-i686
