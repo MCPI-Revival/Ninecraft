@@ -8,7 +8,7 @@ x86_64:
 ```
 sudo dpkg --add-architecture i386
 sudo apt update
-sudo apt install git make cmake gcc-i686-linux-gnu g++-i686-linux-gnu libopenal-dev:i386 libx11-dev:i386 libxrandr-dev:i386 libxinerama-dev:i386 libxcursor-dev:i386 libxi-dev:i386 libgles-dev:i386 zenity unzip
+sudo apt install git make cmake gcc g++ gcc-multilib g++-multilib libopenal-dev:i386 libx11-dev:i386 libxrandr-dev:i386 libxinerama-dev:i386 libxcursor-dev:i386 libxi-dev:i386 libgles-dev:i386 zenity unzip
 ```
 arm64:
 ```
@@ -30,7 +30,7 @@ sudo apt install git make cmake gcc g++ libopenal-dev libx11-dev libxrandr-dev l
 x86_64:
 ```
 sudo pacman -Syu
-sudo pacman -S git make cmake i686-elf-gcc lib32-openal lib32-libx11 lib32-libxrandr lib32-libxinerama lib32-libxcursor lib32-libxi lib32-libglvnd zenity unzip
+sudo pacman -S git make cmake gcc gcc-multilib lib32-openal lib32-libx11 lib32-libxrandr lib32-libxinerama lib32-libxcursor lib32-libxi lib32-libglvnd zenity unzip
 ```
 ### AlpineLinux
 x86:
