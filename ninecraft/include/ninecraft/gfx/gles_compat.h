@@ -1,7 +1,7 @@
 #ifndef NINECRAFT_GFX_GLES_COMPAT_H
 #define NINECRAFT_GFX_GLES_COMPAT_H
 
-#include <GLES/gl.h>
+#include <GL/gl.h>
 #include <ninecraft/ninecraft_defs.h>
 
 // Function documentation

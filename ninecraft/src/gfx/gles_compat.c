@@ -1,5 +1,5 @@
 #include <ninecraft/gfx/gles_compat.h>
-#include <GLES/gl.h>
+#include <GL/glext.h>
 
 NINECRAFT_FLOAT_FUNC void gl_alpha_func(GLenum func, GLclampf ref) {
     glAlphaFunc(func, ref);
@@ -62,7 +62,7 @@ void gl_depth_mask(GLboolean flag) {
 }
 
 NINECRAFT_FLOAT_FUNC void gl_depth_range_f(GLclampf near, GLclampf far) {
-    glDepthRangef(near, far);
+    glDepthRange((GLclampd)near, (GLclampd)far);
 }
 
 void gl_disable(GLenum cap) {
@@ -94,7 +94,7 @@ NINECRAFT_FLOAT_FUNC void gl_fog_f_v(GLenum pname, const GLfloat *params) {
 }
 
 void gl_fog_x(GLenum pname, GLfixed param) {
-    glFogx(pname, param);
+    glFogi(pname, param);
 }
 
 void gl_gen_textures(GLsizei n, GLuint *textures) {
@@ -134,7 +134,7 @@ NINECRAFT_FLOAT_FUNC void gl_normal_3_f(GLfloat nx, GLfloat ny, GLfloat nz) {
 }
 
 NINECRAFT_FLOAT_FUNC void gl_ortho_f(GLfloat left, GLfloat right, GLfloat bottom, GLfloat top, GLfloat near, GLfloat far) {
-    glOrthof(left, right, bottom, top, near, far);
+    glOrtho((GLdouble)left, (GLdouble)right, (GLdouble)bottom, (GLdouble)top, (GLdouble)near, (GLdouble)far);
 }
 
 NINECRAFT_FLOAT_FUNC void gl_polygon_offset(GLfloat factor, GLfloat units) {
