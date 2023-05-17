@@ -32,7 +32,12 @@ x86_64:
 sudo pacman -Syu
 sudo pacman -S git make cmake gcc gcc-multilib lib32-openal lib32-libx11 lib32-libxrandr lib32-libxinerama lib32-libxcursor lib32-libxi lib32-libglvnd zenity unzip
 ```
-### AlpineLinux
+arm:
+```
+sudo pacman -Syu
+sudo pacman -S git make cmake gcc openal libx11 libxrandr libxinerama libxcursor libxi libglvnd zenity unzip
+```
+### AlpineLinux (Not working)
 x86:
 ```
 apk update
