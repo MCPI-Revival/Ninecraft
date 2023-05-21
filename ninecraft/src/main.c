@@ -200,8 +200,8 @@ static void mouse_pos_callback(GLFWwindow* window, double xpos, double ypos) {
         cy /= 2;
         if ((int)xpos != cy || (int)ypos != cy) {
             glfwSetCursorPos(window, cx, cy);
-            y_cam -= ((float) ypos - (float)cy) / 6.0;
-            x_cam += ((float)xpos - (float)cx) / 3.0;
+            y_cam -= ((float) ypos - (float)cy) / 1.7;
+            x_cam += ((float)xpos - (float)cx) / 0.7;
         }
     }
 }
