@@ -25,6 +25,7 @@ typedef struct {
 
 typedef enum {
     did_new_world = 1,
+    did_chat = 2,
     did_options = 3,
     did_rename_world = 4
 } platform_dialogue_id;
