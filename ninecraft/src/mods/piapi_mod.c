@@ -7,6 +7,7 @@
 #include <stdbool.h>
 #include <sys/mman.h>
 #include <unistd.h>
+#include <stdlib.h>
 
 /*
     This mod enables the Minecraft Pi Edition API.
@@ -34,7 +35,6 @@ void piapi_mod_level_generated_injection(void *minecraft) {
     } else if (version_id == version_id_0_6_1 || version_id == version_id_0_6_0) {
         minecraft_command_server_offset = MINECRAFT_COMMANDSERVER_OFFSET_0_6_1;
     } else if (version_id == version_id_0_7_2) {
-        puts("yes");
         minecraft_command_server_offset = MINECRAFT_COMMANDSERVER_OFFSET_0_7_2;
     }
     void *command_server = *(void **)(minecraft + minecraft_command_server_offset);

@@ -4,6 +4,7 @@
 #include <stdint.h>
 #include <stdbool.h>
 #include <ninecraft/android/android_string.h>
+#include <ninecraft/app_context.h>
 
 #define MINECRAFT_COMMANDSERVER_OFFSET_0_6_1 0xe5c
 #define MINECRAFT_COMMANDSERVER_OFFSET_0_7_0 0xebc
@@ -18,6 +19,7 @@
 #define FILLINGCONTAINER_LINKED_SLOTS_COUNT_OFFSET 0x14
 
 #ifdef __i386__
+#define NINECRAFTAPP_SIZE_0_9_0 0xd74
 #define NINECRAFTAPP_SIZE_0_8_1 0xd64
 #define NINECRAFTAPP_SIZE_0_8_0 0xd54
 #define NINECRAFTAPP_SIZE_0_7_6 0xd20
@@ -29,6 +31,7 @@
 #define NINECRAFTAPP_SIZE_0_7_0 0xee0
 #else
 #ifdef __arm__
+#define NINECRAFTAPP_SIZE_0_9_0 0xd80
 #define NINECRAFTAPP_SIZE_0_8_1 0xd70
 #define NINECRAFTAPP_SIZE_0_8_0 0xD60
 #define NINECRAFTAPP_SIZE_0_7_6 0xd30
@@ -67,6 +70,7 @@
 #define NINECRAFTAPP_SIZE_0_1_0 0xdc8
 
 #ifdef __i386__
+#define MINECRAFT_ISGRABBED_OFFSET_0_9_0 0xc9c
 #define MINECRAFT_ISGRABBED_OFFSET_0_8_1 0xc78
 #define MINECRAFT_ISGRABBED_OFFSET_0_8_0 0xc68
 #define MINECRAFT_ISGRABBED_OFFSET_0_7_6 0xc50
@@ -78,6 +82,7 @@
 #define MINECRAFT_ISGRABBED_OFFSET_0_7_0 0xde0
 #else
 #ifdef __arm__
+#define MINECRAFT_ISGRABBED_OFFSET_0_9_0 0xca4
 #define MINECRAFT_ISGRABBED_OFFSET_0_8_1 0xc80
 #define MINECRAFT_ISGRABBED_OFFSET_0_8_0 0xc70
 #define MINECRAFT_ISGRABBED_OFFSET_0_7_6 0xc58
@@ -159,9 +164,17 @@ typedef void (*ninecraft_app_construct_t)(void *ninecraft_app);
 
 extern ninecraft_app_construct_t ninecraft_app_construct;
 
+typedef void (*ninecraft_app_construct_2_t)(void *ninecraft_app, int argc, char **argv);
+
+extern ninecraft_app_construct_2_t ninecraft_app_construct_2;
+
 typedef void (*ninecraft_app_init_t)(void *ninecraft_app);
 
 extern ninecraft_app_init_t ninecraft_app_init;
+
+typedef void (*app_init_t)(void *app, app_context_0_9_0_t *context);
+
+extern app_init_t app_init;
 
 typedef void (*minecraft_set_size_t)(void *minecraft, uint32_t width, uint32_t height);
 

@@ -509,6 +509,76 @@ void *app_platform_vtable_0_8_0[] = {
     (void *)AppPlatform_linux$abortWebRequest
 };
 
+void *app_platform_vtable_0_9_0[] = {
+    (void *)AppPlatform_linux$destroy,
+    (void *)AppPlatform_linux$destroy,
+    (void *)AppPlatform_linux$saveScreenshot,
+    (void *)AppPlatform_linux$getImagePath,
+    (void *)AppPlatform_linux$loadPNG,
+    (void *)AppPlatform_linux$loadTGA,
+    (void *)AppPlatform_linux$playSound,
+    (void *)AppPlatform_linux$showDialog,
+    (void *)AppPlatform_linux$createUserInput,
+    (void *)AppPlatform_linux$getUserInputStatus,
+    (void *)AppPlatform_linux$getUserInput,
+    (void *)AppPlatform_linux$getDateStringGNU,
+    (void *)AppPlatform_linux$checkLicense,
+    (void *)AppPlatform_linux$hasBuyButtonWhenInvalidLicense,
+    (void *)AppPlatform_linux$uploadPlatformDependentData,
+    (void *)AppPlatform_linux$readAssetFile,
+    (void *)AppPlatform_linux$_tick,
+    (void *)AppPlatform_linux$getScreenWidth,
+    (void *)AppPlatform_linux$getScreenHeight,
+    (void *)AppPlatform_linux$getPixelsPerMillimeter,
+    (void *)AppPlatform_linux$isNetworkEnabled,
+    (void *)AppPlatform_linux$openLoginWindow,
+    (void *)AppPlatform_linux$isPowerVR,
+    (void *)AppPlatform_linux$getKeyFromKeyCode,
+    (void *)AppPlatform_linux$buyGame,
+    (void *)AppPlatform_linux$finish,
+    (void *)AppPlatform_linux$supportsTouchscreen,
+    (void *)AppPlatform_linux$hasIDEProfiler,
+    (void *)AppPlatform_linux$supportsVibration,
+    (void *)AppPlatform_linux$vibrate,
+    (void *)AppPlatform_linux$getPlatformStringVarGNU,
+    (void *)AppPlatform_linux$showKeyboard,
+    (void *)AppPlatform_linux$hideKeyboard,
+    (void *)AppPlatform_linux$updateTextBoxText,
+    (void *)AppPlatform_linux$isKeyboardVisible,
+    (void *)AppPlatform_linux$getLoginInformation,
+    (void *)AppPlatform_linux$setLoginInformation,
+    (void *)AppPlatform_linux$clearSessionIDAndRefreshToken,
+    (void *)AppPlatform_linux$statsTrackData,
+    (void *)AppPlatform_linux$updateStatsUserData,
+    (void *)AppPlatform_linux$getTotalMemory,
+    (void *)AppPlatform_linux$getBroadcastAddresses,
+    (void *)AppPlatform_linux$initWithActivity,
+    (void *)AppPlatform_linux$shareOpenGLContext,
+    (void *)AppPlatform_linux$webRequest,
+    (void *)AppPlatform_linux$getWebRequestStatus,
+    (void *)AppPlatform_linux$getWebRequestContent,
+    (void *)AppPlatform_linux$abortWebRequest
+};
+
+int AppPlatform_linux$shareOpenGLContext(AppPlatform_linux *app_platform) {
+    puts("debug: AppPlatform_linux::shareOpenGLContext");
+    return 1;
+}
+
+android_vector_t AppPlatform_linux$getBroadcastAddresses(AppPlatform_linux *app_platform) {
+    puts("debug: AppPlatform_linux::getBroadcastAddresses");
+    android_vector_t out;
+    out._M_start = 0;
+    out._M_finish = 0;
+    out._M_end_of_storage = 0;
+    return out;
+}
+
+size_t AppPlatform_linux$getTotalMemory(AppPlatform_linux *app_platform) {
+    puts("debug: AppPlatform_linux::getTotalMemory");
+    return 2048;
+}
+
 void AppPlatform_linux$updateTextBoxText(AppPlatform_linux *app_platform, android_string_t *text) {
     puts("debug: AppPlatform_linux::updateTextBoxText");
 }
@@ -616,7 +686,9 @@ void AppPlatform_linux$abortWebRequest(AppPlatform_linux *app_platform, int unkn
 }
 
 void AppPlatform_linux$AppPlatform_linux(AppPlatform_linux *app_platform, void *handle, int version_id, ninecraft_options_t *options) {
-    if (version_id == version_id_0_8_1) {
+    if (version_id == version_id_0_9_0) {
+        app_platform->vtable = app_platform_vtable_0_9_0;
+    } else if (version_id == version_id_0_8_1) {
         app_platform->vtable = app_platform_vtable_0_8_0;
     } else if (version_id == version_id_0_8_0) {
         app_platform->vtable = app_platform_vtable_0_8_0;

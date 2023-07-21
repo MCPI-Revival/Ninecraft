@@ -43,6 +43,12 @@ typedef struct {
     android_string_gnu_t unknown3;
 } login_information_t;
 
+int AppPlatform_linux$shareOpenGLContext(AppPlatform_linux *app_platform);
+
+android_vector_t AppPlatform_linux$getBroadcastAddresses(AppPlatform_linux *app_platform);
+
+size_t AppPlatform_linux$getTotalMemory(AppPlatform_linux *app_platform);
+
 void AppPlatform_linux$updateTextBoxText(AppPlatform_linux *app_platform, android_string_t *text);
 
 bool AppPlatform_linux$hasIDEProfiler(AppPlatform_linux *app_platform);

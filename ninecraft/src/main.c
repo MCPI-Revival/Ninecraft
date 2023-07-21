@@ -597,6 +597,8 @@ void missing_hook() {
     hybris_hook("inflateEnd", inflateEnd);
     hybris_hook("uncompress", uncompress);
     hybris_hook("compress", compress);
+    hybris_hook("compressBound", compressBound);
+    
 
     hybris_hook("ftime", ftime);
 
@@ -784,6 +786,8 @@ int main(int argc, char **argv) {
             version_id = version_id_0_8_0;
         } else if (strncmp(verstr, "v0.8.1", 6) == 0) {
             version_id = version_id_0_8_1;
+        } else if (strncmp(verstr, "v0.9.0", 6) == 0) {
+            version_id = version_id_0_9_0;
         } else {
             puts("Unsupported Version!");
             return 1;
@@ -859,7 +863,12 @@ int main(int argc, char **argv) {
 
     printf("%s\n", glGetString(GL_VERSION));
 
-    printf("nine construct %p\n", ninecraft_app_construct);
+    if (version_id >= version_id_0_9_0) {
+        printf("nine construct %p\n", ninecraft_app_construct_2);
+    } else {
+        printf("nine construct %p\n", ninecraft_app_construct);
+    }
+    
     size_t ninecraft_app_size;
 
     if (version_id == version_id_0_1_0) {
@@ -928,11 +937,27 @@ int main(int argc, char **argv) {
         ninecraft_app_size = NINECRAFTAPP_SIZE_0_8_0;
     } else if (version_id == version_id_0_8_1) {
         ninecraft_app_size = NINECRAFTAPP_SIZE_0_8_1;
+    } else if (version_id == version_id_0_9_0) {
+        ninecraft_app_size = NINECRAFTAPP_SIZE_0_9_0;
     }
     ninecraft_app = malloc(ninecraft_app_size);
-    ninecraft_app_construct(ninecraft_app);
+    if (version_id >= version_id_0_9_0) {
+        ninecraft_app_construct_2(ninecraft_app, argc, argv);
+    } else {
+        ninecraft_app_construct(ninecraft_app);
+    }
 
-    if (version_id == version_id_0_8_1) {
+    if (version_id == version_id_0_9_0) {
+#ifdef __i386__
+        android_string_equ((android_string_t *)(ninecraft_app + 3248), "./storage/internal/");
+        android_string_equ((android_string_t *)(ninecraft_app + 3252), "./storage/external/");
+#else
+#ifdef __arm__
+        android_string_equ((android_string_t *)(ninecraft_app + 3256), "./storage/internal/");
+        android_string_equ((android_string_t *)(ninecraft_app + 3260), "./storage/external/");
+#endif
+#endif
+    } else if (version_id == version_id_0_8_1) {
 #ifdef __i386__
         android_string_equ((android_string_t *)(ninecraft_app + 3256), "./storage/internal/");
         android_string_equ((android_string_t *)(ninecraft_app + 3260), "./storage/external/");
@@ -1024,18 +1049,30 @@ int main(int argc, char **argv) {
     AppPlatform_linux$AppPlatform_linux(&platform, handle, version_id, &options);
     printf("%p\n", &platform);
 
-    *(void **)(ninecraft_app + 0x08) = NULL; // egl_display
-    *(void **)(ninecraft_app + 0x0c) = NULL; // egl_content
-    *(void **)(ninecraft_app + 0x10) = NULL; // egl_surface
-    *(void **)(ninecraft_app + 0x14) = &platform; // app_platform
-    if (version_id >= version_id_0_1_0_touch) {
-        *(uint8_t *)(ninecraft_app + 0x18) = 0; // do_render
-    }
+    if (version_id >= version_id_0_9_0) {
+        app_context_0_9_0_t context = {
+            .egl_display = NULL,
+            .egl_context = NULL,
+            .egl_surface = NULL,
+            .unknown = NULL,
+            .platform = &platform,
+            .do_render = true
+        };
+        app_init(ninecraft_app, &context);
+    } else {
+        *(void **)(ninecraft_app + 0x08) = NULL; // egl_display
+        *(void **)(ninecraft_app + 0x0c) = NULL; // egl_content
+        *(void **)(ninecraft_app + 0x10) = NULL; // egl_surface
+        *(void **)(ninecraft_app + 0x14) = &platform; // app_platform
+        if (version_id >= version_id_0_1_0_touch) {
+            *(uint8_t *)(ninecraft_app + 0x18) = 0; // do_render
+        }
 
-    ninecraft_app_init(ninecraft_app);
+        ninecraft_app_init(ninecraft_app);
 
-    if (version_id >= version_id_0_1_0_touch) {
-        *(uint8_t *)(ninecraft_app + 4) = 1; // is_inited
+        if (version_id >= version_id_0_1_0_touch) {
+            *(uint8_t *)(ninecraft_app + 4) = 1; // is_inited
+        }
     }
     
     if (version_id >= version_id_0_1_0_touch) {
@@ -1045,7 +1082,9 @@ int main(int argc, char **argv) {
     }
 
     size_t minecraft_isgrabbed_offset;
-    if (version_id == version_id_0_8_1) {
+    if (version_id == version_id_0_9_0) {
+        minecraft_isgrabbed_offset = MINECRAFT_ISGRABBED_OFFSET_0_9_0;
+    } else if (version_id == version_id_0_8_1) {
         minecraft_isgrabbed_offset = MINECRAFT_ISGRABBED_OFFSET_0_8_1;
     } else if (version_id == version_id_0_8_0) {
         minecraft_isgrabbed_offset = MINECRAFT_ISGRABBED_OFFSET_0_8_0;
