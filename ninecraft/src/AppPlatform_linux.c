@@ -571,6 +571,9 @@ android_vector_t AppPlatform_linux$getBroadcastAddresses(AppPlatform_linux *app_
     out._M_start = 0;
     out._M_finish = 0;
     out._M_end_of_storage = 0;
+    android_string_gnu_t str;
+    android_string_cstr(&str, "0.0.0.0:19132");
+    android_vector_push_back(&out, &str, sizeof(str));
     return out;
 }
 
@@ -703,6 +706,7 @@ void AppPlatform_linux$abortWebRequest(AppPlatform_linux *app_platform, int unkn
 
 void AppPlatform_linux$AppPlatform_linux(AppPlatform_linux *app_platform, void *handle, int version_id, ninecraft_options_t *options) {
     if (version_id == version_id_0_9_0) {
+        memcpy((char *)internal_dlsym(handle, "_ZTV21AppPlatform_android23")+8, app_platform_vtable_0_9_0, sizeof(app_platform_vtable_0_9_0));
         app_platform->vtable = app_platform_vtable_0_9_0;
     } else if (version_id == version_id_0_8_1) {
         app_platform->vtable = app_platform_vtable_0_8_0;
