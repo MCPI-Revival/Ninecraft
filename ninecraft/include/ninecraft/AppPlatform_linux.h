@@ -55,9 +55,13 @@ bool AppPlatform_linux$hasIDEProfiler(AppPlatform_linux *app_platform);
 
 void AppPlatform_linux$loadTGA(AppPlatform_linux *app_platform, image_data_t *image, android_string_t *resource_path, bool alpha);
 
+void AppPlatform_linux$loadTGA_0_9_0(AppPlatform_linux *app_platform, image_data_0_9_0_t *image, android_string_t *resource_path, bool alpha);
+
 NINECRAFT_CSR_FUNCDEF(android_string_gnu_t, AppPlatform_linux$getImagePath, AppPlatform_linux *app_platform, android_string_t *resource_path, bool is_full);
 
 void AppPlatform_linux$loadPNG(AppPlatform_linux *app_platform, image_data_t *image, android_string_t *resource_path, bool alpha);
+
+void AppPlatform_linux$loadPNG_0_9_0(AppPlatform_linux *app_platform, image_data_0_9_0_t *image, android_string_t *resource_path, bool alpha);
 
 login_information_t AppPlatform_linux$getLoginInformation(AppPlatform_linux *app_platform);
 
@@ -142,6 +146,8 @@ extern texture_data_old_t AppPlatform_linux$loadTextureOld(AppPlatform_linux *ap
 extern void AppPlatform_linux$playSound(AppPlatform_linux *app_platform, android_string_t *sound_name, float volume, float pitch);
 
 extern asset_file AppPlatform_linux$readAssetFile(AppPlatform_linux *app_platform, android_string_t *path_str);
+
+extern NINECRAFT_CSR_FUNCDEF(android_string_gnu_t, AppPlatform_linux$readAssetFile_0_9_0, AppPlatform_linux *app_platform, android_string_t *path_str);
 
 extern void AppPlatform_linux$saveScreenshot(AppPlatform_linux *app_platform, android_string_t *path, int32_t width, int32_t height);
 

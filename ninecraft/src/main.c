@@ -865,6 +865,15 @@ int main(int argc, char **argv) {
 
     if (version_id >= version_id_0_9_0) {
         printf("nine construct %p\n", ninecraft_app_construct_2);
+
+        DETOUR(internal_dlsym(handle, "_ZN19AppPlatform_android14getTotalMemoryEv"), &AppPlatform_linux$getTotalMemory, true);
+        DETOUR(internal_dlsym(handle, "_ZN21AppPlatform_android2313readAssetFileERKSs"), &AppPlatform_linux$readAssetFile_0_9_0, true);
+
+        DETOUR(internal_dlsym(handle, "_ZN19AppPlatform_android7loadPNGER9ImageDataRKSs"), &AppPlatform_linux$loadPNG_0_9_0, true);
+        DETOUR(internal_dlsym(handle, "_ZN19AppPlatform_android7loadTGAER9ImageDataRKSs"), &AppPlatform_linux$loadTGA_0_9_0, true);
+        DETOUR(internal_dlsym(handle, "_ZN19AppPlatform_android13readAssetFileERKSs"), &AppPlatform_linux$readAssetFile_0_9_0, true);
+        DETOUR(internal_dlsym(handle, "_ZN19AppPlatform_android12getImagePathERKSsb"), &AppPlatform_linux$getImagePath, true);
+
     } else {
         printf("nine construct %p\n", ninecraft_app_construct);
     }

@@ -514,8 +514,8 @@ void *app_platform_vtable_0_9_0[] = {
     (void *)AppPlatform_linux$destroy,
     (void *)AppPlatform_linux$saveScreenshot,
     (void *)AppPlatform_linux$getImagePath,
-    (void *)AppPlatform_linux$loadPNG,
-    (void *)AppPlatform_linux$loadTGA,
+    (void *)AppPlatform_linux$loadPNG_0_9_0,
+    (void *)AppPlatform_linux$loadTGA_0_9_0,
     (void *)AppPlatform_linux$playSound,
     (void *)AppPlatform_linux$showDialog,
     (void *)AppPlatform_linux$createUserInput,
@@ -525,7 +525,7 @@ void *app_platform_vtable_0_9_0[] = {
     (void *)AppPlatform_linux$checkLicense,
     (void *)AppPlatform_linux$hasBuyButtonWhenInvalidLicense,
     (void *)AppPlatform_linux$uploadPlatformDependentData,
-    (void *)AppPlatform_linux$readAssetFile,
+    (void *)AppPlatform_linux$readAssetFile_0_9_0,
     (void *)AppPlatform_linux$_tick,
     (void *)AppPlatform_linux$getScreenWidth,
     (void *)AppPlatform_linux$getScreenHeight,
@@ -594,6 +594,14 @@ void AppPlatform_linux$loadTGA(AppPlatform_linux *app_platform, image_data_t *im
     image->pixels = stbi_load(android_string_to_str(resource_path), &image->width, &image->height, &channels, 0);
 }
 
+void AppPlatform_linux$loadTGA_0_9_0(AppPlatform_linux *app_platform, image_data_0_9_0_t *image, android_string_t *resource_path, bool alpha) {
+    puts("debug: AppPlatform_linux::loadTGA");
+    int channels;
+    stbi_uc *pixels = stbi_load(android_string_to_str(resource_path), &image->width, &image->height, &channels, 0);
+    android_string_cstrl(&image->pixels, pixels, 4 * image->width * image->height);
+    stbi_image_free(pixels);
+}
+
 NINECRAFT_CSR_FUNCDEF(android_string_gnu_t, AppPlatform_linux$getImagePath, AppPlatform_linux *app_platform, android_string_t *resource_path, bool is_full) {
     puts("debug: AppPlatform_linux::getImagePath");
     if (is_full) {
@@ -612,6 +620,14 @@ NINECRAFT_CSR_FUNCDEF(android_string_gnu_t, AppPlatform_linux$getImagePath, AppP
 void AppPlatform_linux$loadPNG(AppPlatform_linux *app_platform, image_data_t *image, android_string_t *resource_path, bool alpha) {
     puts("debug: AppPlatform_linux::loadPNG");
     image->pixels = stbi_load(android_string_to_str(resource_path), &image->width, &image->height, NULL, STBI_rgb_alpha);
+}
+
+void AppPlatform_linux$loadPNG_0_9_0(AppPlatform_linux *app_platform, image_data_0_9_0_t *image, android_string_t *resource_path, bool alpha) {
+    puts("debug: AppPlatform_linux::loadPNG");
+
+    stbi_uc *pixels = stbi_load(android_string_to_str(resource_path), &image->width, &image->height, NULL, STBI_rgb_alpha);
+    android_string_cstrl(&image->pixels, pixels, 4 * image->width * image->height);
+    stbi_image_free(pixels);
 }
 
 login_information_t AppPlatform_linux$getLoginInformation(AppPlatform_linux *app_platform) {
@@ -1087,6 +1103,13 @@ asset_file AppPlatform_linux$readAssetFile(AppPlatform_linux *app_platform, andr
     free(fullpath_internal_overrides);
     free(fullpath_overrides);
     return asset;
+}
+
+NINECRAFT_CSR_FUNCDEF(android_string_gnu_t, AppPlatform_linux$readAssetFile_0_9_0, AppPlatform_linux *app_platform, android_string_t *path_str) {
+    asset_file asset = AppPlatform_linux$readAssetFile(app_platform, path_str);
+    android_string_gnu_t str;
+    android_string_cstrl(&str, asset.data, asset.size);
+    NINECRAFT_CSR_RETURN(str);
 }
 
 void AppPlatform_linux$saveScreenshot(AppPlatform_linux *app_platform, android_string_t *path, int width, int height) {

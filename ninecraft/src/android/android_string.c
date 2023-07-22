@@ -72,6 +72,23 @@ void android_string_cstr(android_string_t *__this, char *__s) {
     }
 }
 
+void android_string_cstrl(android_string_t *__this, char *__s, size_t length) {
+    if (android_alloc_node_alloc != NULL) {
+        void *last = __s + length;
+        android_string_allocate_block(__this, length + 1);
+        __this->stlp._M_finish = android_string_ucopy_trivial(__s, last, __this->stlp._M_start_of_storage);
+        *(char *)__this->stlp._M_finish = 0;
+    } else { // just a small hack to allow gnu strings
+        char *str = (char *)malloc(0x0d + length);
+        *(int *)str = length;
+        *(int *)(str + 4) = length;
+        *(int *)(str + 8) = 0;
+        str[0x0c + length] = 0;
+        memcpy(str + 0x0c, __s, length);
+        __this->gnu.data = str + 0x0c;
+    }
+}
+
 void android_string_destroy(android_string_t *__this) {
     if (android_alloc_node_alloc != NULL) {
         android_string_deallocate_block(__this);

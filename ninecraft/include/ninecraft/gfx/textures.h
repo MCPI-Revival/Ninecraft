@@ -4,6 +4,8 @@
 #include <stdbool.h>
 #include <stdint.h>
 
+#include <ninecraft/android/android_string.h>
+
 enum texture_type {
     texture_type_ub = 0,
     texture_type_us565 = 1,
@@ -46,5 +48,14 @@ typedef struct {
     int unknown0;
     int mipmap_level;
 } image_data_t;
+
+typedef struct {
+    uint32_t width;
+    uint32_t height;
+    android_string_gnu_t pixels;
+    int format;
+    int unknown0;
+    int mipmap_level;
+} image_data_0_9_0_t;
 
 #endif
