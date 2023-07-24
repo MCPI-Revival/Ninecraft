@@ -579,7 +579,7 @@ android_vector_t AppPlatform_linux$getBroadcastAddresses(AppPlatform_linux *app_
 
 size_t AppPlatform_linux$getTotalMemory(AppPlatform_linux *app_platform) {
     puts("debug: AppPlatform_linux::getTotalMemory");
-    return 2048;
+    return 536870912;
 }
 
 void AppPlatform_linux$updateTextBoxText(AppPlatform_linux *app_platform, android_string_t *text) {
@@ -705,7 +705,10 @@ void AppPlatform_linux$abortWebRequest(AppPlatform_linux *app_platform, int unkn
 }
 
 void AppPlatform_linux$AppPlatform_linux(AppPlatform_linux *app_platform, void *handle, int version_id, ninecraft_options_t *options) {
-    if (version_id == version_id_0_9_0) {
+    if (version_id == version_id_0_9_1) {
+        memcpy((char *)internal_dlsym(handle, "_ZTV21AppPlatform_android23")+8, app_platform_vtable_0_9_0, sizeof(app_platform_vtable_0_9_0));
+        app_platform->vtable = app_platform_vtable_0_9_0;
+    } else if (version_id == version_id_0_9_0) {
         memcpy((char *)internal_dlsym(handle, "_ZTV21AppPlatform_android23")+8, app_platform_vtable_0_9_0, sizeof(app_platform_vtable_0_9_0));
         app_platform->vtable = app_platform_vtable_0_9_0;
     } else if (version_id == version_id_0_8_1) {
