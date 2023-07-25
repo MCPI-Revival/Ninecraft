@@ -41,6 +41,7 @@ enum {
     version_id_0_9_2,
     version_id_0_9_3,
     version_id_0_9_4,
+    version_id_0_9_5,
 };
 
 #endif
