@@ -706,10 +706,10 @@ void AppPlatform_linux$abortWebRequest(AppPlatform_linux *app_platform, int unkn
 
 void AppPlatform_linux$AppPlatform_linux(AppPlatform_linux *app_platform, void *handle, int version_id, ninecraft_options_t *options) {
     if (version_id == version_id_0_9_1) {
-        memcpy((char *)internal_dlsym(handle, "_ZTV21AppPlatform_android23")+8, app_platform_vtable_0_9_0, sizeof(app_platform_vtable_0_9_0));
+        **(void ****)internal_dlsym(handle, "_ZN11AppPlatform10_singletonE") = app_platform_vtable_0_9_0;
         app_platform->vtable = app_platform_vtable_0_9_0;
     } else if (version_id == version_id_0_9_0) {
-        memcpy((char *)internal_dlsym(handle, "_ZTV21AppPlatform_android23")+8, app_platform_vtable_0_9_0, sizeof(app_platform_vtable_0_9_0));
+        **(void ****)internal_dlsym(handle, "_ZN11AppPlatform10_singletonE") = app_platform_vtable_0_9_0;
         app_platform->vtable = app_platform_vtable_0_9_0;
     } else if (version_id == version_id_0_8_1) {
         app_platform->vtable = app_platform_vtable_0_8_0;
