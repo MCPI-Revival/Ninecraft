@@ -18,6 +18,18 @@
 #define FILLINGCONTAINER_LINKED_SLOTS_OFFSET 0x0c
 #define FILLINGCONTAINER_LINKED_SLOTS_COUNT_OFFSET 0x14
 
+
+#ifdef __i386__
+#define MINECRAFTCLIENT_SIZE_0_10_0 0x12c
+#else
+#ifdef __arm__
+#define MINECRAFTCLIENT_SIZE_0_10_0 0x130
+#endif
+#endif
+
+#define MINECRAFTCLIENT_ISGRABBED_OFFSET_0_10_0 0x74
+
+
 #ifdef __i386__
 #define NINECRAFTAPP_SIZE_0_9_5 0xd60
 #define NINECRAFTAPP_SIZE_0_9_4 0xd74
@@ -207,6 +219,22 @@ extern ninecraft_app_update_t ninecraft_app_update;
 typedef void (*ninecraft_app_handle_back_t)(void *ninecraft_app, bool keep_screen);
 
 extern ninecraft_app_handle_back_t ninecraft_app_handle_back;
+
+typedef void (*minecraft_client_set_size_t)(void *minecraft_client, uint32_t width, uint32_t height, float px);
+
+extern minecraft_client_set_size_t minecraft_client_set_size;
+
+typedef void (*minecraft_client_handle_back_t)(void *minecraft_client, bool keep_screen);
+
+extern minecraft_client_handle_back_t minecraft_client_handle_back;
+
+typedef void (*minecraft_update_t)(void *minecraft);
+
+extern minecraft_update_t minecraft_update;
+
+typedef void (*minecraft_client_construct_t)(void *minecraft_client, int argc, char **argv);
+
+extern minecraft_client_construct_t minecraft_client_construct;
 
 extern void minecraft_setup_hooks(void *handle);
 

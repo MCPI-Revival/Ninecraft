@@ -71,25 +71,24 @@ bool mouse_pointer_hidden = false;
 int old_pos_x, old_pos_y, old_width, old_height;
 
 void *load_library(const char *name) {
-    #ifdef __i386__
+#ifdef __i386__
     char *arch = "x86";
-    #else
-    #ifdef __arm__
+#else
+#ifdef __arm__
     char *arch = "armeabi-v7a";
-    #else
+#else
     char *arch = "";
-    #endif
-    #endif
+#endif
+#endif
     char fullpath[MAXPATHLEN];
     getcwd(fullpath, MAXPATHLEN);
     strcat(fullpath, "/lib/");
     strcat(fullpath, arch);
     strcat(fullpath, "/");
     strcat(fullpath, name);
-    
+
     void *handle = internal_dlopen(fullpath, RTLD_LAZY);
-    if (handle == NULL)
-    {
+    if (handle == NULL) {
         printf("failed to load library %s: %s\n", fullpath, internal_dlerror());
         return NULL;
     }
@@ -99,11 +98,9 @@ void *load_library(const char *name) {
 
 void stub_symbols(const char **symbols, void *stub_func) {
     int i = 0;
-    while (true)
-    {
+    while (true) {
         const char *sym = symbols[i];
-        if (sym == NULL)
-        {
+        if (sym == NULL) {
             break;
         }
         hybris_hook(sym, stub_func);
@@ -136,7 +133,7 @@ int mouseToGameKeyCode(int keyCode) {
     }
 }
 
-static void mouse_click_callback(GLFWwindow* window, int button, int action, int mods) {
+static void mouse_click_callback(GLFWwindow *window, int button, int action, int mods) {
     double xpos, ypos;
     glfwGetCursorPos(window, &xpos, &ypos);
     if (!mouse_pointer_hidden) {
@@ -144,16 +141,15 @@ static void mouse_click_callback(GLFWwindow* window, int button, int action, int
         if (version_id == version_id_0_1_0) {
             ((void (*)(int, int, int, int))internal_dlsym(handle, "_ZN5Mouse4feedEiiii"))((int)mc_button, (int)(action == GLFW_PRESS ? 1 : 0), (int)xpos, (int)ypos);
         } else if (version_id >= version_id_0_6_0) {
-            mouse_device_feed_0_6(internal_dlsym(handle, "_ZN5Mouse9_instanceE"), (char)mc_button, (char)(action == GLFW_PRESS ? 1 : 0), (short)xpos, (short)ypos, 0, 0);   
+            mouse_device_feed_0_6(internal_dlsym(handle, "_ZN5Mouse9_instanceE"), (char)mc_button, (char)(action == GLFW_PRESS ? 1 : 0), (short)xpos, (short)ypos, 0, 0);
             multitouch_feed_0_6((char)mc_button, (char)(action == GLFW_PRESS ? 1 : 0), (short)xpos, (short)ypos, 0);
         } else if (version_id <= version_id_0_5_0_j) {
-            mouse_device_feed_0_5(internal_dlsym(handle, "_ZN5Mouse9_instanceE"), (char) mc_button, (char) (action == GLFW_PRESS ? 1 : 0), (short)xpos, (short)ypos);
+            mouse_device_feed_0_5(internal_dlsym(handle, "_ZN5Mouse9_instanceE"), (char)mc_button, (char)(action == GLFW_PRESS ? 1 : 0), (short)xpos, (short)ypos);
             multitouch_feed_0_5((char)mc_button, (char)(action == GLFW_PRESS ? 1 : 0), (short)xpos, (short)ypos, 0);
         }
-        
     } else {
         int game_keycode = mouseToGameKeyCode(button);
-        
+
         if (action == GLFW_PRESS) {
             keyboard_feed(game_keycode, 1);
         } else if (action == GLFW_RELEASE) {
@@ -162,7 +158,7 @@ static void mouse_click_callback(GLFWwindow* window, int button, int action, int
     }
 }
 
-static void mouse_scroll_callback(GLFWwindow* window, double xoffset, double yoffset) {
+static void mouse_scroll_callback(GLFWwindow *window, double xoffset, double yoffset) {
     double xpos, ypos;
     glfwGetCursorPos(window, &xpos, &ypos);
     char key_code = 0;
@@ -178,7 +174,7 @@ static void mouse_scroll_callback(GLFWwindow* window, double xoffset, double yof
 static double last_mouse_x = 0;
 static double last_mouse_y = 0;
 static bool ignore_relative_motion = false;
-static void mouse_pos_callback(GLFWwindow* window, double xpos, double ypos) {
+static void mouse_pos_callback(GLFWwindow *window, double xpos, double ypos) {
     if (!mouse_pointer_hidden || version_id >= version_id_0_6_0) {
         if (version_id == version_id_0_1_0) {
             ((void (*)(int, int, int, int))internal_dlsym(handle, "_ZN5Mouse4feedEiiii"))(0, 0, (int)xpos, (int)ypos);
@@ -200,7 +196,7 @@ static void mouse_pos_callback(GLFWwindow* window, double xpos, double ypos) {
         cy /= 2;
         if ((int)xpos != cy || (int)ypos != cy) {
             glfwSetCursorPos(window, cx, cy);
-            y_cam -= ((float) ypos - (float)cy) / 1.7;
+            y_cam -= ((float)ypos - (float)cy) / 1.7;
             x_cam += ((float)xpos - (float)cx) / 0.7;
         }
     }
@@ -260,20 +256,23 @@ void set_ninecraft_size_0_1_0(int width, int height) {
         float new_screen_width = (float)(width) * (*inv_gui_scale);
         float new_screen_height = (float)(height) * (*inv_gui_scale);
         screen_set_size(
-            screen, 
+            screen,
             (int)(0.0 < new_screen_width) * (int)new_screen_width,
-            (int)(0.0 < new_screen_height) * (int)new_screen_height
-        );
+            (int)(0.0 < new_screen_height) * (int)new_screen_height);
         ((void (*)(void *))(((void ***)screen)[0][3]))(screen);
     }
 }
 
 static void set_ninecraft_size(int width, int height) {
-    glClear(GL_DEPTH_BUFFER_BIT);
-    minecraft_set_size(ninecraft_app, width, height);
+    if (version_id >= version_id_0_10_0) {
+        minecraft_client_set_size(ninecraft_app, width, height, 2.f);
+    } else {
+        glClear(GL_DEPTH_BUFFER_BIT);
+        minecraft_set_size(ninecraft_app, width, height);
+    }
 }
 
-static void resize_callback(GLFWwindow* window, int width, int height) {
+static void resize_callback(GLFWwindow *window, int width, int height) {
     if (version_id == version_id_0_1_0) {
         set_ninecraft_size_0_1_0(width, height);
     } else {
@@ -281,48 +280,46 @@ static void resize_callback(GLFWwindow* window, int width, int height) {
     }
 }
 
-
-
-static void char_callback(GLFWwindow* window, unsigned int codepoint) {
+static void char_callback(GLFWwindow *window, unsigned int codepoint) {
     if (version_id >= version_id_0_6_0 && version_id <= version_id_0_7_1) {
         keyboard_feed_text_0_6_0((char)codepoint);
     } else if (version_id >= version_id_0_7_2) {
-        //char p_codepoint[2] = {(char)codepoint, '\0'};
+        // char p_codepoint[2] = {(char)codepoint, '\0'};
         char p_codepoint[5];
-        
-        if(codepoint <= 0x7f){
-            p_codepoint[0] = (char) codepoint;
+
+        if (codepoint <= 0x7f) {
+            p_codepoint[0] = (char)codepoint;
             p_codepoint[1] = '\x00';
-        }else if(codepoint <= 0x7fff){
-            p_codepoint[0] = (char) (0xc0 | ((codepoint >> 6) & 0x1f));
-            p_codepoint[1] = (char) (0x80 | ((codepoint & 0x3f)));
+        } else if (codepoint <= 0x7fff) {
+            p_codepoint[0] = (char)(0xc0 | ((codepoint >> 6) & 0x1f));
+            p_codepoint[1] = (char)(0x80 | ((codepoint & 0x3f)));
             p_codepoint[2] = '\x00';
-        }else if(codepoint <= 0xffff){
-            p_codepoint[0] = (char) (0xe0 | ((codepoint >> 12) & 0x0f));
-            p_codepoint[1] = (char) (0x80 | ((codepoint >> 6) & 0x3f));
-            p_codepoint[2] = (char) (0x80 | (codepoint & 0x3f));
+        } else if (codepoint <= 0xffff) {
+            p_codepoint[0] = (char)(0xe0 | ((codepoint >> 12) & 0x0f));
+            p_codepoint[1] = (char)(0x80 | ((codepoint >> 6) & 0x3f));
+            p_codepoint[2] = (char)(0x80 | (codepoint & 0x3f));
             p_codepoint[3] = '\x00';
-        }else{
-            p_codepoint[0] = (char) (0xf0 | ((codepoint >> 18) & 0x07));
-            p_codepoint[1] = (char) (0x80 | ((codepoint >> 12) & 0x3f));
-            p_codepoint[2] = (char) (0x80 | ((codepoint >> 6) & 0x3f));
-            p_codepoint[3] = (char) (0x80 | (codepoint & 0x3f));
+        } else {
+            p_codepoint[0] = (char)(0xf0 | ((codepoint >> 18) & 0x07));
+            p_codepoint[1] = (char)(0x80 | ((codepoint >> 12) & 0x3f));
+            p_codepoint[2] = (char)(0x80 | ((codepoint >> 6) & 0x3f));
+            p_codepoint[3] = (char)(0x80 | (codepoint & 0x3f));
             p_codepoint[4] = '\x00';
         }
-        
+
         android_string_t str;
         android_string_cstr(&str, p_codepoint);
         keyboard_feed_text_0_7_2(&str, false);
     }
 }
 
-static void key_callback(GLFWwindow* window, int key, int scancode, int action, int mods) {
+static void key_callback(GLFWwindow *window, int key, int scancode, int action, int mods) {
     if (key == GLFW_KEY_F11) {
         if (action == GLFW_PRESS) {
             if (glfwGetWindowMonitor(_window) == NULL) {
                 glfwGetWindowPos(_window, &old_pos_x, &old_pos_y);
                 glfwGetWindowSize(_window, &old_width, &old_height);
-                const GLFWvidmode * mode = glfwGetVideoMode(glfwGetPrimaryMonitor());
+                const GLFWvidmode *mode = glfwGetVideoMode(glfwGetPrimaryMonitor());
                 glfwSetWindowMonitor(_window, glfwGetPrimaryMonitor(), 0, 0, mode->width, mode->height, 0);
             } else {
                 glfwSetWindowMonitor(_window, NULL, old_pos_x, old_pos_y, old_width, old_height, 0);
@@ -352,7 +349,11 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
             }
         } else if (version_id >= version_id_0_1_1 && key == GLFW_KEY_ESCAPE) {
             if (action == GLFW_PRESS) {
-                ninecraft_app_handle_back(ninecraft_app, false);
+                if (version_id >= version_id_0_10_0) {
+                    minecraft_client_handle_back(ninecraft_app, false);
+                } else {
+                    ninecraft_app_handle_back(ninecraft_app, false);
+                }
             }
         } else if (action == GLFW_PRESS && game_keycode) {
             keyboard_feed(game_keycode, 1);
@@ -362,7 +363,7 @@ static void key_callback(GLFWwindow* window, int key, int scancode, int action, 
     }
 }
 
-void window_close_callback(GLFWwindow* window) {
+void window_close_callback(GLFWwindow *window) {
     audio_engine_destroy();
     exit(0);
 }
@@ -387,64 +388,97 @@ void release_mouse() {
 }
 
 void gles_hook() {
-    hybris_hook("glAlphaFunc", (void *) gl_alpha_func);
-    hybris_hook("glBindBuffer", (void *) gl_bind_buffer);
-    hybris_hook("glBindTexture", (void *) gl_bind_texture);
-    hybris_hook("glBlendFunc", (void *) gl_blend_func);
-    hybris_hook("glBufferData", (void *) gl_buffer_data);
-    hybris_hook("glClear", (void *) gl_clear);
-    hybris_hook("glClearColor", (void *) gl_clear_color);
-    hybris_hook("glColor4f", (void *) gl_color_4_f);
-    hybris_hook("glColorMask", (void *) gl_color_mask);
-    hybris_hook("glColorPointer", (void *) gl_color_pointer);
-    hybris_hook("glCullFace", (void *) gl_cull_face);
-    hybris_hook("glDeleteBuffers", (void *) gl_delete_buffers);
-    hybris_hook("glDeleteTextures", (void *) gl_delete_textures);
-    hybris_hook("glDepthFunc", (void *) gl_depth_func);
-    hybris_hook("glDepthMask", (void *) gl_depth_mask);
-    hybris_hook("glDepthRangef", (void *) gl_depth_range_f);
-    hybris_hook("glDisable", (void *) gl_disable);
-    hybris_hook("glDisableClientState", (void *) gl_disable_client_state);
-    hybris_hook("glDrawArrays", (void *) gl_draw_arrays);
-    hybris_hook("glEnable", (void *) gl_enable);
-    hybris_hook("glEnableClientState", (void *) gl_enable_client_state);
-    hybris_hook("glFogf", (void *) gl_fog_f);
-    hybris_hook("glFogfv", (void *) gl_fog_f_v);
-    hybris_hook("glFogx", (void *) gl_fog_x);
-    hybris_hook("glGenTextures", (void *) gl_gen_textures);
-    hybris_hook("glGetFloatv", (void *) gl_get_float_v);
-    hybris_hook("glGetString", (void *) gl_get_string);
-    hybris_hook("glHint", (void *) gl_hint);
-    hybris_hook("glLineWidth", (void *) gl_line_width);
-    hybris_hook("glLoadIdentity", (void *) gl_load_identity);
-    hybris_hook("glMatrixMode", (void *) gl_matrix_mode);
-    hybris_hook("glMultMatrixf", (void *) gl_mult_matrix_f);
-    hybris_hook("glNormal3f", (void *) gl_normal_3_f);
-    hybris_hook("glOrthof", (void *) gl_ortho_f);
-    hybris_hook("glPolygonOffset", (void *) gl_polygon_offset);
-    hybris_hook("glPopMatrix", (void *) gl_pop_matrix);
-    hybris_hook("glPushMatrix", (void *) gl_push_matrix);
-    hybris_hook("glReadPixels", (void *) gl_read_pixels);
-    hybris_hook("glRotatef", (void *) gl_rotate_f);
-    hybris_hook("glScalef", (void *) gl_scale_f);
-    hybris_hook("glScissor", (void *) gl_scissor);
-    hybris_hook("glShadeModel", (void *) gl_shade_model);
-    hybris_hook("glTexCoordPointer", (void *) gl_tex_coord_pointer);
-    hybris_hook("glTexImage2D", (void *) gl_tex_image_2_d);
-    hybris_hook("glTexParameteri", (void *) gl_tex_parameter_i);
-    hybris_hook("glTexSubImage2D", (void *) gl_tex_sub_image_2_d);
-    hybris_hook("glTranslatef", (void *) gl_translate_f);
-    hybris_hook("glVertexPointer", (void *) gl_vertex_pointer);
-    hybris_hook("glViewport", (void *) gl_viewport);
-    hybris_hook("glDrawElements", (void *) gl_draw_elements);
-    hybris_hook("glGetError", (void *) gl_get_error);
-    hybris_hook("glGenBuffers", (void *) gl_gen_buffers);
-    hybris_hook("glStencilFunc", (void *) gl_stencil_func);
-    hybris_hook("glStencilMask", (void *) gl_stencil_mask);
-    hybris_hook("glLightModelf", (void *) gl_light_model_f);
-    hybris_hook("glLightfv", (void *) gl_light_f_v);
-    hybris_hook("glNormalPointer", (void *) gl_normal_pointer);
-    hybris_hook("glStencilOp", (void *) gl_stencil_op);
+    hybris_hook("glAlphaFunc", (void *)gl_alpha_func);
+    hybris_hook("glBindBuffer", (void *)gl_bind_buffer);
+    hybris_hook("glBindTexture", (void *)gl_bind_texture);
+    hybris_hook("glBlendFunc", (void *)gl_blend_func);
+    hybris_hook("glBufferData", (void *)gl_buffer_data);
+    hybris_hook("glClear", (void *)gl_clear);
+    hybris_hook("glClearColor", (void *)gl_clear_color);
+    hybris_hook("glColor4f", (void *)gl_color_4_f);
+    hybris_hook("glColorMask", (void *)gl_color_mask);
+    hybris_hook("glColorPointer", (void *)gl_color_pointer);
+    hybris_hook("glCullFace", (void *)gl_cull_face);
+    hybris_hook("glDeleteBuffers", (void *)gl_delete_buffers);
+    hybris_hook("glDeleteTextures", (void *)gl_delete_textures);
+    hybris_hook("glDepthFunc", (void *)gl_depth_func);
+    hybris_hook("glDepthMask", (void *)gl_depth_mask);
+    hybris_hook("glDepthRangef", (void *)gl_depth_range_f);
+    hybris_hook("glDisable", (void *)gl_disable);
+    hybris_hook("glDisableClientState", (void *)gl_disable_client_state);
+    hybris_hook("glDrawArrays", (void *)gl_draw_arrays);
+    hybris_hook("glEnable", (void *)gl_enable);
+    hybris_hook("glEnableClientState", (void *)gl_enable_client_state);
+    hybris_hook("glFogf", (void *)gl_fog_f);
+    hybris_hook("glFogfv", (void *)gl_fog_f_v);
+    hybris_hook("glFogx", (void *)gl_fog_x);
+    hybris_hook("glGenTextures", (void *)gl_gen_textures);
+    hybris_hook("glGetFloatv", (void *)gl_get_float_v);
+    hybris_hook("glGetString", (void *)gl_get_string);
+    hybris_hook("glHint", (void *)gl_hint);
+    hybris_hook("glLineWidth", (void *)gl_line_width);
+    hybris_hook("glLoadIdentity", (void *)gl_load_identity);
+    hybris_hook("glMatrixMode", (void *)gl_matrix_mode);
+    hybris_hook("glMultMatrixf", (void *)gl_mult_matrix_f);
+    hybris_hook("glNormal3f", (void *)gl_normal_3_f);
+    hybris_hook("glOrthof", (void *)gl_ortho_f);
+    hybris_hook("glPolygonOffset", (void *)gl_polygon_offset);
+    hybris_hook("glPopMatrix", (void *)gl_pop_matrix);
+    hybris_hook("glPushMatrix", (void *)gl_push_matrix);
+    hybris_hook("glReadPixels", (void *)gl_read_pixels);
+    hybris_hook("glRotatef", (void *)gl_rotate_f);
+    hybris_hook("glScalef", (void *)gl_scale_f);
+    hybris_hook("glScissor", (void *)gl_scissor);
+    hybris_hook("glShadeModel", (void *)gl_shade_model);
+    hybris_hook("glTexCoordPointer", (void *)gl_tex_coord_pointer);
+    hybris_hook("glTexImage2D", (void *)gl_tex_image_2_d);
+    hybris_hook("glTexParameteri", (void *)gl_tex_parameter_i);
+    hybris_hook("glTexSubImage2D", (void *)gl_tex_sub_image_2_d);
+    hybris_hook("glTranslatef", (void *)gl_translate_f);
+    hybris_hook("glVertexPointer", (void *)gl_vertex_pointer);
+    hybris_hook("glViewport", (void *)gl_viewport);
+    hybris_hook("glDrawElements", (void *)gl_draw_elements);
+    hybris_hook("glGetError", (void *)gl_get_error);
+    hybris_hook("glGenBuffers", (void *)gl_gen_buffers);
+    hybris_hook("glStencilFunc", (void *)gl_stencil_func);
+    hybris_hook("glStencilMask", (void *)gl_stencil_mask);
+    hybris_hook("glLightModelf", (void *)gl_light_model_f);
+    hybris_hook("glLightfv", (void *)gl_light_f_v);
+    hybris_hook("glNormalPointer", (void *)gl_normal_pointer);
+    hybris_hook("glStencilOp", (void *)gl_stencil_op);
+    hybris_hook("glActiveTexture", (void *)gl_active_texture);
+    hybris_hook("glAttachShader", (void *)gl_attach_shader);
+    hybris_hook("glClearStencil", (void *)gl_clear_stencil);
+    hybris_hook("glCompileShader", (void *)gl_compile_shader);
+    hybris_hook("glCreateProgram", (void *)gl_create_program);
+    hybris_hook("glCreateShader", (void *)gl_create_shader);
+    hybris_hook("glDeleteProgram", (void *)gl_delete_program);
+    hybris_hook("glEnableVertexAttribArray", (void *)gl_enable_vertex_attrib_array);
+    hybris_hook("glGetActiveAttrib", (void *)gl_get_active_attrib);
+    hybris_hook("glGetActiveUniform", (void *)gl_get_active_uniform);
+    hybris_hook("glGetAttribLocation", (void *)gl_get_attrib_location);
+    hybris_hook("glGetProgramInfoLog", (void *)gl_get_program_info_log);
+    hybris_hook("glGetProgramiv", (void *)gl_get_program_i_v);
+    hybris_hook("glGetShaderInfoLog", (void *)gl_get_shader_info_log);
+    hybris_hook("glGetShaderiv", (void *)gl_get_shader_i_v);
+    hybris_hook("glGetShaderPrecisionFormat", (void *)gl_get_shader_precision_format);
+    hybris_hook("glGetUniformLocation", (void *)gl_get_uniform_location);
+    hybris_hook("glLinkProgram", (void *)gl_link_program);
+    hybris_hook("glReleaseShaderCompiler", (void *)gl_release_shader_compiler);
+    hybris_hook("glShaderSource", (void *)gl_shader_source);
+    hybris_hook("glUniform1fv", (void *)gl_uniform_1_f_v);
+    hybris_hook("glUniform1iv", (void *)gl_uniform_1_i_v);
+    hybris_hook("glUniform2fv", (void *)gl_uniform_2_f_v);
+    hybris_hook("glUniform2iv", (void *)gl_uniform_2_i_v);
+    hybris_hook("glUniform3fv", (void *)gl_uniform_3_f_v);
+    hybris_hook("glUniform3iv", (void *)gl_uniform_3_i_v);
+    hybris_hook("glUniform4fv", (void *)gl_uniform_4_f_v);
+    hybris_hook("glUniform4iv", (void *)gl_uniform_4_i_v);
+    hybris_hook("glUniformMatrix2fv", (void *)gl_uniform_matrix_2_f_v);
+    hybris_hook("glUniformMatrix3fv", (void *)gl_uniform_matrix_3_f_v);
+    hybris_hook("glUniformMatrix4fv", (void *)gl_uniform_matrix_4_f_v);
+    hybris_hook("glUseProgram", (void *)gl_use_program);
+    hybris_hook("glVertexAttribPointer", (void *)gl_vertex_attrib_pointer);
 }
 
 void math_hook() {
@@ -480,6 +514,7 @@ void math_hook() {
     hybris_hook("log10", math_log10);
     hybris_hook("modff", math_modff);
     hybris_hook("ldexpf", math_ldexpf);
+    hybris_hook("tanf", math_tanf);
 }
 
 #ifdef __arm__
@@ -537,9 +572,10 @@ extern void *__dso_handle;
 #define CONSTRUCTION_UNDERWAY_WITHOUT_WAITER 0x100
 #define CONSTRUCTION_UNDERWAY_WITH_WAITER 0x200
 
-typedef union {
-  atomic_int state;
-  int32_t aligner;
+typedef union
+{
+    atomic_int state;
+    int32_t aligner;
 } my_guard_t;
 
 int __my_cxa_guard_acquire(my_guard_t *gv) {
@@ -550,20 +586,18 @@ int __my_cxa_guard_acquire(my_guard_t *gv) {
             return 0;
         } else if (old_value == CONSTRUCTION_NOT_YET_STARTED) {
             if (!atomic_compare_exchange_weak_explicit(&gv->state, &old_value,
-                    CONSTRUCTION_UNDERWAY_WITHOUT_WAITER,
-                    memory_order_relaxed,
-                    memory_order_relaxed)) {
-                    continue;
+                                                       CONSTRUCTION_UNDERWAY_WITHOUT_WAITER,
+                                                       memory_order_relaxed,
+                                                       memory_order_relaxed)) {
+                continue;
             }
             atomic_thread_fence(memory_order_acquire);
             return 1;
         } else if (old_value == CONSTRUCTION_UNDERWAY_WITHOUT_WAITER) {
             if (!atomic_compare_exchange_weak_explicit(&gv->state, &old_value,
-                    CONSTRUCTION_UNDERWAY_WITH_WAITER,
-                    memory_order_relaxed,
-                    memory_order_relaxed
-                )
-            ) {
+                                                       CONSTRUCTION_UNDERWAY_WITH_WAITER,
+                                                       memory_order_relaxed,
+                                                       memory_order_relaxed)) {
                 continue;
             }
         }
@@ -620,13 +654,12 @@ void missing_hook() {
     hybris_hook("uncompress", uncompress);
     hybris_hook("compress", compress);
     hybris_hook("compressBound", compressBound);
-    
 
     hybris_hook("ftime", ftime);
 
     hybris_hook("__cxa_pure_virtual", __my_cxa_pure_virtual);
 
-    #ifdef __arm__
+#ifdef __arm__
     hybris_hook("__aeabi_atexit", __aeabi_atexit);
     hybris_hook("__aeabi_uidiv", __aeabi_uidiv);
     hybris_hook("__aeabi_d2ulz", __aeabi_d2ulz);
@@ -637,7 +670,7 @@ void missing_hook() {
     hybris_hook("__aeabi_idivmod", __aeabi_idivmod);
     hybris_hook("__aeabi_idiv", __aeabi_idiv);
     hybris_hook("__aeabi_ul2f", __aeabi_ul2f);
-    #endif
+#endif
 }
 
 ninecraft_options_t options = {
@@ -679,13 +712,13 @@ int main(int argc, char **argv) {
     }
 
     glfwWindowHint(GLFW_CLIENT_API, GLFW_OPENGL_API);
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 1);
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 5);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 2);
+    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
     glfwWindowHint(GLFW_CONTEXT_CREATION_API, GLFW_NATIVE_CONTEXT_API);
     _window = glfwCreateWindow(720, 480, "Ninecraft", NULL, NULL);
     GLFWimage icon;
     icon.pixels = stbi_load("./res/drawable/iconx.png", &icon.width, &icon.height, NULL, STBI_rgb_alpha);
-    glfwSetWindowIcon(_window, 1, &icon); 
+    glfwSetWindowIcon(_window, 1, &icon);
     stbi_image_free(icon.pixels);
     if (!_window) {
         puts("cant create");
@@ -720,15 +753,14 @@ int main(int argc, char **argv) {
 
     android_alloc_setup_hooks(handle);
     android_string_setup_hooks(handle);
-    
+
     android_string_t in;
     android_string_cstr(&in, "v%d.%d.%d alpha");
 
     void (*get_game_version_string)(android_string_t *, android_string_t *) = (void (*)(android_string_t *, android_string_t *))internal_dlsym(handle, "_ZN6Common20getGameVersionStringERKSs");
-    
+
     void (*get_game_version_string_2)(android_string_t *) = (void (*)(android_string_t *))internal_dlsym(handle, "_ZN6Common20getGameVersionStringEv");
-    
-    
+
     if (get_game_version_string != NULL) {
         android_string_t game_version;
         get_game_version_string(&game_version, &in);
@@ -775,7 +807,7 @@ int main(int argc, char **argv) {
                 version_id = version_id_0_5_0_j;
             } else {
                 version_id = version_id_0_5_0;
-            }            
+            }
         } else if (strncmp(verstr, "v0.6.0", 6) == 0) {
             version_id = version_id_0_6_0;
         } else if (strncmp(verstr, "v0.6.1", 6) == 0) {
@@ -802,24 +834,25 @@ int main(int argc, char **argv) {
         android_string_t game_version;
         get_game_version_string_2(&game_version);
         char *verstr = android_string_to_str(&game_version);
-        printf("Ninecraft is running mcpe %.6s\n", verstr);
-
-        if (strncmp(verstr, "v0.8.0", 6) == 0) {
+        printf("Ninecraft is running mcpe %s\n", verstr);
+        if (strcmp(verstr, "v0.8.0 alpha") == 0) {
             version_id = version_id_0_8_0;
-        } else if (strncmp(verstr, "v0.8.1", 6) == 0) {
+        } else if (strcmp(verstr, "v0.8.1 alpha") == 0) {
             version_id = version_id_0_8_1;
-        } else if (strncmp(verstr, "v0.9.0", 6) == 0) {
+        } else if (strcmp(verstr, "v0.9.0 alpha") == 0) {
             version_id = version_id_0_9_0;
-        } else if (strncmp(verstr, "v0.9.1", 6) == 0) {
+        } else if (strcmp(verstr, "v0.9.1 alpha") == 0) {
             version_id = version_id_0_9_1;
-        } else if (strncmp(verstr, "v0.9.2", 6) == 0) {
+        } else if (strcmp(verstr, "v0.9.2 alpha") == 0) {
             version_id = version_id_0_9_2;
-        } else if (strncmp(verstr, "v0.9.3", 6) == 0) {
+        } else if (strcmp(verstr, "v0.9.3 alpha") == 0) {
             version_id = version_id_0_9_3;
-        } else if (strncmp(verstr, "v0.9.4", 6) == 0) {
+        } else if (strcmp(verstr, "v0.9.4 alpha") == 0) {
             version_id = version_id_0_9_4;
-        } else if (strncmp(verstr, "v0.9.5", 6) == 0) {
+        } else if (strcmp(verstr, "v0.9.5 alpha") == 0) {
             version_id = version_id_0_9_5;
+        } else if (strcmp(verstr, "v0.10.0 alpha") == 0) {
+            version_id = version_id_0_10_0;
         } else {
             puts("Unsupported Version!");
             return 1;
@@ -887,7 +920,7 @@ int main(int argc, char **argv) {
     controller_x_stick = (float *)internal_dlsym(handle, "_ZN10Controller12stickValuesXE");
     controller_y_stick = (float *)internal_dlsym(handle, "_ZN10Controller12stickValuesYE");
 
-    if (version_id >= version_id_0_6_0) {
+    if (version_id >= version_id_0_6_0 && version_id <= version_id_0_9_5) {
         default_mouse_mode = GLFW_CURSOR_HIDDEN;
     }
 
@@ -895,12 +928,14 @@ int main(int argc, char **argv) {
 
     printf("%s\n", glGetString(GL_VERSION));
 
-    if (version_id >= version_id_0_9_0) {
+    if (version_id >= version_id_0_9_0 && version_id <= version_id_0_9_5) {
         printf("nine construct %p\n", ninecraft_app_construct_2);
+    } else if (version_id >= version_id_0_10_0) {
+        printf("nine construct %p\n", minecraft_client_construct);
     } else {
         printf("nine construct %p\n", ninecraft_app_construct);
     }
-    
+
     size_t ninecraft_app_size;
 
     if (version_id == version_id_0_1_0) {
@@ -981,15 +1016,22 @@ int main(int argc, char **argv) {
         ninecraft_app_size = NINECRAFTAPP_SIZE_0_9_4;
     } else if (version_id == version_id_0_9_5) {
         ninecraft_app_size = NINECRAFTAPP_SIZE_0_9_5;
+    } else if (version_id == version_id_0_10_0) {
+        ninecraft_app_size = MINECRAFTCLIENT_SIZE_0_10_0;
     }
     ninecraft_app = malloc(ninecraft_app_size);
-    if (version_id >= version_id_0_9_0) {
-        ninecraft_app_construct_2(ninecraft_app, argc, argv);
+    if (version_id >= version_id_0_9_0 && version_id <= version_id_0_9_5) {
+        ninecraft_app_construct_2(ninecraft_app, 0, NULL);
+    } else if (version_id >= version_id_0_10_0) {
+        minecraft_client_construct(ninecraft_app, 0, NULL);
     } else {
         ninecraft_app_construct(ninecraft_app);
     }
 
-    if (version_id == version_id_0_9_5) {
+    if (version_id == version_id_0_10_0) {
+        android_string_equ((android_string_t *)(ninecraft_app + 120), "./storage/internal/");
+        android_string_equ((android_string_t *)(ninecraft_app + 124), "./storage/external/");
+    } else if (version_id == version_id_0_9_5) {
 #ifdef __i386__
         android_string_equ((android_string_t *)(ninecraft_app + 3228), "./storage/internal/");
         android_string_equ((android_string_t *)(ninecraft_app + 3232), "./storage/external/");
@@ -999,7 +1041,7 @@ int main(int argc, char **argv) {
         android_string_equ((android_string_t *)(ninecraft_app + 3236), "./storage/external/");
 #endif
 #endif
-    } else if (version_id == version_id_0_9_0 || version_id_0_9_1 || version_id_0_9_2 || version_id_0_9_3 || version_id_0_9_4) {
+    } else if (version_id == version_id_0_9_0 || version_id == version_id_0_9_1 || version_id == version_id_0_9_2 || version_id == version_id_0_9_3 || version_id == version_id_0_9_4) {
 #ifdef __i386__
         android_string_equ((android_string_t *)(ninecraft_app + 3248), "./storage/internal/");
         android_string_equ((android_string_t *)(ninecraft_app + 3252), "./storage/external/");
@@ -1108,13 +1150,12 @@ int main(int argc, char **argv) {
             .egl_surface = NULL,
             .unknown = NULL,
             .platform = &platform,
-            .do_render = true
-        };
+            .do_render = false};
         app_init(ninecraft_app, &context);
     } else {
-        *(void **)(ninecraft_app + 0x08) = NULL; // egl_display
-        *(void **)(ninecraft_app + 0x0c) = NULL; // egl_content
-        *(void **)(ninecraft_app + 0x10) = NULL; // egl_surface
+        *(void **)(ninecraft_app + 0x08) = NULL;      // egl_display
+        *(void **)(ninecraft_app + 0x0c) = NULL;      // egl_content
+        *(void **)(ninecraft_app + 0x10) = NULL;      // egl_surface
         *(void **)(ninecraft_app + 0x14) = &platform; // app_platform
         if (version_id >= version_id_0_1_0_touch) {
             *(uint8_t *)(ninecraft_app + 0x18) = 0; // do_render
@@ -1126,7 +1167,7 @@ int main(int argc, char **argv) {
             *(uint8_t *)(ninecraft_app + 4) = 1; // is_inited
         }
     }
-    
+
     if (version_id >= version_id_0_1_0_touch) {
         set_ninecraft_size(720, 480);
     } else {
@@ -1134,7 +1175,9 @@ int main(int argc, char **argv) {
     }
 
     size_t minecraft_isgrabbed_offset;
-    if (version_id == version_id_0_9_5) {
+    if (version_id == version_id_0_10_0) {
+        minecraft_isgrabbed_offset = MINECRAFTCLIENT_ISGRABBED_OFFSET_0_10_0;
+    } else if (version_id == version_id_0_9_5) {
         minecraft_isgrabbed_offset = MINECRAFT_ISGRABBED_OFFSET_0_9_5;
     } else if (version_id == version_id_0_9_4) {
         minecraft_isgrabbed_offset = MINECRAFT_ISGRABBED_OFFSET_0_9_4;
@@ -1216,10 +1259,6 @@ int main(int argc, char **argv) {
         minecraft_isgrabbed_offset = MINECRAFT_ISGRABBED_OFFSET_0_1_0;
     }
 
-    if (version_id >= version_id_0_8_0) {
-        *(int *)internal_dlsym(handle, "_ZN11AppPlatform17TEXTURE_MAX_LEVELE") = 0;
-    }
-
     while (true) {
         if (((bool *)ninecraft_app)[minecraft_isgrabbed_offset]) {
             if (!mouse_pointer_hidden) {
@@ -1235,10 +1274,14 @@ int main(int argc, char **argv) {
             controller_y_stick[1] = (float)(y_cam - 180.0) * 0.0055555557;
             controller_x_stick[1] = ((float)((x_cam - 483.0)) * 0.0020703934);
         }
-        ninecraft_app_update(ninecraft_app);
-        
+        if (version_id >= version_id_0_10_0) {
+            minecraft_update(ninecraft_app);
+        } else {
+            ninecraft_app_update(ninecraft_app);
+        }
+
         if (!mouse_pointer_hidden) {
-            if (version_id >= version_id_0_6_0) {
+            if (version_id >= version_id_0_6_0 && version_id <= version_id_0_9_5) {
                 float inv_gui_scale = *((float *)internal_dlsym(handle, "_ZN3Gui11InvGuiScaleE"));
                 double xpos, ypos;
                 glfwGetCursorPos(_window, &xpos, &ypos);

@@ -1,5 +1,4 @@
 #include <ninecraft/gfx/gles_compat.h>
-#include <GL/glext.h>
 
 NINECRAFT_FLOAT_FUNC void gl_alpha_func(GLenum func, GLclampf ref) {
     glAlphaFunc(func, ref);
@@ -231,4 +230,136 @@ void gl_normal_pointer(GLenum type, GLsizei stride, const GLvoid *pointer) {
 
 void gl_stencil_op(GLenum fail, GLenum zfail, GLenum zpass) {
     glStencilOp(fail, zfail, zpass);
+}
+
+void gl_active_texture(GLenum texture) {
+    glActiveTexture(texture);
+}
+
+void gl_attach_shader(GLuint program, GLuint shader) {
+    glAttachShader(program, shader);
+}
+
+void gl_clear_stencil(GLint s) {
+    glClearStencil(s);
+}
+
+void gl_compile_shader(GLuint shader) {
+    glCompileShader(shader);
+}
+
+GLuint gl_create_program() {
+    return glCreateProgram();
+}
+
+GLuint gl_create_shader(GLenum type) {
+    return glCreateShader(type);
+}
+
+void gl_delete_program(GLuint program) {
+    glDeleteProgram(program);
+}
+
+void gl_enable_vertex_attrib_array(GLuint index) {
+    glEnableVertexAttribArray(index);
+}
+
+void gl_get_active_attrib(GLuint program, GLuint index, GLsizei bufSize, GLsizei *length, GLint *size, GLenum *type, GLchar *name) {
+    glGetActiveAttrib(program, index, bufSize, length, size, type, name);
+}
+
+void gl_get_active_uniform(GLuint program, GLuint index, GLsizei bufSize, GLsizei *length, GLint *size, GLenum *type, GLchar *name) {
+    glGetActiveUniform(program, index, bufSize, length, size, type, name);
+}
+
+GLint gl_get_attrib_location(GLuint program, const GLchar *name) {
+    return glGetAttribLocation(program, name);
+}
+
+void gl_get_program_info_log(GLuint program, GLsizei bufSize, GLsizei *length, GLchar *infoLog) {
+    glGetProgramInfoLog(program, bufSize, length, infoLog);
+}
+
+void gl_get_program_i_v(GLuint program, GLenum pname, GLint *params) {
+    glGetProgramiv(program, pname, params);
+}
+
+void gl_get_shader_info_log(GLuint shader, GLsizei bufSize, GLsizei *length, GLchar *infoLog) {
+    glGetShaderInfoLog(shader, bufSize, length, infoLog);
+}
+
+void gl_get_shader_i_v(GLuint shader, GLenum pname, GLint *params) {
+    glGetShaderiv(shader, pname, params);
+}
+
+void gl_get_shader_precision_format(GLenum shadertype, GLenum precisiontype, GLint *range, GLint *precision) {
+    glGetShaderPrecisionFormat(shadertype, precisiontype, range, precision);
+}
+
+GLint gl_get_uniform_location(GLuint program, const GLchar *name) {
+    return glGetUniformLocation(program, name);
+}
+
+void gl_link_program(GLuint program) {
+    glLinkProgram(program);
+}
+
+void gl_release_shader_compiler() {
+    glReleaseShaderCompiler();
+}
+
+void gl_shader_source(GLuint shader, GLsizei count, const GLchar *const *string, const GLint *length) {
+    glShaderSource(shader, count, string, length);
+}
+
+NINECRAFT_FLOAT_FUNC void gl_uniform_1_f_v(GLint location, GLsizei count, const GLfloat *value) {
+    glUniform1fv(location, count, value);
+}
+
+void gl_uniform_1_i_v(GLint location, GLsizei count, const GLint *value) {
+    glUniform1iv(location, count, value);
+}
+
+NINECRAFT_FLOAT_FUNC void gl_uniform_2_f_v(GLint location, GLsizei count, const GLfloat *value) {
+    glUniform2fv(location, count, value);
+}
+
+void gl_uniform_2_i_v(GLint location, GLsizei count, const GLint *value) {
+    glUniform2iv(location, count, value);
+}
+
+NINECRAFT_FLOAT_FUNC void gl_uniform_3_f_v(GLint location, GLsizei count, const GLfloat *value) {
+    glUniform3fv(location, count, value);
+}
+
+void gl_uniform_3_i_v(GLint location, GLsizei count, const GLint *value) {
+    glUniform3iv(location, count, value);
+}
+
+NINECRAFT_FLOAT_FUNC void gl_uniform_4_f_v(GLint location, GLsizei count, const GLfloat *value) {
+    glUniform4fv(location, count, value);
+}
+
+void gl_uniform_4_i_v(GLint location, GLsizei count, const GLint *value) {
+    glUniform4iv(location, count, value);
+}
+
+NINECRAFT_FLOAT_FUNC void gl_uniform_matrix_2_f_v(GLint location, GLsizei count, GLboolean transpose, const GLfloat *value) {
+    glUniformMatrix2fv(location, count, transpose, value);
+}
+
+NINECRAFT_FLOAT_FUNC void gl_uniform_matrix_3_f_v(GLint location, GLsizei count, GLboolean transpose, const GLfloat *value) {
+    glUniformMatrix3fv(location, count, transpose, value);
+}
+
+NINECRAFT_FLOAT_FUNC void gl_uniform_matrix_4_f_v(GLint location, GLsizei count, GLboolean transpose, const GLfloat *value) {
+    glUniformMatrix4fv(location, count, transpose, value);
+}
+
+void gl_use_program(GLuint program) {
+    glUseProgram(program);
+}
+
+void gl_vertex_attrib_pointer(GLuint index, GLint size, GLenum type, GLboolean normalized, GLsizei stride, const void *pointer) {
+    glVertexAttribPointer(index, size, type, normalized, stride, pointer);
 }

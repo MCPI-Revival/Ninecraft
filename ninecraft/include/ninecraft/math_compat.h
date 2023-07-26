@@ -65,4 +65,6 @@ extern float math_modff(float __x, float *__iptr) NINECRAFT_FLOAT_FUNC;
 
 extern float math_ldexpf(float __x, int __exponenet) NINECRAFT_FLOAT_FUNC;
 
+extern float math_tanf(float __x) NINECRAFT_FLOAT_FUNC;
+
 #endif

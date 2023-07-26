@@ -2,6 +2,7 @@
 #define NINECRAFT_GFX_GLES_COMPAT_H
 
 #include <GL/gl.h>
+#include <GL/glext.h>
 #include <ninecraft/ninecraft_defs.h>
 
 // Function documentation
@@ -122,5 +123,71 @@ extern void gl_light_f_v(GLenum light, GLenum pname, const GLfloat *params) NINE
 extern void gl_normal_pointer(GLenum type, GLsizei stride, const GLvoid *pointer);
 
 extern void gl_stencil_op(GLenum fail, GLenum zfail, GLenum zpass);
+
+extern void gl_active_texture(GLenum texture);
+ 
+extern void gl_attach_shader(GLuint program, GLuint shader);
+ 
+extern void gl_clear_stencil(GLint s);
+ 
+extern void gl_compile_shader(GLuint shader);
+ 
+extern GLuint gl_create_program();
+ 
+extern GLuint gl_create_shader(GLenum type);
+ 
+extern void gl_delete_program(GLuint program);
+
+extern void gl_enable_vertex_attrib_array(GLuint index);
+
+extern void gl_get_active_attrib(GLuint program, GLuint index, GLsizei bufSize, GLsizei *length, GLint *size, GLenum *type, GLchar *name);
+
+extern void gl_get_active_uniform(GLuint program, GLuint index, GLsizei bufSize, GLsizei *length, GLint *size, GLenum *type, GLchar *name);
+
+extern GLint gl_get_attrib_location(GLuint program, const GLchar *name);
+
+extern void gl_get_program_info_log(GLuint program, GLsizei bufSize, GLsizei *length, GLchar *infoLog);
+
+extern void gl_get_program_i_v(GLuint program, GLenum pname, GLint *params);
+
+extern void gl_get_shader_info_log(GLuint shader, GLsizei bufSize, GLsizei *length, GLchar *infoLog);
+
+extern void gl_get_shader_i_v(GLuint shader, GLenum pname, GLint *params);
+
+extern void gl_get_shader_precision_format(GLenum shadertype, GLenum precisiontype, GLint *range, GLint *precision);
+
+extern GLint gl_get_uniform_location(GLuint program, const GLchar *name);
+
+extern void gl_link_program(GLuint program);
+
+extern void gl_release_shader_compiler();
+
+extern void gl_shader_source(GLuint shader, GLsizei count, const GLchar *const *string, const GLint *length);
+
+extern void gl_uniform_1_f_v(GLint location, GLsizei count, const GLfloat *value) NINECRAFT_FLOAT_FUNC;
+
+extern void gl_uniform_1_i_v(GLint location, GLsizei count, const GLint *value);
+
+extern void gl_uniform_2_f_v(GLint location, GLsizei count, const GLfloat *value) NINECRAFT_FLOAT_FUNC;
+
+extern void gl_uniform_2_i_v(GLint location, GLsizei count, const GLint *value);
+
+extern void gl_uniform_3_f_v(GLint location, GLsizei count, const GLfloat *value) NINECRAFT_FLOAT_FUNC;
+
+extern void gl_uniform_3_i_v(GLint location, GLsizei count, const GLint *value);
+
+extern void gl_uniform_4_f_v(GLint location, GLsizei count, const GLfloat *value) NINECRAFT_FLOAT_FUNC;
+
+extern void gl_uniform_4_i_v(GLint location, GLsizei count, const GLint *value);
+
+extern void gl_uniform_matrix_2_f_v(GLint location, GLsizei count, GLboolean transpose, const GLfloat *value) NINECRAFT_FLOAT_FUNC;
+
+extern void gl_uniform_matrix_3_f_v(GLint location, GLsizei count, GLboolean transpose, const GLfloat *value) NINECRAFT_FLOAT_FUNC;
+
+extern void gl_uniform_matrix_4_f_v(GLint location, GLsizei count, GLboolean transpose, const GLfloat *value) NINECRAFT_FLOAT_FUNC;
+
+extern void gl_use_program(GLuint program);
+
+extern void gl_vertex_attrib_pointer(GLuint index, GLint size, GLenum type, GLboolean normalized, GLsizei stride, const void *pointer);
 
 #endif

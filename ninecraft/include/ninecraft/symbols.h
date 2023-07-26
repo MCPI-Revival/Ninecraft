@@ -16,6 +16,8 @@ const char *egl_symbols[] = {
     "eglSwapBuffers",
     "eglSwapInterval",
     "eglTerminate",
+    "eglGetError",
+    "eglGetProcAddress",
     0
 };
 

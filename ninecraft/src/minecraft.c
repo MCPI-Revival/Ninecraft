@@ -19,6 +19,10 @@ app_init_t app_init = NULL;
 minecraft_set_size_t minecraft_set_size = NULL;
 ninecraft_app_update_t ninecraft_app_update = NULL;
 ninecraft_app_handle_back_t ninecraft_app_handle_back = NULL;
+minecraft_client_set_size_t minecraft_client_set_size = NULL;
+minecraft_client_handle_back_t minecraft_client_handle_back = NULL;
+minecraft_update_t minecraft_update = NULL;
+minecraft_client_construct_t minecraft_client_construct = NULL;
 
 void minecraft_setup_hooks(void *handle) {
     minecraft_level_generated = (minecraft_level_generated_t)internal_dlsym(handle, "_ZN9Minecraft15_levelGeneratedEv");
@@ -38,4 +42,8 @@ void minecraft_setup_hooks(void *handle) {
     minecraft_set_size = (minecraft_set_size_t)internal_dlsym(handle, "_ZN9Minecraft7setSizeEii");
     ninecraft_app_update = (ninecraft_app_update_t)internal_dlsym(handle, "_ZN12NinecraftApp6updateEv");
     ninecraft_app_handle_back = (ninecraft_app_handle_back_t)internal_dlsym(handle, "_ZN12NinecraftApp10handleBackEb");
+    minecraft_client_set_size = (minecraft_client_set_size_t)internal_dlsym(handle, "_ZN15MinecraftClient7setSizeEiif");
+    minecraft_client_handle_back = (minecraft_client_handle_back_t)internal_dlsym(handle, "_ZN15MinecraftClient10handleBackEb");
+    minecraft_update = (minecraft_update_t)internal_dlsym(handle, "_ZN9Minecraft6updateEv");
+    minecraft_client_construct = (minecraft_client_construct_t)internal_dlsym(handle, "_ZN15MinecraftClientC2EiPPc");
 }

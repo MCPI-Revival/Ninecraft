@@ -43,6 +43,14 @@ typedef struct {
     android_string_gnu_t unknown3;
 } login_information_t;
 
+void AppPlatform_linux$saveImage(AppPlatform_linux *app_platform, android_string_gnu_t *resource_path, android_string_gnu_t *pixels, int width, int height);
+
+void AppPlatform_linux$swapBuffers(AppPlatform_linux *app_platform);
+
+NINECRAFT_CSR_FUNCDEF(android_string_gnu_t, AppPlatform_linux$getModelName, AppPlatform_linux *app_platform);
+
+void AppPlatform_linux$captureScreen(AppPlatform_linux *app_platform, int width, int height, bool do_capture);
+
 int AppPlatform_linux$shareOpenGLContext(AppPlatform_linux *app_platform);
 
 android_vector_t AppPlatform_linux$getBroadcastAddresses(AppPlatform_linux *app_platform);

@@ -560,6 +560,78 @@ void *app_platform_vtable_0_9_0[] = {
     (void *)AppPlatform_linux$abortWebRequest
 };
 
+void *app_platform_vtable_0_10_0[] = {
+    (void *)AppPlatform_linux$destroy,
+    (void *)AppPlatform_linux$destroy,
+    (void *)AppPlatform_linux$getImagePath,
+    (void *)AppPlatform_linux$loadPNG_0_9_0,
+    (void *)AppPlatform_linux$loadTGA_0_9_0,
+    (void *)AppPlatform_linux$playSound,
+    (void *)AppPlatform_linux$showDialog,
+    (void *)AppPlatform_linux$createUserInput,
+    (void *)AppPlatform_linux$getUserInputStatus,
+    (void *)AppPlatform_linux$getUserInput,
+    (void *)AppPlatform_linux$getDateStringGNU,
+    (void *)AppPlatform_linux$checkLicense,
+    (void *)AppPlatform_linux$hasBuyButtonWhenInvalidLicense,
+    (void *)AppPlatform_linux$saveImage,
+    (void *)AppPlatform_linux$uploadPlatformDependentData,
+    (void *)AppPlatform_linux$readAssetFile_0_9_0,
+    (void *)AppPlatform_linux$_tick,
+    (void *)AppPlatform_linux$getScreenWidth,
+    (void *)AppPlatform_linux$getScreenHeight,
+    (void *)AppPlatform_linux$getPixelsPerMillimeter,
+    (void *)AppPlatform_linux$isNetworkEnabled,
+    (void *)AppPlatform_linux$openLoginWindow,
+    (void *)AppPlatform_linux$isPowerVR,
+    (void *)AppPlatform_linux$getKeyFromKeyCode,
+    (void *)AppPlatform_linux$buyGame,
+    (void *)AppPlatform_linux$finish,
+    (void *)AppPlatform_linux$swapBuffers,
+    (void *)AppPlatform_linux$supportsTouchscreen,
+    (void *)AppPlatform_linux$hasIDEProfiler,
+    (void *)AppPlatform_linux$supportsVibration,
+    (void *)AppPlatform_linux$vibrate,
+    (void *)AppPlatform_linux$getPlatformStringVarGNU,
+    (void *)AppPlatform_linux$showKeyboard,
+    (void *)AppPlatform_linux$hideKeyboard,
+    (void *)AppPlatform_linux$updateTextBoxText,
+    (void *)AppPlatform_linux$isKeyboardVisible,
+    (void *)AppPlatform_linux$getLoginInformation,
+    (void *)AppPlatform_linux$setLoginInformation,
+    (void *)AppPlatform_linux$clearSessionIDAndRefreshToken,
+    (void *)AppPlatform_linux$statsTrackData,
+    (void *)AppPlatform_linux$captureScreen,
+    (void *)AppPlatform_linux$getTotalMemory,
+    (void *)AppPlatform_linux$getBroadcastAddresses,
+    (void *)AppPlatform_linux$getModelName,
+    (void *)AppPlatform_linux$initWithActivity,
+    (void *)AppPlatform_linux$webRequest,
+    (void *)AppPlatform_linux$getWebRequestStatus,
+    (void *)AppPlatform_linux$getWebRequestContent,
+    (void *)AppPlatform_linux$abortWebRequest,
+    (void *)AppPlatform_linux$updateStatsUserData
+};
+
+void AppPlatform_linux$saveImage(AppPlatform_linux *app_platform, android_string_gnu_t *resource_path, android_string_gnu_t *pixels, int width, int height) {
+    puts("debug: AppPlatform_linux::saveImage");
+}
+
+void AppPlatform_linux$swapBuffers(AppPlatform_linux *app_platform) {
+    //puts("debug: AppPlatform_linux::swapBuffers");
+}
+
+NINECRAFT_CSR_FUNCDEF(android_string_gnu_t, AppPlatform_linux$getModelName, AppPlatform_linux *app_platform) {
+    puts("debug: AppPlatform_linux::getModelName");
+    android_string_t out;
+    android_string_cstr(&out, "Linux");
+    NINECRAFT_CSR_RETURN(out.gnu);
+}
+
+void AppPlatform_linux$captureScreen(AppPlatform_linux *app_platform, int width, int height, bool do_capture) {
+    puts("debug: AppPlatform_linux::captureScreen");
+}
+
 int AppPlatform_linux$shareOpenGLContext(AppPlatform_linux *app_platform) {
     puts("debug: AppPlatform_linux::shareOpenGLContext");
     return 1;
@@ -705,7 +777,10 @@ void AppPlatform_linux$abortWebRequest(AppPlatform_linux *app_platform, int unkn
 }
 
 void AppPlatform_linux$AppPlatform_linux(AppPlatform_linux *app_platform, void *handle, int version_id, ninecraft_options_t *options) {
-    if (version_id == version_id_0_9_5) {
+    if (version_id == version_id_0_10_0) {
+        **(void ****)internal_dlsym(handle, "_ZN11AppPlatform10_singletonE") = app_platform_vtable_0_10_0;
+        app_platform->vtable = app_platform_vtable_0_10_0;
+    } else if (version_id == version_id_0_9_5) {
         **(void ****)internal_dlsym(handle, "_ZN11AppPlatform10_singletonE") = app_platform_vtable_0_9_0;
         app_platform->vtable = app_platform_vtable_0_9_0;
     } else if (version_id == version_id_0_9_4) {
