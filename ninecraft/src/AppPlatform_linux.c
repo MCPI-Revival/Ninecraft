@@ -777,7 +777,22 @@ void AppPlatform_linux$abortWebRequest(AppPlatform_linux *app_platform, int unkn
 }
 
 void AppPlatform_linux$AppPlatform_linux(AppPlatform_linux *app_platform, void *handle, int version_id, ninecraft_options_t *options) {
-    if (version_id == version_id_0_10_0) {
+    if (version_id == version_id_0_10_5) {
+        **(void ****)internal_dlsym(handle, "_ZN11AppPlatform10_singletonE") = app_platform_vtable_0_10_0;
+        app_platform->vtable = app_platform_vtable_0_10_0;
+    } else if (version_id == version_id_0_10_4) {
+        **(void ****)internal_dlsym(handle, "_ZN11AppPlatform10_singletonE") = app_platform_vtable_0_10_0;
+        app_platform->vtable = app_platform_vtable_0_10_0;
+    } else if (version_id == version_id_0_10_3) {
+        **(void ****)internal_dlsym(handle, "_ZN11AppPlatform10_singletonE") = app_platform_vtable_0_10_0;
+        app_platform->vtable = app_platform_vtable_0_10_0;
+    } else if (version_id == version_id_0_10_2) {
+        **(void ****)internal_dlsym(handle, "_ZN11AppPlatform10_singletonE") = app_platform_vtable_0_10_0;
+        app_platform->vtable = app_platform_vtable_0_10_0;
+    } else if (version_id == version_id_0_10_1) {
+        **(void ****)internal_dlsym(handle, "_ZN11AppPlatform10_singletonE") = app_platform_vtable_0_10_0;
+        app_platform->vtable = app_platform_vtable_0_10_0;
+    } else if (version_id == version_id_0_10_0) {
         **(void ****)internal_dlsym(handle, "_ZN11AppPlatform10_singletonE") = app_platform_vtable_0_10_0;
         app_platform->vtable = app_platform_vtable_0_10_0;
     } else if (version_id == version_id_0_9_5) {
