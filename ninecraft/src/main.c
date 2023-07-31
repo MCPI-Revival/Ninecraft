@@ -67,7 +67,7 @@ static float *controller_x_stick;
 static float *controller_y_stick;
 
 bool mouse_pointer_hidden = false;
-
+bool chat_remove_first_char = false;
 int old_pos_x, old_pos_y, old_width, old_height;
 
 void *load_library(const char *name) {
@@ -294,6 +294,10 @@ static void resize_callback(GLFWwindow *window, int width, int height) {
 }
 
 static void char_callback(GLFWwindow *window, unsigned int codepoint) {
+    if(chat_remove_first_char){
+        chat_remove_first_char = false;
+        return;
+    }
     if (version_id >= version_id_0_6_0 && version_id <= version_id_0_7_1) {
         keyboard_feed_text_0_6_0((char)codepoint);
     } else if (version_id >= version_id_0_7_2) {
@@ -351,7 +355,12 @@ static void key_callback(GLFWwindow *window, int key, int scancode, int action, 
                 if (action == GLFW_PRESS) {
                     ((void (*)(void *, int))internal_dlsym(handle, "_ZN13ScreenChooser9setScreenE8ScreenId"))(ninecraft_app + 0x2f0, 7);
                 }
-            } else if (version_id >= version_id_0_7_1) {
+            } else if (version_id >= version_id_0_7_1 && version_id <= version_id_0_8_1) {
+                if (action == GLFW_PRESS) {
+                    ((void (*)(void *, int))internal_dlsym(handle, "_ZN13ScreenChooser9setScreenE8ScreenId"))(&ninecraft_app, 7);
+                    chat_remove_first_char = true;
+                }
+            }else if(version_id >= version_id_0_9_0){
                 int w;
                 glfwGetWindowSize(_window, &w, NULL);
                 if (action == GLFW_PRESS) {
