@@ -235,9 +235,10 @@ void set_ninecraft_size_0_1_0(int width, int height) {
     int *mc_width = (int *)internal_dlsym(handle, "_ZN9Minecraft5widthE");
     int *mc_height = (int *)internal_dlsym(handle, "_ZN9Minecraft6heightE");
     void (*screen_set_size)(void *screen, int width, int height) = (void (*)(void *screen, int width, int height))internal_dlsym(handle, "_ZN6Screen7setSizeEii");
-    void (*screen_utbse)(void *screen) = (void (*)(void *screen))internal_dlsym(handle, "_ZN6Screen24updateTabButtonSelectionEv");
+
     *mc_width = width;
     *mc_height = height;
+    
     if (width < 1000) {
         if (width < 800) {
             if (width < 400) {
@@ -259,7 +260,15 @@ void set_ninecraft_size_0_1_0(int width, int height) {
             screen,
             (int)(0.0 < new_screen_width) * (int)new_screen_width,
             (int)(0.0 < new_screen_height) * (int)new_screen_height);
-        ((void (*)(void *))(((void ***)screen)[0][3]))(screen);
+        ((int *)screen)[6] = 0;
+        ((int *)screen)[7] = 0;
+        ((int *)screen)[8] = 0;
+        ((int *)screen)[9] = 0;
+        ((int *)screen)[10] = 0;
+        ((int *)screen)[11] = 0;
+        ((void (*)(void *))((*(int **)screen)[3]))(screen);
+        
+
     }
 }
 
