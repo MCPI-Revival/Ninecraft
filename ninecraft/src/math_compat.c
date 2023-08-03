@@ -133,3 +133,7 @@ NINECRAFT_FLOAT_FUNC float math_ldexpf(float __x, int __exponenet) {
 NINECRAFT_FLOAT_FUNC float math_tanf(float __x) {
     return tanf(__x);   
 }
+
+NINECRAFT_FLOAT_FUNC double math_nearbyint(double __x) {
+    return nearbyint(__x);   
+}

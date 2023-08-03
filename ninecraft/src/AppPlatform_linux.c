@@ -882,7 +882,7 @@ void AppPlatform_linux$AppPlatform_linux(AppPlatform_linux *app_platform, void *
     } else if (version_id == version_id_0_1_0) {
         app_platform->vtable = app_platform_vtable_0_1_0;
     }
-    
+    app_platform->is_keyboard_visible = false;
     app_platform->handle = handle;
     app_platform->status = -1;
     app_platform->version_id = version_id;
@@ -1080,6 +1080,7 @@ bool AppPlatform_linux$hasBuyButtonWhenInvalidLicense(AppPlatform_linux *app_pla
 
 void AppPlatform_linux$hideKeyboard(AppPlatform_linux *app_platform) {
     puts("debug: AppPlatform_linux::hideKeyboard");
+    app_platform->is_keyboard_visible = false;
 }
 
 bool AppPlatform_linux$isKeyboardVisible(AppPlatform_linux *app_platform) {
@@ -1239,10 +1240,12 @@ void AppPlatform_linux$showDialog(AppPlatform_linux *app_platform, int dialog_id
 
 void AppPlatform_linux$showKeyboard(AppPlatform_linux *app_platform) {
     puts("debug: AppPlatform_linux::showKeyboard");
+    app_platform->is_keyboard_visible = true;
 }
 
 void AppPlatform_linux$showKeyboard2(AppPlatform_linux *app_platform, bool show) {
     puts("debug: AppPlatform_linux::showKeyboard2");
+    app_platform->is_keyboard_visible = true;
 }
 
 void AppPlatform_linux$uploadPlatformDependentData(AppPlatform_linux *app_platform, int size, void *data) {

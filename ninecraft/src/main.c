@@ -61,6 +61,7 @@ float y_cam = 0.0;
 float x_cam = 0.0;
 
 void *ninecraft_app;
+AppPlatform_linux platform;
 
 static unsigned char *controller_states;
 static float *controller_x_stick;
@@ -303,35 +304,37 @@ static void resize_callback(GLFWwindow *window, int width, int height) {
 }
 
 static void char_callback(GLFWwindow *window, unsigned int codepoint) {
-    if (version_id >= version_id_0_6_0 && version_id <= version_id_0_7_1) {
-        keyboard_feed_text_0_6_0((char)codepoint);
-    } else if (version_id >= version_id_0_7_2) {
-        // char p_codepoint[2] = {(char)codepoint, '\0'};
-        char p_codepoint[5];
+    if (platform.is_keyboard_visible) {    
+        if (version_id >= version_id_0_6_0 && version_id <= version_id_0_7_1) {
+            keyboard_feed_text_0_6_0((char)codepoint);
+        } else if (version_id >= version_id_0_7_2) {
+            // char p_codepoint[2] = {(char)codepoint, '\0'};
+            char p_codepoint[5];
 
-        if (codepoint <= 0x7f) {
-            p_codepoint[0] = (char)codepoint;
-            p_codepoint[1] = '\x00';
-        } else if (codepoint <= 0x7fff) {
-            p_codepoint[0] = (char)(0xc0 | ((codepoint >> 6) & 0x1f));
-            p_codepoint[1] = (char)(0x80 | ((codepoint & 0x3f)));
-            p_codepoint[2] = '\x00';
-        } else if (codepoint <= 0xffff) {
-            p_codepoint[0] = (char)(0xe0 | ((codepoint >> 12) & 0x0f));
-            p_codepoint[1] = (char)(0x80 | ((codepoint >> 6) & 0x3f));
-            p_codepoint[2] = (char)(0x80 | (codepoint & 0x3f));
-            p_codepoint[3] = '\x00';
-        } else {
-            p_codepoint[0] = (char)(0xf0 | ((codepoint >> 18) & 0x07));
-            p_codepoint[1] = (char)(0x80 | ((codepoint >> 12) & 0x3f));
-            p_codepoint[2] = (char)(0x80 | ((codepoint >> 6) & 0x3f));
-            p_codepoint[3] = (char)(0x80 | (codepoint & 0x3f));
-            p_codepoint[4] = '\x00';
+            if (codepoint <= 0x7f) {
+                p_codepoint[0] = (char)codepoint;
+                p_codepoint[1] = '\x00';
+            } else if (codepoint <= 0x7fff) {
+                p_codepoint[0] = (char)(0xc0 | ((codepoint >> 6) & 0x1f));
+                p_codepoint[1] = (char)(0x80 | ((codepoint & 0x3f)));
+                p_codepoint[2] = '\x00';
+            } else if (codepoint <= 0xffff) {
+                p_codepoint[0] = (char)(0xe0 | ((codepoint >> 12) & 0x0f));
+                p_codepoint[1] = (char)(0x80 | ((codepoint >> 6) & 0x3f));
+                p_codepoint[2] = (char)(0x80 | (codepoint & 0x3f));
+                p_codepoint[3] = '\x00';
+            } else {
+                p_codepoint[0] = (char)(0xf0 | ((codepoint >> 18) & 0x07));
+                p_codepoint[1] = (char)(0x80 | ((codepoint >> 12) & 0x3f));
+                p_codepoint[2] = (char)(0x80 | ((codepoint >> 6) & 0x3f));
+                p_codepoint[3] = (char)(0x80 | (codepoint & 0x3f));
+                p_codepoint[4] = '\x00';
+            }
+
+            android_string_t str;
+            android_string_cstr(&str, p_codepoint);
+            keyboard_feed_text_0_7_2(&str, false);
         }
-
-        android_string_t str;
-        android_string_cstr(&str, p_codepoint);
-        keyboard_feed_text_0_7_2(&str, false);
     }
 }
 
@@ -537,6 +540,7 @@ void math_hook() {
     hybris_hook("modff", math_modff);
     hybris_hook("ldexpf", math_ldexpf);
     hybris_hook("tanf", math_tanf);
+    hybris_hook("nearbyint", math_nearbyint);
 }
 
 #ifdef __arm__
@@ -1181,7 +1185,6 @@ int main(int argc, char **argv) {
         android_string_equ((android_string_t *)(ninecraft_app + 3416), "./storage/external/");
     }
 
-    AppPlatform_linux platform;
     AppPlatform_linux$AppPlatform_linux(&platform, handle, version_id, &options);
     printf("%p\n", &platform);
 

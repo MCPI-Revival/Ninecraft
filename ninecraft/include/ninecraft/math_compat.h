@@ -67,4 +67,6 @@ extern float math_ldexpf(float __x, int __exponenet) NINECRAFT_FLOAT_FUNC;
 
 extern float math_tanf(float __x) NINECRAFT_FLOAT_FUNC;
 
+extern double math_nearbyint(double __x) NINECRAFT_FLOAT_FUNC;
+
 #endif

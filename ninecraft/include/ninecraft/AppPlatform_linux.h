@@ -12,6 +12,7 @@
 
 typedef struct {
     void **vtable;
+    bool is_keyboard_visible;
     void *handle;
     int status;
     int version_id;
