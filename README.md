@@ -47,17 +47,17 @@ apk add git make cmake gcc g++ openal-soft-dev libx11-dev libxrandr-dev libxiner
 x86_64:
 ```
 dnf update
-dnf install git make cmake gcc g++ glibc-devel.i686 libstdc++-devel.i686 openal-soft-devel.i686 libX11-devel.i686 libXrandr-devel.i686 libXinerama-devel.i686 libXcursor-devel.i686 libXi-devel.i686 mesa-libGL-devel.i686 zenity unzip
+dnf install git make cmake gcc g++ glibc-devel.i686 libstdc++-devel.i686 openal-soft-devel.i686 libX11-devel.i686 libXrandr-devel.i686 libXinerama-devel.i686 libXcursor-devel.i686 libXi-devel.i686 libglvnd-devel.i686 zenity unzip
 ```
 x86:
 ```
 dnf update
-dnf install git make cmake gcc g++ openal-soft-devel libX11-devel libXrandr-devel libXinerama-devel libXcursor-devel libXi-devel mesa-libGL-devel zenity unzip
+dnf install git make cmake gcc g++ openal-soft-devel libX11-devel libXrandr-devel libXinerama-devel libXcursor-devel libXi-devel libglvnd-devel zenity unzip
 ```
 arm:
 ```
 dnf update
-dnf install git make cmake gcc g++ openal-soft-devel libX11-devel libXrandr-devel libXinerama-devel libXcursor-devel libXi-devel mesa-libGL-devel zenity unzip
+dnf install git make cmake gcc g++ openal-soft-devel libX11-devel libXrandr-devel libXinerama-devel libXcursor-devel libXi-devel libglvnd-devel zenity unzip
 ```
 ## Compiling
 ### x86_64 & x86:
