@@ -43,7 +43,12 @@ x86:
 apk update
 apk add git make cmake gcc g++ openal-soft-dev libx11-dev libxrandr-dev libxinerama-dev libxcursor-dev libxi-dev mesa-dev zenity unzip
 ```
-
+### Fedora
+x86_64:
+```
+dnf update
+dnf install git make cmake gcc glibc-devel.i686 libstdc++-devel.i686 openal-soft-devel.i686 libX11-devel.i686 libXrandr-devel.i686 libXinerama-devel.i686 libXcursor-devel.i686 libXi-devel.i686 mesa-libGL-devel.i686 zenity unzip
+```
 ## Compiling
 ### x86_64 & x86:
 ```
