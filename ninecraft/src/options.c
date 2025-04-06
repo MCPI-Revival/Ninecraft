@@ -32,7 +32,7 @@ void ninecraft_set_option(ninecraft_options_t *options, char *name, char *value,
                         free(option->value);
                         option->value = (char *)malloc(value_length + 1);
                     }
-                    memset(option->value, value, value_length);
+                    memcpy(option->value, value, value_length);
                     option->value[value_length] = '\0';
                 }
                 return;
@@ -58,7 +58,7 @@ void ninecraft_set_option(ninecraft_options_t *options, char *name, char *value,
 }
 
 void ninecraft_read_options_file(ninecraft_options_t *options, char *file_path) {
-    FILE *stream = fopen(file_path, "r");
+    FILE *stream = fopen(file_path, "rb");
     if (stream != NULL) {
         fseek(stream, 0, SEEK_END);
         size_t buffer_size = ftell(stream);
@@ -104,7 +104,7 @@ void ninecraft_read_options_file(ninecraft_options_t *options, char *file_path) 
 }
 
 void ninecraft_write_options_file(ninecraft_options_t *options, char *file_path) {
-    FILE *stream = fopen(file_path, "w");
+    FILE *stream = fopen(file_path, "wb");
     if (stream != NULL) {
         for (size_t i = 0; i < options->length; ++i) {
             fwrite(options->options[i].name, 1, strlen(options->options[i].name), stream);

@@ -10,12 +10,12 @@
 */
 
 void bg_mod_screen_render_dirt_background_injection(void *screen, uint32_t param_1) {
-    void *minecraft = *(void **)(screen + 20);
-    void *textures = *(void **)(minecraft + 688);
+    void *minecraft = *(void **)((char *)screen + 20);
+    void *textures = *(void **)((char *)minecraft + 688);
     android_string_t str;
     android_string_cstr(&str, "gui/bg32.png");
     textures_load_and_bind_texture(textures, &str);
-    gui_component_blit(screen, 0, 0, 0, 0, *(int *)(screen + 8), *(int *)(screen + 12), 0x100, 0x100);
+    gui_component_blit(screen, 0, 0, 0, 0, *(int *)((char *)screen + 8), *(int *)((char *)screen + 12), 0x100, 0x100);
 }
 
 

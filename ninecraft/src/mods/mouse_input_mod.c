@@ -17,17 +17,22 @@ struct turn_delta {
     float x;
     float y;
 };
-NINECRAFT_FLOAT_FUNC struct turn_delta controller_turn_input_get_turn_delta(void *turn_input) {
-    struct turn_delta ret;
-    ret.x = mouse_get_dx() * 0.3;
-    ret.y = mouse_get_dy() * 0.3;
-    return ret;
+
+void controller_turn_input_get_turn_delta(struct turn_delta *ret, void *turn_input) {
+    struct turn_delta delta;
+    delta.x = mouse_get_dx() * 0.3;
+    delta.y = mouse_get_dy() * 0.3;
+    *ret = delta;
 }
 
+SYSV_WRAPPER(controller_turn_input_get_turn_delta, 2)
+
+#include <stdio.h>
+#include <ancmp/android_dlfcn.h>
 void mouse_input_mod_inject(void *handle, int version_id) {
     if (version_id >= version_id_0_6_0) {
         mouse_get_dx = (mouse_get_dx_t)internal_dlsym(handle, "_ZN5Mouse5getDXEv");
         mouse_get_dy = (mouse_get_dx_t)internal_dlsym(handle, "_ZN5Mouse5getDYEv");
-        DETOUR((void *)internal_dlsym(handle, "_ZN19ControllerTurnInput12getTurnDeltaEv"), controller_turn_input_get_turn_delta, true);
+        DETOUR((void *)internal_dlsym(handle, "_ZN19ControllerTurnInput12getTurnDeltaEv"), GET_SYSV_WRAPPER(controller_turn_input_get_turn_delta), true);
     }
 }

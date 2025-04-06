@@ -3,7 +3,6 @@
 
 #include <stdlib.h>
 #include <stdio.h>
-#include <sys/param.h>
 #include <ninecraft/android/android_string.h>
 #include <stdint.h>
 #include <stdbool.h>

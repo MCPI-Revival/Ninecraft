@@ -1,10 +1,12 @@
-#include <dlfcn.h>
 #include <stdlib.h>
-#include <sys/param.h>
-#include <dirent.h>
+#include <ancmp/android_dirent.h>
 #include <ninecraft/mods/mod_loader.h>
 #include <string.h>
 #include <stdio.h>
+#include <ancmp/android_dlfcn.h>
+#ifdef _WIN32
+#include <direct.h>
+#endif
 
 void **mod_handles = NULL;
 size_t mod_handles_count = 0;
@@ -12,14 +14,14 @@ size_t mod_handles_count = 0;
 #define MOD_ERROR(path, reason) printf("Failed to load mod %s due to %s\n", path, reason)
 
 void mod_loader_load(char *path) {
-    void *handle = dlopen(path, RTLD_NOW);
+    void *handle = android_dlopen(path, ANDROID_RTLD_NOW);
     if (handle == NULL) {
-        MOD_ERROR(path, dlerror());
+        MOD_ERROR(path, android_dlerror());
         return;
     }
-    void *init_addr = dlsym(handle, "mod_init");
+    void *init_addr = android_dlsym(handle, "mod_init");
     if (init_addr == NULL) {
-        MOD_ERROR(path, dlerror());
+        MOD_ERROR(path, android_dlerror());
         return;
     }
     if (mod_handles == NULL || mod_handles_count == 0) {
@@ -35,26 +37,30 @@ void mod_loader_load(char *path) {
 }
 
 void mod_loader_load_all() {
-    char mods_path[MAXPATHLEN];
-    getcwd(mods_path, MAXPATHLEN);
+    char *mods_path = (char *)malloc(1024);
+    mods_path[0] = '\0';
+    getcwd(mods_path, 1024);
     strcat(mods_path, "/mods/");
     
-    DIR *dp = opendir(mods_path);
+    android_DIR *dp = android_opendir(mods_path);
     if (dp == NULL) {
         puts("Failed to load mods");
     }
     
-    struct dirent *entry;
+    android_dirent_t *entry;
 
-    while((entry = readdir(dp))) {
-        char mod_path[MAXPATHLEN];
+    while((entry = android_readdir(dp))) {
+        char *mod_path = (char *)malloc(1024);
+        mod_path[0] = '\0';
         strcpy(mod_path, mods_path);
         strcat(mod_path, entry->d_name);
 
         if (strncmp(mod_path + (strlen(mod_path) - 3), ".so", 3) == 0) {
             mod_loader_load(mod_path);
         }
+        free(mod_path);
     }
+    free(mods_path);
     
-    closedir(dp);
+    android_closedir(dp);
 }

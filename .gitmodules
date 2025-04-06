@@ -1,21 +1,21 @@
 [submodule "glfw"]
 	path = glfw
 	url = https://github.com/glfw/glfw.git
-[submodule "osx-elf-header"]
-    path = osx-elf-header
-    url = https://github.com/MCPI-Revival/osx-elf-header
-[submodule "epoll-shim"]
-    path = epoll-shim
-    url = https://github.com/jiixyj/epoll-shim
 [submodule "minivorbis"]
 	path = minivorbis
 	url = https://github.com/edubart/minivorbis
 [submodule "stb"]
 	path = stb
 	url = https://github.com/nothings/stb.git
-[submodule "miniz"]
-	path = miniz
-	url = https://github.com/richgel999/miniz.git
-[submodule "libhybris"]
-	path = libhybris
-	url = https://github.com/MCPI-Revival/libhybris
+[submodule "zlib"]
+	path = zlib
+	url = http://github.com/madler/zlib
+[submodule "ancmp"]
+	path = ancmp
+	url = http://github.com/MFDGaming/ancmp
+[submodule "glad"]
+	path = glad
+	url = https://github.com/Dav1dde/glad
+[submodule "openal-soft"]
+	path = openal-soft
+	url = https://github.com/kcat/openal-soft

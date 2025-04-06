@@ -1,6 +1,7 @@
 #include <ninecraft/dlfcn_stub.h>
 #include <ninecraft/minecraft.h>
 #include <stddef.h>
+#include <ninecraft/version_ids.h>
 
 minecraft_level_generated_t minecraft_level_generated = NULL;
 minecraft_tick_t minecraft_tick = NULL;
@@ -23,6 +24,241 @@ minecraft_client_set_size_t minecraft_client_set_size = NULL;
 minecraft_client_handle_back_t minecraft_client_handle_back = NULL;
 minecraft_update_t minecraft_update = NULL;
 minecraft_client_construct_t minecraft_client_construct = NULL;
+minecraft_client_init_t minecraft_client_init = NULL;
+app_platform_construct_t app_platform_construct = NULL;
+
+uintptr_t get_ninecraftapp_external_storage_offset(int version_id) {
+    if (version_id == version_id_0_1_0) {
+        return NINECRAFTAPP_EXTERNAL_STORAGE_OFFSET_0_1_0;
+    }
+    if (version_id == version_id_0_1_0_touch) {
+        return NINECRAFTAPP_EXTERNAL_STORAGE_OFFSET_0_1_0_TOUCH;
+    }
+    if (version_id == version_id_0_1_1) {
+        return NINECRAFTAPP_EXTERNAL_STORAGE_OFFSET_0_1_1;
+    }
+    if (version_id == version_id_0_1_1_j) {
+        return NINECRAFTAPP_EXTERNAL_STORAGE_OFFSET_0_1_1_J;
+    }
+    if (version_id == version_id_0_1_2) {
+        return NINECRAFTAPP_EXTERNAL_STORAGE_OFFSET_0_1_2;
+    }
+    if (version_id == version_id_0_1_2_j) {
+        return NINECRAFTAPP_EXTERNAL_STORAGE_OFFSET_0_1_2_J;
+    }
+    if (version_id == version_id_0_1_3) {
+        return NINECRAFTAPP_EXTERNAL_STORAGE_OFFSET_0_1_3;
+    }
+    if (version_id == version_id_0_1_3_j) {
+        return NINECRAFTAPP_EXTERNAL_STORAGE_OFFSET_0_1_3_J;
+    }
+    if (version_id == version_id_0_2_0) {
+        return NINECRAFTAPP_EXTERNAL_STORAGE_OFFSET_0_2_0;
+    }
+    if (version_id == version_id_0_2_0_j) {
+        return NINECRAFTAPP_EXTERNAL_STORAGE_OFFSET_0_2_0_J;
+    }
+    if (version_id == version_id_0_2_1) {
+        return NINECRAFTAPP_EXTERNAL_STORAGE_OFFSET_0_2_1;
+    }
+    if (version_id == version_id_0_2_1_j) {
+        return NINECRAFTAPP_EXTERNAL_STORAGE_OFFSET_0_2_1_J;
+    }
+    if (version_id == version_id_0_2_2) {
+        return NINECRAFTAPP_EXTERNAL_STORAGE_OFFSET_0_2_2;
+    }
+    if (version_id == version_id_0_3_0) {
+        return NINECRAFTAPP_EXTERNAL_STORAGE_OFFSET_0_3_0;
+    }
+    if (version_id == version_id_0_3_0_j) {
+        return NINECRAFTAPP_EXTERNAL_STORAGE_OFFSET_0_3_0_J;
+    }
+    if (version_id == version_id_0_3_2) {
+        return NINECRAFTAPP_EXTERNAL_STORAGE_OFFSET_0_3_2;
+    }
+    if (version_id == version_id_0_3_2_j) {
+        return NINECRAFTAPP_EXTERNAL_STORAGE_OFFSET_0_3_2_J;
+    }
+    if (version_id == version_id_0_3_3) {
+        return NINECRAFTAPP_EXTERNAL_STORAGE_OFFSET_0_3_3;
+    }
+    if (version_id == version_id_0_3_3_j) {
+        return NINECRAFTAPP_EXTERNAL_STORAGE_OFFSET_0_3_3_J;
+    }
+    if (version_id == version_id_0_4_0) {
+        return NINECRAFTAPP_EXTERNAL_STORAGE_OFFSET_0_4_0;
+    }
+    if (version_id == version_id_0_4_0_j) {
+        return NINECRAFTAPP_EXTERNAL_STORAGE_OFFSET_0_4_0_J;
+    }
+    if (version_id == version_id_0_5_0) {
+        return NINECRAFTAPP_EXTERNAL_STORAGE_OFFSET_0_5_0;
+    }
+    if (version_id == version_id_0_5_0_j) {
+        return NINECRAFTAPP_EXTERNAL_STORAGE_OFFSET_0_5_0_J;
+    }
+    if (version_id == version_id_0_6_0) {
+        return NINECRAFTAPP_EXTERNAL_STORAGE_OFFSET_0_6_0;
+    }
+    if (version_id == version_id_0_6_1) {
+        return NINECRAFTAPP_EXTERNAL_STORAGE_OFFSET_0_6_1;
+    }
+    if (version_id == version_id_0_7_0) {
+        return NINECRAFTAPP_EXTERNAL_STORAGE_OFFSET_0_7_0;
+    }
+    if (version_id == version_id_0_7_1) {
+        return NINECRAFTAPP_EXTERNAL_STORAGE_OFFSET_0_7_1;
+    }
+    if (version_id == version_id_0_7_2) {
+        return NINECRAFTAPP_EXTERNAL_STORAGE_OFFSET_0_7_2;
+    }
+    if (version_id == version_id_0_7_3) {
+        return NINECRAFTAPP_EXTERNAL_STORAGE_OFFSET_0_7_3;
+    }
+    if (version_id == version_id_0_7_4) {
+        return NINECRAFTAPP_EXTERNAL_STORAGE_OFFSET_0_7_4;
+    }
+    if (version_id == version_id_0_7_5) {
+        return NINECRAFTAPP_EXTERNAL_STORAGE_OFFSET_0_7_5;
+    }
+    if (version_id == version_id_0_7_6) {
+        return NINECRAFTAPP_EXTERNAL_STORAGE_OFFSET_0_7_6;
+    }
+    if (version_id == version_id_0_8_0) {
+        return NINECRAFTAPP_EXTERNAL_STORAGE_OFFSET_0_8_0;
+    }
+    if (version_id == version_id_0_8_1) {
+        return NINECRAFTAPP_EXTERNAL_STORAGE_OFFSET_0_8_1;
+    }
+    if (version_id == version_id_0_9_0) {
+        return NINECRAFTAPP_EXTERNAL_STORAGE_OFFSET_0_9_0;
+    }
+    if (version_id == version_id_0_9_1) {
+        return NINECRAFTAPP_EXTERNAL_STORAGE_OFFSET_0_9_1;
+    }
+    if (version_id == version_id_0_9_2) {
+        return NINECRAFTAPP_EXTERNAL_STORAGE_OFFSET_0_9_3;
+    }
+    if (version_id == version_id_0_9_3) {
+        return NINECRAFTAPP_EXTERNAL_STORAGE_OFFSET_0_9_3;
+    }
+    if (version_id == version_id_0_9_4) {
+        return NINECRAFTAPP_EXTERNAL_STORAGE_OFFSET_0_9_4;
+    }
+    if (version_id == version_id_0_9_5) {
+        return NINECRAFTAPP_EXTERNAL_STORAGE_OFFSET_0_9_5;
+    }
+    if (version_id == version_id_0_10_0) {
+        return MINECRAFTCLIENT_EXTERNAL_STORAGE_OFFSET_0_10_0;
+    }
+    if (version_id == version_id_0_10_1) {
+        return MINECRAFTCLIENT_EXTERNAL_STORAGE_OFFSET_0_10_1;
+    }
+    if (version_id == version_id_0_10_2) {
+        return MINECRAFTCLIENT_EXTERNAL_STORAGE_OFFSET_0_10_2;
+    }
+    if (version_id == version_id_0_10_3) {
+        return MINECRAFTCLIENT_EXTERNAL_STORAGE_OFFSET_0_10_3;
+    }
+    if (version_id == version_id_0_10_4) {
+        return MINECRAFTCLIENT_EXTERNAL_STORAGE_OFFSET_0_10_4;
+    }
+    if (version_id == version_id_0_10_5) {
+        return MINECRAFTCLIENT_EXTERNAL_STORAGE_OFFSET_0_10_5;
+    }
+    return 0;
+}
+
+uintptr_t get_ninecraftapp_internal_storage_offset(int version_id) {
+    if (version_id == version_id_0_3_3) {
+        return NINECRAFTAPP_INTERNAL_STORAGE_OFFSET_0_3_3;
+    }
+    if (version_id == version_id_0_3_3_j) {
+        return NINECRAFTAPP_INTERNAL_STORAGE_OFFSET_0_3_3_J;
+    }
+    if (version_id == version_id_0_4_0) {
+        return NINECRAFTAPP_INTERNAL_STORAGE_OFFSET_0_4_0;
+    }
+    if (version_id == version_id_0_4_0_j) {
+        return NINECRAFTAPP_INTERNAL_STORAGE_OFFSET_0_4_0_J;
+    }
+    if (version_id == version_id_0_5_0) {
+        return NINECRAFTAPP_INTERNAL_STORAGE_OFFSET_0_5_0;
+    }
+    if (version_id == version_id_0_5_0_j) {
+        return NINECRAFTAPP_INTERNAL_STORAGE_OFFSET_0_5_0_J;
+    }
+    if (version_id == version_id_0_6_0) {
+        return NINECRAFTAPP_INTERNAL_STORAGE_OFFSET_0_6_0;
+    }
+    if (version_id == version_id_0_6_1) {
+        return NINECRAFTAPP_INTERNAL_STORAGE_OFFSET_0_6_1;
+    }
+    if (version_id == version_id_0_7_0) {
+        return NINECRAFTAPP_INTERNAL_STORAGE_OFFSET_0_7_0;
+    }
+    if (version_id == version_id_0_7_1) {
+        return NINECRAFTAPP_INTERNAL_STORAGE_OFFSET_0_7_1;
+    }
+    if (version_id == version_id_0_7_2) {
+        return NINECRAFTAPP_INTERNAL_STORAGE_OFFSET_0_7_2;
+    }
+    if (version_id == version_id_0_7_3) {
+        return NINECRAFTAPP_INTERNAL_STORAGE_OFFSET_0_7_3;
+    }
+    if (version_id == version_id_0_7_4) {
+        return NINECRAFTAPP_INTERNAL_STORAGE_OFFSET_0_7_4;
+    }
+    if (version_id == version_id_0_7_5) {
+        return NINECRAFTAPP_INTERNAL_STORAGE_OFFSET_0_7_5;
+    }
+    if (version_id == version_id_0_7_6) {
+        return NINECRAFTAPP_INTERNAL_STORAGE_OFFSET_0_7_6;
+    }
+    if (version_id == version_id_0_8_0) {
+        return NINECRAFTAPP_INTERNAL_STORAGE_OFFSET_0_8_0;
+    }
+    if (version_id == version_id_0_8_1) {
+        return NINECRAFTAPP_INTERNAL_STORAGE_OFFSET_0_8_1;
+    }
+    if (version_id == version_id_0_9_0) {
+        return NINECRAFTAPP_INTERNAL_STORAGE_OFFSET_0_9_0;
+    }
+    if (version_id == version_id_0_9_1) {
+        return NINECRAFTAPP_INTERNAL_STORAGE_OFFSET_0_9_1;
+    }
+    if (version_id == version_id_0_9_2) {
+        return NINECRAFTAPP_INTERNAL_STORAGE_OFFSET_0_9_3;
+    }
+    if (version_id == version_id_0_9_3) {
+        return NINECRAFTAPP_INTERNAL_STORAGE_OFFSET_0_9_3;
+    }
+    if (version_id == version_id_0_9_4) {
+        return NINECRAFTAPP_INTERNAL_STORAGE_OFFSET_0_9_4;
+    }
+    if (version_id == version_id_0_9_5) {
+        return NINECRAFTAPP_INTERNAL_STORAGE_OFFSET_0_9_5;
+    }
+    if (version_id == version_id_0_10_0) {
+        return MINECRAFTCLIENT_INTERNAL_STORAGE_OFFSET_0_10_0;
+    }
+    if (version_id == version_id_0_10_1) {
+        return MINECRAFTCLIENT_INTERNAL_STORAGE_OFFSET_0_10_1;
+    }
+    if (version_id == version_id_0_10_2) {
+        return MINECRAFTCLIENT_INTERNAL_STORAGE_OFFSET_0_10_2;
+    }
+    if (version_id == version_id_0_10_3) {
+        return MINECRAFTCLIENT_INTERNAL_STORAGE_OFFSET_0_10_3;
+    }
+    if (version_id == version_id_0_10_4) {
+        return MINECRAFTCLIENT_INTERNAL_STORAGE_OFFSET_0_10_4;
+    }
+    if (version_id == version_id_0_10_5) {
+        return MINECRAFTCLIENT_INTERNAL_STORAGE_OFFSET_0_10_5;
+    }
+    return 0;
+}
 
 void minecraft_setup_hooks(void *handle) {
     minecraft_level_generated = (minecraft_level_generated_t)internal_dlsym(handle, "_ZN9Minecraft15_levelGeneratedEv");
@@ -46,4 +282,6 @@ void minecraft_setup_hooks(void *handle) {
     minecraft_client_handle_back = (minecraft_client_handle_back_t)internal_dlsym(handle, "_ZN15MinecraftClient10handleBackEb");
     minecraft_update = (minecraft_update_t)internal_dlsym(handle, "_ZN9Minecraft6updateEv");
     minecraft_client_construct = (minecraft_client_construct_t)internal_dlsym(handle, "_ZN15MinecraftClientC2EiPPc");
+    minecraft_client_init = (minecraft_client_init_t)internal_dlsym(handle, "_ZN15MinecraftClient4initEv");
+    app_platform_construct = (app_platform_construct_t)internal_dlsym(handle, "_ZN11AppPlatformC2Ev");   
 }

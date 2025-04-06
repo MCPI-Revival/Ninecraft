@@ -1,0 +1,4 @@
+#include <ninecraft/app_platform.h>
+
+app_platform_vtable_0_9_0_t platform_vtable_0_9_0;
+app_platform_vtable_0_10_0_t platform_vtable_0_10_0;

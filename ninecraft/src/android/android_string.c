@@ -4,13 +4,15 @@
 #include <string.h>
 #include <stdlib.h>
 #include <stdio.h>
+#include <ancmp/android_dlfcn.h>
 
 android_string_deallocate_block_t android_string_deallocate_block = NULL;
 android_string_assign_t android_string_assign = NULL;
 
 void android_string_setup_hooks(void *handle) {
-    android_string_deallocate_block = (android_string_deallocate_block_t)internal_dlsym(handle, "_ZNSt4priv12_String_baseIcSaIcEE19_M_deallocate_blockEv");
-    android_string_assign = (android_string_assign_t)internal_dlsym(handle, "_ZNSs9_M_assignEPKcS0_");
+    puts("android_string_setup_hooks");
+    android_string_deallocate_block = (android_string_deallocate_block_t)android_dlsym(handle, "_ZNSt4priv12_String_baseIcSaIcEE19_M_deallocate_blockEv");
+    android_string_assign = (android_string_assign_t)android_dlsym(handle, "_ZNSs9_M_assignEPKcS0_");
 }
 
 void *android_string_ucopy_trivial(const void *__first, const void *__last, void *__result) {
@@ -34,7 +36,7 @@ void android_string_move_src(android_string_t *__this, android_string_t *__ps) {
 void android_string_allocate_block(android_string_t *__this, size_t __n) {
     __this->stlp._M_start_of_storage = android_alloc_allocate(&__n);
     __this->stlp._M_finish = __this->stlp._M_start_of_storage;
-    __this->stlp.buffers._M_end_of_storage = __this->stlp._M_start_of_storage + __n;
+    __this->stlp.buffers._M_end_of_storage = (void *)((char *)__this->stlp._M_start_of_storage + __n);
 }
 
 char *android_string_to_str(android_string_t *__this) {

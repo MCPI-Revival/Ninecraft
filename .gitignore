@@ -2,6 +2,7 @@ build/
 buil/
 build2/
 build-arm/
+build-win32/
 build-i686/
 assets3/
 lib3/

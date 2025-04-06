@@ -29,7 +29,7 @@ void multitouch_feed_0_5(char button, char type, short x, short y, char pointer_
 
     android_vector_push_back(multitouch_inputs, &action, sizeof(mouse_action_0_5_t));
 
-    mouse_device_feed_0_5(multitouch_pointers + (action.pointer_id * sizeof(mouse_device_0_5_t)), action.button, action.type, action.x, action.y);
+    mouse_device_feed_0_5((mouse_device_0_5_t *)((char *)multitouch_pointers + (action.pointer_id * sizeof(mouse_device_0_5_t))), action.button, action.type, action.x, action.y);
     
     if (action.button) {
         if (action.type == 1) {
@@ -54,7 +54,7 @@ void multitouch_feed_0_6(char button, char type, short x, short y, char pointer_
 
     android_vector_push_back(multitouch_inputs, &action, sizeof(mouse_action_0_6_t));
 
-    mouse_device_feed_0_6(multitouch_pointers + (action.pointer_id * sizeof(mouse_device_0_6_t)), action.button, action.type, action.x, action.y, action.dx, action.dy);
+    mouse_device_feed_0_6((mouse_device_0_6_t *)((char *)multitouch_pointers + (action.pointer_id * sizeof(mouse_device_0_6_t))), action.button, action.type, action.x, action.y, action.dx, action.dy);
     
     if (action.button) {
         if (action.type == 1) {

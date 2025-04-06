@@ -4,8 +4,10 @@
 #include <ninecraft/audio/sound_repository.h>
 #include <string.h>
 #include <stdlib.h>
-#include <sys/param.h>
-#include <unistd.h>
+#include <time.h>
+#ifdef _WIN32
+#include <direct.h>
+#endif
 
 static ninecraft_sound_t ninecraft_sound_repository[] = {
     {
@@ -678,11 +680,12 @@ ninecraft_sound_resource_t *ninecraft_get_sound_buffer(char *name) {
             int resource_index = rand() % sound->resources_count;
             ninecraft_sound_resource_t *resource = &sound->resources[resource_index];
             if (resource->buffer == NULL) {
-                char path[MAXPATHLEN];
-                getcwd(path, MAXPATHLEN);
+                char *path = (char *)malloc(1024);
+                path[0] = '\0';
+                getcwd(path, 1024);
                 strcat(path, "/res/raw/");
                 strcat(path, resource->name);
-                FILE *fp = fopen(path, "r");
+                FILE *fp = fopen(path, "rb");
                 if (fp != NULL) {
                     OggVorbis_File vorbis;
                     if (ov_open_callbacks(fp, &vorbis, NULL, 0, OV_CALLBACKS_DEFAULT) == 0) {
@@ -705,6 +708,7 @@ ninecraft_sound_resource_t *ninecraft_get_sound_buffer(char *name) {
                     }
                     ov_clear(&vorbis);
                 }
+                free(path);
             }
             return resource;
         }

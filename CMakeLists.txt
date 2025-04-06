@@ -8,19 +8,17 @@ else()
     set(IS_ARM_BUILD FALSE)
 endif()
 
-set(GLFW_BUILD_X11 TRUE)
-
-include_directories(${GLFW_SOURCE_DIR}/include)
 include_directories(${PROJECT_SOURCE_DIR}/minivorbis)
 include_directories(${PROJECT_SOURCE_DIR}/stb)
 
-add_subdirectory(miniz)
-add_subdirectory(libhybris)
+set(LIBTYPE "STATIC" CACHE BOOL "" FORCE)
+
+add_subdirectory(glad/cmake)
+glad_add_library(glad REPRODUCIBLE LOADER API egl=1.5 gl:compatibility=2.0)
+add_subdirectory(zlib)
+add_subdirectory(ancmp)
 add_subdirectory(glfw)
+add_subdirectory(openal-soft)
 add_subdirectory(ninecraft)
-if(APPLE)
-add_subdirectory(osx-elf-header)
-add_subdirectory(epoll-shim)
-endif()
 
 include_directories(${PROJECT_SOURCE_DIR}/libhybris/include)

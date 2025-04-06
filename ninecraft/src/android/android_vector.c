@@ -11,7 +11,7 @@ size_t android_vector_compute_next_size(android_vector_t *__this, size_t __n, si
         puts("Invalid vector length");
         abort();
     }
-    size_t __len = __size + MAX(__n, __size);
+    size_t __len = __size + ((__n >= __size) ? __n : __size);
     if (__len > __max_size || __len < __size) {
         __len = __max_size;
     }

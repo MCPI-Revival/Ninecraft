@@ -1,15 +1,21 @@
-#include <dlfcn.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 #include <stdint.h>
 #include <stdarg.h>
-#include <unistd.h>
 #include <sys/timeb.h>
-#include <sys/param.h>
+#include <sys/stat.h>
+#include <sys/types.h>
+#ifndef _WIN32
 #include <sys/mman.h>
+#include <fnmatch.h>
+#else
+#include <direct.h>
+#define mkdir(x, y) _mkdir(x)
+#endif
 #include <sys/types.h>
 #include <sys/stat.h>
+#define GLFW_INCLUDE_NONE
 #include <GLFW/glfw3.h>
 #include <ninecraft/patch/detours.h>
 #include <ninecraft/gfx/gles_compat.h>
@@ -26,25 +32,22 @@
 #include <ninecraft/input/multitouch.h>
 #include <ninecraft/mods/inject.h>
 #include <ninecraft/mods/mod_loader.h>
+#include <ninecraft/app_platform.h>
 #include <math.h>
 #include <wchar.h>
 #include <wctype.h>
 #include <ninecraft/audio/sles.h>
 #include <ninecraft/audio/audio_engine.h>
-#include <miniz.h>
-#include <fnmatch.h>
+#include <zlib.h>
 
 #include <ninecraft/dlfcn_stub.h>
-#include <hybris/hook.h>
-#include <hybris/jb/linker.h>
+#include <ancmp/hooks.h>
+#include <ancmp/android_dlfcn.h>
+#include <ancmp/linker.h>
 
 #include <ninecraft/math_compat.h>
 #include <ninecraft/ninecraft_defs.h>
-#include <hybris/dlfcn.h>
 
-#include <stdatomic.h>
-#include <linux/futex.h>
-#include <sys/syscall.h>
 #include <ninecraft/options.h>
 
 #define STB_IMAGE_IMPLEMENTATION
@@ -72,28 +75,30 @@ bool mouse_pointer_hidden = false;
 int old_pos_x, old_pos_y, old_width, old_height;
 
 void *load_library(const char *name) {
-#ifdef __i386__
+#if defined(__i386__) || defined(_M_IX86)
     char *arch = "x86";
 #else
-#ifdef __arm__
+#if defined(__arm__) || defined(_M_ARM) 
     char *arch = "armeabi-v7a";
 #else
     char *arch = "";
 #endif
 #endif
-    char fullpath[MAXPATHLEN];
-    getcwd(fullpath, MAXPATHLEN);
+    char *fullpath = (char *)malloc(1024);
+    fullpath[0] = '\0';
+    getcwd(fullpath, 1024);
     strcat(fullpath, "/lib/");
     strcat(fullpath, arch);
     strcat(fullpath, "/");
     strcat(fullpath, name);
 
-    void *handle = internal_dlopen(fullpath, RTLD_LAZY);
+    void *handle = internal_dlopen(fullpath, ANDROID_RTLD_LAZY);
     if (handle == NULL) {
         printf("failed to load library %s: %s\n", fullpath, internal_dlerror());
         return NULL;
     }
     printf("lib: %s: : %p\n", fullpath, handle);
+    free(fullpath);
     return handle;
 }
 
@@ -104,7 +109,7 @@ void stub_symbols(const char **symbols, void *stub_func) {
         if (sym == NULL) {
             break;
         }
-        hybris_hook(sym, stub_func);
+        add_custom_hook((char *)sym, stub_func);
         ++i;
     }
 }
@@ -132,6 +137,7 @@ int mouseToGameKeyCode(int keyCode) {
     } else if (keyCode == GLFW_MOUSE_BUTTON_RIGHT) {
         return MCKEY_PLACE;
     }
+    return 0;
 }
 
 static void mouse_click_callback(GLFWwindow *window, int button, int action, int mods) {
@@ -253,7 +259,7 @@ void set_ninecraft_size_0_1_0(int width, int height) {
     } else {
         *inv_gui_scale = 0.25;
     }
-    void *screen = *(void **)(ninecraft_app + 0xd14);
+    void *screen = *(void **)((char *)ninecraft_app + 0xd14);
     if (screen != NULL) {
         float new_screen_width = (float)(width) * (*inv_gui_scale);
         float new_screen_height = (float)(height) * (*inv_gui_scale);
@@ -304,7 +310,7 @@ static void set_ninecraft_size(int width, int height) {
         }
         *(float *)internal_dlsym(handle, "_ZN3Gui11InvGuiScaleE") = 0.5f;
         *(float *)internal_dlsym(handle, "_ZN3Gui8GuiScaleE") = 2.0f;
-        void *screen = *(void **)(ninecraft_app + screen_offset);
+        void *screen = *(void **)((char *)ninecraft_app + screen_offset);
         if (screen) {
             ((void (*)(void *, int, int))internal_dlsym(handle, "_ZN6Screen7setSizeEii"))(screen, width * 0.5f, height * 0.5f);
         }
@@ -320,7 +326,7 @@ static void resize_callback(GLFWwindow *window, int width, int height) {
 }
 
 static void char_callback(GLFWwindow *window, unsigned int codepoint) {
-    if (platform.is_keyboard_visible) {    
+    if (is_keyboard_visible) {    
         if (version_id >= version_id_0_6_0 && version_id <= version_id_0_7_1) {
             keyboard_feed_text_0_6_0((char)codepoint);
         } else if (version_id >= version_id_0_7_2) {
@@ -398,7 +404,7 @@ static void key_callback(GLFWwindow *window, int key, int scancode, int action, 
                 } else {
                     return;
                 }
-                ((void (*)(void *, int))internal_dlsym(handle, "_ZN13ScreenChooser9setScreenE8ScreenId"))(ninecraft_app + minecraft_screenchooser_offset, 7);
+                ((void (*)(void *, int))internal_dlsym(handle, "_ZN13ScreenChooser9setScreenE8ScreenId"))((char *)ninecraft_app + minecraft_screenchooser_offset, 7);
             }
         } else if (version_id >= version_id_0_1_1 && key == GLFW_KEY_ESCAPE) {
             if (action == GLFW_PRESS) {
@@ -426,14 +432,14 @@ void grab_mouse() {
     mouse_pointer_hidden = true;
     ignore_relative_motion = true;
     glfwSetInputMode(_window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-    glfwSetInputMode(_window, GLFW_RAW_MOUSE_MOTION, GLFW_TRUE);
+    //glfwSetInputMode(_window, GLFW_RAW_MOUSE_MOTION, GLFW_TRUE);
 }
 
 void release_mouse() {
     puts("release_mouse");
     mouse_pointer_hidden = false;
     glfwSetInputMode(_window, GLFW_CURSOR, default_mouse_mode);
-    glfwSetInputMode(_window, GLFW_RAW_MOUSE_MOTION, GLFW_TRUE);
+    //glfwSetInputMode(_window, GLFW_RAW_MOUSE_MOTION, GLFW_TRUE);
     double cursor_x;
     double cursor_y;
     glfwGetCursorPos(_window, &cursor_x, &cursor_y);
@@ -441,134 +447,97 @@ void release_mouse() {
 }
 
 void gles_hook() {
-    hybris_hook("glAlphaFunc", (void *)gl_alpha_func);
-    hybris_hook("glBindBuffer", (void *)gl_bind_buffer);
-    hybris_hook("glBindTexture", (void *)gl_bind_texture);
-    hybris_hook("glBlendFunc", (void *)gl_blend_func);
-    hybris_hook("glBufferData", (void *)gl_buffer_data);
-    hybris_hook("glClear", (void *)gl_clear);
-    hybris_hook("glClearColor", (void *)gl_clear_color);
-    hybris_hook("glColor4f", (void *)gl_color_4_f);
-    hybris_hook("glColorMask", (void *)gl_color_mask);
-    hybris_hook("glColorPointer", (void *)gl_color_pointer);
-    hybris_hook("glCullFace", (void *)gl_cull_face);
-    hybris_hook("glDeleteBuffers", (void *)gl_delete_buffers);
-    hybris_hook("glDeleteTextures", (void *)gl_delete_textures);
-    hybris_hook("glDepthFunc", (void *)gl_depth_func);
-    hybris_hook("glDepthMask", (void *)gl_depth_mask);
-    hybris_hook("glDepthRangef", (void *)gl_depth_range_f);
-    hybris_hook("glDisable", (void *)gl_disable);
-    hybris_hook("glDisableClientState", (void *)gl_disable_client_state);
-    hybris_hook("glDrawArrays", (void *)gl_draw_arrays);
-    hybris_hook("glEnable", (void *)gl_enable);
-    hybris_hook("glEnableClientState", (void *)gl_enable_client_state);
-    hybris_hook("glFogf", (void *)gl_fog_f);
-    hybris_hook("glFogfv", (void *)gl_fog_f_v);
-    hybris_hook("glFogx", (void *)gl_fog_x);
-    hybris_hook("glGenTextures", (void *)gl_gen_textures);
-    hybris_hook("glGetFloatv", (void *)gl_get_float_v);
-    hybris_hook("glGetString", (void *)gl_get_string);
-    hybris_hook("glHint", (void *)gl_hint);
-    hybris_hook("glLineWidth", (void *)gl_line_width);
-    hybris_hook("glLoadIdentity", (void *)gl_load_identity);
-    hybris_hook("glMatrixMode", (void *)gl_matrix_mode);
-    hybris_hook("glMultMatrixf", (void *)gl_mult_matrix_f);
-    hybris_hook("glNormal3f", (void *)gl_normal_3_f);
-    hybris_hook("glOrthof", (void *)gl_ortho_f);
-    hybris_hook("glPolygonOffset", (void *)gl_polygon_offset);
-    hybris_hook("glPopMatrix", (void *)gl_pop_matrix);
-    hybris_hook("glPushMatrix", (void *)gl_push_matrix);
-    hybris_hook("glReadPixels", (void *)gl_read_pixels);
-    hybris_hook("glRotatef", (void *)gl_rotate_f);
-    hybris_hook("glScalef", (void *)gl_scale_f);
-    hybris_hook("glScissor", (void *)gl_scissor);
-    hybris_hook("glShadeModel", (void *)gl_shade_model);
-    hybris_hook("glTexCoordPointer", (void *)gl_tex_coord_pointer);
-    hybris_hook("glTexImage2D", (void *)gl_tex_image_2_d);
-    hybris_hook("glTexParameteri", (void *)gl_tex_parameter_i);
-    hybris_hook("glTexSubImage2D", (void *)gl_tex_sub_image_2_d);
-    hybris_hook("glTranslatef", (void *)gl_translate_f);
-    hybris_hook("glVertexPointer", (void *)gl_vertex_pointer);
-    hybris_hook("glViewport", (void *)gl_viewport);
-    hybris_hook("glDrawElements", (void *)gl_draw_elements);
-    hybris_hook("glGetError", (void *)gl_get_error);
-    hybris_hook("glGenBuffers", (void *)gl_gen_buffers);
-    hybris_hook("glStencilFunc", (void *)gl_stencil_func);
-    hybris_hook("glStencilMask", (void *)gl_stencil_mask);
-    hybris_hook("glLightModelf", (void *)gl_light_model_f);
-    hybris_hook("glLightfv", (void *)gl_light_f_v);
-    hybris_hook("glNormalPointer", (void *)gl_normal_pointer);
-    hybris_hook("glStencilOp", (void *)gl_stencil_op);
-    hybris_hook("glActiveTexture", (void *)gl_active_texture);
-    hybris_hook("glAttachShader", (void *)gl_attach_shader);
-    hybris_hook("glClearStencil", (void *)gl_clear_stencil);
-    hybris_hook("glCompileShader", (void *)gl_compile_shader);
-    hybris_hook("glCreateProgram", (void *)gl_create_program);
-    hybris_hook("glCreateShader", (void *)gl_create_shader);
-    hybris_hook("glDeleteProgram", (void *)gl_delete_program);
-    hybris_hook("glEnableVertexAttribArray", (void *)gl_enable_vertex_attrib_array);
-    hybris_hook("glGetActiveAttrib", (void *)gl_get_active_attrib);
-    hybris_hook("glGetActiveUniform", (void *)gl_get_active_uniform);
-    hybris_hook("glGetAttribLocation", (void *)gl_get_attrib_location);
-    hybris_hook("glGetProgramInfoLog", (void *)gl_get_program_info_log);
-    hybris_hook("glGetProgramiv", (void *)gl_get_program_i_v);
-    hybris_hook("glGetShaderInfoLog", (void *)gl_get_shader_info_log);
-    hybris_hook("glGetShaderiv", (void *)gl_get_shader_i_v);
-    hybris_hook("glGetShaderPrecisionFormat", (void *)gl_get_shader_precision_format);
-    hybris_hook("glGetUniformLocation", (void *)gl_get_uniform_location);
-    hybris_hook("glLinkProgram", (void *)gl_link_program);
-    hybris_hook("glReleaseShaderCompiler", (void *)gl_release_shader_compiler);
-    hybris_hook("glShaderSource", (void *)gl_shader_source);
-    hybris_hook("glUniform1fv", (void *)gl_uniform_1_f_v);
-    hybris_hook("glUniform1iv", (void *)gl_uniform_1_i_v);
-    hybris_hook("glUniform2fv", (void *)gl_uniform_2_f_v);
-    hybris_hook("glUniform2iv", (void *)gl_uniform_2_i_v);
-    hybris_hook("glUniform3fv", (void *)gl_uniform_3_f_v);
-    hybris_hook("glUniform3iv", (void *)gl_uniform_3_i_v);
-    hybris_hook("glUniform4fv", (void *)gl_uniform_4_f_v);
-    hybris_hook("glUniform4iv", (void *)gl_uniform_4_i_v);
-    hybris_hook("glUniformMatrix2fv", (void *)gl_uniform_matrix_2_f_v);
-    hybris_hook("glUniformMatrix3fv", (void *)gl_uniform_matrix_3_f_v);
-    hybris_hook("glUniformMatrix4fv", (void *)gl_uniform_matrix_4_f_v);
-    hybris_hook("glUseProgram", (void *)gl_use_program);
-    hybris_hook("glVertexAttribPointer", (void *)gl_vertex_attrib_pointer);
-}
-
-void math_hook() {
-    hybris_hook("atan2f", math_atan2f);
-    hybris_hook("atanf", math_atanf);
-    hybris_hook("ceilf", math_ceilf);
-    hybris_hook("cosf", math_cosf);
-    hybris_hook("floorf", math_floorf);
-    hybris_hook("fmodf", math_fmodf);
-    hybris_hook("logf", math_logf);
-    hybris_hook("powf", math_powf);
-    hybris_hook("sinf", math_sinf);
-    hybris_hook("sqrtf", math_sqrtf);
-    hybris_hook("floor", math_floor);
-    hybris_hook("ceil", math_ceil);
-    hybris_hook("fmod", math_fmod);
-    hybris_hook("sin", math_sin);
-    hybris_hook("sqrt", math_sqrt);
-    hybris_hook("pow", math_pow);
-    hybris_hook("atan2", math_atan2);
-    hybris_hook("cos", math_cos);
-    hybris_hook("atan", math_atan);
-    hybris_hook("cosh", math_cosh);
-    hybris_hook("tan", math_tan);
-    hybris_hook("tanh", math_tanh);
-    hybris_hook("asin", math_asin);
-    hybris_hook("log", math_log);
-    hybris_hook("sinh", math_sinh);
-    hybris_hook("modf", math_modf);
-    hybris_hook("acos", math_acos);
-    hybris_hook("exp", math_exp);
-    hybris_hook("frexp", math_frexp);
-    hybris_hook("log10", math_log10);
-    hybris_hook("modff", math_modff);
-    hybris_hook("ldexpf", math_ldexpf);
-    hybris_hook("tanf", math_tanf);
-    hybris_hook("nearbyint", math_nearbyint);
+    add_custom_hook("glAlphaFunc", (void *)gl_alpha_func);
+    add_custom_hook("glBindBuffer", (void *)gl_bind_buffer);
+    add_custom_hook("glBindTexture", (void *)gl_bind_texture);
+    add_custom_hook("glBlendFunc", (void *)gl_blend_func);
+    add_custom_hook("glBufferData", (void *)gl_buffer_data);
+    add_custom_hook("glClear", (void *)gl_clear);
+    add_custom_hook("glClearColor", (void *)gl_clear_color);
+    add_custom_hook("glColor4f", (void *)gl_color_4_f);
+    add_custom_hook("glColorMask", (void *)gl_color_mask);
+    add_custom_hook("glColorPointer", (void *)gl_color_pointer);
+    add_custom_hook("glCullFace", (void *)gl_cull_face);
+    add_custom_hook("glDeleteBuffers", (void *)gl_delete_buffers);
+    add_custom_hook("glDeleteTextures", (void *)gl_delete_textures);
+    add_custom_hook("glDepthFunc", (void *)gl_depth_func);
+    add_custom_hook("glDepthMask", (void *)gl_depth_mask);
+    add_custom_hook("glDepthRangef", (void *)gl_depth_range_f);
+    add_custom_hook("glDisable", (void *)gl_disable);
+    add_custom_hook("glDisableClientState", (void *)gl_disable_client_state);
+    add_custom_hook("glDrawArrays", (void *)gl_draw_arrays);
+    add_custom_hook("glEnable", (void *)gl_enable);
+    add_custom_hook("glEnableClientState", (void *)gl_enable_client_state);
+    add_custom_hook("glFogf", (void *)gl_fog_f);
+    add_custom_hook("glFogfv", (void *)gl_fog_f_v);
+    add_custom_hook("glFogx", (void *)gl_fog_x);
+    add_custom_hook("glGenTextures", (void *)gl_gen_textures);
+    add_custom_hook("glGetFloatv", (void *)gl_get_float_v);
+    add_custom_hook("glGetString", (void *)gl_get_string);
+    add_custom_hook("glHint", (void *)gl_hint);
+    add_custom_hook("glLineWidth", (void *)gl_line_width);
+    add_custom_hook("glLoadIdentity", (void *)gl_load_identity);
+    add_custom_hook("glMatrixMode", (void *)gl_matrix_mode);
+    add_custom_hook("glMultMatrixf", (void *)gl_mult_matrix_f);
+    add_custom_hook("glNormal3f", (void *)gl_normal_3_f);
+    add_custom_hook("glOrthof", (void *)gl_ortho_f);
+    add_custom_hook("glPolygonOffset", (void *)gl_polygon_offset);
+    add_custom_hook("glPopMatrix", (void *)gl_pop_matrix);
+    add_custom_hook("glPushMatrix", (void *)gl_push_matrix);
+    add_custom_hook("glReadPixels", (void *)gl_read_pixels);
+    add_custom_hook("glRotatef", (void *)gl_rotate_f);
+    add_custom_hook("glScalef", (void *)gl_scale_f);
+    add_custom_hook("glScissor", (void *)gl_scissor);
+    add_custom_hook("glShadeModel", (void *)gl_shade_model);
+    add_custom_hook("glTexCoordPointer", (void *)gl_tex_coord_pointer);
+    add_custom_hook("glTexImage2D", (void *)gl_tex_image_2_d);
+    add_custom_hook("glTexParameteri", (void *)gl_tex_parameter_i);
+    add_custom_hook("glTexSubImage2D", (void *)gl_tex_sub_image_2_d);
+    add_custom_hook("glTranslatef", (void *)gl_translate_f);
+    add_custom_hook("glVertexPointer", (void *)gl_vertex_pointer);
+    add_custom_hook("glViewport", (void *)gl_viewport);
+    add_custom_hook("glDrawElements", (void *)gl_draw_elements);
+    add_custom_hook("glGetError", (void *)gl_get_error);
+    add_custom_hook("glGenBuffers", (void *)gl_gen_buffers);
+    add_custom_hook("glStencilFunc", (void *)gl_stencil_func);
+    add_custom_hook("glStencilMask", (void *)gl_stencil_mask);
+    add_custom_hook("glLightModelf", (void *)gl_light_model_f);
+    add_custom_hook("glLightfv", (void *)gl_light_f_v);
+    add_custom_hook("glNormalPointer", (void *)gl_normal_pointer);
+    add_custom_hook("glStencilOp", (void *)gl_stencil_op);
+    add_custom_hook("glActiveTexture", (void *)gl_active_texture);
+    add_custom_hook("glAttachShader", (void *)gl_attach_shader);
+    add_custom_hook("glClearStencil", (void *)gl_clear_stencil);
+    add_custom_hook("glCompileShader", (void *)gl_compile_shader);
+    add_custom_hook("glCreateProgram", (void *)gl_create_program);
+    add_custom_hook("glCreateShader", (void *)gl_create_shader);
+    add_custom_hook("glDeleteProgram", (void *)gl_delete_program);
+    add_custom_hook("glEnableVertexAttribArray", (void *)gl_enable_vertex_attrib_array);
+    add_custom_hook("glGetActiveAttrib", (void *)gl_get_active_attrib);
+    add_custom_hook("glGetActiveUniform", (void *)gl_get_active_uniform);
+    add_custom_hook("glGetAttribLocation", (void *)gl_get_attrib_location);
+    add_custom_hook("glGetProgramInfoLog", (void *)gl_get_program_info_log);
+    add_custom_hook("glGetProgramiv", (void *)gl_get_program_i_v);
+    add_custom_hook("glGetShaderInfoLog", (void *)gl_get_shader_info_log);
+    add_custom_hook("glGetShaderiv", (void *)gl_get_shader_i_v);
+    add_custom_hook("glGetShaderPrecisionFormat", (void *)gl_get_shader_precision_format);
+    add_custom_hook("glGetUniformLocation", (void *)gl_get_uniform_location);
+    add_custom_hook("glLinkProgram", (void *)gl_link_program);
+    add_custom_hook("glReleaseShaderCompiler", (void *)gl_release_shader_compiler);
+    add_custom_hook("glShaderSource", (void *)gl_shader_source);
+    add_custom_hook("glUniform1fv", (void *)gl_uniform_1_f_v);
+    add_custom_hook("glUniform1iv", (void *)gl_uniform_1_i_v);
+    add_custom_hook("glUniform2fv", (void *)gl_uniform_2_f_v);
+    add_custom_hook("glUniform2iv", (void *)gl_uniform_2_i_v);
+    add_custom_hook("glUniform3fv", (void *)gl_uniform_3_f_v);
+    add_custom_hook("glUniform3iv", (void *)gl_uniform_3_i_v);
+    add_custom_hook("glUniform4fv", (void *)gl_uniform_4_f_v);
+    add_custom_hook("glUniform4iv", (void *)gl_uniform_4_i_v);
+    add_custom_hook("glUniformMatrix2fv", (void *)gl_uniform_matrix_2_f_v);
+    add_custom_hook("glUniformMatrix3fv", (void *)gl_uniform_matrix_3_f_v);
+    add_custom_hook("glUniformMatrix4fv", (void *)gl_uniform_matrix_4_f_v);
+    add_custom_hook("glUseProgram", (void *)gl_use_program);
+    add_custom_hook("glVertexAttribPointer", (void *)gl_vertex_attrib_pointer);
 }
 
 #ifdef __arm__
@@ -625,7 +594,7 @@ extern void *__dso_handle;
 #define CONSTRUCTION_COMPLETE 1
 #define CONSTRUCTION_UNDERWAY_WITHOUT_WAITER 0x100
 #define CONSTRUCTION_UNDERWAY_WITH_WAITER 0x200
-
+/*
 typedef union
 {
     atomic_int state;
@@ -655,7 +624,7 @@ int __my_cxa_guard_acquire(my_guard_t *gv) {
                 continue;
             }
         }
-        syscall(SYS_futex, &gv->state, FUTEX_WAIT, CONSTRUCTION_UNDERWAY_WITH_WAITER, NULL, NULL, 0);
+        //syscall(SYS_futex, &gv->state, FUTEX_WAIT, CONSTRUCTION_UNDERWAY_WITH_WAITER, NULL, NULL, 0);
         old_value = atomic_load_explicit(&gv->state, memory_order_relaxed);
     }
 }
@@ -663,78 +632,62 @@ int __my_cxa_guard_acquire(my_guard_t *gv) {
 void __my_cxa_guard_release(my_guard_t *gv) {
     int old_value = atomic_exchange_explicit(&gv->state, CONSTRUCTION_COMPLETE, memory_order_release);
     if (old_value == CONSTRUCTION_UNDERWAY_WITH_WAITER) {
-        syscall(SYS_futex, &gv->state, FUTEX_WAKE, INT_MAX, NULL, NULL, 0);
+        //syscall(SYS_futex, &gv->state, FUTEX_WAKE, INT_MAX, NULL, NULL, 0);
     }
-}
+}*/
 
-int __my_srget(struct aFILE *astream) {
+int __my_srget(FILE *astream) {
     puts("__srget");
     return EOF;
 }
 
+void db_test() {
+    puts("db_test");
+}
+
 void missing_hook() {
-    hybris_hook("__cxa_guard_release", __my_cxa_guard_release);
-    hybris_hook("__cxa_guard_acquire", __my_cxa_guard_acquire);
-    hybris_hook("__dso_handle", &__dso_handle);
-    hybris_hook("_Znaj", cpp_operator_new);
-    hybris_hook("_ZdaPv", cpp_operator_delete);
-    hybris_hook("_Znwj", cpp_operator_new);
-    hybris_hook("_ZdlPv", cpp_operator_delete);
-    hybris_hook("strtod", io_strtod);
-    hybris_hook("wcscmp", wcscmp);
-    hybris_hook("wcsncpy", wcsncpy);
-    hybris_hook("iswalpha", iswalpha);
-    hybris_hook("iswcntrl", iswcntrl);
-    hybris_hook("iswdigit", iswdigit);
-    hybris_hook("iswlower", iswlower);
-    hybris_hook("iswprint", iswprint);
-    hybris_hook("iswpunct", iswpunct);
-    hybris_hook("iswupper", iswupper);
-    hybris_hook("iswxdigit", iswxdigit);
-    hybris_hook("wcscat", wcscat);
-    hybris_hook("wcscat", wcscat);
-    hybris_hook("wcscpy", wcscpy);
-    hybris_hook("fnmatch", fnmatch);
-    hybris_hook("__srget", __my_srget);
+    /*add_custom_hook("__cxa_guard_release", __my_cxa_guard_release);
+    add_custom_hook("__cxa_guard_acquire", __my_cxa_guard_acquire);
+    add_custom_hook("__dso_handle", &__dso_handle);
+    add_custom_hook("fnmatch", fnmatch);
+    add_custom_hook("__srget", __my_srget);*/
+    
+    /*add_custom_hook("_Znaj", cpp_operator_new);
+    add_custom_hook("_ZdaPv", cpp_operator_delete);
+    add_custom_hook("_Znwj", cpp_operator_new);
+    add_custom_hook("_ZdlPv", cpp_operator_delete);*/
+    
 
-    hybris_hook("deflateInit_", deflateInit);
-    hybris_hook("deflateInit2_", deflateInit2);
-    hybris_hook("deflate", deflate);
-    hybris_hook("deflateEnd", deflateEnd);
-    hybris_hook("inflateInit_", inflateInit);
-    hybris_hook("inflateInit2_", inflateInit2);
-    hybris_hook("inflate", inflate);
-    hybris_hook("inflateEnd", inflateEnd);
-    hybris_hook("uncompress", uncompress);
-    hybris_hook("compress", compress);
-    hybris_hook("compressBound", compressBound);
-
-    hybris_hook("ftime", ftime);
-
-    hybris_hook("__cxa_pure_virtual", __my_cxa_pure_virtual);
+    add_custom_hook("deflateInit_", deflateInit_);
+    add_custom_hook("deflateInit2_", deflateInit2_);
+    add_custom_hook("deflate", deflate);
+    add_custom_hook("deflateEnd", deflateEnd);
+    add_custom_hook("inflateInit_", inflateInit_);
+    add_custom_hook("inflateInit2_", inflateInit2_);
+    add_custom_hook("inflate", inflate);
+    add_custom_hook("inflateEnd", inflateEnd);
+    add_custom_hook("uncompress", uncompress);
+    add_custom_hook("compress", compress);
+    add_custom_hook("compressBound", compressBound);
 
 #ifdef __arm__
-    hybris_hook("__aeabi_atexit", __aeabi_atexit);
-    hybris_hook("__aeabi_uidiv", __aeabi_uidiv);
-    hybris_hook("__aeabi_d2ulz", __aeabi_d2ulz);
-    hybris_hook("__aeabi_uidivmod", __aeabi_uidivmod);
-    hybris_hook("__aeabi_uldivmod", __aeabi_uldivmod);
-    hybris_hook("__aeabi_ldivmod", __aeabi_ldivmod);
-    hybris_hook("__aeabi_ul2d", __aeabi_ul2d);
-    hybris_hook("__aeabi_idivmod", __aeabi_idivmod);
-    hybris_hook("__aeabi_idiv", __aeabi_idiv);
-    hybris_hook("__aeabi_ul2f", __aeabi_ul2f);
+    add_custom_hook("__aeabi_atexit", __aeabi_atexit);
+    add_custom_hook("__aeabi_uidiv", __aeabi_uidiv);
+    add_custom_hook("__aeabi_d2ulz", __aeabi_d2ulz);
+    add_custom_hook("__aeabi_uidivmod", __aeabi_uidivmod);
+    add_custom_hook("__aeabi_uldivmod", __aeabi_uldivmod);
+    add_custom_hook("__aeabi_ldivmod", __aeabi_ldivmod);
+    add_custom_hook("__aeabi_ul2d", __aeabi_ul2d);
+    add_custom_hook("__aeabi_idivmod", __aeabi_idivmod);
+    add_custom_hook("__aeabi_idiv", __aeabi_idiv);
+    add_custom_hook("__aeabi_ul2f", __aeabi_ul2f);
 #endif
 }
 
-ninecraft_options_t options = {
-    .options = NULL,
-    .length = 0,
-    .capasity = 0
-};
-
 int main(int argc, char **argv) {
-    struct stat st = {0};
+    printf("sizeof wchar: %d\n", sizeof(wchar_t));
+    android_linker_init();
+    static struct stat st = {0};
     if (stat("storage", &st) == -1) {
         mkdir("storage", 0700);
         if (stat("storage/internal", &st) == -1) {
@@ -757,26 +710,34 @@ int main(int argc, char **argv) {
         mkdir("mods", 0700);
     }
 
-    ninecraft_read_options_file(&options, "options.txt");
-    ninecraft_set_default_options(&options, "options.txt");
+    ninecraft_read_options_file(&platform_options, "options.txt");
+    ninecraft_set_default_options(&platform_options, "options.txt");
 
     if (!glfwInit()) {
         // Initialization failed
         puts("init failed");
+        return 1;
     }
 
     glfwWindowHint(GLFW_CLIENT_API, GLFW_OPENGL_API);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 2);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
+    //glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
+    //glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
+#ifdef _WIN32
     glfwWindowHint(GLFW_CONTEXT_CREATION_API, GLFW_NATIVE_CONTEXT_API);
+#else
+    glfwWindowHint(GLFW_CONTEXT_CREATION_API, GLFW_EGL_CONTEXT_API);
+#endif
     _window = glfwCreateWindow(720, 480, "Ninecraft", NULL, NULL);
+    if (!_window) {
+        puts("Cant create window");
+        return 1;
+    }
     GLFWimage icon;
     icon.pixels = stbi_load("./res/drawable/iconx.png", &icon.width, &icon.height, NULL, STBI_rgb_alpha);
     glfwSetWindowIcon(_window, 1, &icon);
     stbi_image_free(icon.pixels);
-    if (!_window) {
-        puts("cant create");
-    }
 
     glfwSetKeyCallback(_window, key_callback);
     glfwSetCharCallback(_window, char_callback);
@@ -788,35 +749,45 @@ int main(int argc, char **argv) {
 
     glfwMakeContextCurrent(_window);
 
+    gladLoadGL(glfwGetProcAddress);
+
     audio_engine_init();
 
-    math_hook();
     gles_hook();
     missing_hook();
-    hybris_hook("__android_log_print", (void *)__android_log_print);
+    add_custom_hook("__android_log_print", (void *)__android_log_print);
     stub_symbols(android_symbols, (void *)android_stub);
     stub_symbols(egl_symbols, (void *)egl_stub);
 
-    hybris_hook("SL_IID_VOLUME", &sles_iid_volume);
-    hybris_hook("SL_IID_ENGINE", &sles_iid_engine);
-    hybris_hook("SL_IID_BUFFERQUEUE", &sles_iid_bufferqueue);
-    hybris_hook("SL_IID_PLAY", &sles_iid_play);
-    hybris_hook("slCreateEngine", sles_create_engine);
+    add_custom_hook("SL_IID_VOLUME", &sles_iid_volume);
+    add_custom_hook("SL_IID_ENGINE", &sles_iid_engine);
+    add_custom_hook("SL_IID_BUFFERQUEUE", &sles_iid_bufferqueue);
+    add_custom_hook("SL_IID_PLAY", &sles_iid_play);
+    add_custom_hook("slCreateEngine", sles_create_engine);
 
     handle = load_library("libminecraftpe.so");
 
+    if (!handle) {
+        puts("libminecraftpe.so not loaded");
+        return 1;
+    }
+    
     android_alloc_setup_hooks(handle);
     android_string_setup_hooks(handle);
 
-    android_string_t in;
+    static android_string_t in;
     android_string_cstr(&in, "v%d.%d.%d alpha");
+#ifdef _MSC_VER
+    void (__stdcall *get_game_version_string)(android_string_t *, android_string_t *) = (void (__stdcall *)(android_string_t *, android_string_t *))internal_dlsym(handle, "_ZN6Common20getGameVersionStringERKSs");
 
+    void (__stdcall *get_game_version_string_2)(android_string_t *) = (void (__stdcall *)(android_string_t *))internal_dlsym(handle, "_ZN6Common20getGameVersionStringEv");
+#else
     void (*get_game_version_string)(android_string_t *, android_string_t *) = (void (*)(android_string_t *, android_string_t *))internal_dlsym(handle, "_ZN6Common20getGameVersionStringERKSs");
 
     void (*get_game_version_string_2)(android_string_t *) = (void (*)(android_string_t *))internal_dlsym(handle, "_ZN6Common20getGameVersionStringEv");
-
+#endif
     if (get_game_version_string != NULL) {
-        android_string_t game_version;
+        static android_string_t game_version;
         get_game_version_string(&game_version, &in);
         char *verstr = android_string_to_str(&game_version);
 
@@ -885,7 +856,7 @@ int main(int argc, char **argv) {
             return 1;
         }
     } else if (get_game_version_string_2 != NULL) {
-        android_string_t game_version;
+        static android_string_t game_version;
         get_game_version_string_2(&game_version);
         char *verstr = android_string_to_str(&game_version);
         printf("Ninecraft is running mcpe %s\n", verstr);
@@ -922,51 +893,51 @@ int main(int argc, char **argv) {
             return 1;
         }
     } else {
-        Dl_info info;
-        hybris_dladdr(internal_dlsym(handle, "_ZN12NinecraftAppC2Ev"), &info);
-        if (strncmp(info.dli_fbase + 0x15d3a8, "v0.2.0", 6) == 0) { // v0.2.0
+        android_Dl_info info;
+        android_dladdr(internal_dlsym(handle, "_ZN12NinecraftAppC2Ev"), &info);
+        if (strncmp((char *)info.dli_fbase + 0x15d3a8, "v0.2.0", 6) == 0) { // v0.2.0
             version_id = version_id_0_2_0;
-        } else if (strncmp(info.dli_fbase + 0x15a480, "v0.2.0", 6) == 0) { // v0.2.0-demo
+        } else if (strncmp((char *)info.dli_fbase + 0x15a480, "v0.2.0", 6) == 0) { // v0.2.0-demo
             version_id = version_id_0_2_0;
-        } else if (strncmp(info.dli_fbase + 0x1574f8, "v0.2.0", 6) == 0) { // v0.2.0j
+        } else if (strncmp((char *)info.dli_fbase + 0x1574f8, "v0.2.0", 6) == 0) { // v0.2.0j
             version_id = version_id_0_2_0_j;
-        } else if (strncmp(info.dli_fbase + 0x1545d8, "v0.2.0", 6) == 0) { // v0.2.0j-demo
+        } else if (strncmp((char *)info.dli_fbase + 0x1545d8, "v0.2.0", 6) == 0) { // v0.2.0j-demo
             version_id = version_id_0_2_0_j;
-        } else if (strncmp(info.dli_fbase + 0xfca6c, "v0.1.3", 6) == 0) { // v0.1.3-2
+        } else if (strncmp((char *)info.dli_fbase + 0xfca6c, "v0.1.3", 6) == 0) { // v0.1.3-2
             version_id = version_id_0_1_3;
-        } else if (strncmp(info.dli_fbase + 0xfca2c, "v0.1.3", 6) == 0) { // v0.1.3-1
+        } else if (strncmp((char *)info.dli_fbase + 0xfca2c, "v0.1.3", 6) == 0) { // v0.1.3-1
             version_id = version_id_0_1_3;
-        } else if (strncmp(info.dli_fbase + 0xfae24, "v0.1.3", 6) == 0) { // v0.1.3-2-demo
+        } else if (strncmp((char *)info.dli_fbase + 0xfae24, "v0.1.3", 6) == 0) { // v0.1.3-2-demo
             version_id = version_id_0_1_3;
-        } else if (strncmp(info.dli_fbase + 0xfade4, "v0.1.3", 6) == 0) { // v0.1.3-1-demo
+        } else if (strncmp((char *)info.dli_fbase + 0xfade4, "v0.1.3", 6) == 0) { // v0.1.3-1-demo
             version_id = version_id_0_1_3;
-        } else if (strncmp(info.dli_fbase + 0x19d910, "v0.1.3", 6) == 0) { // v0.1.3j
+        } else if (strncmp((char *)info.dli_fbase + 0x19d910, "v0.1.3", 6) == 0) { // v0.1.3j
             version_id = version_id_0_1_3_j;
-        } else if (strncmp(info.dli_fbase + 0x19a320, "v0.1.3", 6) == 0) { // v0.1.3j-demo
+        } else if (strncmp((char *)info.dli_fbase + 0x19a320, "v0.1.3", 6) == 0) { // v0.1.3j-demo
             version_id = version_id_0_1_3_j;
-        } else if (strncmp(info.dli_fbase + 0xf799c, "v0.1.2", 6) == 0) { // v0.1.2
+        } else if (strncmp((char *)info.dli_fbase + 0xf799c, "v0.1.2", 6) == 0) { // v0.1.2
             version_id = version_id_0_1_2;
-        } else if (strncmp(info.dli_fbase + 0xf5dc8, "v0.1.2", 6) == 0) { // v0.1.2-demo
+        } else if (strncmp((char *)info.dli_fbase + 0xf5dc8, "v0.1.2", 6) == 0) { // v0.1.2-demo
             version_id = version_id_0_1_2;
-        } else if (strncmp(info.dli_fbase + 0x1966c0, "v0.1.2", 6) == 0) { // v0.1.2j
+        } else if (strncmp((char *)info.dli_fbase + 0x1966c0, "v0.1.2", 6) == 0) { // v0.1.2j
             version_id = version_id_0_1_2_j;
-        } else if (strncmp(info.dli_fbase + 0x193128, "v0.1.2", 6) == 0) { // v0.1.2j-demo
+        } else if (strncmp((char *)info.dli_fbase + 0x193128, "v0.1.2", 6) == 0) { // v0.1.2j-demo
             version_id = version_id_0_1_2_j;
-        } else if (strncmp(info.dli_fbase + 0xf6d30, "v0.1.1", 6) == 0) { // v0.1.1
+        } else if (strncmp((char *)info.dli_fbase + 0xf6d30, "v0.1.1", 6) == 0) { // v0.1.1
             version_id = version_id_0_1_1;
-        } else if (strncmp(info.dli_fbase + 0xf5154, "v0.1.1", 6) == 0) { // v0.1.1-demo
+        } else if (strncmp((char *)info.dli_fbase + 0xf5154, "v0.1.1", 6) == 0) { // v0.1.1-demo
             version_id = version_id_0_1_1;
-        } else if (strncmp(info.dli_fbase + 0x19557c, "v0.1.1", 6) == 0) { // v0.1.1j
+        } else if (strncmp((char *)info.dli_fbase + 0x19557c, "v0.1.1", 6) == 0) { // v0.1.1j
             version_id = version_id_0_1_1_j;
-        } else if (strncmp(info.dli_fbase + 0x191ce4, "v0.1.1", 6) == 0) { // v0.1.1j-demo
+        } else if (strncmp((char *)info.dli_fbase + 0x191ce4, "v0.1.1", 6) == 0) { // v0.1.1j-demo
             version_id = version_id_0_1_1_j;
-        } else if (strncmp(info.dli_fbase + 0x119c64, "v0.1.0", 6) == 0) { // v0.1.0-touch
+        } else if (strncmp((char *)info.dli_fbase + 0x119c64, "v0.1.0", 6) == 0) { // v0.1.0-touch
             version_id = version_id_0_1_0_touch;
-        } else if (strncmp(info.dli_fbase + 0x131480, "v0.1.0", 6) == 0) { // v0.1.0
+        } else if (strncmp((char *)info.dli_fbase + 0x131480, "v0.1.0", 6) == 0) { // v0.1.0
             version_id = version_id_0_1_0;
-        } else if (strncmp(info.dli_fbase + 0x12f938, "v0.1.0", 6) == 0) { // v0.1.0-demo-canada
+        } else if (strncmp((char *)info.dli_fbase + 0x12f938, "v0.1.0", 6) == 0) { // v0.1.0-demo-canada
             version_id = version_id_0_1_0;
-        } else if (strncmp(info.dli_fbase + 0x12f968, "v0.1.0", 6) == 0) { // v0.1.0-demo
+        } else if (strncmp((char *)info.dli_fbase + 0x12f968, "v0.1.0", 6) == 0) { // v0.1.0-demo
             version_id = version_id_0_1_0;
         } else {
             puts("Unsupported Version!");
@@ -1102,142 +1073,97 @@ int main(int argc, char **argv) {
         ninecraft_app_construct(ninecraft_app);
     }
 
-    if (version_id == version_id_0_10_0 || version_id == version_id_0_10_1 || version_id == version_id_0_10_2 || version_id == version_id_0_10_3 || version_id == version_id_0_10_4 || version_id == version_id_0_10_5) {
-        android_string_equ((android_string_t *)(ninecraft_app + 120), "./storage/internal/");
-        android_string_equ((android_string_t *)(ninecraft_app + 124), "./storage/external/");
-    } else if (version_id == version_id_0_9_5) {
-#ifdef __i386__
-        android_string_equ((android_string_t *)(ninecraft_app + 3228), "./storage/internal/");
-        android_string_equ((android_string_t *)(ninecraft_app + 3232), "./storage/external/");
-#else
-#ifdef __arm__
-        android_string_equ((android_string_t *)(ninecraft_app + 3232), "./storage/internal/");
-        android_string_equ((android_string_t *)(ninecraft_app + 3236), "./storage/external/");
-#endif
-#endif
-    } else if (version_id == version_id_0_9_0 || version_id == version_id_0_9_1 || version_id == version_id_0_9_2 || version_id == version_id_0_9_3 || version_id == version_id_0_9_4) {
-#ifdef __i386__
-        android_string_equ((android_string_t *)(ninecraft_app + 3248), "./storage/internal/");
-        android_string_equ((android_string_t *)(ninecraft_app + 3252), "./storage/external/");
-#else
-#ifdef __arm__
-        android_string_equ((android_string_t *)(ninecraft_app + 3256), "./storage/internal/");
-        android_string_equ((android_string_t *)(ninecraft_app + 3260), "./storage/external/");
-#endif
-#endif
-    } else if (version_id == version_id_0_8_1) {
-#ifdef __i386__
-        android_string_equ((android_string_t *)(ninecraft_app + 3256), "./storage/internal/");
-        android_string_equ((android_string_t *)(ninecraft_app + 3260), "./storage/external/");
-#else
-#ifdef __arm__
-        android_string_equ((android_string_t *)(ninecraft_app + 3264), "./storage/internal/");
-        android_string_equ((android_string_t *)(ninecraft_app + 3268), "./storage/external/");
-#endif
-#endif
-    } else if (version_id == version_id_0_8_0) {
-#ifdef __i386__
-        android_string_equ((android_string_t *)(ninecraft_app + 3240), "./storage/internal/");
-        android_string_equ((android_string_t *)(ninecraft_app + 3244), "./storage/external/");
-#else
-#ifdef __arm__
-        android_string_equ((android_string_t *)(ninecraft_app + 3248), "./storage/internal/");
-        android_string_equ((android_string_t *)(ninecraft_app + 3252), "./storage/external/");
-#endif
-#endif
-    } else if (version_id == version_id_0_7_3 || version_id == version_id_0_7_4 || version_id == version_id_0_7_5 || version_id == version_id_0_7_6) {
-#ifdef __i386__
-        android_string_equ((android_string_t *)(ninecraft_app + 3216), "./storage/internal/");
-        android_string_equ((android_string_t *)(ninecraft_app + 3220), "./storage/external/");
-#else
-#ifdef __arm__
-        android_string_equ((android_string_t *)(ninecraft_app + 3224), "./storage/internal/");
-        android_string_equ((android_string_t *)(ninecraft_app + 3228), "./storage/external/");
-#endif
-#endif
-    } else if (version_id == version_id_0_7_0 || version_id == version_id_0_7_1) {
-#ifdef __i386__
-        android_string_equ((android_string_t *)(ninecraft_app + 3616), "./storage/internal/");
-        android_string_equ((android_string_t *)(ninecraft_app + 3640), "./storage/external/");
-#else
-#ifdef __arm__
-        android_string_equ((android_string_t *)(ninecraft_app + 3620), "./storage/internal/");
-        android_string_equ((android_string_t *)(ninecraft_app + 3644), "./storage/external/");
-#endif
-#endif
-    } else if (version_id == version_id_0_7_2) {
-#ifdef __i386__
-        android_string_equ((android_string_t *)(ninecraft_app + 3628), "./storage/internal/");
-        android_string_equ((android_string_t *)(ninecraft_app + 3652), "./storage/external/");
-#else
-#ifdef __arm__
-        android_string_equ((android_string_t *)(ninecraft_app + 3636), "./storage/internal/");
-        android_string_equ((android_string_t *)(ninecraft_app + 3660), "./storage/external/");
-#endif
-#endif
-    } else if (version_id == version_id_0_5_0_j) {
-        android_string_equ((android_string_t *)(ninecraft_app + 3144), "./storage/internal/");
-        android_string_equ((android_string_t *)(ninecraft_app + 3148), "./storage/external/");
-    } else if (version_id == version_id_0_5_0 || version_id == version_id_0_6_0 || version_id == version_id_0_6_1) {
-        android_string_equ((android_string_t *)(ninecraft_app + 3544), "./storage/internal/");
-        android_string_equ((android_string_t *)(ninecraft_app + 3568), "./storage/external/");
-    } else if (version_id == version_id_0_4_0_j) {
-        android_string_equ((android_string_t *)(ninecraft_app + 3140), "./storage/internal/");
-        android_string_equ((android_string_t *)(ninecraft_app + 3144), "./storage/external/");
-    } else if (version_id == version_id_0_4_0) {
-        android_string_equ((android_string_t *)(ninecraft_app + 3540), "./storage/internal/");
-        android_string_equ((android_string_t *)(ninecraft_app + 3564), "./storage/external/");
-    } else if (version_id == version_id_0_3_3_j) {
-        android_string_equ((android_string_t *)(ninecraft_app + 3136), "./storage/internal/");
-        android_string_equ((android_string_t *)(ninecraft_app + 3140), "./storage/external/");
-    } else if (version_id == version_id_0_3_3) {
-        android_string_equ((android_string_t *)(ninecraft_app + 3536), "./storage/internal/");
-        android_string_equ((android_string_t *)(ninecraft_app + 3560), "./storage/external/");
-    } else if (version_id == version_id_0_3_2_j || version_id == version_id_0_3_0_j) {
-        android_string_equ((android_string_t *)(ninecraft_app + 3128), "./storage/external/");
-    } else if (version_id == version_id_0_3_2 || version_id == version_id_0_3_0) {
-        android_string_equ((android_string_t *)(ninecraft_app + 3528), "./storage/external/");
-    } else if (version_id == version_id_0_2_2) {
-        android_string_equ((android_string_t *)(ninecraft_app + 3492), "./storage/external/");
-    } else if (version_id == version_id_0_2_1 || version_id == version_id_0_2_1_j) {
-        android_string_equ((android_string_t *)(ninecraft_app + 3112), "./storage/external/");
-    } else if (version_id == version_id_0_2_0 || version_id == version_id_0_2_0_j) {
-        android_string_equ((android_string_t *)(ninecraft_app + 3060), "./storage/external/");
-    } else if (version_id == version_id_0_1_3 || version_id == version_id_0_1_3_j) {
-        android_string_equ((android_string_t *)(ninecraft_app + 3456), "./storage/external/");
-    } else if (version_id == version_id_0_1_2 || version_id == version_id_0_1_1 || version_id == version_id_0_1_2_j || version_id == version_id_0_1_1_j) {
-        android_string_equ((android_string_t *)(ninecraft_app + 3440), "./storage/external/");
-    } else if (version_id == version_id_0_1_0_touch) {
-        android_string_equ((android_string_t *)(ninecraft_app + 3432), "./storage/external/");
-    } else if (version_id == version_id_0_1_0) {
-        android_string_equ((android_string_t *)(ninecraft_app + 3416), "./storage/external/");
+    char *int_path = (char *)malloc(1024);
+    char *ext_path = (char *)malloc(1024);
+    int_path[0] = '\0';
+    ext_path[0] = '\0';
+    getcwd(int_path, 1024);
+    getcwd(ext_path, 1024);
+    strcat(int_path, "/storage/internal/");
+    strcat(ext_path, "/storage/external/");
+
+    uintptr_t int_off = get_ninecraftapp_internal_storage_offset(version_id);
+    uintptr_t ext_off = get_ninecraftapp_external_storage_offset(version_id);
+    if (int_off) {
+        android_string_equ((android_string_t *)((char *)ninecraft_app + int_off), int_path);
+    }
+    if (ext_off) {
+        android_string_equ((android_string_t *)((char *)ninecraft_app + ext_off), ext_path);
     }
 
-    AppPlatform_linux$AppPlatform_linux(&platform, handle, version_id, &options);
-    printf("%p\n", &platform);
-
     if (version_id >= version_id_0_9_0) {
-        app_context_0_9_0_t context = {
-            .egl_display = NULL,
+        app_platform_0_9_0_t *plat = malloc(sizeof(app_platform_0_9_0_t));
+        static app_context_0_9_0_t context = {
             .egl_context = NULL,
+            .egl_display = NULL,
             .egl_surface = NULL,
-            .unknown = NULL,
-            .platform = &platform,
-            .do_render = false};
+            .u0 = NULL,
+            .platform = NULL,
+            .do_render = false
+        };
+
+        app_platform_construct(plat);
+        if (version_id >= version_id_0_9_0 && version_id <= version_id_0_9_5) {
+            memcpy(&platform_vtable_0_9_0, plat->vtable, sizeof(app_platform_vtable_0_9_0_t));
+            plat->vtable = (void **)&platform_vtable_0_9_0;
+            platform_vtable_0_9_0.getImagePath = (void *)GET_SYSV_WRAPPER(AppPlatform_linux$getImagePath);
+            platform_vtable_0_9_0.loadPNG = (void *)AppPlatform_linux$loadPNG_0_9_0;
+            platform_vtable_0_9_0.loadTGA = (void *)AppPlatform_linux$loadTGA_0_9_0;
+            platform_vtable_0_9_0.getDateString = (void *)GET_SYSV_WRAPPER(AppPlatform_linux$getDateStringGNU);
+            platform_vtable_0_9_0.readAssetFile = (void *)GET_SYSV_WRAPPER(AppPlatform_linux$readAssetFile_0_9_0);
+            platform_vtable_0_9_0.getScreenHeight = (void *)AppPlatform_linux$getScreenHeight;
+            platform_vtable_0_9_0.getScreenWidth = (void *)AppPlatform_linux$getScreenWidth;
+            platform_vtable_0_9_0.showKeyboard = (void *)AppPlatform_linux$showKeyboard;
+            platform_vtable_0_9_0.hideKeyboard = (void *)AppPlatform_linux$hideKeyboard;
+            platform_vtable_0_9_0.getBroadcastAddresses = (void *)GET_SYSV_WRAPPER(AppPlatform_linux$getBroadcastAddresses);
+            platform_vtable_0_9_0.getAvailableMemory = (void *)AppPlatform_linux$getAvailableMemory;
+            platform_vtable_0_9_0.getPlatformStringVar = (void *)GET_SYSV_WRAPPER(AppPlatform_linux$getPlatformStringVarGNU);
+            platform_vtable_0_9_0.getLoginInformation = (void *)GET_SYSV_WRAPPER(AppPlatform_linux$getLoginInformation);
+            platform_vtable_0_9_0.setLoginInformation = (void *)AppPlatform_linux$setLoginInformation;
+            platform_vtable_0_9_0.supportsTouchscreen = (void *)AppPlatform_linux$supportsTouchscreen;
+            platform_vtable_0_9_0.isNetworkEnabled = (void *)AppPlatform_linux$isNetworkEnabled;
+            platform_vtable_0_9_0.getPixelsPerMillimeter = (void *)AppPlatform_linux$getPixelsPerMillimeter;
+        } else if (version_id >= version_id_0_10_0 && version_id <= version_id_0_10_5) {
+            memcpy(&platform_vtable_0_10_0, plat->vtable, sizeof(app_platform_vtable_0_10_0_t));
+            plat->vtable = (void **)&platform_vtable_0_10_0;
+            platform_vtable_0_10_0.getImagePath = (void *)GET_SYSV_WRAPPER(AppPlatform_linux$getImagePath);
+            platform_vtable_0_10_0.loadPNG = (void *)AppPlatform_linux$loadPNG_0_9_0;
+            platform_vtable_0_10_0.loadTGA = (void *)AppPlatform_linux$loadTGA_0_9_0;
+            platform_vtable_0_10_0.getDateString = (void *)GET_SYSV_WRAPPER(AppPlatform_linux$getDateStringGNU);
+            platform_vtable_0_10_0.readAssetFile = (void *)GET_SYSV_WRAPPER(AppPlatform_linux$readAssetFile_0_9_0);
+            platform_vtable_0_10_0.getScreenHeight = (void *)AppPlatform_linux$getScreenHeight;
+            platform_vtable_0_10_0.getScreenWidth = (void *)AppPlatform_linux$getScreenWidth;
+            platform_vtable_0_10_0.showKeyboard = (void *)AppPlatform_linux$showKeyboard;
+            platform_vtable_0_10_0.hideKeyboard = (void *)AppPlatform_linux$hideKeyboard;
+            platform_vtable_0_10_0.getBroadcastAddresses = (void *)GET_SYSV_WRAPPER(AppPlatform_linux$getBroadcastAddresses);
+            platform_vtable_0_10_0.getAvailableMemory = (void *)AppPlatform_linux$getAvailableMemory;
+            platform_vtable_0_10_0.getPlatformStringVar = (void *)GET_SYSV_WRAPPER(AppPlatform_linux$getPlatformStringVarGNU);
+            platform_vtable_0_10_0.getLoginInformation = (void *)GET_SYSV_WRAPPER(AppPlatform_linux$getLoginInformation);
+            platform_vtable_0_10_0.setLoginInformation = (void *)AppPlatform_linux$setLoginInformation;
+            platform_vtable_0_10_0.supportsTouchscreen = (void *)AppPlatform_linux$supportsTouchscreen;
+            platform_vtable_0_10_0.isNetworkEnabled = (void *)AppPlatform_linux$isNetworkEnabled;
+            platform_vtable_0_10_0.getPixelsPerMillimeter = (void *)AppPlatform_linux$getPixelsPerMillimeter;
+            platform_vtable_0_10_0.swapBuffers = (void *)AppPlatform_linux$swapBuffers;
+        }
+        context.platform = plat;
         app_init(ninecraft_app, &context);
     } else {
-        *(void **)(ninecraft_app + 0x08) = NULL;      // egl_display
-        *(void **)(ninecraft_app + 0x0c) = NULL;      // egl_content
-        *(void **)(ninecraft_app + 0x10) = NULL;      // egl_surface
-        *(void **)(ninecraft_app + 0x14) = &platform; // app_platform
+        AppPlatform_linux$AppPlatform_linux(&platform, handle, version_id);
+        printf("%p\n", &platform);
+
+        *(void **)((char *)ninecraft_app + 0x08) = NULL;      // egl_display
+        *(void **)((char *)ninecraft_app + 0x0c) = NULL;      // egl_content
+        *(void **)((char *)ninecraft_app + 0x10) = NULL;      // egl_surface
+        *(void **)((char *)ninecraft_app + 0x14) = &platform; // app_platform
+
         if (version_id >= version_id_0_1_0_touch) {
-            *(uint8_t *)(ninecraft_app + 0x18) = 0; // do_render
+            *(uint8_t *)((char *)ninecraft_app + 0x18) = 0; // do_render
         }
 
         ninecraft_app_init(ninecraft_app);
 
         if (version_id >= version_id_0_1_0_touch) {
-            *(uint8_t *)(ninecraft_app + 4) = 1; // is_inited
+            *(uint8_t *)((char *)ninecraft_app + 4) = 1; // is_inited
         }
     }
 
