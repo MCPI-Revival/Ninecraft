@@ -12,6 +12,7 @@
 #include <stb_image.h>
 #ifdef _WIN32
 #include <direct.h>
+#define popen _popen
 #endif
 
 extern GLFWwindow *_window;
@@ -985,7 +986,7 @@ void AppPlatform_linux$getUserInput(android_vector_t *ret, AppPlatform_linux *ap
     android_string_t name;
     android_string_t seed;
     android_string_t gamemode;
-    /*FILE *fp = popen("zenity --entry --title='Create New World' --text='Enter World Name:'", "r");
+    FILE *fp = popen("zenity --entry --title='Create New World' --text='Enter World Name:'", "r");
     if (fp == NULL) {
         android_string_cstr(&name, "random world");
     } else {
@@ -1055,7 +1056,7 @@ void AppPlatform_linux$getUserInput(android_vector_t *ret, AppPlatform_linux *ap
     android_vector_push_back(&out, &gamemode, android_string_tsize());
 
     printf("start: %u; finish: %u; end: %u;\n", out._M_start, out._M_finish, out._M_end_of_storage);
-    *ret = out;*/
+    *ret = out;
 }
 
 int AppPlatform_linux$getUserInputStatus(AppPlatform_linux *app_platform) {
