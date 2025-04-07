@@ -11,7 +11,7 @@ void ninecraft_set_default_options(ninecraft_options_t *options, char *file_path
     ninecraft_set_option(options, "mp_server_visible_default", "true", false);
     ninecraft_set_option(options, "gfx_fancygraphics", "true", false);
     ninecraft_set_option(options, "gfx_lowquality", "false", false);
-    ninecraft_set_option(options, "ctrl_sensitivity", "1.0", false);
+    ninecraft_set_option(options, "ctrl_sensitivity", "0.5", false);
     ninecraft_set_option(options, "ctrl_invertmouse", "false", false);
     ninecraft_set_option(options, "ctrl_islefthanded", "false", false);
     ninecraft_set_option(options, "ctrl_usetouchscreen", "false", false);
