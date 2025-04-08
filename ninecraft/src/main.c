@@ -564,98 +564,19 @@ extern void __aeabi_ul2f();
 
 #endif
 
-void __my_cxa_pure_virtual() {
-    perror("Called none existant function");
-    abort();
-}
-
 NINECRAFT_FLOAT_FUNC double io_strtod(const char *__nptr, char **__endptr) {
     return strtod(__nptr, __endptr);
 }
-
-void *cpp_operator_new(size_t size) {
-    void *ptr = malloc(size);
-    if (ptr == NULL) {
-        perror("Failed to allocate memory");
-        abort();
-    }
-    return ptr;
-}
-
-void cpp_operator_delete(void *ptr) {
-    if (ptr) {
-        free(ptr);
-    }
-}
-
-extern void *__dso_handle;
-
-#define CONSTRUCTION_NOT_YET_STARTED 0
-#define CONSTRUCTION_COMPLETE 1
-#define CONSTRUCTION_UNDERWAY_WITHOUT_WAITER 0x100
-#define CONSTRUCTION_UNDERWAY_WITH_WAITER 0x200
-/*
-typedef union
-{
-    atomic_int state;
-    int32_t aligner;
-} my_guard_t;
-
-int __my_cxa_guard_acquire(my_guard_t *gv) {
-    int old_value = atomic_load_explicit(&gv->state, memory_order_relaxed);
-    while (true) {
-        if (old_value == CONSTRUCTION_COMPLETE) {
-            atomic_thread_fence(memory_order_acquire);
-            return 0;
-        } else if (old_value == CONSTRUCTION_NOT_YET_STARTED) {
-            if (!atomic_compare_exchange_weak_explicit(&gv->state, &old_value,
-                                                       CONSTRUCTION_UNDERWAY_WITHOUT_WAITER,
-                                                       memory_order_relaxed,
-                                                       memory_order_relaxed)) {
-                continue;
-            }
-            atomic_thread_fence(memory_order_acquire);
-            return 1;
-        } else if (old_value == CONSTRUCTION_UNDERWAY_WITHOUT_WAITER) {
-            if (!atomic_compare_exchange_weak_explicit(&gv->state, &old_value,
-                                                       CONSTRUCTION_UNDERWAY_WITH_WAITER,
-                                                       memory_order_relaxed,
-                                                       memory_order_relaxed)) {
-                continue;
-            }
-        }
-        //syscall(SYS_futex, &gv->state, FUTEX_WAIT, CONSTRUCTION_UNDERWAY_WITH_WAITER, NULL, NULL, 0);
-        old_value = atomic_load_explicit(&gv->state, memory_order_relaxed);
-    }
-}
-
-void __my_cxa_guard_release(my_guard_t *gv) {
-    int old_value = atomic_exchange_explicit(&gv->state, CONSTRUCTION_COMPLETE, memory_order_release);
-    if (old_value == CONSTRUCTION_UNDERWAY_WITH_WAITER) {
-        //syscall(SYS_futex, &gv->state, FUTEX_WAKE, INT_MAX, NULL, NULL, 0);
-    }
-}*/
 
 int __my_srget(FILE *astream) {
     puts("__srget");
     return EOF;
 }
 
-void db_test() {
-    puts("db_test");
-}
-
 void missing_hook() {
-    /*add_custom_hook("__cxa_guard_release", __my_cxa_guard_release);
-    add_custom_hook("__cxa_guard_acquire", __my_cxa_guard_acquire);
-    add_custom_hook("__dso_handle", &__dso_handle);
-    add_custom_hook("fnmatch", fnmatch);
-    add_custom_hook("__srget", __my_srget);*/
-    
-    /*add_custom_hook("_Znaj", cpp_operator_new);
-    add_custom_hook("_ZdaPv", cpp_operator_delete);
-    add_custom_hook("_Znwj", cpp_operator_new);
-    add_custom_hook("_ZdlPv", cpp_operator_delete);*/
+    /*
+    add_custom_hook("fnmatch", fnmatch);*/
+    add_custom_hook("__srget", __my_srget);
     
 
     add_custom_hook("deflateInit_", deflateInit_);
