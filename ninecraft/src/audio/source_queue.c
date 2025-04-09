@@ -18,16 +18,34 @@ bool source_queue_init(source_queue_t *queue) {
 }
 
 bool source_queue_push(source_queue_t *queue, ALuint source, ALuint buffer) {
-    source_queue_entry_t *entry = (source_queue_entry_t *)malloc(sizeof(source_queue_entry_t));
-    if (!entry || !queue) {
+    source_queue_entry_t *entry;
+
+    if (!queue) {
+        return false;
+    }
+    entry = (source_queue_entry_t *)malloc(sizeof(source_queue_entry_t));
+    if (!entry) {
         return false;
     }
     entry->source = source;
     entry->buffer = buffer;
     entry->prev = NULL;
+#ifdef _WIN32
+    WaitForSingleObject(queue->lock, INFINITE);
+#else
+    pthread_mutex_lock(&queue->lock);
+#endif
     entry->next = queue->sources;
+    if (queue->sources) {
+        queue->sources->prev = entry;
+    }
     queue->sources = entry;
     ++queue->size;
+#ifdef _WIN32
+    ReleaseMutex(queue->lock);
+#else
+    pthread_mutex_unlock(&queue->lock);
+#endif
     return true;
 }
 
@@ -37,8 +55,18 @@ bool source_queue_pop(source_queue_t *queue, ALuint *source, ALuint *buffer) {
     if (!queue) {
         return false;
     }
+#ifdef _WIN32
+    WaitForSingleObject(queue->lock, INFINITE);
+#else
+    pthread_mutex_lock(&queue->lock);
+#endif
     entry = queue->sources;
     if (!entry) {
+#ifdef _WIN32
+        ReleaseMutex(queue->lock);
+#else
+        pthread_mutex_unlock(&queue->lock);
+#endif
         return false;
     }
     queue->sources = entry->next;
@@ -49,13 +77,24 @@ bool source_queue_pop(source_queue_t *queue, ALuint *source, ALuint *buffer) {
         queue->sources->prev = NULL;
     }
     free(entry);
+#ifdef _WIN32
+    ReleaseMutex(queue->lock);
+#else
+    pthread_mutex_unlock(&queue->lock);
+#endif
     return true;
 }
 
 void source_queue_iterate(source_queue_t *queue, source_queue_callback_t callback) {
-    source_queue_entry_t *entry = queue->sources;
-    source_queue_entry_t *current;
+    source_queue_entry_t *entry, *current;
     bool stop = false;
+
+#ifdef _WIN32
+    WaitForSingleObject(queue->lock, INFINITE);
+#else
+    pthread_mutex_lock(&queue->lock);
+#endif
+    entry = queue->sources;
 
     while (entry != NULL && !stop) {
         bool delete_entry = false;
@@ -79,4 +118,9 @@ void source_queue_iterate(source_queue_t *queue, source_queue_callback_t callbac
             --queue->size;
         }
     }
+#ifdef _WIN32
+    ReleaseMutex(queue->lock);
+#else
+    pthread_mutex_unlock(&queue->lock);
+#endif
 }
