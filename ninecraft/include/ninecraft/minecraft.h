@@ -6,9 +6,32 @@
 #include <ninecraft/android/android_string.h>
 #include <ninecraft/app_context.h>
 
+#define MINECRAFT_COMMANDSERVER_OFFSET_0_6_0 0xe5c
 #define MINECRAFT_COMMANDSERVER_OFFSET_0_6_1 0xe5c
+#if defined(__i386__) || defined(_M_IX86)
 #define MINECRAFT_COMMANDSERVER_OFFSET_0_7_0 0xebc
+#define MINECRAFT_COMMANDSERVER_OFFSET_0_7_1 0xebc
 #define MINECRAFT_COMMANDSERVER_OFFSET_0_7_2 0xec8
+#define MINECRAFT_COMMANDSERVER_OFFSET_0_7_3 0xcf0
+#define MINECRAFT_COMMANDSERVER_OFFSET_0_7_4 0xcf8
+#define MINECRAFT_COMMANDSERVER_OFFSET_0_7_5 0xcf8
+#define MINECRAFT_COMMANDSERVER_OFFSET_0_7_6 0xcf8
+#define MINECRAFT_COMMANDSERVER_OFFSET_0_8_0 0xd14
+#define MINECRAFT_COMMANDSERVER_OFFSET_0_8_1 0xd24
+#else
+#if defined(__arm__) || defined(_M_ARM)
+#define MINECRAFT_COMMANDSERVER_OFFSET_0_7_0 0xec0
+#define MINECRAFT_COMMANDSERVER_OFFSET_0_7_1 0xec0
+#define MINECRAFT_COMMANDSERVER_OFFSET_0_7_2 0xed0
+#define MINECRAFT_COMMANDSERVER_OFFSET_0_7_3 0xcf8
+#define MINECRAFT_COMMANDSERVER_OFFSET_0_7_4 0xd00
+#define MINECRAFT_COMMANDSERVER_OFFSET_0_7_5 0xd00
+#define MINECRAFT_COMMANDSERVER_OFFSET_0_7_6 0xd00
+#define MINECRAFT_COMMANDSERVER_OFFSET_0_8_0 0xd1c
+#define MINECRAFT_COMMANDSERVER_OFFSET_0_8_1 0xd2c
+#endif
+#endif
+
 #define MINECRAFT_OPTIONS_OFFSET 0x28
 #define MINECRAFT_GUI_OFFSET 0x2e4
 #define MINECRAFT_PLAYER_OFFSET 0x2d8
@@ -335,6 +358,10 @@ extern minecraft_level_generated_t minecraft_level_generated;
 typedef void (*minecraft_tick_t)(void *minecraft, uint32_t param_1, uint32_t param_2);
 
 extern minecraft_tick_t minecraft_tick;
+
+typedef int (*minecraft_is_level_generated_t)(void *minecraft);
+
+extern minecraft_is_level_generated_t minecraft_is_level_generated;
 
 typedef void (*command_server_deconstruct_t)(void *command_server);
 

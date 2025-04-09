@@ -133,9 +133,9 @@ void egl_stub() {
 
 int mouseToGameKeyCode(int keyCode) {
     if (keyCode == GLFW_MOUSE_BUTTON_LEFT) {
-        return MCKEY_BREAK;
+        return MCKEY_DESTROY;
     } else if (keyCode == GLFW_MOUSE_BUTTON_RIGHT) {
-        return MCKEY_PLACE;
+        return MCKEY_USE;
     }
     return 0;
 }
@@ -170,9 +170,9 @@ static void mouse_scroll_callback(GLFWwindow *window, double xoffset, double yof
     glfwGetCursorPos(window, &xpos, &ypos);
     char key_code = 0;
     if (yoffset > 0) {
-        key_code = MCKEY_HOTBAR_PREVIOUS;
+        key_code = MCKEY_MENU_PREVIOUS;
     } else if (yoffset < 0) {
-        key_code = MCKEY_HOTBAR_NEXT;
+        key_code = MCKEY_MENU_NEXT;
     }
     keyboard_feed(key_code, 1);
     keyboard_feed(key_code, 0);
@@ -213,11 +213,11 @@ int getGameKeyCode(int keycode) {
     if (keycode == GLFW_KEY_W) {
         return MCKEY_FORWARD;
     } else if (keycode == GLFW_KEY_A) {
-        return MCKEY_STEP_LEFT;
+        return MCKEY_LEFT;
     } else if (keycode == GLFW_KEY_S) {
-        return MCKEY_BACKWARDS;
+        return MCKEY_BACK;
     } else if (keycode == GLFW_KEY_D) {
-        return MCKEY_STEP_RIGHT;
+        return MCKEY_RIGHT;
     } else if (keycode == GLFW_KEY_SPACE) {
         return MCKEY_JUMP;
     } else if (keycode == GLFW_KEY_E) {
@@ -603,6 +603,46 @@ void missing_hook() {
     add_custom_hook("__aeabi_idiv", __aeabi_idiv);
     add_custom_hook("__aeabi_ul2f", __aeabi_ul2f);
 #endif
+}
+
+unsigned char mcpi_api_initialized = 0;
+
+void piapi_init() {
+    size_t minecraft_command_server_offset = version_id_unknown;
+    if (version_id == version_id_0_6_0) {
+        minecraft_command_server_offset = MINECRAFT_COMMANDSERVER_OFFSET_0_6_0;
+    } else if (version_id == version_id_0_6_1) {
+        minecraft_command_server_offset = MINECRAFT_COMMANDSERVER_OFFSET_0_6_1;
+    } else if (version_id == version_id_0_7_0) {
+        minecraft_command_server_offset = MINECRAFT_COMMANDSERVER_OFFSET_0_7_0;
+    } else if (version_id == version_id_0_7_1) {
+        minecraft_command_server_offset = MINECRAFT_COMMANDSERVER_OFFSET_0_7_1;
+    } else if (version_id == version_id_0_7_2) {
+        minecraft_command_server_offset = MINECRAFT_COMMANDSERVER_OFFSET_0_7_2;
+    } else if (version_id == version_id_0_7_3) {
+        minecraft_command_server_offset = MINECRAFT_COMMANDSERVER_OFFSET_0_7_3;
+    } else if (version_id == version_id_0_7_4) {
+        minecraft_command_server_offset = MINECRAFT_COMMANDSERVER_OFFSET_0_7_4;
+    } else if (version_id == version_id_0_7_5) {
+        minecraft_command_server_offset = MINECRAFT_COMMANDSERVER_OFFSET_0_7_5;
+    } else if (version_id == version_id_0_7_6) {
+        minecraft_command_server_offset = MINECRAFT_COMMANDSERVER_OFFSET_0_7_6;
+    } else if (version_id == version_id_0_8_0) {
+        minecraft_command_server_offset = MINECRAFT_COMMANDSERVER_OFFSET_0_8_0;
+    } else if (version_id == version_id_0_8_1) {
+        minecraft_command_server_offset = MINECRAFT_COMMANDSERVER_OFFSET_0_8_1;
+    }
+    void *command_server = *(void **)((char *)ninecraft_app + minecraft_command_server_offset);
+    if (command_server != NULL) {
+        command_server_deconstruct(command_server);
+        if (command_server) {
+            free(command_server);
+        }
+    }
+    command_server = malloc(0xaaa);
+    command_server_construct(command_server, ninecraft_app);
+    *(void **)((char *)ninecraft_app + minecraft_command_server_offset) = command_server;
+    command_server_init(command_server, 4711);
 }
 
 int main(int argc, char **argv) {
@@ -1197,6 +1237,17 @@ int main(int argc, char **argv) {
         } else {
             if (mouse_pointer_hidden) {
                 release_mouse();
+            }
+        }
+        if (version_id >= version_id_0_6_0 && version_id <= version_id_0_8_1) {
+            if (minecraft_is_level_generated(ninecraft_app)) {
+                if (!mcpi_api_initialized) {
+                    puts("MCPI-API initialized");
+                    piapi_init();
+                    mcpi_api_initialized = 1;
+                }
+            } else {
+                mcpi_api_initialized = 0;
             }
         }
         if (mouse_pointer_hidden) {

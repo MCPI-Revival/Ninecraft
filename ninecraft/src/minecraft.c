@@ -5,6 +5,7 @@
 
 minecraft_level_generated_t minecraft_level_generated = NULL;
 minecraft_tick_t minecraft_tick = NULL;
+minecraft_is_level_generated_t minecraft_is_level_generated = NULL;
 command_server_deconstruct_t command_server_deconstruct = NULL;
 command_server_construct_t command_server_construct = NULL;
 command_server_init_t command_server_init = NULL;
@@ -263,6 +264,7 @@ uintptr_t get_ninecraftapp_internal_storage_offset(int version_id) {
 void minecraft_setup_hooks(void *handle) {
     minecraft_level_generated = (minecraft_level_generated_t)internal_dlsym(handle, "_ZN9Minecraft15_levelGeneratedEv");
     minecraft_tick = (minecraft_tick_t)internal_dlsym(handle, "_ZN9Minecraft4tickEii");
+    minecraft_is_level_generated = (minecraft_is_level_generated_t)internal_dlsym(handle, "_ZN9Minecraft16isLevelGeneratedEv");
     command_server_deconstruct = (command_server_deconstruct_t)internal_dlsym(handle, "_ZN13CommandServerD2Ev");
     command_server_construct = (command_server_construct_t)internal_dlsym(handle, "_ZN13CommandServerC2EP9Minecraft");
     command_server_init = (command_server_init_t)internal_dlsym(handle, "_ZN13CommandServer4initEs");
