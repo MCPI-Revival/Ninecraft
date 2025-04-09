@@ -5,10 +5,15 @@
 #include <stddef.h>
 #include <stdbool.h>
 
-#define SOURCE_QUEUE_INIT {NULL, 0}
+#ifdef _WIN32
+#include <windows.h>
+#else
+#include <pthread.h>
+#endif
 
 typedef struct source_queue_entry_ {
     struct source_queue_entry_ *next;
+    struct source_queue_entry_ *prev;
     ALuint source;
     ALuint buffer;
 } source_queue_entry_t;
@@ -16,13 +21,20 @@ typedef struct source_queue_entry_ {
 typedef struct {
     source_queue_entry_t *sources;
     size_t size;
+#ifdef _WIN32
+    HANDLE lock;
+#else
+    pthread_mutex_t lock;
+#endif
 } source_queue_t;
 
-typedef void (*source_queue_callback_t)(source_queue_entry_t *current, source_queue_entry_t *previous, bool *stop, bool *delete_entry);
+typedef void (*source_queue_callback_t)(ALuint source, ALuint buffer, bool *stop, bool *delete_entry);
+
+bool source_queue_init(source_queue_t *queue);
 
 bool source_queue_push(source_queue_t *queue, ALuint source, ALuint buffer);
 
-bool source_queue_pop(source_queue_t *queue, ALuint *source);
+bool source_queue_pop(source_queue_t *queue, ALuint *source, ALuint *buffer);
 
 void source_queue_iterate(source_queue_t *queue, source_queue_callback_t callback);
 

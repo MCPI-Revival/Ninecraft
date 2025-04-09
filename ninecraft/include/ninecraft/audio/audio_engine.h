@@ -13,9 +13,9 @@ extern ALCcontext *audio_engine_context;
 extern source_queue_t audio_engine_active_sources;
 extern source_queue_t audio_engine_idle_sources;
 
-void audio_engine_delete_sources_callback(source_queue_entry_t *current, source_queue_entry_t *previous, bool *stop, bool *delete_entry);
+void audio_engine_delete_sources_callback(ALuint source, ALuint buffer, bool *stop, bool *delete_entry);
 
-void audio_engine_tick_sources_callback(source_queue_entry_t *current, source_queue_entry_t *previous, bool *stop, bool *delete_entry);
+void audio_engine_tick_sources_callback(ALuint source, ALuint buffer, bool *stop, bool *delete_entry);
 
 void audio_engine_init();
 
