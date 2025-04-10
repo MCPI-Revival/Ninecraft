@@ -27,6 +27,8 @@ minecraft_update_t minecraft_update = NULL;
 minecraft_client_construct_t minecraft_client_construct = NULL;
 minecraft_client_init_t minecraft_client_init = NULL;
 app_platform_construct_t app_platform_construct = NULL;
+screen_construct_t screen_construct = NULL;
+minecraft_set_screen_t minecraft_set_screen = NULL;
 
 uintptr_t get_ninecraftapp_external_storage_offset(int version_id) {
     if (version_id == version_id_0_1_0) {
@@ -285,5 +287,7 @@ void minecraft_setup_hooks(void *handle) {
     minecraft_update = (minecraft_update_t)internal_dlsym(handle, "_ZN9Minecraft6updateEv");
     minecraft_client_construct = (minecraft_client_construct_t)internal_dlsym(handle, "_ZN15MinecraftClientC2EiPPc");
     minecraft_client_init = (minecraft_client_init_t)internal_dlsym(handle, "_ZN15MinecraftClient4initEv");
-    app_platform_construct = (app_platform_construct_t)internal_dlsym(handle, "_ZN11AppPlatformC2Ev");   
+    app_platform_construct = (app_platform_construct_t)internal_dlsym(handle, "_ZN11AppPlatformC2Ev");
+    screen_construct = (screen_construct_t)internal_dlsym(handle, "_ZN6ScreenC2Ev");
+    minecraft_set_screen = (minecraft_set_screen_t)internal_dlsym(handle, "_ZN9Minecraft9setScreenEP6Screen");
 }

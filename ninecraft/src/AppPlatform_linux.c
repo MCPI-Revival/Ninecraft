@@ -17,6 +17,8 @@
 #include <unistd.h>
 #endif
 
+int current_dialog_id = -1;
+
 extern GLFWwindow *_window;
 int status = -1;
 ninecraft_options_t platform_options = {
@@ -985,79 +987,132 @@ int AppPlatform_linux$getScreenWidth(AppPlatform_linux *app_platform) {
 SYSV_WRAPPER(AppPlatform_linux$getUserInput, 2)
 void AppPlatform_linux$getUserInput(android_vector_t *ret, AppPlatform_linux *app_platform) {
     //puts("debug: AppPlatform_linux::getUserInput");
-    android_string_t name;
-    android_string_t seed;
-    android_string_t gamemode;
-    FILE *fp = popen("zenity --entry --title='Create New World' --text='Enter World Name:'", "r");
-    if (fp == NULL) {
-        android_string_cstr(&name, "random world");
-    } else {
-        char input_value[100];
-        for (int i = 0; i < 100; ++i) {
-            char c = fgetc(fp);
-            if (c == '\n' || c == '\0' || c == EOF) {
-                input_value[i] = '\0';
-                break;
-            }
-            input_value[i] = c;
-        }
-        input_value[99] = '\0';
-        printf("%s\n", input_value);
-        android_string_cstr(&name, input_value);
-        pclose(fp);
-    }
-
-    fp = popen("zenity --entry --title='Create New World' --text='Enter World Seed:'", "r");
-    if (fp == NULL) {
-        android_string_cstr(&seed, "random world");
-    } else {
-        char input_value[100];
-        for (int i = 0; i < 100; ++i) {
-            char c = fgetc(fp);
-            if (c == '\n' || c == '\0' || c == EOF) {
-                input_value[i] = '\0';
-                break;
-            } else if (c < '0' || c > '9') {
-                input_value[0] = '\0';
-                break;
-            }
-            input_value[i] = c;
-        }
-        input_value[99] = '\0';
-        printf("%s\n", input_value);
-        android_string_cstr(&seed, input_value);
-        pclose(fp);
-    }
-
-    fp = popen("zenity --entry --title='Create New World' --text='Enter World Gamemode:' 'creative' 'survival'", "r");
-    if (fp == NULL) {
-        android_string_cstr(&seed, "random world");
-    } else {
-        char input_value[100];
-        for (int i = 0; i < 100; ++i) {
-            char c = fgetc(fp);
-            if (c == '\n' || c == '\0' || c == EOF) {
-                input_value[i] = '\0';
-                break;
-            }
-            input_value[i] = c;
-        }
-        input_value[99] = '\0';
-        printf("%s\n", input_value);
-        android_string_cstr(&gamemode, input_value);
-        pclose(fp);
-    }
-    unsigned int size = 24;
+    FILE *fp;
     android_vector_t out;
     out._M_start = 0;
     out._M_finish = 0;
     out._M_end_of_storage = 0;
-    //puts("ok----");
-    android_vector_push_back(&out, &name, android_string_tsize());
-    android_vector_push_back(&out, &seed, android_string_tsize());
-    android_vector_push_back(&out, &gamemode, android_string_tsize());
+    if (current_dialog_id == did_new_world) {
+        android_string_t name;
+        android_string_t seed;
+        android_string_t gamemode;
+        fp = popen("zenity --entry --title='Create New World' --text='Enter World Name:'", "r");
+        if (fp == NULL) {
+            android_string_cstr(&name, "random world");
+        } else {
+            char input_value[100];
+            for (int i = 0; i < 100; ++i) {
+                char c = fgetc(fp);
+                if (c == '\n' || c == '\0' || c == EOF) {
+                    input_value[i] = '\0';
+                    break;
+                }
+                input_value[i] = c;
+            }
+            input_value[99] = '\0';
+            printf("%s\n", input_value);
+            android_string_cstr(&name, input_value);
+            pclose(fp);
+        }
 
-    printf("start: %u; finish: %u; end: %u;\n", out._M_start, out._M_finish, out._M_end_of_storage);
+        fp = popen("zenity --entry --title='Create New World' --text='Enter World Seed:'", "r");
+        if (fp == NULL) {
+            android_string_cstr(&seed, "random world");
+        } else {
+            char input_value[100];
+            for (int i = 0; i < 100; ++i) {
+                char c = fgetc(fp);
+                if (c == '\n' || c == '\0' || c == EOF) {
+                    input_value[i] = '\0';
+                    break;
+                } else if (c < '0' || c > '9') {
+                    input_value[0] = '\0';
+                    break;
+                }
+                input_value[i] = c;
+            }
+            input_value[99] = '\0';
+            printf("%s\n", input_value);
+            android_string_cstr(&seed, input_value);
+            pclose(fp);
+        }
+
+        fp = popen("zenity --entry --title='Create New World' --text='Enter World Gamemode:' 'creative' 'survival'", "r");
+        if (fp == NULL) {
+            android_string_cstr(&seed, "random world");
+        } else {
+            char input_value[100];
+            for (int i = 0; i < 100; ++i) {
+                char c = fgetc(fp);
+                if (c == '\n' || c == '\0' || c == EOF) {
+                    input_value[i] = '\0';
+                    break;
+                }
+                input_value[i] = c;
+            }
+            input_value[99] = '\0';
+            printf("%s\n", input_value);
+            android_string_cstr(&gamemode, input_value);
+            pclose(fp);
+        }
+
+        status = 1;
+
+        android_vector_push_back(&out, &name, android_string_tsize());
+        android_vector_push_back(&out, &seed, android_string_tsize());
+        android_vector_push_back(&out, &gamemode, android_string_tsize());
+    } else if (current_dialog_id == did_chat) {
+        android_string_t message;
+
+        fp = popen("zenity --entry --title='Chat' --text='Enter char message:'", "r");
+        if (fp) {
+            char input_value[100];
+            for (int i = 0; i < 100; ++i) {
+                char c = fgetc(fp);
+                if (c == '\n' || c == '\0' || c == EOF) {
+                    input_value[i] = '\0';
+                    break;
+                }
+                input_value[i] = c;
+            }
+            input_value[99] = '\0';
+
+            android_string_cstr(&message, input_value);
+            pclose(fp);
+
+            android_vector_push_back(&out, &message, android_string_tsize());
+            status = 1;
+        } else {
+            status = 0;
+        }
+    } else if (current_dialog_id == did_rename_world) {
+        android_string_t name;
+
+        fp = popen("zenity --entry --title='Rename world' --text='Enter a new name:'", "r");
+        if (fp) {
+            char input_value[100];
+            for (int i = 0; i < 100; ++i) {
+                char c = fgetc(fp);
+                if (c == '\n' || c == '\0' || c == EOF) {
+                    input_value[i] = '\0';
+                    break;
+                }
+                input_value[i] = c;
+            }
+            input_value[99] = '\0';
+
+            android_string_cstr(&name, input_value);
+            pclose(fp);
+
+            android_vector_push_back(&out, &name, android_string_tsize());
+            status = 1;
+        } else {
+            status = 0;
+        }
+    } else {
+        status = 0;
+    }
+    current_dialog_id = -1;
     *ret = out;
 }
 
@@ -1232,14 +1287,8 @@ void AppPlatform_linux$saveScreenshot(AppPlatform_linux *app_platform, android_s
 
 void AppPlatform_linux$showDialog(AppPlatform_linux *app_platform, int dialog_id) {
     //puts("debug: AppPlatform_linux::showDialog");
-    if (dialog_id == did_new_world) {
-        //puts("Create New World");
-        status = 1;
-    } else if (dialog_id == did_options) {
-        //puts("Options");
-    } else if (dialog_id == did_rename_world) {
-        //puts("Rename World");
-    }
+    current_dialog_id = dialog_id;
+    status = -1;
 }
 
 void AppPlatform_linux$showKeyboard(AppPlatform_linux *app_platform) {

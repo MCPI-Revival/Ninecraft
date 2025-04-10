@@ -447,6 +447,14 @@ typedef void (*app_platform_construct_t)(void *app_platform);
 
 extern app_platform_construct_t app_platform_construct;
 
+typedef void (*screen_construct_t)(void *screen);
+
+extern screen_construct_t screen_construct;
+
+typedef void (*minecraft_set_screen_t)(void *minecraft, void *screen);
+
+extern minecraft_set_screen_t minecraft_set_screen;
+
 extern void minecraft_setup_hooks(void *handle);
 
 #endif
