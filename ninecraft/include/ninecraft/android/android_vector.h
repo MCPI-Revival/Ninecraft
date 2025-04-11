@@ -23,4 +23,8 @@ extern void android_vector_insert_overflow_aux(android_vector_t *__this, void *_
 
 extern void android_vector_push_back(android_vector_t *this_vector, void *item, size_t __entry_size);
 
+extern size_t android_vector_size(android_vector_t *vec, size_t __entry_size);
+
+void *android_vector_at(android_vector_t *vec, size_t index, size_t __entry_size);
+
 #endif

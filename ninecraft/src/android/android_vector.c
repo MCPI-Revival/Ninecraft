@@ -70,3 +70,16 @@ void android_vector_push_back(android_vector_t *this_vector, void *item, size_t 
         this_vector->_M_finish += __entry_size;
     }
 }
+
+size_t android_vector_size(android_vector_t *vec, size_t __entry_size) {
+    return (vec->_M_finish - vec->_M_start) / __entry_size;
+}
+
+void *android_vector_at(android_vector_t *vec, size_t index, size_t __entry_size) {
+    size_t count = (vec->_M_finish - vec->_M_start) / __entry_size;
+    if (index >= count) {
+        puts("Index out of bounds");
+        abort();
+    }
+    return (void *)(vec->_M_start + index * __entry_size);
+}

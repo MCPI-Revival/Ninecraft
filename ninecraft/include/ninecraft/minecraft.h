@@ -6,6 +6,34 @@
 #include <ninecraft/android/android_string.h>
 #include <ninecraft/app_context.h>
 
+#define MINECRAFT_GUI_OFFSET_0_5_0 0x2e4
+#define MINECRAFT_GUI_OFFSET_0_6_0 0x2e4
+#define MINECRAFT_GUI_OFFSET_0_6_1 0x2e4
+
+#define PLAYER_USERNAME_OFFSET_0_5_0 0xc14
+#define PLAYER_USERNAME_OFFSET_0_6_0 0xc1c
+#define PLAYER_USERNAME_OFFSET_0_6_1 0xc1c
+
+#define CHAT_SCREEN_RENDER_VTABLE_OFFSET_0_5_0 0x04
+#define CHAT_SCREEN_RENDER_VTABLE_OFFSET_0_6_0 0x04
+#define CHAT_SCREEN_RENDER_VTABLE_OFFSET_0_6_1 0x04
+
+#define SERVERSIDENETWORKHANDLER_CHAT_PACKET_VTABLE_OFFSET_0_5_0 0x32
+#define SERVERSIDENETWORKHANDLER_CHAT_PACKET_VTABLE_OFFSET_0_6_0 0x34
+#define SERVERSIDENETWORKHANDLER_CHAT_PACKET_VTABLE_OFFSET_0_6_1 0x34
+
+#define CHAT_PACKET_ID_0_5_0 0xb1
+#define CHAT_PACKET_ID_0_6_0 0xb4
+#define CHAT_PACKET_ID_0_6_1 0xb4
+
+#define MESSAGE_PACKET_ID_0_5_0 0x85
+#define MESSAGE_PACKET_ID_0_6_0 0x85
+#define MESSAGE_PACKET_ID_0_6_1 0x85
+
+#define MINECRAFT_RAKNET_INSTANCE_OFFSET_0_5_0 0x2bc
+#define MINECRAFT_RAKNET_INSTANCE_OFFSET_0_6_0 0x2bc
+#define MINECRAFT_RAKNET_INSTANCE_OFFSET_0_6_1 0x2bc
+
 #define MINECRAFT_COMMANDSERVER_OFFSET_0_6_0 0xe5c
 #define MINECRAFT_COMMANDSERVER_OFFSET_0_6_1 0xe5c
 #if defined(__i386__) || defined(_M_IX86)
@@ -454,6 +482,42 @@ extern screen_construct_t screen_construct;
 typedef void (*minecraft_set_screen_t)(void *minecraft, void *screen);
 
 extern minecraft_set_screen_t minecraft_set_screen;
+
+typedef int (*raknet_instance_send_packet_t)(void *raknet_instance, void *packet);
+
+extern raknet_instance_send_packet_t raknet_instance_send_packet;
+
+typedef int (*raknet_rakstring_assign_t)(void *raknet_rakstring, char *str);
+
+extern raknet_rakstring_assign_t raknet_rakstring_assign;
+
+typedef void *(*minecraft_packets_create_packet_t)(int packet_id);
+
+extern minecraft_packets_create_packet_t minecraft_packets_create_packet;
+
+typedef void *(*server_side_network_handler_get_player_t)(void *server_side_network_handler, void *raknet_guid);
+
+extern server_side_network_handler_get_player_t server_side_network_handler_get_player;
+
+typedef void *(*server_side_network_handler_redistribute_packet_t)(void *server_side_network_handler, void *packet, void *raknet_guid);
+
+extern server_side_network_handler_redistribute_packet_t server_side_network_handler_redistribute_packet;
+
+typedef void *(*chat_packet_deconstruct_t)(void *chat_packet);
+
+extern chat_packet_deconstruct_t chat_packet_deconstruct;
+
+typedef void *(*message_packet_deconstruct_t)(void *message_packet);
+
+extern message_packet_deconstruct_t message_packet_deconstruct;
+
+typedef void *(*raknet_instance_is_server_t)(void *raknet_instance);
+
+extern raknet_instance_is_server_t raknet_instance_is_server;
+
+typedef void *(*gui_add_message_t)(void *gui, android_string_t *message);
+
+extern gui_add_message_t gui_add_message;
 
 extern void minecraft_setup_hooks(void *handle);
 

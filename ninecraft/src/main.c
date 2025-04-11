@@ -748,7 +748,6 @@ int main(int argc, char **argv) {
     }
     
     android_alloc_setup_hooks(handle);
-    android_string_setup_hooks(handle);
 
     static android_string_t in;
     android_string_cstr(&in, "v%d.%d.%d alpha");
@@ -919,6 +918,7 @@ int main(int argc, char **argv) {
             return 1;
         }
     }
+    android_string_destroy(&in);
 
     multitouch_setup_hooks(handle);
     keyboard_setup_hooks(handle);

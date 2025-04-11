@@ -16,6 +16,7 @@ void bg_mod_screen_render_dirt_background_injection(void *screen, uint32_t param
     android_string_cstr(&str, "gui/bg32.png");
     textures_load_and_bind_texture(textures, &str);
     gui_component_blit(screen, 0, 0, 0, 0, *(int *)((char *)screen + 8), *(int *)((char *)screen + 12), 0x100, 0x100);
+    android_string_destroy(&str);
 }
 
 

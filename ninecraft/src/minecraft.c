@@ -29,6 +29,15 @@ minecraft_client_init_t minecraft_client_init = NULL;
 app_platform_construct_t app_platform_construct = NULL;
 screen_construct_t screen_construct = NULL;
 minecraft_set_screen_t minecraft_set_screen = NULL;
+raknet_instance_send_packet_t raknet_instance_send_packet = NULL;
+raknet_rakstring_assign_t raknet_rakstring_assign = NULL;
+minecraft_packets_create_packet_t minecraft_packets_create_packet = NULL;
+server_side_network_handler_get_player_t server_side_network_handler_get_player = NULL;
+server_side_network_handler_redistribute_packet_t server_side_network_handler_redistribute_packet = NULL;
+chat_packet_deconstruct_t chat_packet_deconstruct = NULL;
+message_packet_deconstruct_t message_packet_deconstruct = NULL;
+raknet_instance_is_server_t raknet_instance_is_server = NULL;
+gui_add_message_t gui_add_message = NULL;
 
 uintptr_t get_ninecraftapp_external_storage_offset(int version_id) {
     if (version_id == version_id_0_1_0) {
@@ -290,4 +299,13 @@ void minecraft_setup_hooks(void *handle) {
     app_platform_construct = (app_platform_construct_t)internal_dlsym(handle, "_ZN11AppPlatformC2Ev");
     screen_construct = (screen_construct_t)internal_dlsym(handle, "_ZN6ScreenC2Ev");
     minecraft_set_screen = (minecraft_set_screen_t)internal_dlsym(handle, "_ZN9Minecraft9setScreenEP6Screen");
+    raknet_instance_send_packet = (raknet_instance_send_packet_t)internal_dlsym(handle, "_ZN14RakNetInstance4sendEP6Packet");
+    raknet_rakstring_assign = (raknet_rakstring_assign_t)internal_dlsym(handle, "_ZN6RakNet9RakString6AssignEPKc");
+    minecraft_packets_create_packet = (minecraft_packets_create_packet_t)internal_dlsym(handle, "_ZN16MinecraftPackets12createPacketEi");
+    server_side_network_handler_get_player = (server_side_network_handler_get_player_t)internal_dlsym(handle, "_ZN24ServerSideNetworkHandler9getPlayerERKN6RakNet10RakNetGUIDE");
+    server_side_network_handler_redistribute_packet = (server_side_network_handler_redistribute_packet_t)internal_dlsym(handle, "_ZN24ServerSideNetworkHandler18redistributePacketEP6PacketRKN6RakNet10RakNetGUIDE");
+    chat_packet_deconstruct = (chat_packet_deconstruct_t)internal_dlsym(handle, "_ZN10ChatPacketD0Ev");
+    message_packet_deconstruct = (message_packet_deconstruct_t)internal_dlsym(handle, "_ZN13MessagePacketD0Ev");
+    raknet_instance_is_server = (raknet_instance_is_server_t)internal_dlsym(handle, "_ZN14RakNetInstance8isServerEv");
+    gui_add_message = (gui_add_message_t)internal_dlsym(handle, "_ZN3Gui10addMessageERKSs");
 }
