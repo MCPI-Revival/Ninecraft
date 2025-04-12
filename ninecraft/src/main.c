@@ -594,11 +594,6 @@ int __my_srget(FILE *astream) {
 }
 
 void missing_hook() {
-    /*
-    add_custom_hook("fnmatch", fnmatch);*/
-    add_custom_hook("__srget", __my_srget);
-    
-
     add_custom_hook("deflateInit_", deflateInit_);
     add_custom_hook("deflateInit2_", deflateInit2_);
     add_custom_hook("deflate", deflate);
@@ -610,6 +605,8 @@ void missing_hook() {
     add_custom_hook("uncompress", uncompress);
     add_custom_hook("compress", compress);
     add_custom_hook("compressBound", compressBound);
+
+    add_custom_hook("__srget", __my_srget);
 
 #ifdef __arm__
     add_custom_hook("__aeabi_atexit", __aeabi_atexit);
@@ -988,6 +985,8 @@ int main(int argc, char **argv) {
         ninecraft_app_size = NINECRAFTAPP_SIZE_0_3_3_J;
     } else if (version_id == version_id_0_4_0) {
         ninecraft_app_size = NINECRAFTAPP_SIZE_0_4_0;
+    } else if (version_id == version_id_0_4_0_j) {
+        ninecraft_app_size = NINECRAFTAPP_SIZE_0_4_0_J;
     } else if (version_id == version_id_0_5_0) {
         ninecraft_app_size = NINECRAFTAPP_SIZE_0_5_0;
     } else if (version_id == version_id_0_5_0_j) {
