@@ -297,9 +297,9 @@ void android_string_add(android_string_t *__this, char *__s) {
 
 char *android_string_to_str(android_string_t *__this) {
     if (android_string_tsize() == sizeof(android_string_stlp_t)) {
-        return __this->gnu.data;
-    } else {
         return (char *)__this->stlp._M_start_of_storage;
+    } else {
+        return __this->gnu.data;
     }
 }
 
