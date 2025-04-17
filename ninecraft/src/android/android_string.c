@@ -1,6 +1,5 @@
-#include <ninecraft/dlfcn_stub.h>
-#include <ninecraft/android/android_alloc.h>
 #include <ninecraft/android/android_string.h>
+#include <ninecraft/android/android_alloc.h>
 #include <string.h>
 #include <stdlib.h>
 #include <stdio.h>

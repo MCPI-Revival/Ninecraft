@@ -1,9 +1,9 @@
 #include <ninecraft/version_ids.h>
 #include <ninecraft/minecraft.h>
 #include <ninecraft/patch/detours.h>
-#include <ninecraft/dlfcn_stub.h>
 #include <ninecraft/mods/mouse_input_mod.h>
 #include <ninecraft/ninecraft_defs.h>
+#include <ancmp/android_dlfcn.h>
 
 /*
     This mod makes mouse control work more reliably.
@@ -31,8 +31,8 @@ SYSV_WRAPPER(controller_turn_input_get_turn_delta, 2)
 #include <ancmp/android_dlfcn.h>
 void mouse_input_mod_inject(void *handle, int version_id) {
     if (version_id >= version_id_0_6_0) {
-        mouse_get_dx = (mouse_get_dx_t)internal_dlsym(handle, "_ZN5Mouse5getDXEv");
-        mouse_get_dy = (mouse_get_dx_t)internal_dlsym(handle, "_ZN5Mouse5getDYEv");
-        DETOUR((void *)internal_dlsym(handle, "_ZN19ControllerTurnInput12getTurnDeltaEv"), GET_SYSV_WRAPPER(controller_turn_input_get_turn_delta), true);
+        mouse_get_dx = (mouse_get_dx_t)android_dlsym(handle, "_ZN5Mouse5getDXEv");
+        mouse_get_dy = (mouse_get_dx_t)android_dlsym(handle, "_ZN5Mouse5getDYEv");
+        DETOUR((void *)android_dlsym(handle, "_ZN19ControllerTurnInput12getTurnDeltaEv"), GET_SYSV_WRAPPER(controller_turn_input_get_turn_delta), true);
     }
 }

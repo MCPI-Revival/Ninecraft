@@ -1,5 +1,5 @@
-#include <ninecraft/dlfcn_stub.h>
 #include <ninecraft/minecraft.h>
+#include <ancmp/android_dlfcn.h>
 #include <stddef.h>
 #include <ninecraft/version_ids.h>
 
@@ -273,39 +273,39 @@ uintptr_t get_ninecraftapp_internal_storage_offset(int version_id) {
 }
 
 void minecraft_setup_hooks(void *handle) {
-    minecraft_level_generated = (minecraft_level_generated_t)internal_dlsym(handle, "_ZN9Minecraft15_levelGeneratedEv");
-    minecraft_tick = (minecraft_tick_t)internal_dlsym(handle, "_ZN9Minecraft4tickEii");
-    minecraft_is_level_generated = (minecraft_is_level_generated_t)internal_dlsym(handle, "_ZN9Minecraft16isLevelGeneratedEv");
-    command_server_deconstruct = (command_server_deconstruct_t)internal_dlsym(handle, "_ZN13CommandServerD2Ev");
-    command_server_construct = (command_server_construct_t)internal_dlsym(handle, "_ZN13CommandServerC2EP9Minecraft");
-    command_server_init = (command_server_init_t)internal_dlsym(handle, "_ZN13CommandServer4initEs");
-    start_menu_screen_construct = (start_menu_screen_construct_t)internal_dlsym(handle, "_ZN15StartMenuScreenC1Ev");
-    player_renderer_render_name = (player_renderer_render_name_t)internal_dlsym(handle, "_ZN14PlayerRenderer10renderNameEP3Mobfff");
-    textures_load_and_bind_texture = (textures_load_and_bind_texture_t)internal_dlsym(handle, "_ZN8Textures18loadAndBindTextureERKSs");
-    gui_component_blit = (gui_component_blit_t)internal_dlsym(handle, "_ZN12GuiComponent4blitEiiiiiiii");
-    screen_render_dirt_background = (screen_render_dirt_background_t)internal_dlsym(handle, "_ZN6Screen20renderDirtBackgroundEi");
-    ninecraft_app_construct = (ninecraft_app_construct_t)internal_dlsym(handle, "_ZN12NinecraftAppC2Ev");
-    ninecraft_app_construct_2 = (ninecraft_app_construct_2_t)internal_dlsym(handle, "_ZN12NinecraftAppC2EiPPc");
-    ninecraft_app_init = (ninecraft_app_init_t)internal_dlsym(handle, "_ZN12NinecraftApp4initEv");
-    app_init = (app_init_t)internal_dlsym(handle, "_ZN3App4initER10AppContext");
-    minecraft_set_size = (minecraft_set_size_t)internal_dlsym(handle, "_ZN9Minecraft7setSizeEii");
-    ninecraft_app_update = (ninecraft_app_update_t)internal_dlsym(handle, "_ZN12NinecraftApp6updateEv");
-    ninecraft_app_handle_back = (ninecraft_app_handle_back_t)internal_dlsym(handle, "_ZN12NinecraftApp10handleBackEb");
-    minecraft_client_set_size = (minecraft_client_set_size_t)internal_dlsym(handle, "_ZN15MinecraftClient7setSizeEiif");
-    minecraft_client_handle_back = (minecraft_client_handle_back_t)internal_dlsym(handle, "_ZN15MinecraftClient10handleBackEb");
-    minecraft_update = (minecraft_update_t)internal_dlsym(handle, "_ZN9Minecraft6updateEv");
-    minecraft_client_construct = (minecraft_client_construct_t)internal_dlsym(handle, "_ZN15MinecraftClientC2EiPPc");
-    minecraft_client_init = (minecraft_client_init_t)internal_dlsym(handle, "_ZN15MinecraftClient4initEv");
-    app_platform_construct = (app_platform_construct_t)internal_dlsym(handle, "_ZN11AppPlatformC2Ev");
-    screen_construct = (screen_construct_t)internal_dlsym(handle, "_ZN6ScreenC2Ev");
-    minecraft_set_screen = (minecraft_set_screen_t)internal_dlsym(handle, "_ZN9Minecraft9setScreenEP6Screen");
-    raknet_instance_send_packet = (raknet_instance_send_packet_t)internal_dlsym(handle, "_ZN14RakNetInstance4sendEP6Packet");
-    raknet_rakstring_assign = (raknet_rakstring_assign_t)internal_dlsym(handle, "_ZN6RakNet9RakString6AssignEPKc");
-    minecraft_packets_create_packet = (minecraft_packets_create_packet_t)internal_dlsym(handle, "_ZN16MinecraftPackets12createPacketEi");
-    server_side_network_handler_get_player = (server_side_network_handler_get_player_t)internal_dlsym(handle, "_ZN24ServerSideNetworkHandler9getPlayerERKN6RakNet10RakNetGUIDE");
-    server_side_network_handler_redistribute_packet = (server_side_network_handler_redistribute_packet_t)internal_dlsym(handle, "_ZN24ServerSideNetworkHandler18redistributePacketEP6PacketRKN6RakNet10RakNetGUIDE");
-    chat_packet_deconstruct = (chat_packet_deconstruct_t)internal_dlsym(handle, "_ZN10ChatPacketD0Ev");
-    message_packet_deconstruct = (message_packet_deconstruct_t)internal_dlsym(handle, "_ZN13MessagePacketD0Ev");
-    raknet_instance_is_server = (raknet_instance_is_server_t)internal_dlsym(handle, "_ZN14RakNetInstance8isServerEv");
-    gui_add_message = (gui_add_message_t)internal_dlsym(handle, "_ZN3Gui10addMessageERKSs");
+    minecraft_level_generated = (minecraft_level_generated_t)android_dlsym(handle, "_ZN9Minecraft15_levelGeneratedEv");
+    minecraft_tick = (minecraft_tick_t)android_dlsym(handle, "_ZN9Minecraft4tickEii");
+    minecraft_is_level_generated = (minecraft_is_level_generated_t)android_dlsym(handle, "_ZN9Minecraft16isLevelGeneratedEv");
+    command_server_deconstruct = (command_server_deconstruct_t)android_dlsym(handle, "_ZN13CommandServerD2Ev");
+    command_server_construct = (command_server_construct_t)android_dlsym(handle, "_ZN13CommandServerC2EP9Minecraft");
+    command_server_init = (command_server_init_t)android_dlsym(handle, "_ZN13CommandServer4initEs");
+    start_menu_screen_construct = (start_menu_screen_construct_t)android_dlsym(handle, "_ZN15StartMenuScreenC1Ev");
+    player_renderer_render_name = (player_renderer_render_name_t)android_dlsym(handle, "_ZN14PlayerRenderer10renderNameEP3Mobfff");
+    textures_load_and_bind_texture = (textures_load_and_bind_texture_t)android_dlsym(handle, "_ZN8Textures18loadAndBindTextureERKSs");
+    gui_component_blit = (gui_component_blit_t)android_dlsym(handle, "_ZN12GuiComponent4blitEiiiiiiii");
+    screen_render_dirt_background = (screen_render_dirt_background_t)android_dlsym(handle, "_ZN6Screen20renderDirtBackgroundEi");
+    ninecraft_app_construct = (ninecraft_app_construct_t)android_dlsym(handle, "_ZN12NinecraftAppC2Ev");
+    ninecraft_app_construct_2 = (ninecraft_app_construct_2_t)android_dlsym(handle, "_ZN12NinecraftAppC2EiPPc");
+    ninecraft_app_init = (ninecraft_app_init_t)android_dlsym(handle, "_ZN12NinecraftApp4initEv");
+    app_init = (app_init_t)android_dlsym(handle, "_ZN3App4initER10AppContext");
+    minecraft_set_size = (minecraft_set_size_t)android_dlsym(handle, "_ZN9Minecraft7setSizeEii");
+    ninecraft_app_update = (ninecraft_app_update_t)android_dlsym(handle, "_ZN12NinecraftApp6updateEv");
+    ninecraft_app_handle_back = (ninecraft_app_handle_back_t)android_dlsym(handle, "_ZN12NinecraftApp10handleBackEb");
+    minecraft_client_set_size = (minecraft_client_set_size_t)android_dlsym(handle, "_ZN15MinecraftClient7setSizeEiif");
+    minecraft_client_handle_back = (minecraft_client_handle_back_t)android_dlsym(handle, "_ZN15MinecraftClient10handleBackEb");
+    minecraft_update = (minecraft_update_t)android_dlsym(handle, "_ZN9Minecraft6updateEv");
+    minecraft_client_construct = (minecraft_client_construct_t)android_dlsym(handle, "_ZN15MinecraftClientC2EiPPc");
+    minecraft_client_init = (minecraft_client_init_t)android_dlsym(handle, "_ZN15MinecraftClient4initEv");
+    app_platform_construct = (app_platform_construct_t)android_dlsym(handle, "_ZN11AppPlatformC2Ev");
+    screen_construct = (screen_construct_t)android_dlsym(handle, "_ZN6ScreenC2Ev");
+    minecraft_set_screen = (minecraft_set_screen_t)android_dlsym(handle, "_ZN9Minecraft9setScreenEP6Screen");
+    raknet_instance_send_packet = (raknet_instance_send_packet_t)android_dlsym(handle, "_ZN14RakNetInstance4sendEP6Packet");
+    raknet_rakstring_assign = (raknet_rakstring_assign_t)android_dlsym(handle, "_ZN6RakNet9RakString6AssignEPKc");
+    minecraft_packets_create_packet = (minecraft_packets_create_packet_t)android_dlsym(handle, "_ZN16MinecraftPackets12createPacketEi");
+    server_side_network_handler_get_player = (server_side_network_handler_get_player_t)android_dlsym(handle, "_ZN24ServerSideNetworkHandler9getPlayerERKN6RakNet10RakNetGUIDE");
+    server_side_network_handler_redistribute_packet = (server_side_network_handler_redistribute_packet_t)android_dlsym(handle, "_ZN24ServerSideNetworkHandler18redistributePacketEP6PacketRKN6RakNet10RakNetGUIDE");
+    chat_packet_deconstruct = (chat_packet_deconstruct_t)android_dlsym(handle, "_ZN10ChatPacketD0Ev");
+    message_packet_deconstruct = (message_packet_deconstruct_t)android_dlsym(handle, "_ZN13MessagePacketD0Ev");
+    raknet_instance_is_server = (raknet_instance_is_server_t)android_dlsym(handle, "_ZN14RakNetInstance8isServerEv");
+    gui_add_message = (gui_add_message_t)android_dlsym(handle, "_ZN3Gui10addMessageERKSs");
 }

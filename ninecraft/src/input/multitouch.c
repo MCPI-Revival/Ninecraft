@@ -1,7 +1,7 @@
-#include <ninecraft/dlfcn_stub.h>
+#include <ninecraft/input/multitouch.h>
 #include <ninecraft/input/action/mouse_action.h>
 #include <ninecraft/input/mouse_device.h>
-#include <ninecraft/input/multitouch.h>
+#include <ancmp/android_dlfcn.h>
 
 void *multitouch_pointers = NULL;
 char *multitouch_released = NULL;
@@ -11,12 +11,12 @@ char *multitouch_pressed_ut = NULL;
 android_vector_t *multitouch_inputs = NULL;
 
 void multitouch_setup_hooks(void *handle) {
-    multitouch_pointers = (void *)internal_dlsym(handle, "_ZN10Multitouch9_pointersE");
-    multitouch_released = (char *)internal_dlsym(handle, "_ZN10Multitouch12_wasReleasedE");
-    multitouch_released_ut = (char *)internal_dlsym(handle, "_ZN10Multitouch22_wasReleasedThisUpdateE");
-    multitouch_pressed = (char *)internal_dlsym(handle, "_ZN10Multitouch11_wasPressedE");
-    multitouch_pressed_ut = (char *)internal_dlsym(handle, "_ZN10Multitouch21_wasPressedThisUpdateE");
-    multitouch_inputs = (android_vector_t *)internal_dlsym(handle, "_ZN10Multitouch7_inputsE");
+    multitouch_pointers = (void *)android_dlsym(handle, "_ZN10Multitouch9_pointersE");
+    multitouch_released = (char *)android_dlsym(handle, "_ZN10Multitouch12_wasReleasedE");
+    multitouch_released_ut = (char *)android_dlsym(handle, "_ZN10Multitouch22_wasReleasedThisUpdateE");
+    multitouch_pressed = (char *)android_dlsym(handle, "_ZN10Multitouch11_wasPressedE");
+    multitouch_pressed_ut = (char *)android_dlsym(handle, "_ZN10Multitouch21_wasPressedThisUpdateE");
+    multitouch_inputs = (android_vector_t *)android_dlsym(handle, "_ZN10Multitouch7_inputsE");
 }
 
 void multitouch_feed_0_5(char button, char type, short x, short y, char pointer_id) {

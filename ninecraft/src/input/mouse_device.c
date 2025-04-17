@@ -1,6 +1,5 @@
-#include <ninecraft/dlfcn_stub.h>
-#include <ninecraft/input/action/mouse_action.h>
 #include <ninecraft/input/mouse_device.h>
+#include <ninecraft/input/action/mouse_action.h>
 
 void mouse_device_feed_0_5(mouse_device_0_5_t *mouse_device, char button, char type, short x, short y) {
     mouse_action_0_5_t action;

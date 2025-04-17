@@ -1,15 +1,15 @@
-#include <ninecraft/dlfcn_stub.h>
 #include <ninecraft/android/android_alloc.h>
 #include <stddef.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <ancmp/android_dlfcn.h>
 
 android_alloc_node_alloc_t android_alloc_node_alloc = NULL;
 android_alloc_node_dealloc_t android_alloc_node_dealloc = NULL;
 
 void android_alloc_setup_hooks(void *handle) {
-    android_alloc_node_alloc = (android_alloc_node_alloc_t)internal_dlsym(handle, "_ZNSt17__node_alloc_impl11_M_allocateERj");
-    android_alloc_node_dealloc = (android_alloc_node_dealloc_t)internal_dlsym(handle, "_ZNSt17__node_alloc_impl13_M_deallocateEPvj");
+    android_alloc_node_alloc = (android_alloc_node_alloc_t)android_dlsym(handle, "_ZNSt17__node_alloc_impl11_M_allocateERj");
+    android_alloc_node_dealloc = (android_alloc_node_dealloc_t)android_dlsym(handle, "_ZNSt17__node_alloc_impl13_M_deallocateEPvj");
 }
 
 void *android_alloc_allocate(size_t *__np) {

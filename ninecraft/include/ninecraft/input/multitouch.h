@@ -1,6 +1,8 @@
 #ifndef NINECRAFT_INPUT_MULTITOUCH_H
 #define NINECRAFT_INPUT_MULTITOUCH_H
 
+#include <ninecraft/android/android_vector.h>
+
 extern void *multitouch_pointers;
 extern char *multitouch_released;
 extern char *multitouch_released_ut;

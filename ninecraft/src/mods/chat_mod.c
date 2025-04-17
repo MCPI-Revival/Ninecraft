@@ -1,7 +1,6 @@
 #include <ninecraft/version_ids.h>
 #include <ninecraft/minecraft.h>
 #include <ninecraft/patch/detours.h>
-#include <ninecraft/dlfcn_stub.h>
 #include <ninecraft/mods/chat_mod.h>
 #include <ninecraft/ninecraft_defs.h>
 #include <ninecraft/android/android_string.h>
@@ -10,6 +9,7 @@
 #include <string.h>
 #include <ninecraft/AppPlatform_linux.h>
 #include <ninecraft/android/android_vector.h>
+#include <ancmp/android_dlfcn.h>
 
 /*
     This mod allows you to chat in versions between
@@ -210,8 +210,8 @@ void server_side_network_handler_handle_chat_packet(void *__this, void *raknet_g
 void chat_mod_inject(void *handle) {
     int server_side_network_handler_vtable_offset;
     int chat_screen_vtable_offset;
-    void **server_side_network_handler_vtable = (void **)internal_dlsym(handle, "_ZTV24ServerSideNetworkHandler");
-    void **chat_screen_vtable = (void **)internal_dlsym(handle, "_ZTV10ChatScreen");
+    void **server_side_network_handler_vtable = (void **)android_dlsym(handle, "_ZTV24ServerSideNetworkHandler");
+    void **chat_screen_vtable = (void **)android_dlsym(handle, "_ZTV10ChatScreen");
     if (!server_side_network_handler_vtable || !chat_screen_vtable) {
         return;
     }

@@ -1,16 +1,16 @@
-#include <ninecraft/dlfcn_stub.h>
-#include <ninecraft/input/action/keyboard_action.h>
 #include <ninecraft/input/keyboard.h>
+#include <ninecraft/input/action/keyboard_action.h>
 #include <ninecraft/android/android_alloc.h>
+#include <ancmp/android_dlfcn.h>
 
 android_vector_t *keyboard_inputs = NULL;
 android_vector_t *keyboard_input_text = NULL;
 int *keyboard_states = NULL;
 
 void keyboard_setup_hooks(void *handle) {
-    keyboard_inputs = (android_vector_t *)internal_dlsym(handle, "_ZN8Keyboard7_inputsE");
-    keyboard_input_text = (android_vector_t *)internal_dlsym(handle, "_ZN8Keyboard10_inputTextE");
-    keyboard_states = (int *)internal_dlsym(handle, "_ZN8Keyboard7_statesE");
+    keyboard_inputs = (android_vector_t *)android_dlsym(handle, "_ZN8Keyboard7_inputsE");
+    keyboard_input_text = (android_vector_t *)android_dlsym(handle, "_ZN8Keyboard10_inputTextE");
+    keyboard_states = (int *)android_dlsym(handle, "_ZN8Keyboard7_statesE");
 }
 
 void keyboard_feed(unsigned char key, int state) {

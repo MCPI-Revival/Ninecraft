@@ -40,7 +40,6 @@
 #include <ninecraft/audio/audio_engine.h>
 #include <zlib.h>
 
-#include <ninecraft/dlfcn_stub.h>
 #include <ancmp/hooks.h>
 #include <ancmp/android_dlfcn.h>
 #include <ancmp/linker.h>
@@ -92,9 +91,9 @@ void *load_library(const char *name) {
     strcat(fullpath, "/");
     strcat(fullpath, name);
 
-    void *handle = internal_dlopen(fullpath, ANDROID_RTLD_LAZY);
+    void *handle = android_dlopen(fullpath, ANDROID_RTLD_LAZY);
     if (handle == NULL) {
-        printf("failed to load library %s: %s\n", fullpath, internal_dlerror());
+        printf("failed to load library %s: %s\n", fullpath, android_dlerror());
         return NULL;
     }
     printf("lib: %s: : %p\n", fullpath, handle);
@@ -146,12 +145,12 @@ static void mouse_click_callback(GLFWwindow *window, int button, int action, int
     if (!mouse_pointer_hidden) {
         int mc_button = (button == GLFW_MOUSE_BUTTON_LEFT ? 1 : (button == GLFW_MOUSE_BUTTON_RIGHT ? 2 : 0));
         if (version_id == version_id_0_1_0) {
-            ((void (*)(int, int, int, int))internal_dlsym(handle, "_ZN5Mouse4feedEiiii"))((int)mc_button, (int)(action == GLFW_PRESS ? 1 : 0), (int)xpos, (int)ypos);
+            ((void (*)(int, int, int, int))android_dlsym(handle, "_ZN5Mouse4feedEiiii"))((int)mc_button, (int)(action == GLFW_PRESS ? 1 : 0), (int)xpos, (int)ypos);
         } else if (version_id >= version_id_0_6_0) {
-            mouse_device_feed_0_6(internal_dlsym(handle, "_ZN5Mouse9_instanceE"), (char)mc_button, (char)(action == GLFW_PRESS ? 1 : 0), (short)xpos, (short)ypos, 0, 0);
+            mouse_device_feed_0_6(android_dlsym(handle, "_ZN5Mouse9_instanceE"), (char)mc_button, (char)(action == GLFW_PRESS ? 1 : 0), (short)xpos, (short)ypos, 0, 0);
             multitouch_feed_0_6((char)mc_button, (char)(action == GLFW_PRESS ? 1 : 0), (short)xpos, (short)ypos, 0);
         } else if (version_id <= version_id_0_5_0_j) {
-            mouse_device_feed_0_5(internal_dlsym(handle, "_ZN5Mouse9_instanceE"), (char)mc_button, (char)(action == GLFW_PRESS ? 1 : 0), (short)xpos, (short)ypos);
+            mouse_device_feed_0_5(android_dlsym(handle, "_ZN5Mouse9_instanceE"), (char)mc_button, (char)(action == GLFW_PRESS ? 1 : 0), (short)xpos, (short)ypos);
             multitouch_feed_0_5((char)mc_button, (char)(action == GLFW_PRESS ? 1 : 0), (short)xpos, (short)ypos, 0);
         }
     } else {
@@ -184,15 +183,15 @@ static bool ignore_relative_motion = false;
 static void mouse_pos_callback(GLFWwindow *window, double xpos, double ypos) {
     if (!mouse_pointer_hidden || version_id >= version_id_0_6_0) {
         if (version_id == version_id_0_1_0) {
-            ((void (*)(int, int, int, int))internal_dlsym(handle, "_ZN5Mouse4feedEiiii"))(0, 0, (int)xpos, (int)ypos);
+            ((void (*)(int, int, int, int))android_dlsym(handle, "_ZN5Mouse4feedEiiii"))(0, 0, (int)xpos, (int)ypos);
         } else if (version_id >= version_id_0_6_0) {
-            mouse_device_feed_0_6(internal_dlsym(handle, "_ZN5Mouse9_instanceE"), 0, 0, (short)xpos, (short)ypos, (short)(!ignore_relative_motion ? (xpos - last_mouse_x) : 0), (short)(!ignore_relative_motion ? (ypos - last_mouse_y) : 0));
+            mouse_device_feed_0_6(android_dlsym(handle, "_ZN5Mouse9_instanceE"), 0, 0, (short)xpos, (short)ypos, (short)(!ignore_relative_motion ? (xpos - last_mouse_x) : 0), (short)(!ignore_relative_motion ? (ypos - last_mouse_y) : 0));
             ignore_relative_motion = false;
             last_mouse_x = xpos;
             last_mouse_y = ypos;
             multitouch_feed_0_6(0, 0, (short)xpos, (short)ypos, 0);
         } else if (version_id <= version_id_0_5_0_j) {
-            mouse_device_feed_0_5(internal_dlsym(handle, "_ZN5Mouse9_instanceE"), 0, 0, (short)xpos, (short)ypos);
+            mouse_device_feed_0_5(android_dlsym(handle, "_ZN5Mouse9_instanceE"), 0, 0, (short)xpos, (short)ypos);
             multitouch_feed_0_5(0, 0, (short)xpos, (short)ypos, 0);
         }
     } else {
@@ -238,10 +237,10 @@ int getGameKeyCode(int keycode) {
 }
 
 void set_ninecraft_size_0_1_0(int width, int height) {
-    float *inv_gui_scale = (float *)internal_dlsym(handle, "_ZN3Gui11InvGuiScaleE");
-    int *mc_width = (int *)internal_dlsym(handle, "_ZN9Minecraft5widthE");
-    int *mc_height = (int *)internal_dlsym(handle, "_ZN9Minecraft6heightE");
-    void (*screen_set_size)(void *screen, int width, int height) = (void (*)(void *screen, int width, int height))internal_dlsym(handle, "_ZN6Screen7setSizeEii");
+    float *inv_gui_scale = (float *)android_dlsym(handle, "_ZN3Gui11InvGuiScaleE");
+    int *mc_width = (int *)android_dlsym(handle, "_ZN9Minecraft5widthE");
+    int *mc_height = (int *)android_dlsym(handle, "_ZN9Minecraft6heightE");
+    void (*screen_set_size)(void *screen, int width, int height) = (void (*)(void *screen, int width, int height))android_dlsym(handle, "_ZN6Screen7setSizeEii");
 
     *mc_width = width;
     *mc_height = height;
@@ -308,11 +307,11 @@ static void set_ninecraft_size(int width, int height) {
         } else {
             return;
         }
-        *(float *)internal_dlsym(handle, "_ZN3Gui11InvGuiScaleE") = 0.5f;
-        *(float *)internal_dlsym(handle, "_ZN3Gui8GuiScaleE") = 2.0f;
+        *(float *)android_dlsym(handle, "_ZN3Gui11InvGuiScaleE") = 0.5f;
+        *(float *)android_dlsym(handle, "_ZN3Gui8GuiScaleE") = 2.0f;
         void *screen = *(void **)((char *)ninecraft_app + screen_offset);
         if (screen) {
-            ((void (*)(void *, int, int))internal_dlsym(handle, "_ZN6Screen7setSizeEii"))(screen, width * 0.5f, height * 0.5f);
+            ((void (*)(void *, int, int))android_dlsym(handle, "_ZN6Screen7setSizeEii"))(screen, width * 0.5f, height * 0.5f);
         }
     }
 }
@@ -418,7 +417,7 @@ static void key_callback(GLFWwindow *window, int key, int scancode, int action, 
                     } else if (version_id == version_id_0_8_1) {
                         minecraft_screenchooser_offset = MINECRAFT_SCREENCHOOSER_OFFSET_0_8_1;
                     }
-                    ((void (*)(void *, int))internal_dlsym(handle, "_ZN13ScreenChooser9setScreenE8ScreenId"))((char *)ninecraft_app + minecraft_screenchooser_offset, 7);
+                    ((void (*)(void *, int))android_dlsym(handle, "_ZN13ScreenChooser9setScreenE8ScreenId"))((char *)ninecraft_app + minecraft_screenchooser_offset, 7);
                 } else if (version_id >= version_id_0_1_0 && version_id <= version_id_0_6_1) {
                     void *chat_screen = chat_screen_create();
                     if (chat_screen) {
@@ -745,20 +744,20 @@ int main(int argc, char **argv) {
     static android_string_t in;
     android_string_cstr(&in, "v%d.%d.%d alpha");
 #ifdef _MSC_VER
-    void (__stdcall *get_game_version_string)(android_string_t *, android_string_t *) = (void (__stdcall *)(android_string_t *, android_string_t *))internal_dlsym(handle, "_ZN6Common20getGameVersionStringERKSs");
+    void (__stdcall *get_game_version_string)(android_string_t *, android_string_t *) = (void (__stdcall *)(android_string_t *, android_string_t *))android_dlsym(handle, "_ZN6Common20getGameVersionStringERKSs");
 
-    void (__stdcall *get_game_version_string_2)(android_string_t *) = (void (__stdcall *)(android_string_t *))internal_dlsym(handle, "_ZN6Common20getGameVersionStringEv");
+    void (__stdcall *get_game_version_string_2)(android_string_t *) = (void (__stdcall *)(android_string_t *))android_dlsym(handle, "_ZN6Common20getGameVersionStringEv");
 #else
-    void (*get_game_version_string)(android_string_t *, android_string_t *) = (void (*)(android_string_t *, android_string_t *))internal_dlsym(handle, "_ZN6Common20getGameVersionStringERKSs");
+    void (*get_game_version_string)(android_string_t *, android_string_t *) = (void (*)(android_string_t *, android_string_t *))android_dlsym(handle, "_ZN6Common20getGameVersionStringERKSs");
 
-    void (*get_game_version_string_2)(android_string_t *) = (void (*)(android_string_t *))internal_dlsym(handle, "_ZN6Common20getGameVersionStringEv");
+    void (*get_game_version_string_2)(android_string_t *) = (void (*)(android_string_t *))android_dlsym(handle, "_ZN6Common20getGameVersionStringEv");
 #endif
     if (get_game_version_string != NULL) {
         static android_string_t game_version;
         get_game_version_string(&game_version, &in);
         char *verstr = android_string_to_str(&game_version);
 
-        bool is_j = internal_dlsym(handle, "Java_com_mojang_minecraftpe_MainActivity_nativeOnCreate") != NULL;
+        bool is_j = android_dlsym(handle, "Java_com_mojang_minecraftpe_MainActivity_nativeOnCreate") != NULL;
 
         printf("Ninecraft is running mcpe %.6s%s\n", verstr, is_j ? "j" : "");
 
@@ -861,7 +860,7 @@ int main(int argc, char **argv) {
         }
     } else {
         android_Dl_info info;
-        android_dladdr(internal_dlsym(handle, "_ZN12NinecraftAppC2Ev"), &info);
+        android_dladdr(android_dlsym(handle, "_ZN12NinecraftAppC2Ev"), &info);
         if (strncmp((char *)info.dli_fbase + 0x15d3a8, "v0.2.0", 6) == 0) { // v0.2.0
             version_id = version_id_0_2_0;
         } else if (strncmp((char *)info.dli_fbase + 0x15a480, "v0.2.0", 6) == 0) { // v0.2.0-demo
@@ -919,9 +918,9 @@ int main(int argc, char **argv) {
     inject_mods(handle, version_id);
     mod_loader_load_all();
 
-    controller_states = (unsigned char *)internal_dlsym(handle, "_ZN10Controller15isTouchedValuesE");
-    controller_x_stick = (float *)internal_dlsym(handle, "_ZN10Controller12stickValuesXE");
-    controller_y_stick = (float *)internal_dlsym(handle, "_ZN10Controller12stickValuesYE");
+    controller_states = (unsigned char *)android_dlsym(handle, "_ZN10Controller15isTouchedValuesE");
+    controller_x_stick = (float *)android_dlsym(handle, "_ZN10Controller12stickValuesXE");
+    controller_y_stick = (float *)android_dlsym(handle, "_ZN10Controller12stickValuesYE");
 
     if (version_id >= version_id_0_6_0 && version_id <= version_id_0_9_5) {
         default_mouse_mode = GLFW_CURSOR_HIDDEN;
@@ -1268,12 +1267,12 @@ int main(int argc, char **argv) {
 
         if (!mouse_pointer_hidden) {
             if (version_id >= version_id_0_6_0 && version_id <= version_id_0_9_5) {
-                float inv_gui_scale = *((float *)internal_dlsym(handle, "_ZN3Gui11InvGuiScaleE"));
+                float inv_gui_scale = *((float *)android_dlsym(handle, "_ZN3Gui11InvGuiScaleE"));
                 double xpos, ypos;
                 glfwGetCursorPos(_window, &xpos, &ypos);
                 short cx = (short)(xpos * inv_gui_scale);
                 short cy = (short)(ypos * inv_gui_scale);
-                ((NINECRAFT_FLOAT_FUNC void (*)(float, float, void *))internal_dlsym(handle, "_Z12renderCursorffP9Minecraft"))(cx, cy, ninecraft_app);
+                ((NINECRAFT_FLOAT_FUNC void (*)(float, float, void *))android_dlsym(handle, "_Z12renderCursorffP9Minecraft"))(cx, cy, ninecraft_app);
             }
         }
         audio_engine_tick();

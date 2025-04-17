@@ -2,7 +2,7 @@
 #define NINECRAFT_APP_PLATFORM_H
 
 #include <string.h>
-#include <ninecraft/dlfcn_stub.h>
+#include <ancmp/android_dlfcn.h>
 #include <ninecraft/gfx/textures.h>
 #include <ninecraft/android/android_string.h>
 #include <ninecraft/android/android_vector.h>
