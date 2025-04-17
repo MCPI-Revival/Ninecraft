@@ -45,8 +45,6 @@
 #include <ancmp/linker.h>
 #include <ancmp/abi_fix.h>
 
-#include <ninecraft/ninecraft_defs.h>
-
 #include <ninecraft/options.h>
 
 #define STB_IMAGE_IMPLEMENTATION

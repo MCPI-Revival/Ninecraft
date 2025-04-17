@@ -2,7 +2,6 @@
 #define NINECRAFT_GFX_GLES_COMPAT_H
 
 #include <glad/gl.h>
-#include <ninecraft/ninecraft_defs.h>
 #include <ancmp/abi_fix.h>
 
 // Function documentation

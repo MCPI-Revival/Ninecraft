@@ -7,7 +7,6 @@
 #include <ninecraft/android/android_string.h>
 #include <ninecraft/android/android_vector.h>
 #include <ninecraft/options.h>
-#include <ninecraft/ninecraft_defs.h>
 #include <ancmp/abi_fix.h>
 
 typedef struct {

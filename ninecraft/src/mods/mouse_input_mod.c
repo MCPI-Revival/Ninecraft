@@ -2,8 +2,8 @@
 #include <ninecraft/minecraft.h>
 #include <ninecraft/patch/detours.h>
 #include <ninecraft/mods/mouse_input_mod.h>
-#include <ninecraft/ninecraft_defs.h>
 #include <ancmp/android_dlfcn.h>
+#include <ancmp/abi_fix.h>
 
 /*
     This mod makes mouse control work more reliably.
