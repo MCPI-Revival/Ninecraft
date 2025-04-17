@@ -92,7 +92,7 @@ void *app_platform_vtable_0_1_1[] = {
     (void *)AppPlatform_linux$vibrate
 };
 
-void *app_platform_vtable_0_1_3_stlp[] = {
+void *app_platform_vtable_0_1_3[] = {
     (void *)AppPlatform_linux$destroy,
     (void *)AppPlatform_linux$destroy,
     (void *)AppPlatform_linux$saveScreenshot,
@@ -118,33 +118,7 @@ void *app_platform_vtable_0_1_3_stlp[] = {
     (void *)AppPlatform_linux$vibrate
 };
 
-void *app_platform_vtable_0_1_3_gnu[] = {
-    (void *)AppPlatform_linux$destroy,
-    (void *)AppPlatform_linux$destroy,
-    (void *)AppPlatform_linux$saveScreenshot,
-    (void *)GET_SYSV_WRAPPER(AppPlatform_linux$loadTexture),
-    (void *)AppPlatform_linux$playSound,
-    (void *)AppPlatform_linux$showDialog,
-    (void *)AppPlatform_linux$createUserInput,
-    (void *)AppPlatform_linux$getUserInputStatus,
-    (void *)GET_SYSV_WRAPPER(AppPlatform_linux$getUserInput),
-    (void *)GET_SYSV_WRAPPER(AppPlatform_linux$getDateString),
-    (void *)AppPlatform_linux$checkLicense,
-    (void *)AppPlatform_linux$hasBuyButtonWhenInvalidLicense,
-    (void *)AppPlatform_linux$uploadPlatformDependentData,
-    (void *)AppPlatform_linux$_tick,
-    (void *)AppPlatform_linux$getScreenWidth,
-    (void *)AppPlatform_linux$getScreenHeight,
-    (void *)AppPlatform_linux$getPixelsPerMillimeter,
-    (void *)GET_SYSV_WRAPPER(AppPlatform_linux$getOptionStrings),
-    (void *)AppPlatform_linux$isPowerVR,
-    (void *)AppPlatform_linux$buyGame,
-    (void *)AppPlatform_linux$finish,
-    (void *)AppPlatform_linux$isTouchscreen,
-    (void *)AppPlatform_linux$vibrate
-};
-
-void *app_platform_vtable_0_3_0_stlp[] = {
+void *app_platform_vtable_0_3_0[] = {
     (void *)AppPlatform_linux$destroy,
     (void *)AppPlatform_linux$destroy,
     (void *)AppPlatform_linux$saveScreenshot,
@@ -171,34 +145,7 @@ void *app_platform_vtable_0_3_0_stlp[] = {
     (void *)AppPlatform_linux$vibrate
 };
 
-void *app_platform_vtable_0_3_0_gnu[] = {
-    (void *)AppPlatform_linux$destroy,
-    (void *)AppPlatform_linux$destroy,
-    (void *)AppPlatform_linux$saveScreenshot,
-    (void *)GET_SYSV_WRAPPER(AppPlatform_linux$loadTexture),
-    (void *)AppPlatform_linux$playSound,
-    (void *)AppPlatform_linux$showDialog,
-    (void *)AppPlatform_linux$createUserInput,
-    (void *)AppPlatform_linux$getUserInputStatus,
-    (void *)GET_SYSV_WRAPPER(AppPlatform_linux$getUserInput),
-    (void *)GET_SYSV_WRAPPER(AppPlatform_linux$getDateString),
-    (void *)AppPlatform_linux$checkLicense,
-    (void *)AppPlatform_linux$hasBuyButtonWhenInvalidLicense,
-    (void *)AppPlatform_linux$uploadPlatformDependentData,
-    (void *)GET_SYSV_WRAPPER(AppPlatform_linux$readAssetFile),
-    (void *)AppPlatform_linux$_tick,
-    (void *)AppPlatform_linux$getScreenWidth,
-    (void *)AppPlatform_linux$getScreenHeight,
-    (void *)AppPlatform_linux$getPixelsPerMillimeter,
-    (void *)GET_SYSV_WRAPPER(AppPlatform_linux$getOptionStrings),
-    (void *)AppPlatform_linux$isPowerVR,
-    (void *)AppPlatform_linux$buyGame,
-    (void *)AppPlatform_linux$finish,
-    (void *)AppPlatform_linux$isTouchscreen,
-    (void *)AppPlatform_linux$vibrate
-};
-
-void *app_platform_vtable_0_3_2_stlp[] = {
+void *app_platform_vtable_0_3_2[] = {
     (void *)AppPlatform_linux$destroy,
     (void *)AppPlatform_linux$destroy,
     (void *)AppPlatform_linux$saveScreenshot,
@@ -226,64 +173,7 @@ void *app_platform_vtable_0_3_2_stlp[] = {
     (void *)GET_SYSV_WRAPPER(AppPlatform_linux$getPlatformStringVar)
 };
 
-void *app_platform_vtable_0_3_2_gnu[] = {
-    (void *)AppPlatform_linux$destroy,
-    (void *)AppPlatform_linux$destroy,
-    (void *)AppPlatform_linux$saveScreenshot,
-    (void *)GET_SYSV_WRAPPER(AppPlatform_linux$loadTexture),
-    (void *)AppPlatform_linux$playSound,
-    (void *)AppPlatform_linux$showDialog,
-    (void *)AppPlatform_linux$createUserInput,
-    (void *)AppPlatform_linux$getUserInputStatus,
-    (void *)GET_SYSV_WRAPPER(AppPlatform_linux$getUserInput),
-    (void *)GET_SYSV_WRAPPER(AppPlatform_linux$getDateString),
-    (void *)AppPlatform_linux$checkLicense,
-    (void *)AppPlatform_linux$hasBuyButtonWhenInvalidLicense,
-    (void *)AppPlatform_linux$uploadPlatformDependentData,
-    (void *)GET_SYSV_WRAPPER(AppPlatform_linux$readAssetFile),
-    (void *)AppPlatform_linux$_tick,
-    (void *)AppPlatform_linux$getScreenWidth,
-    (void *)AppPlatform_linux$getScreenHeight,
-    (void *)AppPlatform_linux$getPixelsPerMillimeter,
-    (void *)GET_SYSV_WRAPPER(AppPlatform_linux$getOptionStrings),
-    (void *)AppPlatform_linux$isPowerVR,
-    (void *)AppPlatform_linux$buyGame,
-    (void *)AppPlatform_linux$finish,
-    (void *)AppPlatform_linux$isTouchscreen,
-    (void *)AppPlatform_linux$vibrate,
-    (void *)GET_SYSV_WRAPPER(AppPlatform_linux$getPlatformStringVar)
-};
-
-void *app_platform_vtable_0_4_0_stlp[] = {
-    (void *)AppPlatform_linux$destroy,
-    (void *)AppPlatform_linux$destroy,
-    (void *)AppPlatform_linux$saveScreenshot,
-    (void *)GET_SYSV_WRAPPER(AppPlatform_linux$loadTexture),
-    (void *)AppPlatform_linux$playSound,
-    (void *)AppPlatform_linux$showDialog,
-    (void *)AppPlatform_linux$createUserInput,
-    (void *)AppPlatform_linux$getUserInputStatus,
-    (void *)GET_SYSV_WRAPPER(AppPlatform_linux$getUserInput),
-    (void *)GET_SYSV_WRAPPER(AppPlatform_linux$getDateString),
-    (void *)AppPlatform_linux$checkLicense,
-    (void *)AppPlatform_linux$hasBuyButtonWhenInvalidLicense,
-    (void *)AppPlatform_linux$uploadPlatformDependentData,
-    (void *)GET_SYSV_WRAPPER(AppPlatform_linux$readAssetFile),
-    (void *)AppPlatform_linux$_tick,
-    (void *)AppPlatform_linux$getScreenWidth,
-    (void *)AppPlatform_linux$getScreenHeight,
-    (void *)AppPlatform_linux$getPixelsPerMillimeter,
-    (void *)AppPlatform_linux$isNetworkEnabled,
-    (void *)GET_SYSV_WRAPPER(AppPlatform_linux$getOptionStrings),
-    (void *)AppPlatform_linux$isPowerVR,
-    (void *)AppPlatform_linux$buyGame,
-    (void *)AppPlatform_linux$finish,
-    (void *)AppPlatform_linux$isTouchscreen,
-    (void *)AppPlatform_linux$vibrate,
-    (void *)GET_SYSV_WRAPPER(AppPlatform_linux$getPlatformStringVar)
-};
-
-void *app_platform_vtable_0_4_0_gnu[] = {
+void *app_platform_vtable_0_4_0[] = {
     (void *)AppPlatform_linux$destroy,
     (void *)AppPlatform_linux$destroy,
     (void *)AppPlatform_linux$saveScreenshot,
@@ -731,12 +621,17 @@ void AppPlatform_linux$loadPNG_0_9_0(AppPlatform_linux *app_platform, image_data
 SYSV_WRAPPER(AppPlatform_linux$getLoginInformation, 2)
 void AppPlatform_linux$getLoginInformation(login_information_t *ret, AppPlatform_linux *app_platform) {
     //puts("debug: AppPlatform_linux::getLoginInformation");
-    login_information_t info;
-    android_string_cstr((android_string_t *)&info.unknown0, "");
-    android_string_cstr((android_string_t *)&info.unknown1, "");
-    android_string_cstr((android_string_t *)&info.unknown2, "");
-    android_string_cstr((android_string_t *)&info.unknown3, "");
-    *ret = info;
+    if (android_string_tsize() == sizeof(android_string_stlp_t)) {
+        android_string_cstr((android_string_t *)&ret->stlp.unknown0, "");
+        android_string_cstr((android_string_t *)&ret->stlp.unknown1, "");
+        android_string_cstr((android_string_t *)&ret->stlp.unknown2, "");
+        android_string_cstr((android_string_t *)&ret->stlp.unknown3, "");
+    } else {
+        android_string_cstr((android_string_t *)&ret->gnu.unknown0, "");
+        android_string_cstr((android_string_t *)&ret->gnu.unknown1, "");
+        android_string_cstr((android_string_t *)&ret->gnu.unknown2, "");
+        android_string_cstr((android_string_t *)&ret->gnu.unknown3, "");
+    }
 }
 
 void AppPlatform_linux$setLoginInformation(AppPlatform_linux *app_platform, login_information_t *info) {
@@ -824,39 +719,39 @@ void AppPlatform_linux$AppPlatform_linux(AppPlatform_linux *app_platform, void *
     } else if (version_id == version_id_0_6_0) {
         app_platform->vtable = app_platform_vtable_0_6_0;
     } else if (version_id == version_id_0_5_0) {
-        app_platform->vtable = app_platform_vtable_0_4_0_stlp;
+        app_platform->vtable = app_platform_vtable_0_4_0;
     } else if (version_id == version_id_0_5_0_j) {
-        app_platform->vtable = app_platform_vtable_0_4_0_gnu;
+        app_platform->vtable = app_platform_vtable_0_4_0;
     } else if (version_id == version_id_0_4_0) {
-        app_platform->vtable = app_platform_vtable_0_4_0_stlp;
+        app_platform->vtable = app_platform_vtable_0_4_0;
     } else if (version_id == version_id_0_4_0_j) {
-        app_platform->vtable = app_platform_vtable_0_4_0_gnu;
+        app_platform->vtable = app_platform_vtable_0_4_0;
     } else if (version_id == version_id_0_3_3) {
-        app_platform->vtable = app_platform_vtable_0_3_2_stlp;
+        app_platform->vtable = app_platform_vtable_0_3_2;
     } else if (version_id == version_id_0_3_3_j) {
-        app_platform->vtable = app_platform_vtable_0_3_2_gnu;
+        app_platform->vtable = app_platform_vtable_0_3_2;
     } else if (version_id == version_id_0_3_2) {
-        app_platform->vtable = app_platform_vtable_0_3_2_stlp;
+        app_platform->vtable = app_platform_vtable_0_3_2;
     } else if (version_id == version_id_0_3_2_j) {
-        app_platform->vtable = app_platform_vtable_0_3_2_gnu;
+        app_platform->vtable = app_platform_vtable_0_3_2;
     } else if (version_id == version_id_0_3_0) {
-        app_platform->vtable = app_platform_vtable_0_3_0_stlp;
+        app_platform->vtable = app_platform_vtable_0_3_0;
     } else if (version_id == version_id_0_3_0_j) {
-        app_platform->vtable = app_platform_vtable_0_3_0_gnu;
+        app_platform->vtable = app_platform_vtable_0_3_0;
     } else if (version_id == version_id_0_2_2) {
-        app_platform->vtable = app_platform_vtable_0_1_3_stlp;
+        app_platform->vtable = app_platform_vtable_0_1_3;
     } else if (version_id == version_id_0_2_1) {
-        app_platform->vtable = app_platform_vtable_0_1_3_gnu;
+        app_platform->vtable = app_platform_vtable_0_1_3;
     } else if (version_id == version_id_0_2_1_j) {
-        app_platform->vtable = app_platform_vtable_0_1_3_gnu;
+        app_platform->vtable = app_platform_vtable_0_1_3;
     } else if (version_id == version_id_0_2_0) {
-        app_platform->vtable = app_platform_vtable_0_1_3_gnu;
+        app_platform->vtable = app_platform_vtable_0_1_3;
     } else if (version_id == version_id_0_2_0_j) {
-        app_platform->vtable = app_platform_vtable_0_1_3_gnu;
+        app_platform->vtable = app_platform_vtable_0_1_3;
     } else if (version_id == version_id_0_1_3) {
-        app_platform->vtable = app_platform_vtable_0_1_3_stlp;
+        app_platform->vtable = app_platform_vtable_0_1_3;
     } else if (version_id == version_id_0_1_3_j) {
-        app_platform->vtable = app_platform_vtable_0_1_3_stlp;
+        app_platform->vtable = app_platform_vtable_0_1_3;
     } else if (version_id == version_id_0_1_2) {
         app_platform->vtable = app_platform_vtable_0_1_1;
     } else if (version_id == version_id_0_1_2_j) {

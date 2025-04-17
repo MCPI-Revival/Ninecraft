@@ -10,11 +10,19 @@ typedef struct {
     int size;
 } minecraft_asset_t;
 
-typedef struct {
-    android_string_gnu_t unknown0;
-    android_string_gnu_t unknown1;
-    android_string_gnu_t unknown2;
-    android_string_gnu_t unknown3;
+typedef union {
+    struct {
+        android_string_gnu_t unknown0;
+        android_string_gnu_t unknown1;
+        android_string_gnu_t unknown2;
+        android_string_gnu_t unknown3;
+    } gnu;
+    struct {
+        android_string_stlp_t unknown0;
+        android_string_stlp_t unknown1;
+        android_string_stlp_t unknown2;
+        android_string_stlp_t unknown3;
+    } stlp;
 } minecraft_login_info_t;
 
 typedef struct {

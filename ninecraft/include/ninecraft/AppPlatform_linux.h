@@ -25,17 +25,19 @@ typedef enum {
     did_rename_world = 4
 } platform_dialogue_id;
 
-typedef struct {
-    android_string_t name;
-    android_string_t seed;
-    char filler[0x1000];
-} user_input;
-
-typedef struct {
-    android_string_gnu_t unknown0;
-    android_string_gnu_t unknown1;
-    android_string_gnu_t unknown2;
-    android_string_gnu_t unknown3;
+typedef union {
+    struct {
+        android_string_gnu_t unknown0;
+        android_string_gnu_t unknown1;
+        android_string_gnu_t unknown2;
+        android_string_gnu_t unknown3;
+    } gnu;
+    struct {
+        android_string_stlp_t unknown0;
+        android_string_stlp_t unknown1;
+        android_string_stlp_t unknown2;
+        android_string_stlp_t unknown3;
+    } stlp;
 } login_information_t;
 
 extern ninecraft_options_t platform_options;
