@@ -43,8 +43,8 @@
 #include <ancmp/hooks.h>
 #include <ancmp/android_dlfcn.h>
 #include <ancmp/linker.h>
+#include <ancmp/abi_fix.h>
 
-#include <ninecraft/math_compat.h>
 #include <ninecraft/ninecraft_defs.h>
 
 #include <ninecraft/options.h>
@@ -583,7 +583,7 @@ extern void __aeabi_ul2f();
 
 #endif
 
-NINECRAFT_FLOAT_FUNC double io_strtod(const char *__nptr, char **__endptr) {
+FLOAT_ABI_FIX double io_strtod(const char *__nptr, char **__endptr) {
     return strtod(__nptr, __endptr);
 }
 
@@ -1272,7 +1272,7 @@ int main(int argc, char **argv) {
                 glfwGetCursorPos(_window, &xpos, &ypos);
                 short cx = (short)(xpos * inv_gui_scale);
                 short cy = (short)(ypos * inv_gui_scale);
-                ((NINECRAFT_FLOAT_FUNC void (*)(float, float, void *))android_dlsym(handle, "_Z12renderCursorffP9Minecraft"))(cx, cy, ninecraft_app);
+                ((FLOAT_ABI_FIX void (*)(float, float, void *))android_dlsym(handle, "_Z12renderCursorffP9Minecraft"))(cx, cy, ninecraft_app);
             }
         }
         audio_engine_tick();

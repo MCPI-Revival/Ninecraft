@@ -822,7 +822,7 @@ void AppPlatform_linux$getOptionStrings(android_vector_t *ret, AppPlatform_linux
     *ret = out;
 }
 
-NINECRAFT_FLOAT_FUNC float AppPlatform_linux$getPixelsPerMillimeter(AppPlatform_linux *app_platform) {
+FLOAT_ABI_FIX float AppPlatform_linux$getPixelsPerMillimeter(AppPlatform_linux *app_platform) {
     //puts("debug: AppPlatform_linux::getPixelsPerMillimeter");
     int cw, ch;
     glfwGetWindowSize(_window, &cw, &ch);
@@ -1088,7 +1088,7 @@ void AppPlatform_linux$loadTextureOld(texture_data_old_t *ret, AppPlatform_linux
     *ret = texture_data;
 }
 
-NINECRAFT_FLOAT_FUNC void AppPlatform_linux$playSound(AppPlatform_linux *app_platform, android_string_t *sound_name, float volume, float pitch) {
+FLOAT_ABI_FIX void AppPlatform_linux$playSound(AppPlatform_linux *app_platform, android_string_t *sound_name, float volume, float pitch) {
     //puts("debug: AppPlatform_linux::playSound");
     ninecraft_sound_resource_t *res = ninecraft_get_sound_buffer(android_string_to_str(sound_name));
     audio_engine_play(res->buffer, res->buffer_size, res->num_channels, res->bits_per_sample, res->freq, volume, pitch);

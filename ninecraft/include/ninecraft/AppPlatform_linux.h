@@ -8,6 +8,7 @@
 #include <ninecraft/android/android_vector.h>
 #include <ninecraft/options.h>
 #include <ninecraft/ninecraft_defs.h>
+#include <ancmp/abi_fix.h>
 
 typedef struct {
     void **vtable;
@@ -127,7 +128,7 @@ extern int32_t AppPlatform_linux$getKeyFromKeyCode(AppPlatform_linux *app_platfo
 EXTERN_SYSV_WRAPPER(AppPlatform_linux$getOptionStrings);
 void AppPlatform_linux$getOptionStrings(android_vector_t *ret, AppPlatform_linux *app_platform);
 
-extern float AppPlatform_linux$getPixelsPerMillimeter(AppPlatform_linux *app_platform);
+extern float AppPlatform_linux$getPixelsPerMillimeter(AppPlatform_linux *app_platform) FLOAT_ABI_FIX;
 
 EXTERN_SYSV_WRAPPER(AppPlatform_linux$getPlatformStringVar);
 extern void AppPlatform_linux$getPlatformStringVar(android_string_t *ret, AppPlatform_linux *app_platform, int zero);
@@ -159,7 +160,7 @@ extern void AppPlatform_linux$loadTexture(texture_data_t *ret, AppPlatform_linux
 EXTERN_SYSV_WRAPPER(AppPlatform_linux$loadTextureOld);
 extern void AppPlatform_linux$loadTextureOld(texture_data_old_t *ret, AppPlatform_linux *app_platform, android_string_t *path_str, bool alpha);
 
-extern void AppPlatform_linux$playSound(AppPlatform_linux *app_platform, android_string_t *sound_name, float volume, float pitch);
+extern void AppPlatform_linux$playSound(AppPlatform_linux *app_platform, android_string_t *sound_name, float volume, float pitch) FLOAT_ABI_FIX;
 
 EXTERN_SYSV_WRAPPER(AppPlatform_linux$readAssetFile);
 extern void AppPlatform_linux$readAssetFile(asset_file *ret, AppPlatform_linux *app_platform, android_string_t *path_str);

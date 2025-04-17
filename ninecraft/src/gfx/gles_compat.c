@@ -1,6 +1,6 @@
 #include <ninecraft/gfx/gles_compat.h>
 
-NINECRAFT_FLOAT_FUNC void gl_alpha_func(GLenum func, GLclampf ref) {
+FLOAT_ABI_FIX void gl_alpha_func(GLenum func, GLclampf ref) {
     glAlphaFunc(func, ref);
 }
 
@@ -24,11 +24,11 @@ void gl_clear(GLbitfield mask) {
     glClear(mask);
 }
 
-NINECRAFT_FLOAT_FUNC void gl_clear_color(GLclampf red, GLclampf green, GLclampf blue, GLclampf alpha) {
+FLOAT_ABI_FIX void gl_clear_color(GLclampf red, GLclampf green, GLclampf blue, GLclampf alpha) {
     glClearColor(red, green, blue, alpha);
 }
 
-NINECRAFT_FLOAT_FUNC void gl_color_4_f(GLfloat red, GLfloat green, GLfloat blue, GLfloat alpha) {
+FLOAT_ABI_FIX void gl_color_4_f(GLfloat red, GLfloat green, GLfloat blue, GLfloat alpha) {
     glColor4f(red, green, blue, alpha);
 }
 
@@ -60,7 +60,7 @@ void gl_depth_mask(GLboolean flag) {
     glDepthMask(flag);
 }
 
-NINECRAFT_FLOAT_FUNC void gl_depth_range_f(GLclampf near, GLclampf far) {
+FLOAT_ABI_FIX void gl_depth_range_f(GLclampf near, GLclampf far) {
     glDepthRange((GLclampd)near, (GLclampd)far);
 }
 
@@ -84,11 +84,11 @@ void gl_enable_client_state(GLenum array) {
     glEnableClientState(array);
 }
 
-NINECRAFT_FLOAT_FUNC void gl_fog_f(GLenum pname, GLfloat param) {
+FLOAT_ABI_FIX void gl_fog_f(GLenum pname, GLfloat param) {
     glFogf(pname, param);
 }
 
-NINECRAFT_FLOAT_FUNC void gl_fog_f_v(GLenum pname, const GLfloat *params) {
+FLOAT_ABI_FIX void gl_fog_f_v(GLenum pname, const GLfloat *params) {
     glFogfv(pname, params);
 }
 
@@ -100,7 +100,7 @@ void gl_gen_textures(GLsizei n, GLuint *textures) {
     glGenTextures(n, textures);
 }
 
-NINECRAFT_FLOAT_FUNC void gl_get_float_v(GLenum pname, GLfloat *params) {
+FLOAT_ABI_FIX void gl_get_float_v(GLenum pname, GLfloat *params) {
     glGetFloatv(pname, params);
 }
 
@@ -112,7 +112,7 @@ void gl_hint(GLenum target, GLenum mode) {
     glHint(target, mode);
 }
 
-NINECRAFT_FLOAT_FUNC void gl_line_width(GLfloat width) {
+FLOAT_ABI_FIX void gl_line_width(GLfloat width) {
     glLineWidth(width);
 }
 
@@ -124,19 +124,19 @@ void gl_matrix_mode(GLenum mode) {
     glMatrixMode(mode);
 }
 
-NINECRAFT_FLOAT_FUNC void gl_mult_matrix_f(const GLfloat *m) {
+FLOAT_ABI_FIX void gl_mult_matrix_f(const GLfloat *m) {
     glMultMatrixf(m);
 }
 
-NINECRAFT_FLOAT_FUNC void gl_normal_3_f(GLfloat nx, GLfloat ny, GLfloat nz) {
+FLOAT_ABI_FIX void gl_normal_3_f(GLfloat nx, GLfloat ny, GLfloat nz) {
     glNormal3f(nx, ny, nz);
 }
 
-NINECRAFT_FLOAT_FUNC void gl_ortho_f(GLfloat left, GLfloat right, GLfloat bottom, GLfloat top, GLfloat near, GLfloat far) {
+FLOAT_ABI_FIX void gl_ortho_f(GLfloat left, GLfloat right, GLfloat bottom, GLfloat top, GLfloat near, GLfloat far) {
     glOrtho((GLdouble)left, (GLdouble)right, (GLdouble)bottom, (GLdouble)top, (GLdouble)near, (GLdouble)far);
 }
 
-NINECRAFT_FLOAT_FUNC void gl_polygon_offset(GLfloat factor, GLfloat units) {
+FLOAT_ABI_FIX void gl_polygon_offset(GLfloat factor, GLfloat units) {
     glPolygonOffset(factor, units);
 }
 
@@ -152,11 +152,11 @@ void gl_read_pixels(GLint x, GLint y, GLsizei width, GLsizei height, GLenum form
     glReadPixels(x, y, width, height, format, type, pixels);
 }
 
-NINECRAFT_FLOAT_FUNC void gl_rotate_f(GLfloat angle, GLfloat x, GLfloat y, GLfloat z) {
+FLOAT_ABI_FIX void gl_rotate_f(GLfloat angle, GLfloat x, GLfloat y, GLfloat z) {
     glRotatef(angle, x, y, z);
 }
 
-NINECRAFT_FLOAT_FUNC void gl_scale_f(GLfloat x, GLfloat y, GLfloat z) {
+FLOAT_ABI_FIX void gl_scale_f(GLfloat x, GLfloat y, GLfloat z) {
     glScalef(x, y, z);
 }
 
@@ -184,7 +184,7 @@ void gl_tex_sub_image_2_d(GLenum target, GLint level, GLint xoffset, GLint yoffs
     glTexSubImage2D(target, level, xoffset, yoffset, width, height, format, type, pixels);
 }
 
-NINECRAFT_FLOAT_FUNC void gl_translate_f(GLfloat x, GLfloat y, GLfloat z) {
+FLOAT_ABI_FIX void gl_translate_f(GLfloat x, GLfloat y, GLfloat z) {
     glTranslatef(x, y, z);
 }
 
@@ -216,11 +216,11 @@ void gl_stencil_mask(GLuint mask) {
     glStencilMask(mask);
 }
 
-NINECRAFT_FLOAT_FUNC void gl_light_model_f(GLenum pname, GLfloat param) {
+FLOAT_ABI_FIX void gl_light_model_f(GLenum pname, GLfloat param) {
     glLightModelf(pname, param);
 }
 
-NINECRAFT_FLOAT_FUNC void gl_light_f_v(GLenum light, GLenum pname, const GLfloat *params) {
+FLOAT_ABI_FIX void gl_light_f_v(GLenum light, GLenum pname, const GLfloat *params) {
     glLightfv(light, pname, params);
 }
 
@@ -312,7 +312,7 @@ void gl_shader_source(GLuint shader, GLsizei count, const GLchar *const *string,
     glShaderSource(shader, count, string, length);
 }
 
-NINECRAFT_FLOAT_FUNC void gl_uniform_1_f_v(GLint location, GLsizei count, const GLfloat *value) {
+FLOAT_ABI_FIX void gl_uniform_1_f_v(GLint location, GLsizei count, const GLfloat *value) {
     glUniform1fv(location, count, value);
 }
 
@@ -320,7 +320,7 @@ void gl_uniform_1_i_v(GLint location, GLsizei count, const GLint *value) {
     glUniform1iv(location, count, value);
 }
 
-NINECRAFT_FLOAT_FUNC void gl_uniform_2_f_v(GLint location, GLsizei count, const GLfloat *value) {
+FLOAT_ABI_FIX void gl_uniform_2_f_v(GLint location, GLsizei count, const GLfloat *value) {
     glUniform2fv(location, count, value);
 }
 
@@ -328,7 +328,7 @@ void gl_uniform_2_i_v(GLint location, GLsizei count, const GLint *value) {
     glUniform2iv(location, count, value);
 }
 
-NINECRAFT_FLOAT_FUNC void gl_uniform_3_f_v(GLint location, GLsizei count, const GLfloat *value) {
+FLOAT_ABI_FIX void gl_uniform_3_f_v(GLint location, GLsizei count, const GLfloat *value) {
     glUniform3fv(location, count, value);
 }
 
@@ -336,7 +336,7 @@ void gl_uniform_3_i_v(GLint location, GLsizei count, const GLint *value) {
     glUniform3iv(location, count, value);
 }
 
-NINECRAFT_FLOAT_FUNC void gl_uniform_4_f_v(GLint location, GLsizei count, const GLfloat *value) {
+FLOAT_ABI_FIX void gl_uniform_4_f_v(GLint location, GLsizei count, const GLfloat *value) {
     glUniform4fv(location, count, value);
 }
 
@@ -344,15 +344,15 @@ void gl_uniform_4_i_v(GLint location, GLsizei count, const GLint *value) {
     glUniform4iv(location, count, value);
 }
 
-NINECRAFT_FLOAT_FUNC void gl_uniform_matrix_2_f_v(GLint location, GLsizei count, GLboolean transpose, const GLfloat *value) {
+FLOAT_ABI_FIX void gl_uniform_matrix_2_f_v(GLint location, GLsizei count, GLboolean transpose, const GLfloat *value) {
     glUniformMatrix2fv(location, count, transpose, value);
 }
 
-NINECRAFT_FLOAT_FUNC void gl_uniform_matrix_3_f_v(GLint location, GLsizei count, GLboolean transpose, const GLfloat *value) {
+FLOAT_ABI_FIX void gl_uniform_matrix_3_f_v(GLint location, GLsizei count, GLboolean transpose, const GLfloat *value) {
     glUniformMatrix3fv(location, count, transpose, value);
 }
 
-NINECRAFT_FLOAT_FUNC void gl_uniform_matrix_4_f_v(GLint location, GLsizei count, GLboolean transpose, const GLfloat *value) {
+FLOAT_ABI_FIX void gl_uniform_matrix_4_f_v(GLint location, GLsizei count, GLboolean transpose, const GLfloat *value) {
     glUniformMatrix4fv(location, count, transpose, value);
 }
 
