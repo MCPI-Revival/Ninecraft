@@ -581,10 +581,6 @@ extern void __aeabi_ul2f();
 
 #endif
 
-FLOAT_ABI_FIX double io_strtod(const char *__nptr, char **__endptr) {
-    return strtod(__nptr, __endptr);
-}
-
 int __my_srget(FILE *astream) {
     puts("__srget");
     return EOF;
@@ -604,19 +600,6 @@ void missing_hook() {
     add_custom_hook("compressBound", compressBound);
 
     add_custom_hook("__srget", __my_srget);
-
-#ifdef __arm__
-    add_custom_hook("__aeabi_atexit", __aeabi_atexit);
-    add_custom_hook("__aeabi_uidiv", __aeabi_uidiv);
-    add_custom_hook("__aeabi_d2ulz", __aeabi_d2ulz);
-    add_custom_hook("__aeabi_uidivmod", __aeabi_uidivmod);
-    add_custom_hook("__aeabi_uldivmod", __aeabi_uldivmod);
-    add_custom_hook("__aeabi_ldivmod", __aeabi_ldivmod);
-    add_custom_hook("__aeabi_ul2d", __aeabi_ul2d);
-    add_custom_hook("__aeabi_idivmod", __aeabi_idivmod);
-    add_custom_hook("__aeabi_idiv", __aeabi_idiv);
-    add_custom_hook("__aeabi_ul2f", __aeabi_ul2f);
-#endif
 }
 
 unsigned char mcpi_api_initialized = 0;
