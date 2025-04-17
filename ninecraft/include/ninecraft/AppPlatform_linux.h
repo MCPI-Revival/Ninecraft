@@ -41,12 +41,12 @@ typedef struct {
 extern ninecraft_options_t platform_options;
 extern bool is_keyboard_visible;
 
-void AppPlatform_linux$saveImage(AppPlatform_linux *app_platform, android_string_gnu_t *resource_path, android_string_gnu_t *pixels, int width, int height);
+void AppPlatform_linux$saveImage(AppPlatform_linux *app_platform, android_string_t *resource_path, android_string_t *pixels, int width, int height);
 
 void AppPlatform_linux$swapBuffers(AppPlatform_linux *app_platform);
 
 EXTERN_SYSV_WRAPPER(AppPlatform_linux$getModelName);
-void AppPlatform_linux$getModelName(android_string_gnu_t *ret, AppPlatform_linux *app_platform);
+void AppPlatform_linux$getModelName(android_string_t *ret, AppPlatform_linux *app_platform);
 
 void AppPlatform_linux$captureScreen(AppPlatform_linux *app_platform, int width, int height, bool do_capture);
 
@@ -68,7 +68,7 @@ void AppPlatform_linux$loadTGA(AppPlatform_linux *app_platform, image_data_t *im
 void AppPlatform_linux$loadTGA_0_9_0(AppPlatform_linux *app_platform, image_data_0_9_0_t *image, android_string_t *resource_path, bool alpha);
 
 EXTERN_SYSV_WRAPPER(AppPlatform_linux$getImagePath);
-void AppPlatform_linux$getImagePath(android_string_gnu_t *ret, AppPlatform_linux *app_platform, android_string_t *resource_path, bool is_full);
+void AppPlatform_linux$getImagePath(android_string_t *ret, AppPlatform_linux *app_platform, android_string_t *resource_path, bool is_full);
 
 void AppPlatform_linux$loadPNG(AppPlatform_linux *app_platform, image_data_t *image, android_string_t *resource_path, bool alpha);
 
@@ -117,11 +117,8 @@ extern void AppPlatform_linux$createUserInput(AppPlatform_linux *app_platform);
 
 extern void AppPlatform_linux$finish(AppPlatform_linux *app_platform);
 
-EXTERN_SYSV_WRAPPER(AppPlatform_linux$getDateStringSTLP);
-extern void AppPlatform_linux$getDateStringSTLP(android_string_stlp_t *ret, AppPlatform_linux *app_platform, unsigned int seconds);
-
-EXTERN_SYSV_WRAPPER(AppPlatform_linux$getDateStringGNU);
-extern void AppPlatform_linux$getDateStringGNU(android_string_gnu_t *ret, AppPlatform_linux *app_platform, unsigned int seconds);
+EXTERN_SYSV_WRAPPER(AppPlatform_linux$getDateString);
+extern void AppPlatform_linux$getDateString(android_string_t *ret, AppPlatform_linux *app_platform, unsigned int seconds);
 
 extern int32_t AppPlatform_linux$getKeyFromKeyCode(AppPlatform_linux *app_platform, unsigned int key_code, unsigned int meta_state, unsigned int device_id);
 
@@ -130,11 +127,8 @@ void AppPlatform_linux$getOptionStrings(android_vector_t *ret, AppPlatform_linux
 
 extern float AppPlatform_linux$getPixelsPerMillimeter(AppPlatform_linux *app_platform);
 
-EXTERN_SYSV_WRAPPER(AppPlatform_linux$getPlatformStringVarSTLP);
-extern void AppPlatform_linux$getPlatformStringVarSTLP(android_string_stlp_t *ret, AppPlatform_linux *app_platform, int zero);
-
-EXTERN_SYSV_WRAPPER(AppPlatform_linux$getPlatformStringVarGNU);
-extern void AppPlatform_linux$getPlatformStringVarGNU(android_string_gnu_t *ret, AppPlatform_linux *app_platform, int zero);
+EXTERN_SYSV_WRAPPER(AppPlatform_linux$getPlatformStringVar);
+extern void AppPlatform_linux$getPlatformStringVar(android_string_t *ret, AppPlatform_linux *app_platform, int zero);
 
 extern int AppPlatform_linux$getScreenHeight(AppPlatform_linux *app_platform);
 
@@ -169,7 +163,7 @@ EXTERN_SYSV_WRAPPER(AppPlatform_linux$readAssetFile);
 extern void AppPlatform_linux$readAssetFile(asset_file *ret, AppPlatform_linux *app_platform, android_string_t *path_str);
 
 EXTERN_SYSV_WRAPPER(AppPlatform_linux$readAssetFile_0_9_0);
-extern void AppPlatform_linux$readAssetFile_0_9_0(android_string_gnu_t *ret, AppPlatform_linux *app_platform, android_string_t *path_str);
+extern void AppPlatform_linux$readAssetFile_0_9_0(android_string_t *ret, AppPlatform_linux *app_platform, android_string_t *path_str);
 
 extern void AppPlatform_linux$saveScreenshot(AppPlatform_linux *app_platform, android_string_t *path, int32_t width, int32_t height);
 

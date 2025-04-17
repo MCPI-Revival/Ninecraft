@@ -1075,7 +1075,7 @@ int main(int argc, char **argv) {
             platform_vtable_0_9_0.getImagePath = (void *)GET_SYSV_WRAPPER(AppPlatform_linux$getImagePath);
             platform_vtable_0_9_0.loadPNG = (void *)AppPlatform_linux$loadPNG_0_9_0;
             platform_vtable_0_9_0.loadTGA = (void *)AppPlatform_linux$loadTGA_0_9_0;
-            platform_vtable_0_9_0.getDateString = (void *)GET_SYSV_WRAPPER(AppPlatform_linux$getDateStringGNU);
+            platform_vtable_0_9_0.getDateString = (void *)GET_SYSV_WRAPPER(AppPlatform_linux$getDateString);
             platform_vtable_0_9_0.readAssetFile = (void *)GET_SYSV_WRAPPER(AppPlatform_linux$readAssetFile_0_9_0);
             platform_vtable_0_9_0.getScreenHeight = (void *)AppPlatform_linux$getScreenHeight;
             platform_vtable_0_9_0.getScreenWidth = (void *)AppPlatform_linux$getScreenWidth;
@@ -1083,7 +1083,7 @@ int main(int argc, char **argv) {
             platform_vtable_0_9_0.hideKeyboard = (void *)AppPlatform_linux$hideKeyboard;
             platform_vtable_0_9_0.getBroadcastAddresses = (void *)GET_SYSV_WRAPPER(AppPlatform_linux$getBroadcastAddresses);
             platform_vtable_0_9_0.getAvailableMemory = (void *)AppPlatform_linux$getAvailableMemory;
-            platform_vtable_0_9_0.getPlatformStringVar = (void *)GET_SYSV_WRAPPER(AppPlatform_linux$getPlatformStringVarGNU);
+            platform_vtable_0_9_0.getPlatformStringVar = (void *)GET_SYSV_WRAPPER(AppPlatform_linux$getPlatformStringVar);
             platform_vtable_0_9_0.getLoginInformation = (void *)GET_SYSV_WRAPPER(AppPlatform_linux$getLoginInformation);
             platform_vtable_0_9_0.setLoginInformation = (void *)AppPlatform_linux$setLoginInformation;
             platform_vtable_0_9_0.supportsTouchscreen = (void *)AppPlatform_linux$supportsTouchscreen;
@@ -1095,7 +1095,7 @@ int main(int argc, char **argv) {
             platform_vtable_0_10_0.getImagePath = (void *)GET_SYSV_WRAPPER(AppPlatform_linux$getImagePath);
             platform_vtable_0_10_0.loadPNG = (void *)AppPlatform_linux$loadPNG_0_9_0;
             platform_vtable_0_10_0.loadTGA = (void *)AppPlatform_linux$loadTGA_0_9_0;
-            platform_vtable_0_10_0.getDateString = (void *)GET_SYSV_WRAPPER(AppPlatform_linux$getDateStringGNU);
+            platform_vtable_0_10_0.getDateString = (void *)GET_SYSV_WRAPPER(AppPlatform_linux$getDateString);
             platform_vtable_0_10_0.readAssetFile = (void *)GET_SYSV_WRAPPER(AppPlatform_linux$readAssetFile_0_9_0);
             platform_vtable_0_10_0.getScreenHeight = (void *)AppPlatform_linux$getScreenHeight;
             platform_vtable_0_10_0.getScreenWidth = (void *)AppPlatform_linux$getScreenWidth;
@@ -1103,7 +1103,7 @@ int main(int argc, char **argv) {
             platform_vtable_0_10_0.hideKeyboard = (void *)AppPlatform_linux$hideKeyboard;
             platform_vtable_0_10_0.getBroadcastAddresses = (void *)GET_SYSV_WRAPPER(AppPlatform_linux$getBroadcastAddresses);
             platform_vtable_0_10_0.getAvailableMemory = (void *)AppPlatform_linux$getAvailableMemory;
-            platform_vtable_0_10_0.getPlatformStringVar = (void *)GET_SYSV_WRAPPER(AppPlatform_linux$getPlatformStringVarGNU);
+            platform_vtable_0_10_0.getPlatformStringVar = (void *)GET_SYSV_WRAPPER(AppPlatform_linux$getPlatformStringVar);
             platform_vtable_0_10_0.getLoginInformation = (void *)GET_SYSV_WRAPPER(AppPlatform_linux$getLoginInformation);
             platform_vtable_0_10_0.setLoginInformation = (void *)AppPlatform_linux$setLoginInformation;
             platform_vtable_0_10_0.supportsTouchscreen = (void *)AppPlatform_linux$supportsTouchscreen;

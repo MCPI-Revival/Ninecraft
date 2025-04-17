@@ -35,7 +35,7 @@ void *app_platform_vtable_0_1_0[] = {
     (void *)AppPlatform_linux$createUserInput,
     (void *)AppPlatform_linux$getUserInputStatus,
     (void *)GET_SYSV_WRAPPER(AppPlatform_linux$getUserInput),
-    (void *)GET_SYSV_WRAPPER(AppPlatform_linux$getDateStringSTLP),
+    (void *)GET_SYSV_WRAPPER(AppPlatform_linux$getDateString),
     (void *)AppPlatform_linux$checkLicense,
     (void *)AppPlatform_linux$hasBuyButtonWhenInvalidLicense,
     (void *)AppPlatform_linux$uploadPlatformDependentData,
@@ -55,7 +55,7 @@ void *app_platform_vtable_0_1_0_touch[] = {
     (void *)AppPlatform_linux$createUserInput,
     (void *)AppPlatform_linux$getUserInputStatus,
     (void *)GET_SYSV_WRAPPER(AppPlatform_linux$getUserInput),
-    (void *)GET_SYSV_WRAPPER(AppPlatform_linux$getDateStringSTLP),
+    (void *)GET_SYSV_WRAPPER(AppPlatform_linux$getDateString),
     (void *)AppPlatform_linux$checkLicense,
     (void *)AppPlatform_linux$hasBuyButtonWhenInvalidLicense,
     (void *)AppPlatform_linux$uploadPlatformDependentData,
@@ -77,7 +77,7 @@ void *app_platform_vtable_0_1_1[] = {
     (void *)AppPlatform_linux$createUserInput,
     (void *)AppPlatform_linux$getUserInputStatus,
     (void *)GET_SYSV_WRAPPER(AppPlatform_linux$getUserInput),
-    (void *)GET_SYSV_WRAPPER(AppPlatform_linux$getDateStringSTLP),
+    (void *)GET_SYSV_WRAPPER(AppPlatform_linux$getDateString),
     (void *)AppPlatform_linux$checkLicense,
     (void *)AppPlatform_linux$hasBuyButtonWhenInvalidLicense,
     (void *)AppPlatform_linux$uploadPlatformDependentData,
@@ -102,7 +102,7 @@ void *app_platform_vtable_0_1_3_stlp[] = {
     (void *)AppPlatform_linux$createUserInput,
     (void *)AppPlatform_linux$getUserInputStatus,
     (void *)GET_SYSV_WRAPPER(AppPlatform_linux$getUserInput),
-    (void *)GET_SYSV_WRAPPER(AppPlatform_linux$getDateStringSTLP),
+    (void *)GET_SYSV_WRAPPER(AppPlatform_linux$getDateString),
     (void *)AppPlatform_linux$checkLicense,
     (void *)AppPlatform_linux$hasBuyButtonWhenInvalidLicense,
     (void *)AppPlatform_linux$uploadPlatformDependentData,
@@ -128,7 +128,7 @@ void *app_platform_vtable_0_1_3_gnu[] = {
     (void *)AppPlatform_linux$createUserInput,
     (void *)AppPlatform_linux$getUserInputStatus,
     (void *)GET_SYSV_WRAPPER(AppPlatform_linux$getUserInput),
-    (void *)GET_SYSV_WRAPPER(AppPlatform_linux$getDateStringGNU),
+    (void *)GET_SYSV_WRAPPER(AppPlatform_linux$getDateString),
     (void *)AppPlatform_linux$checkLicense,
     (void *)AppPlatform_linux$hasBuyButtonWhenInvalidLicense,
     (void *)AppPlatform_linux$uploadPlatformDependentData,
@@ -154,7 +154,7 @@ void *app_platform_vtable_0_3_0_stlp[] = {
     (void *)AppPlatform_linux$createUserInput,
     (void *)AppPlatform_linux$getUserInputStatus,
     (void *)GET_SYSV_WRAPPER(AppPlatform_linux$getUserInput),
-    (void *)GET_SYSV_WRAPPER(AppPlatform_linux$getDateStringSTLP),
+    (void *)GET_SYSV_WRAPPER(AppPlatform_linux$getDateString),
     (void *)AppPlatform_linux$checkLicense,
     (void *)AppPlatform_linux$hasBuyButtonWhenInvalidLicense,
     (void *)AppPlatform_linux$uploadPlatformDependentData,
@@ -181,7 +181,7 @@ void *app_platform_vtable_0_3_0_gnu[] = {
     (void *)AppPlatform_linux$createUserInput,
     (void *)AppPlatform_linux$getUserInputStatus,
     (void *)GET_SYSV_WRAPPER(AppPlatform_linux$getUserInput),
-    (void *)GET_SYSV_WRAPPER(AppPlatform_linux$getDateStringGNU),
+    (void *)GET_SYSV_WRAPPER(AppPlatform_linux$getDateString),
     (void *)AppPlatform_linux$checkLicense,
     (void *)AppPlatform_linux$hasBuyButtonWhenInvalidLicense,
     (void *)AppPlatform_linux$uploadPlatformDependentData,
@@ -208,7 +208,7 @@ void *app_platform_vtable_0_3_2_stlp[] = {
     (void *)AppPlatform_linux$createUserInput,
     (void *)AppPlatform_linux$getUserInputStatus,
     (void *)GET_SYSV_WRAPPER(AppPlatform_linux$getUserInput),
-    (void *)GET_SYSV_WRAPPER(AppPlatform_linux$getDateStringSTLP),
+    (void *)GET_SYSV_WRAPPER(AppPlatform_linux$getDateString),
     (void *)AppPlatform_linux$checkLicense,
     (void *)AppPlatform_linux$hasBuyButtonWhenInvalidLicense,
     (void *)AppPlatform_linux$uploadPlatformDependentData,
@@ -223,7 +223,7 @@ void *app_platform_vtable_0_3_2_stlp[] = {
     (void *)AppPlatform_linux$finish,
     (void *)AppPlatform_linux$isTouchscreen,
     (void *)AppPlatform_linux$vibrate,
-    (void *)GET_SYSV_WRAPPER(AppPlatform_linux$getPlatformStringVarSTLP)
+    (void *)GET_SYSV_WRAPPER(AppPlatform_linux$getPlatformStringVar)
 };
 
 void *app_platform_vtable_0_3_2_gnu[] = {
@@ -236,7 +236,7 @@ void *app_platform_vtable_0_3_2_gnu[] = {
     (void *)AppPlatform_linux$createUserInput,
     (void *)AppPlatform_linux$getUserInputStatus,
     (void *)GET_SYSV_WRAPPER(AppPlatform_linux$getUserInput),
-    (void *)GET_SYSV_WRAPPER(AppPlatform_linux$getDateStringGNU),
+    (void *)GET_SYSV_WRAPPER(AppPlatform_linux$getDateString),
     (void *)AppPlatform_linux$checkLicense,
     (void *)AppPlatform_linux$hasBuyButtonWhenInvalidLicense,
     (void *)AppPlatform_linux$uploadPlatformDependentData,
@@ -251,7 +251,7 @@ void *app_platform_vtable_0_3_2_gnu[] = {
     (void *)AppPlatform_linux$finish,
     (void *)AppPlatform_linux$isTouchscreen,
     (void *)AppPlatform_linux$vibrate,
-    (void *)GET_SYSV_WRAPPER(AppPlatform_linux$getPlatformStringVarGNU)
+    (void *)GET_SYSV_WRAPPER(AppPlatform_linux$getPlatformStringVar)
 };
 
 void *app_platform_vtable_0_4_0_stlp[] = {
@@ -264,7 +264,7 @@ void *app_platform_vtable_0_4_0_stlp[] = {
     (void *)AppPlatform_linux$createUserInput,
     (void *)AppPlatform_linux$getUserInputStatus,
     (void *)GET_SYSV_WRAPPER(AppPlatform_linux$getUserInput),
-    (void *)GET_SYSV_WRAPPER(AppPlatform_linux$getDateStringSTLP),
+    (void *)GET_SYSV_WRAPPER(AppPlatform_linux$getDateString),
     (void *)AppPlatform_linux$checkLicense,
     (void *)AppPlatform_linux$hasBuyButtonWhenInvalidLicense,
     (void *)AppPlatform_linux$uploadPlatformDependentData,
@@ -280,7 +280,7 @@ void *app_platform_vtable_0_4_0_stlp[] = {
     (void *)AppPlatform_linux$finish,
     (void *)AppPlatform_linux$isTouchscreen,
     (void *)AppPlatform_linux$vibrate,
-    (void *)GET_SYSV_WRAPPER(AppPlatform_linux$getPlatformStringVarSTLP)
+    (void *)GET_SYSV_WRAPPER(AppPlatform_linux$getPlatformStringVar)
 };
 
 void *app_platform_vtable_0_4_0_gnu[] = {
@@ -293,7 +293,7 @@ void *app_platform_vtable_0_4_0_gnu[] = {
     (void *)AppPlatform_linux$createUserInput,
     (void *)AppPlatform_linux$getUserInputStatus,
     (void *)GET_SYSV_WRAPPER(AppPlatform_linux$getUserInput),
-    (void *)GET_SYSV_WRAPPER(AppPlatform_linux$getDateStringGNU),
+    (void *)GET_SYSV_WRAPPER(AppPlatform_linux$getDateString),
     (void *)AppPlatform_linux$checkLicense,
     (void *)AppPlatform_linux$hasBuyButtonWhenInvalidLicense,
     (void *)AppPlatform_linux$uploadPlatformDependentData,
@@ -309,7 +309,7 @@ void *app_platform_vtable_0_4_0_gnu[] = {
     (void *)AppPlatform_linux$finish,
     (void *)AppPlatform_linux$isTouchscreen,
     (void *)AppPlatform_linux$vibrate,
-    (void *)GET_SYSV_WRAPPER(AppPlatform_linux$getPlatformStringVarGNU)
+    (void *)GET_SYSV_WRAPPER(AppPlatform_linux$getPlatformStringVar)
 };
 
 void *app_platform_vtable_0_6_0[] = {
@@ -322,7 +322,7 @@ void *app_platform_vtable_0_6_0[] = {
     (void *)AppPlatform_linux$createUserInput,
     (void *)AppPlatform_linux$getUserInputStatus,
     (void *)GET_SYSV_WRAPPER(AppPlatform_linux$getUserInput),
-    (void *)GET_SYSV_WRAPPER(AppPlatform_linux$getDateStringSTLP),
+    (void *)GET_SYSV_WRAPPER(AppPlatform_linux$getDateString),
     (void *)AppPlatform_linux$checkLicense,
     (void *)AppPlatform_linux$hasBuyButtonWhenInvalidLicense,
     (void *)AppPlatform_linux$uploadPlatformDependentData,
@@ -339,7 +339,7 @@ void *app_platform_vtable_0_6_0[] = {
     (void *)AppPlatform_linux$finish,
     (void *)AppPlatform_linux$isTouchscreen,
     (void *)AppPlatform_linux$vibrate,
-    (void *)GET_SYSV_WRAPPER(AppPlatform_linux$getPlatformStringVarSTLP),
+    (void *)GET_SYSV_WRAPPER(AppPlatform_linux$getPlatformStringVar),
     (void *)AppPlatform_linux$showKeyboard,
     (void *)AppPlatform_linux$hideKeyboard,
     (void *)AppPlatform_linux$isKeyboardVisible,
@@ -356,7 +356,7 @@ void *app_platform_vtable_0_7_0[] = {
     (void *)AppPlatform_linux$createUserInput,
     (void *)AppPlatform_linux$getUserInputStatus,
     (void *)GET_SYSV_WRAPPER(AppPlatform_linux$getUserInput),
-    (void *)GET_SYSV_WRAPPER(AppPlatform_linux$getDateStringSTLP),
+    (void *)GET_SYSV_WRAPPER(AppPlatform_linux$getDateString),
     (void *)AppPlatform_linux$checkLicense,
     (void *)AppPlatform_linux$hasBuyButtonWhenInvalidLicense,
     (void *)AppPlatform_linux$uploadPlatformDependentData,
@@ -374,7 +374,7 @@ void *app_platform_vtable_0_7_0[] = {
     (void *)AppPlatform_linux$supportsTouchscreen,
     (void *)AppPlatform_linux$supportsVibration,
     (void *)AppPlatform_linux$vibrate,
-    (void *)GET_SYSV_WRAPPER(AppPlatform_linux$getPlatformStringVarSTLP),
+    (void *)GET_SYSV_WRAPPER(AppPlatform_linux$getPlatformStringVar),
     (void *)AppPlatform_linux$showKeyboard,
     (void *)AppPlatform_linux$hideKeyboard,
     (void *)AppPlatform_linux$isKeyboardVisible,
@@ -398,7 +398,7 @@ void *app_platform_vtable_0_7_2[] = {
     (void *)AppPlatform_linux$createUserInput,
     (void *)AppPlatform_linux$getUserInputStatus,
     (void *)GET_SYSV_WRAPPER(AppPlatform_linux$getUserInput),
-    (void *)GET_SYSV_WRAPPER(AppPlatform_linux$getDateStringSTLP),
+    (void *)GET_SYSV_WRAPPER(AppPlatform_linux$getDateString),
     (void *)AppPlatform_linux$checkLicense,
     (void *)AppPlatform_linux$hasBuyButtonWhenInvalidLicense,
     (void *)AppPlatform_linux$uploadPlatformDependentData,
@@ -416,7 +416,7 @@ void *app_platform_vtable_0_7_2[] = {
     (void *)AppPlatform_linux$supportsTouchscreen,
     (void *)AppPlatform_linux$supportsVibration,
     (void *)AppPlatform_linux$vibrate,
-    (void *)GET_SYSV_WRAPPER(AppPlatform_linux$getPlatformStringVarSTLP),
+    (void *)GET_SYSV_WRAPPER(AppPlatform_linux$getPlatformStringVar),
     (void *)AppPlatform_linux$showKeyboard,
     (void *)AppPlatform_linux$hideKeyboard,
     (void *)AppPlatform_linux$isKeyboardVisible,
@@ -441,7 +441,7 @@ void *app_platform_vtable_0_7_3[] = {
     (void *)AppPlatform_linux$createUserInput,
     (void *)AppPlatform_linux$getUserInputStatus,
     (void *)GET_SYSV_WRAPPER(AppPlatform_linux$getUserInput),
-    (void *)GET_SYSV_WRAPPER(AppPlatform_linux$getDateStringGNU),
+    (void *)GET_SYSV_WRAPPER(AppPlatform_linux$getDateString),
     (void *)AppPlatform_linux$checkLicense,
     (void *)AppPlatform_linux$hasBuyButtonWhenInvalidLicense,
     (void *)AppPlatform_linux$uploadPlatformDependentData,
@@ -459,7 +459,7 @@ void *app_platform_vtable_0_7_3[] = {
     (void *)AppPlatform_linux$supportsTouchscreen,
     (void *)AppPlatform_linux$supportsVibration,
     (void *)AppPlatform_linux$vibrate,
-    (void *)GET_SYSV_WRAPPER(AppPlatform_linux$getPlatformStringVarGNU),
+    (void *)GET_SYSV_WRAPPER(AppPlatform_linux$getPlatformStringVar),
     (void *)AppPlatform_linux$showKeyboard,
     (void *)AppPlatform_linux$hideKeyboard,
     (void *)AppPlatform_linux$isKeyboardVisible,
@@ -488,7 +488,7 @@ void *app_platform_vtable_0_8_0[] = {
     (void *)AppPlatform_linux$createUserInput,
     (void *)AppPlatform_linux$getUserInputStatus,
     (void *)GET_SYSV_WRAPPER(AppPlatform_linux$getUserInput),
-    (void *)GET_SYSV_WRAPPER(AppPlatform_linux$getDateStringGNU),
+    (void *)GET_SYSV_WRAPPER(AppPlatform_linux$getDateString),
     (void *)AppPlatform_linux$checkLicense,
     (void *)AppPlatform_linux$hasBuyButtonWhenInvalidLicense,
     (void *)AppPlatform_linux$uploadPlatformDependentData,
@@ -507,7 +507,7 @@ void *app_platform_vtable_0_8_0[] = {
     (void *)AppPlatform_linux$hasIDEProfiler,
     (void *)AppPlatform_linux$supportsVibration,
     (void *)AppPlatform_linux$vibrate,
-    (void *)GET_SYSV_WRAPPER(AppPlatform_linux$getPlatformStringVarGNU),
+    (void *)GET_SYSV_WRAPPER(AppPlatform_linux$getPlatformStringVar),
     (void *)AppPlatform_linux$showKeyboard,
     (void *)AppPlatform_linux$hideKeyboard,
     (void *)AppPlatform_linux$updateTextBoxText,
@@ -536,7 +536,7 @@ void *app_platform_vtable_0_9_0[] = {
     (void *)AppPlatform_linux$createUserInput,
     (void *)AppPlatform_linux$getUserInputStatus,
     (void *)GET_SYSV_WRAPPER(AppPlatform_linux$getUserInput),
-    (void *)GET_SYSV_WRAPPER(AppPlatform_linux$getDateStringGNU),
+    (void *)GET_SYSV_WRAPPER(AppPlatform_linux$getDateString),
     (void *)AppPlatform_linux$checkLicense,
     (void *)AppPlatform_linux$hasBuyButtonWhenInvalidLicense,
     (void *)AppPlatform_linux$uploadPlatformDependentData,
@@ -555,7 +555,7 @@ void *app_platform_vtable_0_9_0[] = {
     (void *)AppPlatform_linux$hasIDEProfiler,
     (void *)AppPlatform_linux$supportsVibration,
     (void *)AppPlatform_linux$vibrate,
-    (void *)GET_SYSV_WRAPPER(AppPlatform_linux$getPlatformStringVarGNU),
+    (void *)GET_SYSV_WRAPPER(AppPlatform_linux$getPlatformStringVar),
     (void *)AppPlatform_linux$showKeyboard,
     (void *)AppPlatform_linux$hideKeyboard,
     (void *)AppPlatform_linux$updateTextBoxText,
@@ -587,7 +587,7 @@ void *app_platform_vtable_0_10_0[] = {
     (void *)AppPlatform_linux$createUserInput,
     (void *)AppPlatform_linux$getUserInputStatus,
     (void *)GET_SYSV_WRAPPER(AppPlatform_linux$getUserInput),
-    (void *)GET_SYSV_WRAPPER(AppPlatform_linux$getDateStringGNU),
+    (void *)GET_SYSV_WRAPPER(AppPlatform_linux$getDateString),
     (void *)AppPlatform_linux$checkLicense,
     (void *)AppPlatform_linux$hasBuyButtonWhenInvalidLicense,
     (void *)AppPlatform_linux$saveImage,
@@ -608,7 +608,7 @@ void *app_platform_vtable_0_10_0[] = {
     (void *)AppPlatform_linux$hasIDEProfiler,
     (void *)AppPlatform_linux$supportsVibration,
     (void *)AppPlatform_linux$vibrate,
-    (void *)GET_SYSV_WRAPPER(AppPlatform_linux$getPlatformStringVarGNU),
+    (void *)GET_SYSV_WRAPPER(AppPlatform_linux$getPlatformStringVar),
     (void *)AppPlatform_linux$showKeyboard,
     (void *)AppPlatform_linux$hideKeyboard,
     (void *)AppPlatform_linux$updateTextBoxText,
@@ -629,7 +629,7 @@ void *app_platform_vtable_0_10_0[] = {
     (void *)AppPlatform_linux$updateStatsUserData,
 };
 
-void AppPlatform_linux$saveImage(AppPlatform_linux *app_platform, android_string_gnu_t *resource_path, android_string_gnu_t *pixels, int width, int height) {
+void AppPlatform_linux$saveImage(AppPlatform_linux *app_platform, android_string_t *resource_path, android_string_t *pixels, int width, int height) {
     //puts("debug: AppPlatform_linux::saveImage");
 }
 
@@ -638,11 +638,9 @@ void AppPlatform_linux$swapBuffers(AppPlatform_linux *app_platform) {
 }
 
 SYSV_WRAPPER(AppPlatform_linux$getModelName, 2)
-void AppPlatform_linux$getModelName(android_string_gnu_t *ret, AppPlatform_linux *app_platform) {
+void AppPlatform_linux$getModelName(android_string_t *ret, AppPlatform_linux *app_platform) {
     //puts("debug: AppPlatform_linux::getModelName");
-    android_string_t out;
-    android_string_cstr(&out, "Linux");
-    *ret = out.gnu;
+    android_string_cstr(ret, "Linux");
 }
 
 void AppPlatform_linux$captureScreen(AppPlatform_linux *app_platform, int width, int height, bool do_capture) {
@@ -661,9 +659,9 @@ void AppPlatform_linux$getBroadcastAddresses(android_vector_t *ret, AppPlatform_
     out._M_start = 0;
     out._M_finish = 0;
     out._M_end_of_storage = 0;
-    android_string_gnu_t str;
-    android_string_cstr((android_string_t *)&str, "0.0.0.0:19132");
-    android_vector_push_back(&out, &str, sizeof(str));
+    android_string_t str;
+    android_string_cstr(&str, "0.0.0.0:19132");
+    android_vector_push_back(&out, &str, android_string_tsize());
     *ret = out;
 }
 
@@ -701,20 +699,19 @@ void AppPlatform_linux$loadTGA_0_9_0(AppPlatform_linux *app_platform, image_data
 }
 
 SYSV_WRAPPER(AppPlatform_linux$getImagePath, 4)
-void AppPlatform_linux$getImagePath(android_string_gnu_t *ret, AppPlatform_linux *app_platform, android_string_t *resource_path, bool is_full) {
+void AppPlatform_linux$getImagePath(android_string_t *ret, AppPlatform_linux *app_platform, android_string_t *resource_path, bool is_full) {
     //puts("debug: AppPlatform_linux::getImagePath");
+    char *resource_path_c = android_string_to_str(resource_path);
     if (is_full) {
         char *str = (char *)malloc(1024);
         str[0] = '\0';
         getcwd(str, 1024);
         strcat(str, "/assets/images/");
-        strcat(str, android_string_to_str(resource_path));
-        android_string_t out;
-        android_string_cstr(&out, str);
+        strcat(str, resource_path_c);
+        android_string_cstr(ret, str);
         free(str);
-        *ret = out.gnu;
     } else {
-        *ret = resource_path->gnu;
+        android_string_cstr(ret, resource_path_c);
     }
 }
 
@@ -898,24 +895,12 @@ void AppPlatform_linux$finish(AppPlatform_linux *app_platform) {
     //puts("debug: AppPlatform_linux::finish");
 }
 
-SYSV_WRAPPER(AppPlatform_linux$getDateStringSTLP, 3)
-void AppPlatform_linux$getDateStringSTLP(android_string_stlp_t *ret, AppPlatform_linux *app_platform, unsigned int seconds) {
+SYSV_WRAPPER(AppPlatform_linux$getDateString, 3)
+void AppPlatform_linux$getDateString(android_string_t *ret, AppPlatform_linux *app_platform, unsigned int seconds) {
     //puts("debug: AppPlatform_linux::getDateString");
-    android_string_stlp_t str;
     char date[200];
     date_str(date, seconds);
-    android_string_cstr((android_string_t *)&str, date);
-    *ret = str;
-}
-
-SYSV_WRAPPER(AppPlatform_linux$getDateStringGNU, 3)
-void AppPlatform_linux$getDateStringGNU(android_string_gnu_t *ret, AppPlatform_linux *app_platform, unsigned int seconds) {
-    //puts("debug: AppPlatform_linux::getDateString");
-    android_string_gnu_t str;
-    char date[200];
-    date_str(date, seconds);
-    android_string_cstr((android_string_t *)&str, date);
-    *ret = str;
+    android_string_cstr(ret, date);
 }
 
 int AppPlatform_linux$getKeyFromKeyCode(AppPlatform_linux *app_platform, unsigned int key_code, unsigned int meta_state, unsigned int device_id) {
@@ -949,23 +934,11 @@ NINECRAFT_FLOAT_FUNC float AppPlatform_linux$getPixelsPerMillimeter(AppPlatform_
     return (((float)cw + (float)ch) * 0.5f ) / 25.4f;
 }
 
-SYSV_WRAPPER(AppPlatform_linux$getPlatformStringVarSTLP, 3)
-void AppPlatform_linux$getPlatformStringVarSTLP(android_string_stlp_t *ret, AppPlatform_linux *app_platform, int zero) {
+SYSV_WRAPPER(AppPlatform_linux$getPlatformStringVar, 3)
+void AppPlatform_linux$getPlatformStringVar(android_string_t *ret, AppPlatform_linux *app_platform, int zero) {
     //puts("debug: AppPlatform_linux::getPlatformStringVar");
-
     printf("%p\n", app_platform);
-
-    android_string_stlp_t str;
-    android_string_cstr((android_string_t *)&str, "Linux");
-    *ret = str;
-}
-
-SYSV_WRAPPER(AppPlatform_linux$getPlatformStringVarGNU, 3)
-void AppPlatform_linux$getPlatformStringVarGNU(android_string_gnu_t *ret, AppPlatform_linux *app_platform, int zero) {
-    //puts("debug: AppPlatform_linux::getPlatformStringVar");
-    android_string_gnu_t str;
-    android_string_cstr((android_string_t *)&str, "Linux");
-    *ret = str;
+    android_string_cstr(ret, "Linux");
 }
 
 int AppPlatform_linux$getScreenHeight(AppPlatform_linux *app_platform) {
@@ -1253,9 +1226,7 @@ void AppPlatform_linux$readAssetFile(asset_file *ret, AppPlatform_linux *app_pla
     if (!file) {
         free(path);
         printf("Error[%d] failed to read %s\n", errno, path);
-        android_string_cstr(&str, "");
-        free(path);
-        asset.data = 0;
+        asset.data = NULL;
         asset.size = -1;
         *ret = asset;
         return;
@@ -1272,13 +1243,14 @@ void AppPlatform_linux$readAssetFile(asset_file *ret, AppPlatform_linux *app_pla
 }
 
 SYSV_WRAPPER(AppPlatform_linux$readAssetFile_0_9_0, 3)
-void AppPlatform_linux$readAssetFile_0_9_0(android_string_gnu_t *ret, AppPlatform_linux *app_platform, android_string_t *path_str) {
+void AppPlatform_linux$readAssetFile_0_9_0(android_string_t *ret, AppPlatform_linux *app_platform, android_string_t *path_str) {
     asset_file asset;
     AppPlatform_linux$readAssetFile(&asset, app_platform, path_str);
-    //asset_file asset = AppPlatform_linux$readAssetFile(app_platform, path_str);;
-    android_string_gnu_t str;
-    android_string_cstrl((android_string_t *)&str, asset.data, asset.size);
-    *ret = str;
+    if (asset.data == NULL && asset.size == -1) {
+        android_string_cstr(ret, "");
+    } else {
+        android_string_cstrl(ret, asset.data, asset.size);
+    }
 }
 
 void AppPlatform_linux$saveScreenshot(AppPlatform_linux *app_platform, android_string_t *path, int width, int height) {
