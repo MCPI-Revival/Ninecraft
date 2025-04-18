@@ -289,7 +289,7 @@ static void set_ninecraft_size(int width, int height) {
         } else if (version_id == version_id_0_9_4) {
             screen_offset = NINECRAFTAPP_SCREEN_OFFSET_0_9_4;
         } else if (version_id == version_id_0_9_3) {
-            screen_offset = NINECRAFTAPP_SCREEN_OFFSET_0_9_3s;
+            screen_offset = NINECRAFTAPP_SCREEN_OFFSET_0_9_3;
         } else if (version_id == version_id_0_9_2) {
             screen_offset = NINECRAFTAPP_SCREEN_OFFSET_0_9_2;
         } else if (version_id == version_id_0_9_1) {

@@ -19,7 +19,7 @@ void *android_alloc_allocate(size_t *__np) {
     }
     void *data = malloc(__n);
     if (data == NULL) {
-        perror("Failed to allocate memeory with android_alloc");
+        perror("Failed to allocate memory with android_alloc");
         abort();
     }
     return data;
