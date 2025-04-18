@@ -25,7 +25,6 @@
 #include <ninecraft/android/android_alloc.h>
 #include <ninecraft/symbols.h>
 #include <ninecraft/AppPlatform_linux.h>
-#include <ninecraft/hooks.h>
 #include <ninecraft/minecraft.h>
 #include <ninecraft/input/keyboard.h>
 #include <ninecraft/input/mouse_device.h>
