@@ -284,7 +284,19 @@ static void set_ninecraft_size(int width, int height) {
         minecraft_set_size(ninecraft_app, width, height);
         // Scaling fix
         size_t screen_offset;
-        if (version_id == version_id_0_8_1) {
+        if (version_id == version_id_0_9_5) {
+            screen_offset = NINECRAFTAPP_SCREEN_OFFSET_0_9_5;
+        } else if (version_id == version_id_0_9_4) {
+            screen_offset = NINECRAFTAPP_SCREEN_OFFSET_0_9_4;
+        } else if (version_id == version_id_0_9_3) {
+            screen_offset = NINECRAFTAPP_SCREEN_OFFSET_0_9_3s;
+        } else if (version_id == version_id_0_9_2) {
+            screen_offset = NINECRAFTAPP_SCREEN_OFFSET_0_9_2;
+        } else if (version_id == version_id_0_9_1) {
+            screen_offset = NINECRAFTAPP_SCREEN_OFFSET_0_9_1;
+        } else if (version_id == version_id_0_9_0) {
+            screen_offset = NINECRAFTAPP_SCREEN_OFFSET_0_9_0;
+        } else if (version_id == version_id_0_8_1) {
             screen_offset = NINECRAFTAPP_SCREEN_OFFSET_0_8_1;
         } else if (version_id == version_id_0_8_0) {
             screen_offset = NINECRAFTAPP_SCREEN_OFFSET_0_8_0;
@@ -387,14 +399,16 @@ static void key_callback(GLFWwindow *window, int key, int scancode, int action, 
     } else {
         int game_keycode = getGameKeyCode(key);
         if (mouse_pointer_hidden && key == GLFW_KEY_LEFT_SHIFT) {
-            if (action == GLFW_PRESS) {
-                controller_states[0] = 1;
-            } else if (action == GLFW_RELEASE) {
-                controller_states[0] = 0;
+            if (controller_states) {
+                if (action == GLFW_PRESS) {
+                    controller_states[0] = 1;
+                } else if (action == GLFW_RELEASE) {
+                    controller_states[0] = 0;
+                }
             }
         } else if (mouse_pointer_hidden && key == GLFW_KEY_T) {
             if (action == GLFW_PRESS) {
-                if (version_id >= version_id_0_7_0 && version_id <= version_id_0_8_1) {
+                if (version_id >= version_id_0_7_0 && version_id <= version_id_0_9_5) {
                     size_t minecraft_screenchooser_offset;
                     if (version_id == version_id_0_7_0) {
                         minecraft_screenchooser_offset = MINECRAFT_SCREENCHOOSER_OFFSET_0_7_0;
@@ -414,8 +428,24 @@ static void key_callback(GLFWwindow *window, int key, int scancode, int action, 
                         minecraft_screenchooser_offset = MINECRAFT_SCREENCHOOSER_OFFSET_0_8_0;
                     } else if (version_id == version_id_0_8_1) {
                         minecraft_screenchooser_offset = MINECRAFT_SCREENCHOOSER_OFFSET_0_8_1;
+                    } else if (version_id == version_id_0_9_0) {
+                        minecraft_screenchooser_offset = MINECRAFT_SCREENCHOOSER_OFFSET_0_9_0;
+                    } else if (version_id == version_id_0_9_1) {
+                        minecraft_screenchooser_offset = MINECRAFT_SCREENCHOOSER_OFFSET_0_9_1;
+                    } else if (version_id == version_id_0_9_2) {
+                        minecraft_screenchooser_offset = MINECRAFT_SCREENCHOOSER_OFFSET_0_9_2;
+                    } else if (version_id == version_id_0_9_3) {
+                        minecraft_screenchooser_offset = MINECRAFT_SCREENCHOOSER_OFFSET_0_9_3;
+                    } else if (version_id == version_id_0_9_4) {
+                        minecraft_screenchooser_offset = MINECRAFT_SCREENCHOOSER_OFFSET_0_9_4;
+                    } else if (version_id == version_id_0_9_5) {
+                        minecraft_screenchooser_offset = MINECRAFT_SCREENCHOOSER_OFFSET_0_9_5;
                     }
-                    ((void (*)(void *, int))android_dlsym(handle, "_ZN13ScreenChooser9setScreenE8ScreenId"))((char *)ninecraft_app + minecraft_screenchooser_offset, 7);
+                    if (version_id >= version_id_0_9_0) {
+                        ((void (*)(void *, int))android_dlsym(handle, "_ZN13ScreenChooser9setScreenE8ScreenId"))((char *)ninecraft_app + minecraft_screenchooser_offset, 5);
+                    } else {
+                        ((void (*)(void *, int))android_dlsym(handle, "_ZN13ScreenChooser9setScreenE8ScreenId"))((char *)ninecraft_app + minecraft_screenchooser_offset, 7);
+                    }
                 } else if (version_id >= version_id_0_1_0 && version_id <= version_id_0_6_1) {
                     void *chat_screen = chat_screen_create();
                     if (chat_screen) {
@@ -724,7 +754,7 @@ int main(int argc, char **argv) {
 
     static android_string_t in;
     android_string_cstr(&in, "v%d.%d.%d alpha");
-#ifdef _MSC_VER
+#ifdef _WIN32 
     void (__stdcall *get_game_version_string)(android_string_t *, android_string_t *) = (void (__stdcall *)(android_string_t *, android_string_t *))android_dlsym(handle, "_ZN6Common20getGameVersionStringERKSs");
 
     void (__stdcall *get_game_version_string_2)(android_string_t *) = (void (__stdcall *)(android_string_t *))android_dlsym(handle, "_ZN6Common20getGameVersionStringEv");
@@ -1236,9 +1266,11 @@ int main(int argc, char **argv) {
             }
         }
         if (mouse_pointer_hidden) {
-            controller_states[1] = 1;
-            controller_y_stick[1] = (float)(y_cam - 180.0) * 0.0055555557;
-            controller_x_stick[1] = ((float)((x_cam - 483.0)) * 0.0020703934);
+            if (controller_states && controller_y_stick && controller_x_stick) {
+                controller_states[1] = 1;
+                controller_y_stick[1] = (float)(y_cam - 180.0) * 0.0055555557;
+                controller_x_stick[1] = ((float)((x_cam - 483.0)) * 0.0020703934);
+            }
         }
         if (version_id >= version_id_0_10_0) {
             minecraft_update(ninecraft_app);
