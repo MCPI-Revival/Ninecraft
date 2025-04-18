@@ -1,14 +1,6 @@
 cmake_minimum_required(VERSION 3.1)
 project(ninecraft)
 
-if(CMAKE_SYSTEM_PROCESSOR MATCHES "(arm)|(armhf)|(aarch64)|(arm64)")
-    set(IS_ARM_BUILD TRUE)
-    set(IS_ARMHF_BUILD TRUE)
-else()
-    set(IS_ARM_BUILD FALSE)
-endif()
-
-include_directories(${PROJECT_SOURCE_DIR}/minivorbis)
 include_directories(${PROJECT_SOURCE_DIR}/stb)
 
 add_subdirectory(glad/cmake)
@@ -21,5 +13,3 @@ if(WIN32)
     add_subdirectory(openal-soft)
 endif()
 add_subdirectory(ninecraft)
-
-include_directories(${PROJECT_SOURCE_DIR}/libhybris/include)

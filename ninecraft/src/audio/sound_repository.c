@@ -1,7 +1,6 @@
-#define OGG_IMPL
-#define VORBIS_IMPL
-#include <minivorbis.h>
 #include <ninecraft/audio/sound_repository.h>
+#define STB_VORBIS_HEADER_ONLY
+#include <stb_vorbis.c>
 #include <string.h>
 #include <stdlib.h>
 #include <time.h>
@@ -687,30 +686,12 @@ ninecraft_sound_resource_t *ninecraft_get_sound_buffer(char *name) {
                 getcwd(path, 1024);
                 strcat(path, "/res/raw/");
                 strcat(path, resource->name);
-                FILE *fp = fopen(path, "rb");
-                if (fp != NULL) {
-                    OggVorbis_File vorbis;
-                    if (ov_open_callbacks(fp, &vorbis, NULL, 0, OV_CALLBACKS_DEFAULT) == 0) {
-                        vorbis_info* info = ov_info(&vorbis, -1);
-                        resource->bits_per_sample = 16;
-                        resource->num_channels = info->channels;
-                        resource->freq = info->rate;
-                        resource->buffer_size = ov_pcm_total(&vorbis, -1) * info->channels * 2;
-                        resource->buffer = (uint8_t *)malloc(resource->buffer_size);
-
-                        long size = 0;
-                        size_t offset = 0;
-                        int sel = 0;
-                        while ((size = ov_read(&vorbis, resource->buffer + offset, resource->buffer_size, 0, 2, 1, &sel)) != 0) {
-                            if (size < 0) {
-                                puts("[SOUND_REPOSITORY] Broken audio sample.");
-                            }
-                            offset += (size_t)size;
-                        }
-                    }
-                    ov_clear(&vorbis);
+                int samples_count = stb_vorbis_decode_filename(path, &resource->num_channels, &resource->freq, (short **)&resource->buffer);
+                if (samples_count != -1) {
+                    resource->buffer_size = samples_count * resource->num_channels * 2;
+                } else {
+                    memset(resource, 0, sizeof(ninecraft_sound_resource_t));
                 }
-                free(path);
             }
             return resource;
         }
