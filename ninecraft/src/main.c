@@ -339,27 +339,22 @@ static void char_callback(GLFWwindow *window, unsigned int codepoint) {
         if (version_id >= version_id_0_6_0 && version_id <= version_id_0_7_1) {
             keyboard_feed_text_0_6_0((char)codepoint);
         } else if (version_id >= version_id_0_7_2) {
-            // char p_codepoint[2] = {(char)codepoint, '\0'};
-            char p_codepoint[5];
+            char p_codepoint[5] = {'\0', '\0', '\0', '\0', '\0'};
 
             if (codepoint <= 0x7f) {
                 p_codepoint[0] = (char)codepoint;
-                p_codepoint[1] = '\x00';
             } else if (codepoint <= 0x7fff) {
                 p_codepoint[0] = (char)(0xc0 | ((codepoint >> 6) & 0x1f));
                 p_codepoint[1] = (char)(0x80 | ((codepoint & 0x3f)));
-                p_codepoint[2] = '\x00';
             } else if (codepoint <= 0xffff) {
                 p_codepoint[0] = (char)(0xe0 | ((codepoint >> 12) & 0x0f));
                 p_codepoint[1] = (char)(0x80 | ((codepoint >> 6) & 0x3f));
                 p_codepoint[2] = (char)(0x80 | (codepoint & 0x3f));
-                p_codepoint[3] = '\x00';
             } else {
                 p_codepoint[0] = (char)(0xf0 | ((codepoint >> 18) & 0x07));
                 p_codepoint[1] = (char)(0x80 | ((codepoint >> 12) & 0x3f));
                 p_codepoint[2] = (char)(0x80 | ((codepoint >> 6) & 0x3f));
                 p_codepoint[3] = (char)(0x80 | (codepoint & 0x3f));
-                p_codepoint[4] = '\x00';
             }
 
             android_string_t str;
@@ -587,30 +582,6 @@ void gles_hook() {
     add_custom_hook("glVertexAttribPointer", (void *)gl_vertex_attrib_pointer);
 }
 
-#ifdef __arm__
-
-extern void __aeabi_uidiv();
-
-extern void __aeabi_atexit();
-
-extern void __aeabi_d2ulz();
-
-extern void __aeabi_uidivmod();
-
-extern void __aeabi_uldivmod();
-
-extern void __aeabi_ldivmod();
-
-extern void __aeabi_ul2d();
-
-extern void __aeabi_idivmod();
-
-extern void __aeabi_idiv();
-
-extern void __aeabi_ul2f();
-
-#endif
-
 int __my_srget(FILE *astream) {
     puts("__srget");
     return EOF;
@@ -696,7 +667,6 @@ int main(int argc, char **argv) {
     ninecraft_set_default_options(&platform_options, "options.txt");
 
     if (!glfwInit()) {
-        // Initialization failed
         puts("init failed");
         return 1;
     }
@@ -704,8 +674,7 @@ int main(int argc, char **argv) {
     glfwWindowHint(GLFW_CLIENT_API, GLFW_OPENGL_API);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 2);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
-    //glfwWindowHint(GLFW_OPENGL_PROFILE, GLFW_OPENGL_CORE_PROFILE);
-    //glfwWindowHint(GLFW_OPENGL_FORWARD_COMPAT, GL_TRUE);
+
     glfwWindowHint(GLFW_CONTEXT_CREATION_API, GLFW_NATIVE_CONTEXT_API);
     _window = glfwCreateWindow(720, 480, "Ninecraft", NULL, NULL);
     if (!_window) {

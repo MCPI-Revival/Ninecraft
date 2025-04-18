@@ -4,7 +4,7 @@
 #include <ninecraft/android/android_vector.h>
 
 typedef struct {
-    void *vtable;
+    int event_index;
     short x;
     short y;
     short old_x;
@@ -15,7 +15,7 @@ typedef struct {
 } mouse_device_0_5_t;
 
 typedef struct {
-    void *vtable;
+    int event_index;
     short x;
     short y;
     short dx;
