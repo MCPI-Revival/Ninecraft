@@ -9,7 +9,7 @@
 
 #if defined(__i386__) || defined(_M_IX86)
 
-#define INST_NOP 0x9090
+#define INST_PATCH 0x9090
 #define OFFSET_FOR_0_9_0 79
 #define OFFSET_FOR_0_9_1 79
 #define OFFSET_FOR_0_9_2 79
@@ -20,13 +20,13 @@
 #else
 #if defined(__arm__) || defined(_M_ARM) 
 
-#define INST_NOP 0xbf00
-#define OFFSET_FOR_0_9_0 43
-#define OFFSET_FOR_0_9_1 43
-#define OFFSET_FOR_0_9_2 43
-#define OFFSET_FOR_0_9_3 43
-#define OFFSET_FOR_0_9_4 43
-#define OFFSET_FOR_0_9_5 43
+#define INST_PATCH 0x2001
+#define OFFSET_FOR_0_9_0 41
+#define OFFSET_FOR_0_9_1 41
+#define OFFSET_FOR_0_9_2 41
+#define OFFSET_FOR_0_9_3 41
+#define OFFSET_FOR_0_9_4 41
+#define OFFSET_FOR_0_9_5 41
 
 #endif
 #endif
@@ -36,17 +36,17 @@ void header_buttons_fix_mod_inject(void *handle, int version_id) {
         char *play_screen_reset_base_buttons = (char *)android_dlsym(handle, "_ZN10PlayScreen16resetBaseButtonsEv");
         if (play_screen_reset_base_buttons) {
             if (version_id == version_id_0_9_0) {
-                *(short *)(play_screen_reset_base_buttons + OFFSET_FOR_0_9_0) = INST_NOP;
+                *(short *)(play_screen_reset_base_buttons + OFFSET_FOR_0_9_0) = INST_PATCH;
             } else if (version_id == version_id_0_9_1) {
-                *(short *)(play_screen_reset_base_buttons + OFFSET_FOR_0_9_1) = INST_NOP;
+                *(short *)(play_screen_reset_base_buttons + OFFSET_FOR_0_9_1) = INST_PATCH;
             } else if (version_id == version_id_0_9_2) {
-                *(short *)(play_screen_reset_base_buttons + OFFSET_FOR_0_9_2) = INST_NOP;
+                *(short *)(play_screen_reset_base_buttons + OFFSET_FOR_0_9_2) = INST_PATCH;
             } else if (version_id == version_id_0_9_3) {
-                *(short *)(play_screen_reset_base_buttons + OFFSET_FOR_0_9_3) = INST_NOP;
+                *(short *)(play_screen_reset_base_buttons + OFFSET_FOR_0_9_3) = INST_PATCH;
             } else if (version_id == version_id_0_9_4) {
-                *(short *)(play_screen_reset_base_buttons + OFFSET_FOR_0_9_4) = INST_NOP;
+                *(short *)(play_screen_reset_base_buttons + OFFSET_FOR_0_9_4) = INST_PATCH;
             } else if (version_id == version_id_0_9_5) {
-                *(short *)(play_screen_reset_base_buttons + OFFSET_FOR_0_9_5) = INST_NOP;
+                *(short *)(play_screen_reset_base_buttons + OFFSET_FOR_0_9_5) = INST_PATCH;
             }
         }
     }
