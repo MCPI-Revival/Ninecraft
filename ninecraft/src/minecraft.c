@@ -38,6 +38,7 @@ chat_packet_deconstruct_t chat_packet_deconstruct = NULL;
 message_packet_deconstruct_t message_packet_deconstruct = NULL;
 raknet_instance_is_server_t raknet_instance_is_server = NULL;
 gui_add_message_t gui_add_message = NULL;
+options_set_key_t options_set_key = NULL;
 
 uintptr_t get_ninecraftapp_external_storage_offset(int version_id) {
     if (version_id == version_id_0_1_0) {
@@ -308,4 +309,5 @@ void minecraft_setup_hooks(void *handle) {
     message_packet_deconstruct = (message_packet_deconstruct_t)android_dlsym(handle, "_ZN13MessagePacketD0Ev");
     raknet_instance_is_server = (raknet_instance_is_server_t)android_dlsym(handle, "_ZN14RakNetInstance8isServerEv");
     gui_add_message = (gui_add_message_t)android_dlsym(handle, "_ZN3Gui10addMessageERKSs");
+    options_set_key = (options_set_key_t)android_dlsym(handle, "_ZN7Options6setKeyEii");
 }

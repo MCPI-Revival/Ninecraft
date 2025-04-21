@@ -34,6 +34,31 @@
 #define MINECRAFT_RAKNET_INSTANCE_OFFSET_0_6_0 0x2bc
 #define MINECRAFT_RAKNET_INSTANCE_OFFSET_0_6_1 0x2bc
 
+#define MINECRAFT_OPTIONS_OFFSET_0_5_0 0x28
+#define MINECRAFT_OPTIONS_OFFSET_0_5_0_J 0x28
+#define MINECRAFT_OPTIONS_OFFSET_0_6_0 0x28
+#define MINECRAFT_OPTIONS_OFFSET_0_6_1 0x28
+#define MINECRAFT_OPTIONS_OFFSET_0_7_0 0x3c
+#define MINECRAFT_OPTIONS_OFFSET_0_7_1 0x3c
+#define MINECRAFT_OPTIONS_OFFSET_0_7_2 0x3c
+#define MINECRAFT_OPTIONS_OFFSET_0_7_3 0x3c
+#define MINECRAFT_OPTIONS_OFFSET_0_7_4 0x3c
+#define MINECRAFT_OPTIONS_OFFSET_0_7_5 0x3c
+#define MINECRAFT_OPTIONS_OFFSET_0_7_6 0x3c
+#define MINECRAFT_OPTIONS_OFFSET_0_8_0 0x3c
+#define MINECRAFT_OPTIONS_OFFSET_0_8_1 0x3c
+#define MINECRAFT_OPTIONS_OFFSET_0_9_0 0x4c
+#define MINECRAFT_OPTIONS_OFFSET_0_9_1 0x4c
+#define MINECRAFT_OPTIONS_OFFSET_0_9_2 0x4c
+#define MINECRAFT_OPTIONS_OFFSET_0_9_3 0x4c
+#define MINECRAFT_OPTIONS_OFFSET_0_9_4 0x4c
+#define MINECRAFT_OPTIONS_OFFSET_0_9_5 0x38
+
+#define OPTIONS_KEYS_OFFSET_0_5_0 0x1f8
+#define OPTIONS_KEYS_OFFSET_0_5_0_J 0xa4
+#define OPTIONS_KEYS_OFFSET_0_6_0 0x1f8
+#define OPTIONS_KEYS_OFFSET_0_6_1 0x1f8
+
 #define MINECRAFT_COMMANDSERVER_OFFSET_0_6_0 0xe5c
 #define MINECRAFT_COMMANDSERVER_OFFSET_0_6_1 0xe5c
 #if defined(__i386__) || defined(_M_IX86)
@@ -533,6 +558,10 @@ extern raknet_instance_is_server_t raknet_instance_is_server;
 typedef void *(*gui_add_message_t)(void *gui, android_string_t *message);
 
 extern gui_add_message_t gui_add_message;
+
+typedef void *(*options_set_key_t)(void *options, int key, int value);
+
+extern options_set_key_t options_set_key;
 
 extern void minecraft_setup_hooks(void *handle);
 
