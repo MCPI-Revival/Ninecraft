@@ -646,43 +646,6 @@ void piapi_init() {
     command_server_init(command_server, 4711);
 }
 
-typedef struct {
-    void **vtable;
-    float h_pos;
-    float v_pos;
-    bool unknown0;
-    bool is_jumping;
-    bool is_sneaking;
-    bool is_flying_up;
-    bool is_flying_down;
-    bool unknown5;
-    bool forward_pressed;
-    bool back_pressed;
-    bool left_pressed;
-    bool right_pressed;
-    bool jump_pressed;
-    bool sneak_pressed;
-    bool crafting_pressed;
-    bool unknown13;
-    bool unknown14;
-    bool unknown15;
-    void *options;
-} keyboard_input_t;
-
-void xperia_play_input_tick(keyboard_input_t *__this, void *player) {
-    ((void (*)(keyboard_input_t *, void *))android_dlsym(handle, "_ZN13KeyboardInput4tickEP6Player"))(__this, player);
-    if (__this->jump_pressed) {
-        __this->is_flying_up = true;
-    } else {
-        __this->is_flying_up = false;
-    }
-    if (__this->sneak_pressed) {
-        __this->is_flying_down = true;
-    } else {
-        __this->is_flying_down = false;
-    }
-}
-
 int main(int argc, char **argv) {
     printf("sizeof wchar: %d\n", sizeof(wchar_t));
     android_linker_init();
@@ -1157,6 +1120,7 @@ int main(int argc, char **argv) {
     } else {
         set_ninecraft_size_0_1_0(720, 480);
     }
+
     int minecraft_options_offset = 0;
     if (version_id == version_id_0_5_0) {
         minecraft_options_offset = MINECRAFT_OPTIONS_OFFSET_0_5_0;
@@ -1201,11 +1165,6 @@ int main(int argc, char **argv) {
     char *minecraft_options = (char *)ninecraft_app + minecraft_options_offset;
 
     if (version_id >= version_id_0_5_0 && version_id <= version_id_0_9_5 && minecraft_options_offset) {
-        if (version_id >= version_id_0_5_0 && version_id <= version_id_0_8_1) {
-            ((void **)android_dlsym(handle, "_ZTV15XperiaPlayInput"))[4] = xperia_play_input_tick;
-        } else {
-            ((void **)android_dlsym(handle, "_ZTV19ControllerMoveInput"))[4] = xperia_play_input_tick;
-        }
         if (version_id >= version_id_0_7_0 && options_set_key) {
             options_set_key((void *)minecraft_options, MCKEY_ID_SNEAK, MCKEY_SNEAK);
             options_set_key((void *)minecraft_options, MCKEY_ID_DROP, MCKEY_DROP);

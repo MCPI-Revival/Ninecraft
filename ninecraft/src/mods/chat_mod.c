@@ -1,6 +1,5 @@
 #include <ninecraft/version_ids.h>
 #include <ninecraft/minecraft.h>
-#include <ninecraft/patch/detours.h>
 #include <ninecraft/mods/chat_mod.h>
 #include <ninecraft/android/android_string.h>
 #include <stdio.h>
