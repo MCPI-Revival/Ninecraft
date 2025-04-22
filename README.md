@@ -63,13 +63,17 @@ dnf install git make cmake gcc g++ openal-soft-devel libX11-devel libXrandr-deve
 ```
 ## Compiling on windows
 ### mingw32 & llvm-mingw
+```
 git clone --recursive http://github.com/MCPI-Revival/Ninecraft.git
 cd Ninecraft
 .\compile.bat
+```
 ### Visual Studio 2022 build tools
+```
 git clone --recursive http://github.com/MCPI-Revival/Ninecraft.git
 cd Ninecraft
 .\compile-msvc.bat
+```
 ## Compiling on linux
 ### x86_64 & x86:
 ```
