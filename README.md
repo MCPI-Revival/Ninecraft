@@ -1,8 +1,10 @@
 # Ninecraft
 
-![alt screenshot](https://raw.githubusercontent.com/MCPI-Revival/Ninecraft/master/screenshots/Screenshot%20from%202022-09-10%2000-45-48.png)
+![alt screenshot](https://raw.githubusercontent.com/MCPI-Revival/Ninecraft/master/screenshots/0.6.1-menu.png)
 
 ## Installing compile dependencies
+### Microsoft Windows:
+To compile Ninecraft on Windows, you'll need either MinGW32, LLVM-MinGW, or the Visual Studio 2022 Build Tools. CMake and Git are also required.
 ### Debian/Ubuntu:
 x86_64:
 ```
@@ -59,7 +61,16 @@ arm:
 dnf update
 dnf install git make cmake gcc g++ openal-soft-devel libX11-devel libXrandr-devel libXinerama-devel libXcursor-devel libXi-devel libglvnd-devel zenity unzip
 ```
-## Compiling
+## Compiling on windows
+### mingw32 & llvm-mingw
+git clone --recursive http://github.com/MCPI-Revival/Ninecraft.git
+cd Ninecraft
+.\compile.bat
+### Visual Studio 2022 build tools
+git clone --recursive http://github.com/MCPI-Revival/Ninecraft.git
+cd Ninecraft
+.\compile-msvc.bat
+## Compiling on linux
 ### x86_64 & x86:
 ```
 git clone --recursive http://github.com/MCPI-Revival/Ninecraft.git
@@ -86,32 +97,4 @@ make build-arm
 ### arm64 & arm
 ```
 ./build-arm/ninecraft/ninecraft
-```
-
-## Creating mods
-### Example mod
-```c
-#include <stdio.h>
-
-extern void *handle;
-extern void *ninecraft_app;
-
-int mod_init() {
-    puts("TEST > Loaded mod");
-}
-```
-### Compiling
-
-To compile you must include the ninecraft header files
-in your project's root directory
-
-#### x86
-```
-gcc -m32 -c -fpic -I./ninecraft/include test.c
-gcc -m32 -shared -o mods/libtest.so test.o
-```
-#### ARM
-```
-gcc -mthumb -c -fpic -I./ninecraft/include test.c
-gcc -mthumb -shared -o mods/libtest.so test.o
 ```
