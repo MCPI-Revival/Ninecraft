@@ -51,6 +51,7 @@
 
 void *handle = NULL;
 GLFWwindow *_window = NULL;
+bool ctrl_pressed = false;
 
 int default_mouse_mode = GLFW_CURSOR_NORMAL;
 
@@ -395,8 +396,93 @@ static void key_callback(GLFWwindow *window, int key, int scancode, int action, 
             }
         }
     } else {
+        if (key == GLFW_KEY_LEFT_CONTROL) {
+            if (action == GLFW_PRESS) {
+                ctrl_pressed = true;
+            } else if (action == GLFW_RELEASE) {
+                ctrl_pressed = false;
+            }
+        }
         int game_keycode = getGameKeyCode(key);
-        if (mouse_pointer_hidden && key == GLFW_KEY_LEFT_SHIFT && version_id <= version_id_0_4_0_j) {
+        if (key == GLFW_KEY_Q && action == GLFW_PRESS && mouse_pointer_hidden && version_id >= version_id_0_5_0 && version_id <= version_id_0_8_1) {
+            size_t player_offset, inventory_offset;
+            if (version_id == version_id_0_5_0) {
+                player_offset = MINECRAFT_LOCAL_PLAYER_OFFSET_0_5_0;
+                inventory_offset = PLAYER_INVENTORY_OFFSET_0_5_0;
+            } else if (version_id == version_id_0_5_0_j) {
+                player_offset = MINECRAFT_LOCAL_PLAYER_OFFSET_0_5_0_J;
+                inventory_offset = PLAYER_INVENTORY_OFFSET_0_5_0_J;
+            } else if (version_id == version_id_0_6_0) {
+                player_offset = MINECRAFT_LOCAL_PLAYER_OFFSET_0_6_0;
+                inventory_offset = PLAYER_INVENTORY_OFFSET_0_6_0;
+            } else if (version_id == version_id_0_6_1) {
+                player_offset = MINECRAFT_LOCAL_PLAYER_OFFSET_0_6_1;
+                inventory_offset = PLAYER_INVENTORY_OFFSET_0_6_1;
+            } else if (version_id == version_id_0_7_0) {
+                player_offset = MINECRAFT_LOCAL_PLAYER_OFFSET_0_7_0;
+                inventory_offset = PLAYER_INVENTORY_OFFSET_0_7_0;
+            } else if (version_id == version_id_0_7_1) {
+                player_offset = MINECRAFT_LOCAL_PLAYER_OFFSET_0_7_1;
+                inventory_offset = PLAYER_INVENTORY_OFFSET_0_7_1;
+            } else if (version_id == version_id_0_7_2) {
+                player_offset = MINECRAFT_LOCAL_PLAYER_OFFSET_0_7_2;
+                inventory_offset = PLAYER_INVENTORY_OFFSET_0_7_2;
+            } else if (version_id == version_id_0_7_3) {
+                player_offset = MINECRAFT_LOCAL_PLAYER_OFFSET_0_7_3;
+                inventory_offset = PLAYER_INVENTORY_OFFSET_0_7_3;
+            } else if (version_id == version_id_0_7_4) {
+                player_offset = MINECRAFT_LOCAL_PLAYER_OFFSET_0_7_4;
+                inventory_offset = PLAYER_INVENTORY_OFFSET_0_7_4;
+            } else if (version_id == version_id_0_7_5) {
+                player_offset = MINECRAFT_LOCAL_PLAYER_OFFSET_0_7_5;
+                inventory_offset = PLAYER_INVENTORY_OFFSET_0_7_5;
+            } else if (version_id == version_id_0_7_6) {
+                player_offset = MINECRAFT_LOCAL_PLAYER_OFFSET_0_7_6;
+                inventory_offset = PLAYER_INVENTORY_OFFSET_0_7_6;
+            } else if (version_id == version_id_0_8_0) {
+                player_offset = MINECRAFT_LOCAL_PLAYER_OFFSET_0_8_0;
+                inventory_offset = PLAYER_INVENTORY_OFFSET_0_8_0;
+            } else if (version_id == version_id_0_8_1) {
+                player_offset = MINECRAFT_LOCAL_PLAYER_OFFSET_0_8_1;
+                inventory_offset = PLAYER_INVENTORY_OFFSET_0_8_1;
+            }
+            void *player = *(void **)((char *)ninecraft_app + player_offset);
+            if (player) {
+                bool is_creative = ((bool (*)(void *))android_dlsym(handle, "_ZN9Minecraft14isCreativeModeEv"))(ninecraft_app);
+                if (!is_creative) {
+                    void *player_inventory = *(void **)((char *)player + inventory_offset);
+                    void *item_instance = ((void *(*)(void *))android_dlsym(handle, "_ZN9Inventory11getSelectedEv"))(player_inventory);
+                    if (item_instance) {
+                        bool is_empty = ((bool (*)(void *))android_dlsym(handle, "_ZNK12ItemInstance6isNullEv"))(item_instance);
+                        if (!is_empty) {
+                            void *item_instance_copy = ((void *(*)(void *, void *))android_dlsym(handle, "_ZN12ItemInstance5cloneEPKS_"))(item_instance, NULL);
+                            if (!ctrl_pressed) {
+                                *(int *)item_instance_copy = 1;
+                                *(int *)item_instance -= 1;
+                            }
+
+                            if (*(int *)item_instance < 1 || ctrl_pressed) {
+                                android_vector_t *slots = ((android_vector_t *(*)(void *))android_dlsym(handle, "_ZN16FillingContainer11getSlotListERi"))(player_inventory);
+                                size_t slot = 0;
+                                for (; slot < android_vector_size(slots, sizeof(void *)); ++slot) {
+                                    if (*(void **)android_vector_at(slots, slot, sizeof(void *)) == item_instance) {
+                                        break;
+                                    }
+                                }
+                                ((void (*)(void *, int))android_dlsym(handle, "_ZN16FillingContainer7releaseEi"))(player_inventory, slot);
+                                ((void (*)(void *, int))android_dlsym(handle, "_ZN16FillingContainer22compressLinkedSlotListEi"))(player_inventory, slot);
+                            }
+
+                            if (version_id >= version_id_0_5_0 && version_id <= version_id_0_7_1) {
+                                ((void (*)(void *, void *, bool))android_dlsym(handle, "_ZN11LocalPlayer4dropEP12ItemInstanceb"))(player, item_instance_copy, false);
+                            } else if (version_id >= version_id_0_7_2 && version_id <= version_id_0_8_1) {
+                                ((void (*)(void *, void *, bool))android_dlsym(handle, "_ZN11LocalPlayer4dropEPK12ItemInstanceb"))(player, item_instance_copy, false);
+                            }
+                        }
+                    }
+                }
+            }         
+        } else if (mouse_pointer_hidden && key == GLFW_KEY_LEFT_SHIFT && version_id <= version_id_0_4_0_j) {
             if (controller_states) {
                 if (action == GLFW_PRESS) {
                     controller_states[0] = 1;

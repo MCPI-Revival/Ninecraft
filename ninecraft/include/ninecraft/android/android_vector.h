@@ -25,6 +25,6 @@ extern void android_vector_push_back(android_vector_t *this_vector, void *item, 
 
 extern size_t android_vector_size(android_vector_t *vec, size_t __entry_size);
 
-void *android_vector_at(android_vector_t *vec, size_t index, size_t __entry_size);
+extern void *android_vector_at(android_vector_t *vec, size_t index, size_t __entry_size);
 
 #endif
