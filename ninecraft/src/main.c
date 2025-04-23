@@ -215,7 +215,7 @@ int getGameKeyCode(int keycode) {
         return MCKEY_BACK;
     } else if (keycode == GLFW_KEY_D) {
         return MCKEY_RIGHT;
-    } else if (keycode == GLFW_KEY_SPACE) {
+    } else if (keycode == GLFW_KEY_SPACE && !is_keyboard_visible) {
         return MCKEY_JUMP;
     } else if (keycode == GLFW_KEY_E) {
         return MCKEY_INVENTORY;
