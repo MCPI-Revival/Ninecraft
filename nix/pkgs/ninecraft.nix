@@ -62,7 +62,7 @@
 
     if [[ -z "$VERSION" ]]; then
       if [[ ! -d "lib" ]]; then
-        VERSION=0.4.0
+        VERSION=0.5.0
       fi
     fi
 
@@ -71,7 +71,7 @@
         rm mcpe.apk
       fi
       rm -rf assets res lib
-      export URL="https://archive.org/download/MCPEAlpha/PE-a''${VERSION:-0.4.0}-''${ARCH:-x86}.apk"
+      export URL="https://archive.org/download/MCPEAlpha/PE-a''${VERSION}-''${ARCH:-x86}.apk"
       echo "Downloading Minecraft PE $VERSION from $URL..."
       ${curl}/bin/curl -L --output mcpe.apk "$URL"
 
