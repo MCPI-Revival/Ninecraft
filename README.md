@@ -4,7 +4,8 @@
 
 ## Installing compile dependencies
 ### Microsoft Windows:
-To compile Ninecraft on Windows, you'll need either MinGW32, LLVM-MinGW, or the Visual Studio 2022 Build Tools. CMake and Git are also required.
+To compile Ninecraft on Windows, you'll need either MinGW32, LLVM-MinGW, or the Visual Studio 2022 Build Tools. CMake, Python and Git are also required.
+After python is installed you must run `pip install jinja2`
 ### Debian/Ubuntu:
 x86_64:
 ```
