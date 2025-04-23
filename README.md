@@ -64,7 +64,9 @@ dnf install git make cmake gcc g++ openal-soft-devel libX11-devel libXrandr-deve
 ```
 
 ### Nix/NixOS
-you can skip the cloning and go straight to [#before-running-for-the-first-time](#before-running-for-the-first-time)
+```
+nix --extra-experimental-features "nix-command flakes" shell 'git+https://github.com/MCPI-Revival/Ninecraft.?submodules=1'
+```
 
 ## Compiling on windows
 ### mingw32 & llvm-mingw
@@ -99,7 +101,7 @@ make build-arm
 ```
 ### on nix
 ```
-nix --extra-experimental-features "nix-command flakes" run 'git+https://github.com/MCPI-Revival/Ninecraft.?submodules=1'#extract  /path/to/your/apk
+ninecraft-extract
 ```
 
 ## Running
@@ -113,5 +115,5 @@ nix --extra-experimental-features "nix-command flakes" run 'git+https://github.c
 ```
 ### NixOS (eventialy be both arm and x86, also Windows and Mac)
 ```sh
-nix --extra-experimental-features "nix-command flakes" run 'git+https://github.com/MCPI-Revival/Ninecraft.?submodules=1'
+ninecraft (optional version)
 ```
