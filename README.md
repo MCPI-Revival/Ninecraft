@@ -113,7 +113,7 @@ ninecraft-extract
 ```
 ./build-arm/ninecraft/ninecraft
 ```
-### NixOS (eventialy be both arm and x86, also Windows and Mac)
+### NixOS (eventually be both arm and x86, also Windows and Mac)
 ```sh
 ninecraft (optional version)
 ```
