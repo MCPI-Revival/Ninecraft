@@ -23,7 +23,6 @@
     in {
       packages = rec {
         extract = pkgs.callPackage ./nix/pkgs/extract.nix {};
-        patch = pkgs.callPackage ./nix/pkgs/patch.nix {};
         ninecraft = pkgs.pkgsi686Linux.callPackage ./nix/pkgs/ninecraft.nix {
           ninecraft-extract = extract;
         };
