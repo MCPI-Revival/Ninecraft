@@ -1,12 +1,13 @@
-{stdenv,
-pkg-config,
-cmake,
-xorg,
-python312,
-python312Packages,
-openal,
-glfw,
-zlib
+{
+  stdenv,
+  pkg-config,
+  cmake,
+  xorg,
+  python312,
+  python312Packages,
+  openal,
+  glfw,
+  zlib,
 }:
 stdenv.mkDerivation {
   name = "ninecraft";
@@ -29,11 +30,10 @@ stdenv.mkDerivation {
 
     glfw
     zlib
-
   ];
   installPhase = ''
-  mkdir -p $out/{bin,var/lib/ninecraft}
-  cp -r ninecraft/ninecraft $out/bin
-  cp -r $src/internal_overrides $out/var/lib/ninecraft
+    mkdir -p $out/{bin,var/lib/ninecraft}
+    cp -r ninecraft/ninecraft $out/bin
+    cp -r $src/internal_overrides $out/var/lib/ninecraft
   '';
 }
