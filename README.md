@@ -62,6 +62,10 @@ arm:
 dnf update
 dnf install git make cmake gcc g++ openal-soft-devel libX11-devel libXrandr-devel libXinerama-devel libXcursor-devel libXi-devel libglvnd-devel zenity unzip
 ```
+
+### Nix/NixOS
+you can skip the cloning and go straight to [[#before-running-for-the-first-time]]
+
 ## Compiling on windows
 ### mingw32 & llvm-mingw
 ```
@@ -93,6 +97,10 @@ make build-arm
 ```
 ./tools/extract.sh /path/to/your/apk
 ```
+### on nix
+```
+nix --extra-experimental-features "nix-command flakes" run 'github:MCPI-Revival/Ninecraft.?submodules=1'#extract  /path/to/your/apk
+```
 
 ## Running
 ### x86_64 & x86:
@@ -103,7 +111,7 @@ make build-arm
 ```
 ./build-arm/ninecraft/ninecraft
 ```
-### NixOS (eventialy be both arm and x86, also windows ans mac)
+### NixOS (eventialy be both arm and x86, also Windows and Mac)
 ```sh
 nix --extra-experimental-features "nix-command flakes" run 'github:MCPI-Revival/Ninecraft.?submodules=1'
 ```

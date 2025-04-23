@@ -12,6 +12,12 @@
     system = "x86_64-linux";
     pkgs = import nixpkgs {inherit system;};
   in {
-    packages.${system}.default = pkgs.pkgsi686Linux.callPackage ./nix/pkgs/ninecraft.nix {};
+    packages.${system} = rec {
+      ninecraft = pkgs.pkgsi686Linux.callPackage ./nix/pkgs/ninecraft.nix {};
+      default = ninecraft;
+      extract = pkgs.callPackage ./nix/pkgs/extract.nix {};
+      patch = pkgs.callPackage ./nix/pkgs/patch.nix {};
+
+    };
   };
 }
