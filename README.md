@@ -99,7 +99,7 @@ make build-arm
 ```
 ### on nix
 ```
-nix --extra-experimental-features "nix-command flakes" run 'github:MCPI-Revival/Ninecraft.?submodules=1'#extract  /path/to/your/apk
+nix --extra-experimental-features "nix-command flakes" run 'git+https://github.com/MCPI-Revival/Ninecraft.?submodules=1'#extract  /path/to/your/apk
 ```
 
 ## Running
@@ -113,5 +113,5 @@ nix --extra-experimental-features "nix-command flakes" run 'github:MCPI-Revival/
 ```
 ### NixOS (eventialy be both arm and x86, also Windows and Mac)
 ```sh
-nix --extra-experimental-features "nix-command flakes" run 'github:MCPI-Revival/Ninecraft.?submodules=1'
+nix --extra-experimental-features "nix-command flakes" run 'git+https://github.com/MCPI-Revival/Ninecraft.?submodules=1'
 ```

@@ -8,6 +8,7 @@
   openal,
   glfw,
   zlib,
+  lib
 }:
 stdenv.mkDerivation {
   name = "ninecraft";
@@ -36,4 +37,14 @@ stdenv.mkDerivation {
     cp -r ninecraft/ninecraft $out/bin
     cp -r $src/internal_overrides $out/var/lib/ninecraft
   '';
+
+   meta = with lib; {
+    mainProgram = "ninecraft";
+    description = "A mcpe 0.1.0-0.10.5 launcher for linux and windows ";
+    homepage = "https://github.com/MCPI-Revival/Ninecraft";
+    changelog = "https://github.com/MCPI-Revival/Ninecraft/-/blob/${finalAttrs.version}/NEWS?ref_type=tags";
+    license = licenses.mit;
+    platforms = platforms.unix;
+    maintainers = "MCPI-Revival";
+  };
 }
