@@ -103,3 +103,7 @@ make build-arm
 ```
 ./build-arm/ninecraft/ninecraft
 ```
+### NixOS (eventialy be both arm and x86, also windows ans mac)
+```sh
+nix --extra-experimental-features "nix-command flakes" run 'github:MCPI-Revival/Ninecraft.?submodules=1'
+```
