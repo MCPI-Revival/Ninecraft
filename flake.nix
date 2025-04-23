@@ -9,7 +9,7 @@
   outputs = {
     self,
     nixpkgs,
-    flake-utils
+    flake-utils,
   }: let
     system = "x86_64-linux";
     mkPkgs = system:
@@ -17,16 +17,18 @@
         inherit system;
         config.allowUnfree = true;
       };
-  in 
-   flake-utils.lib.eachDefaultSystem (system: let
+  in
+    flake-utils.lib.eachDefaultSystem (system: let
       pkgs = mkPkgs system;
     in {
-    packages = rec {
-      ninecraft = pkgs.pkgsi686Linux.callPackage ./nix/pkgs/ninecraft.nix {};
-      default = ninecraft;
-      extract = pkgs.callPackage ./nix/pkgs/extract.nix {};
-      patch = pkgs.callPackage ./nix/pkgs/patch.nix {};
-
-    };
-  });
+      packages = rec {
+        extract = pkgs.callPackage ./nix/pkgs/extract.nix {};
+        patch = pkgs.callPackage ./nix/pkgs/patch.nix {};
+        ninecraft = pkgs.pkgsi686Linux.callPackage ./nix/pkgs/ninecraft.nix {
+          ninecraft-extract = extract;
+        };
+        default = ninecraft;
+      };
+      formatter = pkgs.alejandra;
+    });
 }

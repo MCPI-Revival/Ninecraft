@@ -1,5 +1,3 @@
-{
-  writeScriptBin,...
-}:
-writeScriptBin "ninecraft-extract" 
+{writeScriptBin, ...}:
+writeScriptBin "ninecraft-extract"
 (builtins.readFile ../../tools/extract.sh)
