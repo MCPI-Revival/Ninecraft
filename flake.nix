@@ -11,7 +11,6 @@
     nixpkgs,
     flake-utils,
   }: let
-    system = "x86_64-linux";
     mkPkgs = system:
       import nixpkgs {
         inherit system;
