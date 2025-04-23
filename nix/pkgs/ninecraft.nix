@@ -97,7 +97,7 @@ in
       cp ${entryScript ninecraft} $out/bin/ninecraft
       cp ${ninecraft}/bin/ninecraft $out/bin/ninecraft-unwrapped
       cp ${ninecraft-unpatched}/bin/ninecraft $out/bin/ninecraft-unpatched
-      cp ${entryScript ninecraft} $out/bin/ninecraft-wrapped-unpatched
+      cp ${entryScript ninecraft-unpatched} $out/bin/ninecraft-wrapped-unpatched
       cp ${ninecraft-extract}/bin/ninecraft-extract $out/bin
     '';
 
