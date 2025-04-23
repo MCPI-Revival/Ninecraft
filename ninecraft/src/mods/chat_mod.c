@@ -139,11 +139,11 @@ void chat_screen_render(void *char_screen, int mouse_x, int mouse_y, float f) {
                     send_message(formatted_message);
                     if (gui_add_message) {
                         if (version_id == version_id_0_5_0) {
-                            gui_add_message(ninecraft_app + MINECRAFT_GUI_OFFSET_0_5_0, &formatted_message_str);
+                            gui_add_message((char *)ninecraft_app + MINECRAFT_GUI_OFFSET_0_5_0, &formatted_message_str);
                         } else if (version_id == version_id_0_6_0) {
-                            gui_add_message(ninecraft_app + MINECRAFT_GUI_OFFSET_0_6_0, &formatted_message_str);
+                            gui_add_message((char *)ninecraft_app + MINECRAFT_GUI_OFFSET_0_6_0, &formatted_message_str);
                         } else if (version_id == version_id_0_6_1) {
-                            gui_add_message(ninecraft_app + MINECRAFT_GUI_OFFSET_0_6_1, &formatted_message_str);
+                            gui_add_message((char *)ninecraft_app + MINECRAFT_GUI_OFFSET_0_6_1, &formatted_message_str);
                         }
                     }
                     android_string_destroy(&formatted_message_str);
@@ -192,11 +192,11 @@ void server_side_network_handler_handle_chat_packet(void *__this, void *raknet_g
         if (raknet_instance_is_server(raknet_instance)) {
             if (gui_add_message) {
                 if (version_id == version_id_0_5_0) {
-                    gui_add_message(ninecraft_app + MINECRAFT_GUI_OFFSET_0_5_0, &formatted_message_str);
+                    gui_add_message((char *)ninecraft_app + MINECRAFT_GUI_OFFSET_0_5_0, &formatted_message_str);
                 } else if (version_id == version_id_0_6_0) {
-                    gui_add_message(ninecraft_app + MINECRAFT_GUI_OFFSET_0_6_0, &formatted_message_str);
+                    gui_add_message((char *)ninecraft_app + MINECRAFT_GUI_OFFSET_0_6_0, &formatted_message_str);
                 } else if (version_id == version_id_0_6_1) {
-                    gui_add_message(ninecraft_app + MINECRAFT_GUI_OFFSET_0_6_1, &formatted_message_str);
+                    gui_add_message((char *)ninecraft_app + MINECRAFT_GUI_OFFSET_0_6_1, &formatted_message_str);
                 }
             }
         }

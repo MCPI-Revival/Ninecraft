@@ -7,7 +7,7 @@
 
 /*
     This mod fixes input related issues
-    for mcpe 0.5.0-0.9.5
+    for mcpe 0.5.0-0.10.5
 */
 
 static void *_handle = NULL;
@@ -53,7 +53,7 @@ void inputs_fix_mod_inject(void *handle, int version_id) {
     _handle = handle;
     if (version_id >= version_id_0_5_0 && version_id <= version_id_0_8_1) {
         ((void **)android_dlsym(handle, "_ZTV15XperiaPlayInput"))[4] = xperia_play_input_tick;
-    } else if (version_id >= version_id_0_9_0 && version_id <= version_id_0_9_5) {
+    } else if (version_id >= version_id_0_9_0 && version_id <= version_id_0_10_5) {
         ((void **)android_dlsym(handle, "_ZTV19ControllerMoveInput"))[4] = xperia_play_input_tick;
     }
 }
