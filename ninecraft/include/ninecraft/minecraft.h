@@ -71,6 +71,12 @@
 #define PLAYER_INVENTORY_OFFSET_0_9_3 0xc88
 #define PLAYER_INVENTORY_OFFSET_0_9_4 0xc88
 #define PLAYER_INVENTORY_OFFSET_0_9_5 0xc88
+#define PLAYER_INVENTORY_OFFSET_0_10_0 0xc88
+#define PLAYER_INVENTORY_OFFSET_0_10_1 0xc88
+#define PLAYER_INVENTORY_OFFSET_0_10_2 0xc88
+#define PLAYER_INVENTORY_OFFSET_0_10_3 0xc88
+#define PLAYER_INVENTORY_OFFSET_0_10_4 0xc88
+#define PLAYER_INVENTORY_OFFSET_0_10_5 0xc88
 
 #else
 #if defined(__arm__) || defined(_M_ARM)
@@ -90,6 +96,12 @@
 #define PLAYER_INVENTORY_OFFSET_0_9_3 0xc8c
 #define PLAYER_INVENTORY_OFFSET_0_9_4 0xc8c
 #define PLAYER_INVENTORY_OFFSET_0_9_5 0xc8c
+#define PLAYER_INVENTORY_OFFSET_0_10_0 0xc8c
+#define PLAYER_INVENTORY_OFFSET_0_10_1 0xc8c
+#define PLAYER_INVENTORY_OFFSET_0_10_2 0xc8c
+#define PLAYER_INVENTORY_OFFSET_0_10_3 0xc8c
+#define PLAYER_INVENTORY_OFFSET_0_10_4 0xc8c
+#define PLAYER_INVENTORY_OFFSET_0_10_5 0xc8c
 
 #endif
 #endif
@@ -286,6 +298,12 @@
 #define MINECRAFTCLIENT_EXTERNAL_STORAGE_OFFSET_0_10_5 0x7c
 
 #if defined(__i386__) || defined(_M_IX86)
+#define MINECRAFT_SCREENCHOOSER_OFFSET_0_10_5 0xac
+#define MINECRAFT_SCREENCHOOSER_OFFSET_0_10_4 0xac
+#define MINECRAFT_SCREENCHOOSER_OFFSET_0_10_3 0xac
+#define MINECRAFT_SCREENCHOOSER_OFFSET_0_10_2 0xac
+#define MINECRAFT_SCREENCHOOSER_OFFSET_0_10_1 0xac
+#define MINECRAFT_SCREENCHOOSER_OFFSET_0_10_0 0xac
 #define MINECRAFT_SCREENCHOOSER_OFFSET_0_9_5 0x198
 #define MINECRAFT_SCREENCHOOSER_OFFSET_0_9_4 0x1ac
 #define MINECRAFT_SCREENCHOOSER_OFFSET_0_9_3 0x1ac
@@ -303,6 +321,12 @@
 #define MINECRAFT_SCREENCHOOSER_OFFSET_0_7_0 0x2f0
 #else
 #if defined(__arm__) || defined(_M_ARM)
+#define MINECRAFT_SCREENCHOOSER_OFFSET_0_10_5 0xb0
+#define MINECRAFT_SCREENCHOOSER_OFFSET_0_10_4 0xb0
+#define MINECRAFT_SCREENCHOOSER_OFFSET_0_10_3 0xb0
+#define MINECRAFT_SCREENCHOOSER_OFFSET_0_10_2 0xb0
+#define MINECRAFT_SCREENCHOOSER_OFFSET_0_10_1 0xb0
+#define MINECRAFT_SCREENCHOOSER_OFFSET_0_10_0 0xb0
 #define MINECRAFT_SCREENCHOOSER_OFFSET_0_9_5 0x198
 #define MINECRAFT_SCREENCHOOSER_OFFSET_0_9_4 0x1ac
 #define MINECRAFT_SCREENCHOOSER_OFFSET_0_9_3 0x1ac
@@ -320,6 +344,13 @@
 #define MINECRAFT_SCREENCHOOSER_OFFSET_0_7_0 0x2f0
 #endif
 #endif
+
+#define MINECRAFTCLIENT_SCREEN_OFFSET_0_10_5 0x6c
+#define MINECRAFTCLIENT_SCREEN_OFFSET_0_10_4 0x6c
+#define MINECRAFTCLIENT_SCREEN_OFFSET_0_10_3 0x6c
+#define MINECRAFTCLIENT_SCREEN_OFFSET_0_10_2 0x6c
+#define MINECRAFTCLIENT_SCREEN_OFFSET_0_10_1 0x6c
+#define MINECRAFTCLIENT_SCREEN_OFFSET_0_10_0 0x6c
 
 #if defined(__i386__) || defined(_M_IX86)
 #define NINECRAFTAPP_SCREEN_OFFSET_0_9_5 0xc80
@@ -648,9 +679,17 @@ typedef void *(*gui_add_message_t)(void *gui, android_string_t *message);
 
 extern gui_add_message_t gui_add_message;
 
-typedef void *(*options_set_key_t)(void *options, int key, int value);
+typedef void (*options_set_key_t)(void *options, int key, int value);
 
 extern options_set_key_t options_set_key;
+
+typedef void *(*minecraft_client_get_options_t)(void *minecraft_client);
+
+extern minecraft_client_get_options_t minecraft_client_get_options;
+
+typedef void *(*minecraft_client_get_local_player_t)(void *minecraft_client);
+
+extern minecraft_client_get_local_player_t minecraft_client_get_local_player;
 
 extern void minecraft_setup_hooks(void *handle);
 
