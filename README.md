@@ -64,7 +64,7 @@ dnf install git make cmake gcc g++ openal-soft-devel libX11-devel libXrandr-deve
 ```
 
 ### Nix/NixOS
-you can skip the cloning and go straight to [[#before-running-for-the-first-time]]
+you can skip the cloning and go straight to [#before-running-for-the-first-time](#before-running-for-the-first-time)
 
 ## Compiling on windows
 ### mingw32 & llvm-mingw
