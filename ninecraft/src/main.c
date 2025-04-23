@@ -404,7 +404,7 @@ static void key_callback(GLFWwindow *window, int key, int scancode, int action, 
             }
         }
         int game_keycode = getGameKeyCode(key);
-        if (key == GLFW_KEY_Q && action == GLFW_PRESS && mouse_pointer_hidden && version_id >= version_id_0_5_0 && version_id <= version_id_0_8_1) {
+        if (key == GLFW_KEY_Q && action == GLFW_PRESS && mouse_pointer_hidden && version_id >= version_id_0_5_0 && version_id <= version_id_0_9_5) {
             size_t player_offset, inventory_offset;
             if (version_id == version_id_0_5_0) {
                 player_offset = MINECRAFT_LOCAL_PLAYER_OFFSET_0_5_0;
@@ -445,6 +445,24 @@ static void key_callback(GLFWwindow *window, int key, int scancode, int action, 
             } else if (version_id == version_id_0_8_1) {
                 player_offset = MINECRAFT_LOCAL_PLAYER_OFFSET_0_8_1;
                 inventory_offset = PLAYER_INVENTORY_OFFSET_0_8_1;
+            } else if (version_id == version_id_0_9_0) {
+                player_offset = MINECRAFT_LOCAL_PLAYER_OFFSET_0_9_0;
+                inventory_offset = PLAYER_INVENTORY_OFFSET_0_9_0;
+            } else if (version_id == version_id_0_9_1) {
+                player_offset = MINECRAFT_LOCAL_PLAYER_OFFSET_0_9_1;
+                inventory_offset = PLAYER_INVENTORY_OFFSET_0_9_1;
+            } else if (version_id == version_id_0_9_2) {
+                player_offset = MINECRAFT_LOCAL_PLAYER_OFFSET_0_9_2;
+                inventory_offset = PLAYER_INVENTORY_OFFSET_0_9_2;
+            } else if (version_id == version_id_0_9_3) {
+                player_offset = MINECRAFT_LOCAL_PLAYER_OFFSET_0_9_3;
+                inventory_offset = PLAYER_INVENTORY_OFFSET_0_9_3;
+            } else if (version_id == version_id_0_9_4) {
+                player_offset = MINECRAFT_LOCAL_PLAYER_OFFSET_0_9_4;
+                inventory_offset = PLAYER_INVENTORY_OFFSET_0_9_4;
+            } else if (version_id == version_id_0_9_5) {
+                player_offset = MINECRAFT_LOCAL_PLAYER_OFFSET_0_9_5;
+                inventory_offset = PLAYER_INVENTORY_OFFSET_0_9_5;
             }
             void *player = *(void **)((char *)ninecraft_app + player_offset);
             if (player) {
@@ -475,7 +493,7 @@ static void key_callback(GLFWwindow *window, int key, int scancode, int action, 
 
                             if (version_id >= version_id_0_5_0 && version_id <= version_id_0_7_1) {
                                 ((void (*)(void *, void *, bool))android_dlsym(handle, "_ZN11LocalPlayer4dropEP12ItemInstanceb"))(player, item_instance_copy, false);
-                            } else if (version_id >= version_id_0_7_2 && version_id <= version_id_0_8_1) {
+                            } else if (version_id >= version_id_0_7_2 && version_id <= version_id_0_9_5) {
                                 ((void (*)(void *, void *, bool))android_dlsym(handle, "_ZN11LocalPlayer4dropEPK12ItemInstanceb"))(player, item_instance_copy, false);
                             }
                         }
