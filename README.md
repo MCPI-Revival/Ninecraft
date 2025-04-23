@@ -40,7 +40,7 @@ arm:
 sudo pacman -Syu
 sudo pacman -S git make cmake gcc openal libx11 libxrandr libxinerama libxcursor libxi libglvnd zenity unzip
 ```
-### AlpineLinux (Not working)
+### AlpineLinux
 x86:
 ```
 apk update
