@@ -12,6 +12,7 @@
   zenity,
   ninecraft-extract,
   wrapGAppsHook,
+  unzip,
 }: let
   ninecraft = stdenv.mkDerivation {
     name = "ninecraft";
@@ -40,7 +41,7 @@
     writeShellApplication {
       name = "ninecraft-wrapper";
 
-      runtimeInputs = [curl ninecraft ninecraft-extract zenity];
+      runtimeInputs = [curl ninecraft ninecraft-extract zenity unzip];
       text = ''
         set +u
           export NINECRAFT_DATA=''${XDG_DATA_HOME:-$HOME/.local/share}/ninecraft
