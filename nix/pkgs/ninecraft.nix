@@ -14,25 +14,30 @@
   zenity,
   ninecraft-extract,
   gdk-pixbuf,
+  wrapGAppsHook,
+  gobject-introspection,
+  gtk3,
+  librsvg,
+  dconf,
 }: let
-  ninecraft-unpatched = stdenv.mkDerivation {
-    name = "ninecraft-unpatched";
+  ninecraft = stdenv.mkDerivation {
+    name = "ninecraft";
     version = "1.2.0_56b9f26";
     src = ../..;
     nativeBuildInputs = [
       pkg-config
       cmake
+
+      wrapGAppsHook
+      gobject-introspection
+      gtk3
+      librsvg
+      dconf
     ];
+    patches = [./use-system-dependancies.patch];
     buildInputs = [
-      xorg.libX11
-      xorg.libXrandr
-      xorg.libXinerama
-      xorg.libXcursor
-      xorg.libXi
-      python312
       openal
       python312Packages.jinja2
-      gdk-pixbuf
       glfw
       zlib
     ];
@@ -41,9 +46,6 @@
       cp -r ninecraft/ninecraft $out/bin/ninecraft
       cp -r $src/internal_overrides $out/var/lib/ninecraft
     '';
-  };
-  ninecraft = ninecraft-unpatched.overrideAttrs {
-    patches = [./use-system-dependancies.patch];
   };
   entryScript = ninecraft:
     writeShellApplication {
@@ -97,13 +99,11 @@ in
   stdenv.mkDerivation {
     name = "ninecraft";
     version = "1.2.0_56b9f26";
-    phases = ["buildPhase"];
+    src = ./.;
     buildPhase = ''
       mkdir -p $out/bin
       cp ${entryScript ninecraft}/bin/ninecraft-wrapper $out/bin/ninecraft
       cp ${ninecraft}/bin/ninecraft $out/bin/ninecraft-unwrapped
-      cp ${ninecraft-unpatched}/bin/ninecraft $out/bin/ninecraft-unpatched
-      cp ${entryScript ninecraft-unpatched}/bin/ninecraft-wrapper $out/bin/ninecraft-wrapped-unpatched
       cp ${ninecraft-extract}/bin/ninecraft-extract $out/bin
     '';
 
