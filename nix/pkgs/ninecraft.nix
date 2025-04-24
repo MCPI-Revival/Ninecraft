@@ -2,8 +2,6 @@
   stdenv,
   pkg-config,
   cmake,
-  xorg,
-  python312,
   python312Packages,
   openal,
   glfw,
@@ -13,12 +11,7 @@
   curl,
   zenity,
   ninecraft-extract,
-  gdk-pixbuf,
   wrapGAppsHook,
-  gobject-introspection,
-  gtk3,
-  librsvg,
-  dconf,
 }: let
   ninecraft = stdenv.mkDerivation {
     name = "ninecraft";
@@ -29,10 +22,6 @@
       cmake
 
       wrapGAppsHook
-      gobject-introspection
-      gtk3
-      librsvg
-      dconf
     ];
     patches = [./use-system-dependancies.patch];
     buildInputs = [
