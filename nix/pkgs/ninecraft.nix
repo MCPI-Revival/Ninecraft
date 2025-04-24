@@ -13,6 +13,7 @@
   ninecraft-extract,
   wrapGAppsHook,
   unzip,
+  nixgl,
 }: let
   ninecraft = stdenv.mkDerivation {
     name = "ninecraft";
@@ -41,7 +42,7 @@
     writeShellApplication {
       name = "ninecraft-wrapper";
 
-      runtimeInputs = [curl ninecraft ninecraft-extract zenity unzip];
+      runtimeInputs = [curl ninecraft ninecraft-extract zenity unzip nixgl.auto.nixGLDefault];
       text = ''
         set +u
           export NINECRAFT_DATA=''${XDG_DATA_HOME:-$HOME/.local/share}/ninecraft
@@ -82,7 +83,7 @@
           pwd
           ls
           echo "Starting Ninecraft..."
-          ninecraft
+          nixGL ninecraft
       '';
     };
 in
