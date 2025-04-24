@@ -25,6 +25,9 @@
         ninecraft = pkgs.pkgsi686Linux.callPackage ./nix/pkgs/ninecraft.nix {
           ninecraft-extract = extract;
         };
+        ninecraft-unwrapped = pkgs.pkgsi686Linux.callPackage ./nix/pkgs/ninecraft-unwrapped.nix {
+          ninecraft-extract = extract;
+        };
         default = ninecraft;
       };
       formatter = pkgs.alejandra;
