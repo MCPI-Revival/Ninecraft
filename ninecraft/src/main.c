@@ -628,6 +628,7 @@ void grab_mouse() {
     ignore_relative_motion = true;
     glfwSetInputMode(_window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
     //glfwSetInputMode(_window, GLFW_RAW_MOUSE_MOTION, GLFW_TRUE);
+    mod_loader_execute_on_minecraft_grab_mouse(ninecraft_app, version_id);
 }
 
 void release_mouse() {
@@ -639,6 +640,7 @@ void release_mouse() {
     double cursor_y;
     glfwGetCursorPos(_window, &cursor_x, &cursor_y);
     mouse_pos_callback(_window, cursor_x, cursor_y);
+    mod_loader_execute_on_minecraft_release_mouse(ninecraft_app, version_id);
 }
 
 void gles_hook() {
@@ -1049,7 +1051,7 @@ int main(int argc, char **argv) {
     keyboard_setup_hooks(handle);
     minecraft_setup_hooks(handle);
     inject_mods(handle, version_id);
-    mod_loader_load_all();
+    mod_loader_load_all(handle, version_id);
 
     controller_states = (unsigned char *)android_dlsym(handle, "_ZN10Controller15isTouchedValuesE");
     controller_x_stick = (float *)android_dlsym(handle, "_ZN10Controller12stickValuesXE");
@@ -1189,6 +1191,8 @@ int main(int argc, char **argv) {
         android_string_equ((android_string_t *)((char *)ninecraft_app + ext_off), storage_path);
     }
 
+    mod_loader_execute_on_minecraft_construct(ninecraft_app, version_id);
+
     if (version_id >= version_id_0_9_0) {
         app_platform_0_9_0_t *plat = malloc(sizeof(app_platform_0_9_0_t));
         static app_context_0_9_0_t context = {
@@ -1265,12 +1269,6 @@ int main(int argc, char **argv) {
         }
     }
 
-    if (version_id >= version_id_0_1_0_touch) {
-        set_ninecraft_size(720, 480);
-    } else {
-        set_ninecraft_size_0_1_0(720, 480);
-    }
-
     int minecraft_options_offset = 0;
     if (version_id == version_id_0_5_0) {
         minecraft_options_offset = MINECRAFT_OPTIONS_OFFSET_0_5_0;
@@ -1338,6 +1336,14 @@ int main(int argc, char **argv) {
                 *(int *)((char *)options_keys[MCKEY_ID_SNEAK] + android_string_tsize()) = MCKEY_SNEAK;
             }
         }
+    }
+
+    mod_loader_execute_on_minecraft_init(ninecraft_app, version_id);
+
+    if (version_id >= version_id_0_1_0_touch) {
+        set_ninecraft_size(720, 480);
+    } else {
+        set_ninecraft_size_0_1_0(720, 480);
     }
 
     size_t minecraft_isgrabbed_offset;
@@ -1469,6 +1475,7 @@ int main(int argc, char **argv) {
         } else {
             ninecraft_app_update(ninecraft_app);
         }
+        mod_loader_execute_on_minecraft_update(ninecraft_app, version_id);
 
         if (!mouse_pointer_hidden) {
             if (version_id >= version_id_0_6_0 && version_id <= version_id_0_9_5) {
