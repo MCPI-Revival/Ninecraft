@@ -67,6 +67,7 @@ dnf install git make cmake gcc g++ openal-soft-devel libX11-devel libXrandr-deve
 ```
 nix --extra-experimental-features "nix-command flakes" shell github:MCPI-Revival/Ninecraft --impure
 ```
+to install globaly see here [nix/README.md].
 
 ## Compiling on windows
 ### mingw32 & llvm-mingw
