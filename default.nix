@@ -11,7 +11,7 @@ in rec {
     nixgl = nixgl.nixgl;
   };
   nixos = {pkgs, ...}: {
-    imports = [./nix/modules/nixos.nix];
+    imports = [./nix/nixos];
     programs.ninecraft.package = ninecraft;
   };
 }
