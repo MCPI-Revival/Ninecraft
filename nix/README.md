@@ -10,7 +10,7 @@ Following the nix install
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
 	 ninecraft = {
-      url = "git+https://github.com/MCPI-Revival/Ninecraft?submodules=1";
+      url = "github:MCPI-Revival/Ninecraft";
       inputs.nixpkgs.follows = "nixpkgs";
     };
   };
@@ -20,7 +20,7 @@ Following the nix install
       # NOTE: change "host" to your system's hostname
       host = nixpkgs.lib.nixosSystem {
 		system = "x96_64-linux";
-		speciaArgs = [ninecraft];
+		specialArgs = [ninecraft];
         modules = [
           ./configuration.nix
         ];
