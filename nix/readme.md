@@ -19,10 +19,11 @@ Following the nix install
     nixosConfigurations = {
       # NOTE: change "host" to your system's hostname
       host = nixpkgs.lib.nixosSystem {
+		system = "x96_64-linux";
+		speciaArgs = [ninecraft];
         modules = [
           ./configuration.nix
         ];
-		extra
       };
     };
   };
@@ -31,9 +32,9 @@ Following the nix install
 
 > configuration.nix
 ```nix
-{inputs, ...}: {
+{ninecraft, ...}: {
   imports = [
-    inputs.ninecraft.nixosModules.default
+    ninecraft.nixosModules.default
   ];
   nix.settings.experimental-features = [ "nix-command" "flakes" ];
 
@@ -54,7 +55,7 @@ and then you can use `ninecraft` command system wide.
 ```nix
 {pkgs,lib,...}:
 let
-ninecraft = builtins.getFlake git+https://github.com/MCPI-Revival/Ninecraft?submodules=1;
+ninecraft = builtins.getFlake github:MCPI-Revival/Ninecraft;
 in
 {
 	nix.settings.experimental-features = [ "nix-command" "flakes" ];

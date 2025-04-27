@@ -54,6 +54,7 @@
         default = ninecraft;
       };
       formatter = pkgs.alejandra;
+      devShell = pkgs.callPackage ./nix/shell.nix;
     })
     // {
       nixosModules.default = {pkgs, ...}: {
