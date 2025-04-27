@@ -82,12 +82,3 @@ in
 	];
 }
 ```
-
-
-# ok so how is this going to work
-
-have a shell and a module
-
-# packages
-ninecraft-extract - extract an apk into res lib and assets
-ninecraft-gl - ninecraft wrapped with gl
