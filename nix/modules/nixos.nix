@@ -6,7 +6,7 @@
 }: let
   cfg = config.programs.ninecraft;
 in {
-  options.ninecraft = let
+  options.programs.ninecraft = let
     types = lib.types;
   in {
     enable = lib.mkEnableOption "Install Ninecraft";
@@ -22,7 +22,7 @@ in {
     networking.firewall = lib.mkIf cfg.openFirewall {
       enable = lib.mkDefault true;
       #allowedTCPPorts = [19132];
-      allowedUDPorts = [19132];
+      allowedUDPPorts = [19132];
     };
   };
 }
