@@ -31,13 +31,18 @@ Following the nix install
 
 > configuration.nix
 ```nix
-{pkgs,lib, ninecraft,...}:
-{
-	nix.settings.experimental-features = [ "nix-command" "flakes" ];
-	enviroment.systemPackages = [
-		ninecraft.packages.${pkgs.system}.ninecraft
-	];
+{inputs, ...}: {
+  imports = [
+    inputs.ninecraft.nixosModules.default
+  ];
+  nix.settings.experimental-features = [ "nix-command" "flakes" ];
+
+  programs.ninecraft = {
+    enable = true;
+    openFirewall = true;
+  };
 }
+
 ```
 
 and then you can use `ninecraft` command system wide.
@@ -77,22 +82,11 @@ in
 }
 ```
 
-## Channels
-```bash
-sudo nix-channel --add https://github.com/MCPI-Revival/Ninecraft/archive/master.tar.gz ninecraft
-sudo nix-channel --update
-```
 
-configuration.nix
-```nix
-{pkgs,lib,...}:
-{
-	imports = [
-		<ninecraft/nix/nixos>
-	];
-	programs.ninecraft = {
-		enable = true;
-		openFirewall = true;
-	};
-}
-```
+# ok so how is this going to work
+
+have a shell and a module
+
+# packages
+ninecraft-extract - extract an apk into res lib and assets
+ninecraft-gl - ninecraft wrapped with gl
