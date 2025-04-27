@@ -14,7 +14,7 @@
     };
     ancmp = {
       flake = false;
-      url = "github:MFDGaming/ancmp/85e2b026b983e69e957da6c2cd2a336e318b25aa";
+      url = "github:MFDGaming/ancmp";
     };
     stb = {
       flake = false;
@@ -47,6 +47,9 @@
           ninecraft-extract = extract;
           internal_overrides = ./internal_overrides;
           inherit glad ancmp stb;
+        };
+        ninecraft-nixgl = pkgs.callPackage ./nix/pkgs/ninecraft-nixgl.nix {
+          inherit ninecraft;
         };
         default = ninecraft;
       };

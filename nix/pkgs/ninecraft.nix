@@ -19,10 +19,12 @@
   ancmp,
   stb,
   tree,
+  makeWrapper,
+  ...
 }: let
   ninecraft = stdenv.mkDerivation {
     pname = "ninecraft";
-    version = "1.2.0_56b9f26";
+    version = "1.2.0";
     src = ../..;
     prePhases = ["submoduleFetchPhase"];
     submoduleFetchPhase = ''
@@ -54,12 +56,17 @@
        mkdir -p $out/bin
       cp -r ninecraft/ninecraft $out/bin/ninecraft
     '';
+    postFixup = ''
+      wrapProgram $out/bin/ninecraft --set PATH ${lib.makeBinPath [
+        zenity
+      ]}
+    '';
   };
 in
   writeShellApplication {
     name = "ninecraft";
 
-    runtimeInputs = [curl ninecraft ninecraft-extract zenity unzip];
+    runtimeInputs = [curl ninecraft ninecraft-extract];
     text = ''
       set +u
         export NINECRAFT_DATA=''${XDG_DATA_HOME:-$HOME/.local/share}/ninecraft

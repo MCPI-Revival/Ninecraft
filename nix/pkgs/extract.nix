@@ -1,3 +1,18 @@
-{writeScriptBin, ...}:
-writeScriptBin "ninecraft-extract"
-(builtins.readFile ../../tools/extract.sh)
+{
+  symlinkJoin,
+  unzip,
+  makeWrapper,
+  writeScriptBin,
+  ...
+}: let
+  name = "ninecraft-extract";
+  script = writeScriptBin name (builtins.readFile ../../tools/extract.sh);
+in
+  symlinkJoin {
+    inherit name;
+    paths = [unzip script];
+    buildInputs = [makeWrapper];
+    postFixup = ''
+      wrapProgram $out/bin/${name} --prefix PATH : $out/bin
+    '';
+  }
