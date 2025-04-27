@@ -34,5 +34,14 @@
         default = ninecraft;
       };
       formatter = pkgs.alejandra;
-    });
+    })
+    // {
+      nixosModules.default = {pkgs, ...}: {
+        imports = [
+          ./nix/modules/nixos.nix
+        ];
+
+        programs.ninecraft.package = self.packages.${pkgs.system}.ninecraft;
+      };
+    };
 }
