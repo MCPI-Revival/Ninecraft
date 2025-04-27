@@ -49,7 +49,7 @@ and then you can use `ninecraft` command system wide.
 ```nix
 {pkgs,lib,...}:
 let
-ninecraft = builtins.getFlake git+https://github.com/tumble1999/Ninecraft?submodules=1;
+ninecraft = builtins.getFlake git+https://github.com/MCPI-Revival/Ninecraft?submodules=1;
 in
 {
 	nix.settings.experimental-features = [ "nix-command" "flakes" ];
@@ -66,7 +66,7 @@ in
 ```nix
 {pkgs,lib,...}:
 let
-ninecraft = builtins.getFlake git+https://github.com/tumble1999/Ninecraft?submodules=1;
+ninecraft = builtins.getFlake git+https://github.com/MCPI-Revival/Ninecraft?submodules=1;
 in
 {
 	#state username etc...
@@ -74,5 +74,25 @@ in
 	home.packages = [
 		ninecraft.packages.${pkgs.system}.ninecraft
 	];
+}
+```
+
+## Channels
+```bash
+sudo nix-channel --add https://github.com/MCPI-Revival/Ninecraft/archive/master.tar.gz ninecraft
+sudo nix-channel --update
+```
+
+configuration.nix
+```nix
+{pkgs,lib,...}:
+{
+	imports = [
+		(import <ninecraft>).nixos
+	];
+	programs.ninecraft = {
+		enable = true;
+		openFirewall = true;
+	};
 }
 ```
