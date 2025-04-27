@@ -14,7 +14,7 @@
     };
     ancmp = {
       flake = false;
-      url = "github:MFDGaming/ancmp/f15e841a4a888b4dd09ba09d04a95dfb92839207";
+      url = "github:MFDGaming/ancmp/85e2b026b983e69e957da6c2cd2a336e318b25aa";
     };
     stb = {
       flake = false;
@@ -29,7 +29,7 @@
     nixgl,
     glad,
     ancmp,
-    stb
+    stb,
   }: let
     mkPkgs = system:
       import nixpkgs {
