@@ -88,7 +88,7 @@ configuration.nix
 {pkgs,lib,...}:
 {
 	imports = [
-		(import <ninecraft>).nixos
+		<ninecraft/nix/nixos>
 	];
 	programs.ninecraft = {
 		enable = true;

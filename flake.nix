@@ -37,7 +37,7 @@
     })
     // {
       nixosModules.default = {pkgs, ...}: {
-        imports = [./nix/modules/nixos.nix];
+        imports = [./nix/nixos];
         programs.ninecraft.package = self.packages.${pkgs.system}.ninecraft;
       };
     };
