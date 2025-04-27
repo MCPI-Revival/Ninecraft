@@ -17,7 +17,21 @@ in {
   };
 
   config = lib.mkIf cfg.enable {
-    environment.systemPackages = [cfg.package];
+    environment.systemPackages = with pkgs; [
+      (symlinkJoin
+        {
+          name = "ninecraft-game";
+          paths = [
+            (makeDesktopItem {
+              desktopName = "Ninecraft";
+              name = "ninecraft";
+              icon = "applications-games";
+              exec = "ninecraft";
+            })
+            cfg.package
+          ];
+        })
+    ];
 
     networking.firewall = lib.mkIf cfg.openFirewall {
       enable = lib.mkDefault true;
