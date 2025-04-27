@@ -14,4 +14,9 @@ in rec {
     imports = [./nix/nixos];
     programs.ninecraft.package = ninecraft;
   };
+  shell = import ./nix/shell.nix {
+    inherit (pkgs) mkShell;
+    inherit ninecraft;
+    ninecraft-extract = extract;
+  };
 }
