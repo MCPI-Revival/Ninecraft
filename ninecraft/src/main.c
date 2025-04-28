@@ -1460,7 +1460,7 @@ int main(int argc, char **argv) {
             }
         }
         if (mouse_pointer_hidden) {
-            if (controller_states && controller_y_stick && controller_x_stick && version_id <= version_id_0_4_0_j) {
+            if (controller_states && controller_y_stick && controller_x_stick && version_id <= version_id_0_5_0_j) {
                 controller_states[1] = 1;
                 controller_y_stick[1] = (float)(y_cam - 180.0) * 0.0055555557;
                 controller_x_stick[1] = ((float)((x_cam - 483.0)) * 0.0020703934);
