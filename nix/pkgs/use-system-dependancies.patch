@@ -1,0 +1,53 @@
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index eb083f8..f7ac1da 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -1,13 +1,21 @@
+ cmake_minimum_required(VERSION 3.1)
+ project(ninecraft)
+ 
+-include_directories(${PROJECT_SOURCE_DIR}/stb)
++set(GLAD_DIR $ENV{glad})
++set(ANCMP_DIR $ENV{ancmp})
++set(STB_DIR $ENV{stb})
+ 
+-add_subdirectory(glad/cmake)
++include_directories(${STB_DIR})
++
++
++add_subdirectory(${GLAD_DIR}/cmake ${GLAD_DIR})
+ glad_add_library(glad REPRODUCIBLE LOADER API egl=1.5 gl:compatibility=2.0)
+-add_subdirectory(zlib)
+-add_subdirectory(ancmp)
+-add_subdirectory(glfw)
++# add_subdirectory(zlib)
++add_subdirectory(${ANCMP_DIR} ${ANCMP_DIR})
++# add_subdirectory(glfw)
++find_package(PkgConfig)
++find_package(glfw3 REQUIRED)
++find_package(ZLIB REQUIRED)
+ if(WIN32)
+     set(LIBTYPE "STATIC" CACHE BOOL "" FORCE)
+     add_subdirectory(openal-soft)
+diff --git a/ninecraft/CMakeLists.txt b/ninecraft/CMakeLists.txt
+index 8f810ee..5d11b1e 100644
+--- a/ninecraft/CMakeLists.txt
++++ b/ninecraft/CMakeLists.txt
+@@ -4,7 +4,9 @@ project(ninecraft-core)
+ 
+ file(GLOB_RECURSE SOURCE_FILES CONFIGURE_DEPENDS src/*.c)
+ 
+-add_executable(ninecraft ${SOURCE_FILES} ../stb/stb_vorbis.c)
++
++
++add_executable(ninecraft ${SOURCE_FILES} ${STB_DIR}/stb_vorbis.c)
+ if(WIN32)
+     target_compile_definitions(ninecraft PRIVATE AL_LIBTYPE_STATIC)
+     target_link_libraries(ninecraft OpenAL::OpenAL)
+@@ -14,5 +16,5 @@ else()
+     target_link_libraries(ninecraft ${OPENAL_LIBRARY})
+ endif()
+ target_include_directories(ninecraft PUBLIC include/)
+-target_link_libraries(ninecraft ${CMAKE_DL_LIBS} zlibstatic glad glfw ancmp)
++target_link_libraries(ninecraft ${CMAKE_DL_LIBS} ZLIB::ZLIB glad glfw ancmp)
+ include_directories(ninecraft PUBLIC include/)

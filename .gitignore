@@ -25,3 +25,5 @@ a.out
 *.o
 /*.apk
 /*.trace
+result/
+result
