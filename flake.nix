@@ -54,8 +54,12 @@
       devShell = pkgs.callPackage ./nix/shell.nix;
     })
     // {
-      nixosModules.default = {pkgs, ...}: {
+      nixosModule = {pkgs, ...}: {
         imports = [./nix/nixos];
+        programs.ninecraft.package = self.packages.${pkgs.system}.ninecraft;
+      };
+    homeManagerModule = {pkgs, ...}: {
+        imports = [./nix/home];
         programs.ninecraft.package = self.packages.${pkgs.system}.ninecraft;
       };
     };

@@ -1,10 +1,14 @@
 # How to install system wide
+# Setup
+## without flakes
+```sh
+nix-channel --add https://github.com/MCPI-Revival/ninecraft/archive/master.tar.gz ninecraft
+nix-channel --update
+```
 
-Following the nix install 
+## with flakes 
+Please don't just blindly copy and paste the below, please [learn about nix flakes](https://jade.fyi/blog/flakes-arent-real/) or just use the above without flakes
 
-
-## NixOS
-### With Flakes
 ```nix
 {
   inputs = {
@@ -15,7 +19,9 @@ Following the nix install
     };
   };
 
-  outputs = { self, nixpkgs, ninecraft }: {
+  outputs = { self, nixpkgs, ninecraft }:
+  let pkgs = import nixpkgs {system = "x86_64-linux";};
+  in {
     nixosConfigurations = {
       # NOTE: change "host" to your system's hostname
       host = nixpkgs.lib.nixosSystem {
@@ -26,59 +32,103 @@ Following the nix install
         ];
       };
     };
+    homeConfigurations = {
+      # NOTE: change "user" to your username
+      user = lib.homeManagerConfiguration {
+          extraSpecialArgs = moduleArgs;
+
+		specialArgs = [ninecraft];
+        modules = [
+          ./home.nix
+        ];
+		system
+      };
+    };
   };
 }
 ```
 
-> configuration.nix
-```nix
-{ninecraft, ...}: {
-  imports = [
-    ninecraft.nixosModules.default
-  ];
-  nix.settings.experimental-features = [ "nix-command" "flakes" ];
 
-  programs.ninecraft = {
-    enable = true;
-    openFirewall = true;
-  };
-}
+# Configuration
 
-```
-
-and then you can use `ninecraft` command system wide.
-
-### Without Flakes
-
+## NixOS
 
 > configuration.nix
 ```nix
 {pkgs,lib,...}:
-let
-ninecraft = builtins.getFlake github:MCPI-Revival/Ninecraft;
-in
 {
-	nix.settings.experimental-features = [ "nix-command" "flakes" ];
-	enviroment.systemPackages = [
-		ninecraft.packages.${pkgs.system}.ninecraft
+	imports = [
+		# without flakes
+		<ninecraft/nix/nixos>
+		#with flakes
+    	ninecraft.nixosModule
 	];
+
+	# ... other stuff
+
+	programs.ninecraft = {
+		enable = true;
+		openFirewall = true;
+	};
 }
 ```
 
-## Home Manager
-[Install home-manager](https://nix-community.github.io/home-manager/index.xhtml#ch-installation)
+## HomeManager
+> home.nix
 
-> ~/.config/home-manager/home.nix
+This is a work in progress and many options may not function yet.
+
 ```nix
 {pkgs,lib,...}:
-let
-ninecraft = builtins.getFlake git+https://github.com/MCPI-Revival/Ninecraft?submodules=1;
-in
 {
-	#state username etc...
-	nix.settings.experimental-features = [ "nix-command" "flakes" ];
-	home.packages = [
-		ninecraft.packages.${pkgs.system}.ninecraft
+	imports = [
+		# without flakes
+		<ninecraft/nix/home>
+		#with flakes
+    	ninecraft.homeManagerModule
 	];
+
+	# ... other stuff
+
+	programs.ninecraft = {
+		enable = true;
+		version = "0.6.0";
+		#apk = fetchzip {
+			# 	url = "https://archive.org/download/MCPEAlpha/PE-a0.7.0-x86.apk"
+			# 	hash = lib.fakeHash;
+			# }
+		options = {
+			"mp_username"="Steve";
+			"mp_server"="Steve";
+			"mp_server_visible_default"=true;
+			"gfx_fancygraphics"=true;
+			"gfx_lowquality"=false;
+			"ctrl_sensitivity"=0.5
+			"ctrl_invertmouse"=false;
+			"ctrl_islefthanded"=false;
+			"ctrl_usetouchscreen"=false;
+			"ctrl_usetouchjoypad"=false;
+			"feedback_vibration"=false;
+			"game_difficulty"=4;
+		};
+		
+		#extracts into mod folder
+		mods = with pkgs; [
+			(fetchzip {
+				url = "example.com/mod.zip";
+				hash = lib.fakeHash;
+			})
+			(fetchgit {
+				url = "https://.../ok.git";
+				hash = lib.fakeHash;
+			})
+			(fetchFromGitHub {
+				owner = "a";
+				repo = "b";
+				rev = "main";
+				hash = lib.fakeHash;
+			})
+		]
+	}
 }
 ```
