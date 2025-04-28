@@ -13,6 +13,7 @@ in {
     openFirewall = lib.mkEnableOption "Open Ninecraft ports";
     package = lib.mkOption {
       type = types.package;
+      default = with import ../pkgs {}; ninecraft;
     };
   };
 

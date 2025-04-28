@@ -40,19 +40,16 @@
   in
     flake-utils.lib.eachDefaultSystem (system: let
       pkgs = mkPkgs system;
-    in {
-      packages = rec {
-        extract = pkgs.callPackage ./nix/pkgs/extract.nix {};
-        ninecraft = pkgs.pkgsi686Linux.callPackage ./nix/pkgs/ninecraft.nix {
-          ninecraft-extract = extract;
+    in rec {
+      packages =
+        (import ./nix/pkgs {
+          inherit pkgs;
           internal_overrides = ./internal_overrides;
           inherit glad ancmp stb;
+        })
+        // {
+          default = packages.ninecraft;
         };
-        ninecraft-nixgl = pkgs.callPackage ./nix/pkgs/ninecraft-nixgl.nix {
-          inherit ninecraft;
-        };
-        default = ninecraft;
-      };
       formatter = pkgs.alejandra;
       devShell = pkgs.callPackage ./nix/shell.nix;
     })
