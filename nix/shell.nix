@@ -4,7 +4,7 @@
   ninecraft-extract,
   ninecraft-nixgl,
 }:
-pkgs.mkShell {
+mkShell {
   packages = [
     ninecraft
     ninecraft-extract
