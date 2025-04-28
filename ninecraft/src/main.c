@@ -799,7 +799,6 @@ void piapi_init() {
 }
 
 int main(int argc, char **argv) {
-    printf("sizeof wchar: %d\n", sizeof(wchar_t));
     android_linker_init();
     static struct stat st = {0};
     if (stat("storage", &st) == -1) {
@@ -1062,8 +1061,6 @@ int main(int argc, char **argv) {
     }
 
     glfwSetInputMode(_window, GLFW_CURSOR, default_mouse_mode);
-
-    printf("%s\n", glGetString(GL_VERSION));
 
     if (version_id >= version_id_0_9_0 && version_id <= version_id_0_9_5) {
         printf("nine construct %p\n", ninecraft_app_construct_2);
@@ -1463,7 +1460,7 @@ int main(int argc, char **argv) {
             }
         }
         if (mouse_pointer_hidden) {
-            if (controller_states && controller_y_stick && controller_x_stick) {
+            if (controller_states && controller_y_stick && controller_x_stick && version_id <= version_id_0_4_0_j) {
                 controller_states[1] = 1;
                 controller_y_stick[1] = (float)(y_cam - 180.0) * 0.0055555557;
                 controller_x_stick[1] = ((float)((x_cam - 483.0)) * 0.0020703934);
