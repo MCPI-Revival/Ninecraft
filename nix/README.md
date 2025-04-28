@@ -19,7 +19,7 @@ Following the nix install
     nixosConfigurations = {
       # NOTE: change "host" to your system's hostname
       host = nixpkgs.lib.nixosSystem {
-		system = "x96_64-linux";
+		system = "x86_64-linux";
 		specialArgs = [ninecraft];
         modules = [
           ./configuration.nix
