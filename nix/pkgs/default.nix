@@ -43,12 +43,17 @@
   }),
 }: rec {
   extract = pkgs.callPackage ./extract.nix {};
+  ninecraft-unwrapped = pkgs.pkgsi686Linux.callPackage ./ninecraft.nix {
+    inherit glad ancmp stb internal_overrides;
+  };
   ninecraft = pkgs.pkgsi686Linux.callPackage ./ninecraft.nix {
     ninecraft-extract = extract;
-    inherit internal_overrides;
-    inherit glad ancmp stb;
+    inherit internal_overrides ninecraft-unwrapped;
   };
   ninecraft-nixgl = pkgs.callPackage ./ninecraft-nixgl.nix {
     inherit ninecraft;
   };
+  ninecraft-desktop =
+    pkgs.callPackage ./ninecraft-nixgl.nix {
+    };
 }

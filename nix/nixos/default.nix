@@ -28,6 +28,7 @@ in {
               name = "ninecraft";
               icon = "applications-games";
               exec = "ninecraft";
+              path = xdg.dataHome + "/ninecraft";
             })
             cfg.package
           ];
