@@ -31,6 +31,7 @@
     ancmp,
     stb,
   }: let
+    lib = nixpkgs.lib;
     mkPkgs = system:
       import nixpkgs {
         inherit system;
@@ -47,20 +48,24 @@
           internal_overrides = ./internal_overrides;
           inherit glad ancmp stb;
         })
-        // {
+        // rec {
           default = packages.ninecraft;
+          fetchapk = pkgs.callPackage (./nix/pkgs/fetchapk.nix) {};
+          versions = pkgs.callPackage ./nix/pkgs/versions.nix {inherit fetchapk;};
         };
       formatter = pkgs.alejandra;
-      devShell = pkgs.callPackage ./nix/shell.nix;
+      # devShell = pkgs.callPackage ./nix/shell.nix packages;
     })
     // {
       nixosModule = {pkgs, ...}: {
         imports = [./nix/nixos];
-        programs.ninecraft.package = self.packages.${pkgs.system}.ninecraft;
+        programs.ninecraft.package = self.packages.${pkgs.system}.ninecraft-unwrapped;
       };
-    homeManagerModule = {pkgs, ...}: {
+      homeManagerModule = {pkgs, ...}: {
         imports = [./nix/home];
-        programs.ninecraft.package = self.packages.${pkgs.system}.ninecraft;
+        programs.ninecraft.package = self.packages.${pkgs.system}.ninecraft-nixgl.override {
+          ninecraft = self.packages.${pkgs.system}.ninecraft-unwrapped;
+        };
       };
     };
 }
