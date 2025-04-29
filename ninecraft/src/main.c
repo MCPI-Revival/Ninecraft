@@ -866,6 +866,14 @@ int main(int argc, char **argv) {
     add_custom_hook("SL_IID_PLAY", &sles_iid_play);
     add_custom_hook("slCreateEngine", sles_create_engine);
 
+    struct soinfo *so_liblog = android_library_create("liblog.so");
+    struct soinfo *so_libgles = android_library_create("libGLESv1_CM.so");
+    struct soinfo *so_libgles2 = android_library_create("libGLESv2.so");
+    struct soinfo *so_libegl = android_library_create("libEGL.so");
+    struct soinfo *so_libandroid = android_library_create("libandroid.so");
+    struct soinfo *so_libopensles = android_library_create("libOpenSLES.so");
+    struct soinfo *so_libz = android_library_create("libz.so");
+
     handle = load_library("libminecraftpe.so");
 
     if (!handle) {
