@@ -3,45 +3,26 @@ project(ninecraft)
 
 find_package(PkgConfig)
 
-# STB
-if(EXISTS $ENV{stb}/stb_vorbis.c)
-	set(STB_DIR $ENV{stb})
-elseif(EXISTS ${PROJECT_SOURCE_DIR}/stb)
-	set(STB_DIR ${PROJECT_SOURCE_DIR}/stb)
-endif()
-include_directories(${STB_DIR})
+include_directories(${PROJECT_SOURCE_DIR}/stb)
 
-# GLAD
-if(EXISTS $ENV{glad}/cmake/CMakeLists.txt)
-	add_subdirectory($ENV{glad}/cmake $ENV{glad})
-elseif(EXISTS glad/cmake/CMakeLists.txt)
-	add_subdirectory(glad/cmake)
-endif()
-if(glad)
-	glad_add_library(glad REPRODUCIBLE LOADER API egl=1.5 gl:compatibility=2.0)
-endif()
+add_subdirectory(glad/cmake)
+glad_add_library(glad REPRODUCIBLE LOADER API egl=1.5 gl:compatibility=2.0)
+
 
 # ZLIB
 find_package(ZLIB)
-if(ZLIB::ZLIB)
-	set(zlibstatic ZLIB::ZLIB)
-elseif(EXISTS "zlib/CMakeLists.txt")
-	add_subdirectory(zlib)
-	set(zlibstatic zlibstatic)
+if(NOT ZLIB_FOUND)
+MESSAGE(STATUS "Including ZLIB from submodule")
+add_subdirectory(zlib)
 endif()
 
-# ancmp
-if(EXISTS $ENV{ancmp}/CMakeLists.txt)
-	add_subdirectory($ENV{ancmp} $ENV{ancmp})
-elseif(EXISTS acmp/CMakeLists.txt)
-	add_subdirectory(ancmp)
-endif()
+add_subdirectory(ancmp)
 
-
-find_library(glfw3)
-if(NOT glfw and EXISTS "glfw/CMakeLists.txt")
-	# fallback to included submodule
-	add_subdirectory(glfw)
+# GLFW
+find_package(glfw3)
+if(NOT glfw3_FOUND)
+MESSAGE(STATUS "Including GLFW from submodule")
+add_subdirectory(glfw)
 endif()
 
 if(WIN32)
