@@ -22,9 +22,15 @@
   makeWrapper,
   ...
 }: let
-  ninecraft = stdenv.mkDerivation {
+  ninecraft = stdenv.mkDerivation rec {
     pname = "ninecraft";
     version = "1.2.0";
+    # srcs = [../.. stb glad ancmp];
+    # setSourceRoot = ''      sourceRoot=$(if [[ "${pname}" == "source" ]]; then
+    #               echo "."
+    #             else
+    #               echo ${pname}-*
+    #             fi)'';
     src = ../..;
     prePhases = ["submoduleFetchPhase"];
     submoduleFetchPhase = ''
@@ -36,7 +42,8 @@
       cp --no-preserve=mode,ownership -r ${ancmp} $ancmp
       cp --no-preserve=mode,ownership -r ${stb} $stb
 
-         	 ls -al deps_src
+      ls -al deps_src
+      # echo $src
     '';
     nativeBuildInputs = [
       pkg-config
@@ -51,6 +58,7 @@
       python312Packages.jinja2
       glfw
       zlib
+      stb
     ];
     installPhase = ''
        mkdir -p $out/bin

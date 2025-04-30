@@ -4,7 +4,9 @@ project(ninecraft-core)
 
 file(GLOB_RECURSE SOURCE_FILES CONFIGURE_DEPENDS src/*.c)
 
-add_executable(ninecraft ${SOURCE_FILES} ../stb/stb_vorbis.c)
+
+add_executable(ninecraft ${SOURCE_FILES} ${STB_DIR}/stb_vorbis.c)
+
 if(WIN32)
     target_compile_definitions(ninecraft PRIVATE AL_LIBTYPE_STATIC)
     target_link_libraries(ninecraft OpenAL::OpenAL)
