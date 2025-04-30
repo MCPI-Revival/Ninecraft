@@ -22,7 +22,7 @@ if(glad)
 endif()
 
 # ZLIB
-find_package(ZLIB REQUIRED)
+find_package(ZLIB)
 if(ZLIB::ZLIB)
 	set(zlibstatic ZLIB::ZLIB)
 elseif(EXISTS "zlib/CMakeLists.txt")
@@ -38,7 +38,7 @@ elseif(EXISTS acmp/CMakeLists.txt)
 endif()
 
 
-find_library(glfw3 REQUIRED)
+find_library(glfw3)
 if(NOT glfw and EXISTS "glfw/CMakeLists.txt")
 	# fallback to included submodule
 	add_subdirectory(glfw)

@@ -45,7 +45,7 @@
       wrapGAppsHook
     ];
 
-    patches = [./use-system-dependancies.patch];
+    #patches = [./use-system-dependancies.patch];
     buildInputs = [
       openal
       python312Packages.jinja2
