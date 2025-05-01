@@ -3,11 +3,12 @@
   flakeLock ? builtins.fromJSON (builtins.readFile ../../flake.lock),
   getHash ? name: flakeLock.nodes.${name}.locked.narHash,
   getRev ? name: flakeLock.nodes.${name}.locked.rev,
-  nixgl ? (pkgs.fetchFromGitHub {
+  nixgl ? (pkgs.fetchFromGitHub rec {
+    name = "nixgl";
     owner = "nix-community";
-    repo = "nixGL";
-    rev = getRev "nixgl";
-    hash = getHash "nixgl";
+    repo = name;
+    rev = getRev name;
+    hash = getHash name;
   }),
   pkgs ? (import <nixpkgs> {
     config.allowUnfree = true;
@@ -29,16 +30,14 @@
     owner = "Dav1dde";
     repo = name;
     rev = getRev name;
-    hash =
-      getHash name;
+    hash = getHash name;
   }),
   ancmp ? (pkgs.fetchFromGitHub rec {
     name = "ancmp";
     owner = "MFDGaming";
     repo = name;
     rev = getRev name;
-    hash =
-      getHash name;
+    hash = getHash name;
   }),
   stb ? (pkgs.fetchFromGitHub rec {
     name = "stb";

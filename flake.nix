@@ -44,7 +44,6 @@
       packages =
         (import ./nix/pkgs {
           inherit pkgs;
-          internal_overrides = ./internal_overrides;
         })
         // {
           default = packages.ninecraft;
