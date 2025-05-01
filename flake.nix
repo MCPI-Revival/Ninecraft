@@ -44,8 +44,6 @@
       packages =
         (import ./nix/pkgs {
           inherit pkgs;
-          internal_overrides = ./internal_overrides;
-          inherit glad ancmp stb;
         })
         // {
           default = packages.ninecraft;
@@ -58,7 +56,7 @@
         imports = [./nix/nixos];
         programs.ninecraft.package = self.packages.${pkgs.system}.ninecraft;
       };
-    homeManagerModule = {pkgs, ...}: {
+      homeManagerModule = {pkgs, ...}: {
         imports = [./nix/home];
         programs.ninecraft.package = self.packages.${pkgs.system}.ninecraft;
       };
