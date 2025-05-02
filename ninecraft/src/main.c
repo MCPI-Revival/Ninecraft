@@ -798,6 +798,123 @@ void piapi_init() {
     command_server_init(command_server, 4711);
 }
 
+void leveldb_zlib_compress_impl(void *__this, const char *input, unsigned int length, android_string_t *output) {
+    size_t BUFSIZE = 128 * 1024;
+    uint8_t *temp_buffer = malloc(BUFSIZE);
+
+    size_t current_alloc_len = ((compressBound(length) / BUFSIZE) + 1) * BUFSIZE;
+	uint8_t *buf = (uint8_t *)malloc(current_alloc_len);
+    size_t off = 0;
+
+	z_stream strm;
+	strm.zalloc = 0;
+	strm.zfree = 0;
+	strm.next_in = (unsigned char *)(input);
+	strm.avail_in = (uint32_t)length;
+	strm.next_out = temp_buffer;
+	strm.avail_out = BUFSIZE;
+	deflateInit(&strm, 0);
+	int deflate_res = Z_OK;
+	while (strm.avail_in != 0)
+	{
+		int res = deflate(&strm, Z_NO_FLUSH);
+		assert(res == Z_OK);
+		if (strm.avail_out == 0)
+		{
+            if (off >= current_alloc_len) {
+                current_alloc_len += BUFSIZE;
+                buf = (uint8_t *)realloc(buf, current_alloc_len);
+            }
+            memcpy(&buf[off], temp_buffer, BUFSIZE);
+            off += BUFSIZE;
+			strm.next_out = temp_buffer;
+			strm.avail_out = BUFSIZE;
+		}
+	}
+	while (deflate_res == Z_OK)
+	{
+		if (strm.avail_out == 0)
+		{
+			if (off >= current_alloc_len) {
+                current_alloc_len += BUFSIZE;
+                buf = (uint8_t *)realloc(buf, current_alloc_len);
+            }
+            memcpy(&buf[off], temp_buffer, BUFSIZE);
+            off += BUFSIZE;
+			strm.next_out = temp_buffer;
+			strm.avail_out = BUFSIZE;
+		}
+		deflate_res = deflate(&strm, Z_FINISH);
+	}
+	assert(deflate_res == Z_STREAM_END);
+    if (off >= current_alloc_len) {
+        current_alloc_len += BUFSIZE;
+        buf = (uint8_t *)realloc(buf, current_alloc_len);
+    }
+    memcpy(&buf[off], temp_buffer, BUFSIZE - strm.avail_out);
+	off += BUFSIZE - strm.avail_out;
+	deflateEnd(&strm);
+    free(temp_buffer);
+
+    android_string_cstrl(output, (char *)buf, off);
+    free(buf);
+}
+
+bool leveldb_zlib_decompress(void *__this, const char *input, unsigned int length, android_string_t *output) {
+    size_t CHUNK = 64 * 1024;
+    uint8_t *out, *buf;
+	int ret;
+	size_t have;
+	z_stream strm;
+    size_t off = 0;
+    
+	strm.zalloc = Z_NULL;
+	strm.zfree = Z_NULL;
+	strm.opaque = Z_NULL;
+	strm.avail_in = (uint32_t)length;
+	strm.next_in = (Bytef*)input;
+	ret = inflateInit(&strm);
+	if (ret != Z_OK) {
+		return false;
+    }
+    out = (uint8_t *)malloc(CHUNK);
+    buf = NULL;
+
+	do {
+		do {
+			strm.avail_out = CHUNK;
+			strm.next_out = out;
+			ret = inflate(&strm, Z_NO_FLUSH);
+			assert(ret != Z_STREAM_ERROR);
+			switch (ret) {
+			case Z_NEED_DICT:
+				ret = Z_DATA_ERROR;
+			case Z_DATA_ERROR:
+			case Z_MEM_ERROR:
+				(void)inflateEnd(&strm);
+                free(out);
+                if (buf) {
+                    free(buf);
+                }
+				return false;
+			}
+			have = CHUNK - strm.avail_out;
+            if (!buf) {
+                buf = (uint8_t *)malloc(have);
+            } else {
+                buf = (uint8_t *)realloc(buf, off + have);
+            }
+			memcpy(&buf[off], out, have);
+            off += have;
+		} while (strm.avail_out == 0);
+	} while (ret != Z_STREAM_END);
+	(void)inflateEnd(&strm);
+    android_string_cstrl(output, (char *)buf, off);
+    free(buf);
+    free(out);
+	return ret == Z_STREAM_END ? true : false;
+}
+
 int main(int argc, char **argv) {
     android_linker_init();
     static struct stat st = {0};
@@ -1059,6 +1176,12 @@ int main(int argc, char **argv) {
     minecraft_setup_hooks(handle);
     inject_mods(handle, version_id);
     mod_loader_load_all(handle, version_id);
+
+    if (version_id >= version_id_0_9_0) {
+        void **zlib_compressor_vtable = (void **)android_dlsym(handle, "_ZTVN7leveldb14ZlibCompressorE");
+        zlib_compressor_vtable[4] = leveldb_zlib_compress_impl;
+        zlib_compressor_vtable[5] = leveldb_zlib_decompress;
+    }
 
     controller_states = (unsigned char *)android_dlsym(handle, "_ZN10Controller15isTouchedValuesE");
     controller_x_stick = (float *)android_dlsym(handle, "_ZN10Controller12stickValuesXE");
