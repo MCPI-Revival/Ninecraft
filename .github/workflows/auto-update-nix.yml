@@ -30,7 +30,7 @@ jobs:
         git config --global user.name "github-actions[bot]"
         git config --global user.email "github-actions[bot]@users.noreply.github.com"
 
-        if git diff --quiet HEAD changedir/; then
+        if git diff --quiet HEAD ./flake.lock; then
           echo "No changes"
           echo "changed=false" >> $GITHUB_OUTPUT
         else
@@ -41,6 +41,6 @@ jobs:
     - name: Commit and Push
       if: steps.changes.outputs.changed == 'true'
       run: |
-        git add changedir/
+        git add ./flake.lock
         git commit -m "Auto-update: $(date)"
         git push
