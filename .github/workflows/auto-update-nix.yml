@@ -1,4 +1,4 @@
-name: C/C++ CI
+name: AutoUpdateNix
 
 on:
   push:
@@ -7,7 +7,7 @@ on:
     branches: [ "master" ]
 
 jobs:
-  build:
+  auto-update-nix:
 
     runs-on: ubuntu-latest
 
