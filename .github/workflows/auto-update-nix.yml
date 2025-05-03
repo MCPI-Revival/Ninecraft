@@ -1,0 +1,44 @@
+name: C/C++ CI
+
+on:
+  push:
+    branches: [ "master" ]
+  pull_request:
+    branches: [ "master" ]
+
+jobs:
+  build:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set up dependencies
+      run: |
+        sudo apt-get update
+        sudo apt-get install -y nix-bin git
+        
+    - name: Check for update
+      run: nix flake update
+
+    - name: Check if directory has changed
+      id: changes
+      run: |
+        git config --global user.name "github-actions[bot]"
+        git config --global user.email "github-actions[bot]@users.noreply.github.com"
+
+        if git diff --quiet HEAD changedir/; then
+          echo "No changes"
+          echo "changed=false" >> $GITHUB_OUTPUT
+        else
+          echo "Changes found"
+          echo "changed=true" >> $GITHUB_OUTPUT
+        fi
+
+    - name: Commit and Push
+      if: steps.changes.outputs.changed == 'true'
+      run: |
+        git add changedir/
+        git commit -m "Auto-update: $(date)"
+        git push
