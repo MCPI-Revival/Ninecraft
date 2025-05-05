@@ -1002,18 +1002,15 @@ int main(int argc, char **argv) {
 
     static android_string_t in;
     android_string_cstr(&in, "v%d.%d.%d alpha");
-#ifdef _WIN32 
-    void (__stdcall *get_game_version_string)(android_string_t *, android_string_t *) = (void (__stdcall *)(android_string_t *, android_string_t *))android_dlsym(handle, "_ZN6Common20getGameVersionStringERKSs");
-
-    void (__stdcall *get_game_version_string_2)(android_string_t *) = (void (__stdcall *)(android_string_t *))android_dlsym(handle, "_ZN6Common20getGameVersionStringEv");
-#else
     void (*get_game_version_string)(android_string_t *, android_string_t *) = (void (*)(android_string_t *, android_string_t *))android_dlsym(handle, "_ZN6Common20getGameVersionStringERKSs");
-
     void (*get_game_version_string_2)(android_string_t *) = (void (*)(android_string_t *))android_dlsym(handle, "_ZN6Common20getGameVersionStringEv");
-#endif
     if (get_game_version_string != NULL) {
         static android_string_t game_version;
-        get_game_version_string(&game_version, &in);
+#if defined(__i386__) || defined(_M_IX86)
+        sysv_call_func(get_game_version_string, &game_version, 1, &in);
+#else
+        get_game_version_string(&game_version, &in)
+#endif
         char *verstr = android_string_to_str(&game_version);
 
         bool is_j = android_dlsym(handle, "Java_com_mojang_minecraftpe_MainActivity_nativeOnCreate") != NULL;
@@ -1082,7 +1079,11 @@ int main(int argc, char **argv) {
         }
     } else if (get_game_version_string_2 != NULL) {
         static android_string_t game_version;
+#if defined(__i386__) || defined(_M_IX86)
+        sysv_call_func(get_game_version_string_2, &game_version, 0);
+#else
         get_game_version_string_2(&game_version);
+#endif
         char *verstr = android_string_to_str(&game_version);
         printf("Ninecraft is running mcpe %s\n", verstr);
         if (strcmp(verstr, "v0.8.0 alpha") == 0) {
@@ -1397,53 +1398,7 @@ int main(int argc, char **argv) {
         }
     }
 
-    int minecraft_options_offset = 0;
-    if (version_id == version_id_0_5_0) {
-        minecraft_options_offset = MINECRAFT_OPTIONS_OFFSET_0_5_0;
-    } else if (version_id == version_id_0_5_0_j) {
-        minecraft_options_offset = MINECRAFT_OPTIONS_OFFSET_0_5_0_J;
-    } else if (version_id == version_id_0_6_0) {
-        minecraft_options_offset = MINECRAFT_OPTIONS_OFFSET_0_6_0;
-    } else if (version_id == version_id_0_6_1) {
-        minecraft_options_offset = MINECRAFT_OPTIONS_OFFSET_0_6_1;
-    } else if (version_id == version_id_0_7_0) {
-        minecraft_options_offset = MINECRAFT_OPTIONS_OFFSET_0_7_0;
-    } else if (version_id == version_id_0_7_1) {
-        minecraft_options_offset = MINECRAFT_OPTIONS_OFFSET_0_7_1;
-    } else if (version_id == version_id_0_7_2) {
-        minecraft_options_offset = MINECRAFT_OPTIONS_OFFSET_0_7_2;
-    } else if (version_id == version_id_0_7_3) {
-        minecraft_options_offset = MINECRAFT_OPTIONS_OFFSET_0_7_3;
-    } else if (version_id == version_id_0_7_4) {
-        minecraft_options_offset = MINECRAFT_OPTIONS_OFFSET_0_7_4;
-    } else if (version_id == version_id_0_7_5) {
-        minecraft_options_offset = MINECRAFT_OPTIONS_OFFSET_0_7_5;
-    } else if (version_id == version_id_0_7_6) {
-        minecraft_options_offset = MINECRAFT_OPTIONS_OFFSET_0_7_6;
-    } else if (version_id == version_id_0_8_0) {
-        minecraft_options_offset = MINECRAFT_OPTIONS_OFFSET_0_8_0;
-    } else if (version_id == version_id_0_8_1) {
-        minecraft_options_offset = MINECRAFT_OPTIONS_OFFSET_0_8_1;
-    } else if (version_id == version_id_0_9_0) {
-        minecraft_options_offset = MINECRAFT_OPTIONS_OFFSET_0_9_0;
-    } else if (version_id == version_id_0_9_1) {
-        minecraft_options_offset = MINECRAFT_OPTIONS_OFFSET_0_9_1;
-    } else if (version_id == version_id_0_9_2) {
-        minecraft_options_offset = MINECRAFT_OPTIONS_OFFSET_0_9_2;
-    } else if (version_id == version_id_0_9_3) {
-        minecraft_options_offset = MINECRAFT_OPTIONS_OFFSET_0_9_3;
-    } else if (version_id == version_id_0_9_4) {
-        minecraft_options_offset = MINECRAFT_OPTIONS_OFFSET_0_9_4;
-    } else if (version_id == version_id_0_9_5) {
-        minecraft_options_offset = MINECRAFT_OPTIONS_OFFSET_0_9_5;
-    }
-
-    char *minecraft_options = NULL;
-    if (version_id >= version_id_0_5_0 && version_id <= version_id_0_9_5) {
-        minecraft_options = (char *)ninecraft_app + minecraft_options_offset;
-    } else if (version_id >= version_id_0_10_0 && version_id <= version_id_0_10_5) {
-        minecraft_options = minecraft_client_get_options(ninecraft_app);
-    }
+    char *minecraft_options = minecraft_get_options(ninecraft_app, version_id);
 
     if (version_id >= version_id_0_5_0 && version_id <= version_id_0_10_5 && minecraft_options && minecraft_options != ninecraft_app) {
         if (version_id >= version_id_0_7_0 && options_set_key) {
@@ -1568,7 +1523,7 @@ int main(int argc, char **argv) {
     } else if (version_id == version_id_0_1_0) {
         minecraft_isgrabbed_offset = MINECRAFT_ISGRABBED_OFFSET_0_1_0;
     }
-
+    
     while (true) {
         if (((bool *)ninecraft_app)[minecraft_isgrabbed_offset]) {
             if (!mouse_pointer_hidden) {

@@ -535,6 +535,10 @@
 #define MINECRAFT_ISGRABBED_OFFSET_0_1_0_TOUCH 0xd38
 #define MINECRAFT_ISGRABBED_OFFSET_0_1_0 0xd28
 
+extern void gui_component_draw_rect(void *gui_component, int x1, int y1, int x2, int y2, int color, int thickness);
+
+extern void *minecraft_get_options(void *minecraft, int version_id);
+
 extern uintptr_t get_ninecraftapp_external_storage_offset(int version_id);
 
 extern uintptr_t get_ninecraftapp_internal_storage_offset(int version_id);
@@ -575,7 +579,7 @@ typedef void (*textures_load_and_bind_texture_t)(void *textures, android_string_
 
 extern textures_load_and_bind_texture_t textures_load_and_bind_texture;
 
-typedef void (*gui_component_blit_t)(void *screen, int32_t x_dest, int32_t y_dest, int32_t x_src, int32_t y_src, int32_t width_dest, int32_t height_dest, int32_t width_src, int32_t height_src);
+typedef void (*gui_component_blit_t)(void *gui_component, int32_t x_dest, int32_t y_dest, int32_t x_src, int32_t y_src, int32_t width_dest, int32_t height_dest, int32_t width_src, int32_t height_src);
 
 extern gui_component_blit_t gui_component_blit;
 
@@ -690,6 +694,9 @@ extern minecraft_client_get_options_t minecraft_client_get_options;
 typedef void *(*minecraft_client_get_local_player_t)(void *minecraft_client);
 
 extern minecraft_client_get_local_player_t minecraft_client_get_local_player;
+
+typedef void (*gui_component_fill_t)(void *gui_component, int x1, int y1, int x2, int y2, int color);
+extern gui_component_fill_t gui_component_fill;
 
 extern void minecraft_setup_hooks(void *handle);
 
