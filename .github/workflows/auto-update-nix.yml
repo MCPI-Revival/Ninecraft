@@ -1,0 +1,46 @@
+name: AutoUpdateNix
+
+on:
+  push:
+    branches: [ "master" ]
+  pull_request:
+    branches: [ "master" ]
+
+jobs:
+  auto-update-nix:
+
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Set up Nix
+      uses: cachix/install-nix-action@v27
+      with:
+        nix_path: nixpkgs=channel:nixos-23.11
+        extra_nix_config: |
+          experimental-features = nix-command flakes
+        
+    - name: Check for update
+      run: nix --extra-experimental-features "nix-command flakes" flake update
+
+    - name: Check if directory has changed
+      id: changes
+      run: |
+        git config --global user.name "github-actions[bot]"
+        git config --global user.email "github-actions[bot]@users.noreply.github.com"
+
+        if git diff --quiet HEAD ./flake.lock; then
+          echo "No changes"
+          echo "changed=false" >> $GITHUB_OUTPUT
+        else
+          echo "Changes found"
+          echo "changed=true" >> $GITHUB_OUTPUT
+        fi
+
+    - name: Commit and Push
+      if: steps.changes.outputs.changed == 'true'
+      run: |
+        git add ./flake.lock
+        git commit -m "Auto-update: $(date)"
+        git push
