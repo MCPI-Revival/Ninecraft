@@ -3,4 +3,6 @@
 
 extern void chat_mod_inject(void *handle);
 
+extern void chat_mod_append_char(char c);
+
 #endif
