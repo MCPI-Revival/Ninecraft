@@ -7,6 +7,7 @@
     nixgl = {
       url = "github:nix-community/nixGL";
       inputs.nixpkgs.follows = "nixpkgs";
+      inputs.flake-utils.follows = "flake-utils";
     };
     glad = {
       flake = false;
@@ -58,7 +59,7 @@
         imports = [./nix/nixos];
         programs.ninecraft.package = self.packages.${pkgs.system}.ninecraft;
       };
-    homeManagerModule = {pkgs, ...}: {
+      homeManagerModule = {pkgs, ...}: {
         imports = [./nix/home];
         programs.ninecraft.package = self.packages.${pkgs.system}.ninecraft;
       };
