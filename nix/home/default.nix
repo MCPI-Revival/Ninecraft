@@ -22,25 +22,25 @@ in {
       type = types.nullOr (types.package);
     };
     options = lib.mkOption {
-      type = types.attrsOf (types.oneOf [types.int types.bool types.str] );
+      type = types.attrsOf (types.oneOf [types.int types.bool types.str]);
       default = {
-			"mp_username"="Steve";
-			"mp_server"="Steve";
-			"mp_server_visible_default"=true;
-			"gfx_fancygraphics"=true;
-			"gfx_lowquality"=false;
-			"ctrl_sensitivity"=0.5;
-			"ctrl_invertmouse"=false;
-			"ctrl_islefthanded"=false;
-			"ctrl_usetouchscreen"=false;
-			"ctrl_usetouchjoypad"=false;
-			"feedback_vibration"=false;
-			"game_difficulty"=4;
-		};
+        "mp_username" = "Steve";
+        "mp_server" = "Steve";
+        "mp_server_visible_default" = true;
+        "gfx_fancygraphics" = true;
+        "gfx_lowquality" = false;
+        "ctrl_sensitivity" = 0.5;
+        "ctrl_invertmouse" = false;
+        "ctrl_islefthanded" = false;
+        "ctrl_usetouchscreen" = false;
+        "ctrl_usetouchjoypad" = false;
+        "feedback_vibration" = false;
+        "game_difficulty" = 4;
+      };
     };
     mods = lib.mkOption {
       type = types.listOf types.package;
       default = [];
-    }
+    };
   };
 }
