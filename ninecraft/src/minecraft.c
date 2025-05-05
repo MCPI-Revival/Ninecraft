@@ -41,6 +41,62 @@ gui_add_message_t gui_add_message = NULL;
 options_set_key_t options_set_key = NULL;
 minecraft_client_get_options_t minecraft_client_get_options = NULL;
 minecraft_client_get_local_player_t minecraft_client_get_local_player = NULL;
+gui_component_fill_t gui_component_fill = NULL;
+
+void gui_component_draw_rect(void *gui_component, int x1, int y1, int x2, int y2, int color, int thickness) {
+    if (gui_component_fill) {
+        gui_component_fill(gui_component, x1, y1, x2, y1 + thickness, color);
+        gui_component_fill(gui_component, x1, y2 - thickness, x2, y2, color);
+        gui_component_fill(gui_component, x1, y1, x1 + thickness, y2, color);
+        gui_component_fill(gui_component, x2 - thickness, y1, x2, y2, color);
+    }
+}
+
+void *minecraft_get_options(void *minecraft, int version_id) {
+    char *mc_options = NULL;
+    if (version_id == version_id_0_5_0) {
+        mc_options = (char *)minecraft + MINECRAFT_OPTIONS_OFFSET_0_5_0;
+    } else if (version_id == version_id_0_5_0_j) {
+        mc_options = (char *)minecraft + MINECRAFT_OPTIONS_OFFSET_0_5_0_J;
+    } else if (version_id == version_id_0_6_0) {
+        mc_options = (char *)minecraft + MINECRAFT_OPTIONS_OFFSET_0_6_0;
+    } else if (version_id == version_id_0_6_1) {
+        mc_options = (char *)minecraft + MINECRAFT_OPTIONS_OFFSET_0_6_1;
+    } else if (version_id == version_id_0_7_0) {
+        mc_options = (char *)minecraft + MINECRAFT_OPTIONS_OFFSET_0_7_0;
+    } else if (version_id == version_id_0_7_1) {
+        mc_options = (char *)minecraft + MINECRAFT_OPTIONS_OFFSET_0_7_1;
+    } else if (version_id == version_id_0_7_2) {
+        mc_options = (char *)minecraft + MINECRAFT_OPTIONS_OFFSET_0_7_2;
+    } else if (version_id == version_id_0_7_3) {
+        mc_options = (char *)minecraft + MINECRAFT_OPTIONS_OFFSET_0_7_3;
+    } else if (version_id == version_id_0_7_4) {
+        mc_options = (char *)minecraft + MINECRAFT_OPTIONS_OFFSET_0_7_4;
+    } else if (version_id == version_id_0_7_5) {
+        mc_options = (char *)minecraft + MINECRAFT_OPTIONS_OFFSET_0_7_5;
+    } else if (version_id == version_id_0_7_6) {
+        mc_options = (char *)minecraft + MINECRAFT_OPTIONS_OFFSET_0_7_6;
+    } else if (version_id == version_id_0_8_0) {
+        mc_options = (char *)minecraft + MINECRAFT_OPTIONS_OFFSET_0_8_0;
+    } else if (version_id == version_id_0_8_1) {
+        mc_options = (char *)minecraft + MINECRAFT_OPTIONS_OFFSET_0_8_1;
+    } else if (version_id == version_id_0_9_0) {
+        mc_options = (char *)minecraft + MINECRAFT_OPTIONS_OFFSET_0_9_0;
+    } else if (version_id == version_id_0_9_1) {
+        mc_options = (char *)minecraft + MINECRAFT_OPTIONS_OFFSET_0_9_1;
+    } else if (version_id == version_id_0_9_2) {
+        mc_options = (char *)minecraft + MINECRAFT_OPTIONS_OFFSET_0_9_2;
+    } else if (version_id == version_id_0_9_3) {
+        mc_options = (char *)minecraft + MINECRAFT_OPTIONS_OFFSET_0_9_3;
+    } else if (version_id == version_id_0_9_4) {
+        mc_options = (char *)minecraft + MINECRAFT_OPTIONS_OFFSET_0_9_4;
+    } else if (version_id == version_id_0_9_5) {
+        mc_options = (char *)minecraft + MINECRAFT_OPTIONS_OFFSET_0_9_5;
+    } else if (version_id >= version_id_0_10_0 && version_id <= version_id_0_10_5) {
+        mc_options = (char *)minecraft_client_get_options(minecraft);
+    }
+    return (void *)mc_options;
+}
 
 uintptr_t get_ninecraftapp_external_storage_offset(int version_id) {
     if (version_id == version_id_0_1_0) {
@@ -314,4 +370,5 @@ void minecraft_setup_hooks(void *handle) {
     options_set_key = (options_set_key_t)android_dlsym(handle, "_ZN7Options6setKeyEii");
     minecraft_client_get_options = (minecraft_client_get_options_t)android_dlsym(handle, "_ZN15MinecraftClient10getOptionsEv");
     minecraft_client_get_local_player = (minecraft_client_get_local_player_t)android_dlsym(handle, "_ZN15MinecraftClient14getLocalPlayerEv");
+    gui_component_fill = (gui_component_fill_t)android_dlsym(handle, "_ZN12GuiComponent4fillEiiiii");
 }
