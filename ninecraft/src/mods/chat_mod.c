@@ -8,6 +8,8 @@
 #include <ninecraft/AppPlatform_linux.h>
 #include <ninecraft/android/android_vector.h>
 #include <ancmp/android_dlfcn.h>
+#include <ninecraft/text_box.h>
+#include <ninecraft/input/minecraft_keys.h>
 
 /*
     This mod allows you to chat in versions between
@@ -16,6 +18,8 @@
 
 extern void *ninecraft_app;
 extern int version_id;
+
+static text_box_t text_box;
 
 void *get_raknet_instance() {
     if (version_id == version_id_0_5_0) {
@@ -103,60 +107,6 @@ void send_message(char *message) {
     raknet_instance_send_packet(raknet_instance, packet);
 }
 
-void chat_screen_render(void *char_screen, int mouse_x, int mouse_y, float f) {
-    void *raknet_instance;
-
-    int user_input_status = AppPlatform_linux$getUserInputStatus(NULL);
-	if (user_input_status < 0) {
-		return;
-    }
-
-	if (user_input_status == 1) {
-        android_vector_t user_input;
-        AppPlatform_linux$getUserInput(&user_input, NULL);
-		if (android_vector_size(&user_input, android_string_tsize()) >= 1) {
-            android_string_t *message = android_vector_at(&user_input, 0, android_string_tsize());
-            if (!raknet_instance_is_server) {
-                return;
-            }
-            raknet_instance = get_raknet_instance();
-            if (!raknet_instance) {
-                return;
-            }
-            if (raknet_instance_is_server(raknet_instance)) {
-                char *username = "Steve";
-                char *formatted_message;
-                android_string_t formatted_message_str;
-
-                for (int i = 0; i < platform_options.length; ++i) {
-                    if (strcmp(platform_options.options[i].name, "mp_username") == 0) {
-                        username = platform_options.options[i].value;
-                    }
-                }
-                formatted_message = get_formatted_message(username, android_string_to_str(message));
-                android_string_cstr(&formatted_message_str, formatted_message);
-                if (formatted_message) {
-                    send_message(formatted_message);
-                    if (gui_add_message) {
-                        if (version_id == version_id_0_5_0) {
-                            gui_add_message((char *)ninecraft_app + MINECRAFT_GUI_OFFSET_0_5_0, &formatted_message_str);
-                        } else if (version_id == version_id_0_6_0) {
-                            gui_add_message((char *)ninecraft_app + MINECRAFT_GUI_OFFSET_0_6_0, &formatted_message_str);
-                        } else if (version_id == version_id_0_6_1) {
-                            gui_add_message((char *)ninecraft_app + MINECRAFT_GUI_OFFSET_0_6_1, &formatted_message_str);
-                        }
-                    }
-                    android_string_destroy(&formatted_message_str);
-                    free(formatted_message);
-                }
-            } else {
-			    send_chat_message(android_string_to_str(message));
-            }
-		}
-	}
-    minecraft_set_screen(ninecraft_app, NULL);
-}
-
 void server_side_network_handler_handle_chat_packet(void *__this, void *raknet_guid, void *chat_packet) {
     android_string_t *message_str = (android_string_t *)((char *)chat_packet + 12);
     char *message = android_string_to_str(message_str);
@@ -205,9 +155,106 @@ void server_side_network_handler_handle_chat_packet(void *__this, void *raknet_g
     free(formatted_message);
 }
 
+void chat_screen_render(void *__this, int mouse_x, int mouse_y, float f) {
+    void *raknet_instance;
+
+    gui_component_fill(__this, 0, 0, *((int *)__this + 2), *((int *)__this + 3), 0xa0000000);
+
+    text_box.width = *((int *)__this + 2);
+    text_box_render(&text_box, ninecraft_app, mouse_x, mouse_y);
+
+	if (text_box.is_finished) {
+        AppPlatform_linux$hideKeyboard(NULL);
+        if (text_box.text && text_box.text_len != 0) {
+            if (!raknet_instance_is_server) {
+                return;
+            }
+            raknet_instance = get_raknet_instance();
+            if (!raknet_instance) {
+                return;
+            }
+            if (raknet_instance_is_server(raknet_instance)) {
+                char *username = "Steve";
+                char *formatted_message;
+                android_string_t formatted_message_str;
+                for (int i = 0; i < platform_options.length; ++i) {
+                    if (strcmp(platform_options.options[i].name, "mp_username") == 0) {
+                        username = platform_options.options[i].value;
+                    }
+                }
+                formatted_message = get_formatted_message(username, text_box.text);
+                android_string_cstr(&formatted_message_str, formatted_message);
+                if (formatted_message) {
+                    send_message(formatted_message);
+                    if (gui_add_message) {
+                        if (version_id == version_id_0_5_0) {
+                            gui_add_message((char *)ninecraft_app + MINECRAFT_GUI_OFFSET_0_5_0, &formatted_message_str);
+                        } else if (version_id == version_id_0_6_0) {
+                            gui_add_message((char *)ninecraft_app + MINECRAFT_GUI_OFFSET_0_6_0, &formatted_message_str);
+                        } else if (version_id == version_id_0_6_1) {
+                            gui_add_message((char *)ninecraft_app + MINECRAFT_GUI_OFFSET_0_6_1, &formatted_message_str);
+                        }
+                    }
+                    android_string_destroy(&formatted_message_str);
+                    free(formatted_message);
+                }
+            } else {
+		        send_chat_message(text_box.text);
+            }
+        }
+        if (text_box.text) {
+            free(text_box.text);
+        }
+        text_box.text = NULL;
+        text_box.text_len = 0;
+        text_box.is_finished = false;
+        minecraft_set_screen(ninecraft_app, NULL);
+	}
+}
+
+void chat_screen_mouse_clicked(void *__this, int x, int y, int state) {
+    if (text_box_is_hovered(&text_box, x, y)) {
+        text_box_set_focused(&text_box, true);
+        AppPlatform_linux$showKeyboard(NULL);
+    } else {
+        text_box_set_focused(&text_box, false);
+        AppPlatform_linux$hideKeyboard(NULL);
+    }
+    
+}
+
+void chat_screen_mouse_released(void *__this, int x, int y, int state) {
+    
+}
+
+void chat_screen_key_pressed(void *__this, int code) {
+    text_box_keyboard_key_pressed(&text_box, code);
+}
+
+void chat_screen_keyboard_new_char(void *__this, char c) {
+    text_box_keyboard_new_char(&text_box, c);
+}
+
+bool chat_screen_handle_back_event(void *__this, bool back) {
+    AppPlatform_linux$hideKeyboard(NULL);
+    text_box_set_focused(&text_box, false);
+    return false;
+}
+
+void chat_mod_append_char(char c) {
+    if (version_id == version_id_0_5_0) {
+        text_box_keyboard_new_char(&text_box, c);
+    }
+}
+
 void chat_mod_inject(void *handle) {
     int server_side_network_handler_vtable_offset;
-    int chat_screen_vtable_offset;
+    int chat_screen_render_vtable_offset;
+    int chat_screen_mouse_clicked_vtable_offset;
+    int chat_screen_mouse_released_vtable_offset;
+    int chat_screen_key_pressed_vtable_offset;
+    int chat_screen_handle_back_event_vtable_offset;
+    int chat_screen_keyboard_new_char_vtable_offset;
     void **server_side_network_handler_vtable = (void **)android_dlsym(handle, "_ZTV24ServerSideNetworkHandler");
     void **chat_screen_vtable = (void **)android_dlsym(handle, "_ZTV10ChatScreen");
     if (!server_side_network_handler_vtable || !chat_screen_vtable) {
@@ -215,16 +262,40 @@ void chat_mod_inject(void *handle) {
     }
     if (version_id == version_id_0_5_0) {
         server_side_network_handler_vtable_offset = SERVERSIDENETWORKHANDLER_CHAT_PACKET_VTABLE_OFFSET_0_5_0;
-        chat_screen_vtable_offset = CHAT_SCREEN_RENDER_VTABLE_OFFSET_0_5_0;
+        chat_screen_render_vtable_offset = CHAT_SCREEN_RENDER_VTABLE_OFFSET_0_5_0;
+        chat_screen_mouse_clicked_vtable_offset = CHAT_SCREEN_MOUSE_CLICKED_VTABLE_OFFSET_0_5_0;
+        chat_screen_mouse_released_vtable_offset = CHAT_SCREEN_MOUSE_RELEASED_VTABLE_OFFSET_0_5_0;
+        chat_screen_key_pressed_vtable_offset = CHAT_SCREEN_KEY_PRESSED_VTABLE_OFFSET_0_5_0;
+        chat_screen_handle_back_event_vtable_offset = CHAT_SCREEN_HANDLE_BACK_EVENT_VTABLE_OFFSET_0_5_0;
     } else if (version_id == version_id_0_6_0) {
         server_side_network_handler_vtable_offset = SERVERSIDENETWORKHANDLER_CHAT_PACKET_VTABLE_OFFSET_0_6_0;
-        chat_screen_vtable_offset = CHAT_SCREEN_RENDER_VTABLE_OFFSET_0_6_0;
+        chat_screen_render_vtable_offset = CHAT_SCREEN_RENDER_VTABLE_OFFSET_0_6_0;
+        chat_screen_mouse_clicked_vtable_offset = CHAT_SCREEN_MOUSE_CLICKED_VTABLE_OFFSET_0_6_0;
+        chat_screen_mouse_released_vtable_offset = CHAT_SCREEN_MOUSE_RELEASED_VTABLE_OFFSET_0_6_0;
+        chat_screen_key_pressed_vtable_offset = CHAT_SCREEN_KEY_PRESSED_VTABLE_OFFSET_0_6_0;
+        chat_screen_keyboard_new_char_vtable_offset = CHAT_SCREEN_KEYBOARD_NEW_CHAR_VTABLE_OFFSET_0_6_0;
+        chat_screen_handle_back_event_vtable_offset = CHAT_SCREEN_HANDLE_BACK_EVENT_VTABLE_OFFSET_0_6_0;
     } else if (version_id == version_id_0_6_1) {
         server_side_network_handler_vtable_offset = SERVERSIDENETWORKHANDLER_CHAT_PACKET_VTABLE_OFFSET_0_6_1;
-        chat_screen_vtable_offset = CHAT_SCREEN_RENDER_VTABLE_OFFSET_0_6_1;
+        chat_screen_render_vtable_offset = CHAT_SCREEN_RENDER_VTABLE_OFFSET_0_6_1;
+        chat_screen_mouse_clicked_vtable_offset = CHAT_SCREEN_MOUSE_CLICKED_VTABLE_OFFSET_0_6_1;
+        chat_screen_mouse_released_vtable_offset = CHAT_SCREEN_MOUSE_RELEASED_VTABLE_OFFSET_0_6_1;
+        chat_screen_key_pressed_vtable_offset = CHAT_SCREEN_KEY_PRESSED_VTABLE_OFFSET_0_6_1;
+        chat_screen_keyboard_new_char_vtable_offset = CHAT_SCREEN_KEYBOARD_NEW_CHAR_VTABLE_OFFSET_0_6_1;
+        chat_screen_handle_back_event_vtable_offset = CHAT_SCREEN_HANDLE_BACK_EVENT_VTABLE_OFFSET_0_6_1;
     } else {
         return;
     }
     server_side_network_handler_vtable[server_side_network_handler_vtable_offset] = (void *)server_side_network_handler_handle_chat_packet;
-    chat_screen_vtable[chat_screen_vtable_offset] = (void *)chat_screen_render;
+    chat_screen_vtable[chat_screen_render_vtable_offset] = (void *)chat_screen_render;
+    chat_screen_vtable[chat_screen_mouse_clicked_vtable_offset] = (void *)chat_screen_mouse_clicked;
+    chat_screen_vtable[chat_screen_mouse_released_vtable_offset] = (void *)chat_screen_mouse_released;
+    chat_screen_vtable[chat_screen_key_pressed_vtable_offset] = (void *)chat_screen_key_pressed;
+    chat_screen_vtable[chat_screen_handle_back_event_vtable_offset] = (void *)chat_screen_handle_back_event;
+    if (version_id >= version_id_0_6_0) {
+        chat_screen_vtable[chat_screen_keyboard_new_char_vtable_offset] = (void *)chat_screen_keyboard_new_char;
+    }
+
+    text_box_construct(&text_box);
+    text_box.placeholder = "Enter message...";
 }

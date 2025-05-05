@@ -45,6 +45,7 @@
 #include <ancmp/abi_fix.h>
 
 #include <ninecraft/options.h>
+#include <ninecraft/mods/chat_mod.h>
 
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb_image.h>
@@ -350,7 +351,8 @@ static void resize_callback(GLFWwindow *window, int width, int height) {
 }
 
 static void char_callback(GLFWwindow *window, unsigned int codepoint) {
-    if (is_keyboard_visible) {    
+    if (is_keyboard_visible) {
+        chat_mod_append_char(codepoint);
         if (version_id >= version_id_0_6_0 && version_id <= version_id_0_7_1) {
             keyboard_feed_text_0_6_0((char)codepoint);
         } else if (version_id >= version_id_0_7_2) {
