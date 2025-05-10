@@ -1011,7 +1011,7 @@ int main(int argc, char **argv) {
 #if defined(__i386__) || defined(_M_IX86)
         sysv_call_func(get_game_version_string, &game_version, 1, &in);
 #else
-        get_game_version_string(&game_version, &in)
+        get_game_version_string(&game_version, &in);
 #endif
         char *verstr = android_string_to_str(&game_version);
 
