@@ -155,7 +155,7 @@ void server_side_network_handler_handle_chat_packet(void *__this, void *raknet_g
     free(formatted_message);
 }
 
-void chat_screen_render(void *__this, int mouse_x, int mouse_y, float f) {
+FLOAT_ABI_FIX void chat_screen_render(void *__this, int mouse_x, int mouse_y, float f) {
     void *raknet_instance;
 
     gui_component_fill(__this, 0, 0, *((int *)__this + 2), *((int *)__this + 3), 0xa0000000);
