@@ -7,46 +7,21 @@
 #include <sys/mman.h>
 #endif
 
-static uintptr_t trampoline_alloc() {
-#ifdef _WIN32
-    return (uintptr_t)VirtualAlloc(NULL, 0x1000, MEM_RESERVE | MEM_COMMIT, PAGE_EXECUTE_READWRITE);
-#else
-    return (uintptr_t)mmap(NULL, 0x1000, PROT_READ | PROT_WRITE | PROT_EXEC, MAP_PRIVATE | MAP_ANONYMOUS, -1, 0);
-#endif
+void detour_disarm(detour_backup_t backup) {
+    memcpy(backup.addr, backup.original, backup.len);
 }
 
-static uintptr_t arm_trampoline(uintptr_t target_addr) {
-    uintptr_t trampoline = trampoline_alloc();
-    trampoline = (trampoline + 3) & ~3;
-
-    if (target_addr & 1) {
-        uintptr_t addr = target_addr & ~1;
-        *(uint32_t *)trampoline = *(uint32_t *)addr;
-        *(uint32_t *)(trampoline + 4) = *(uint32_t *)(addr + 4);
-        *(uint32_t *)(trampoline + 8) = 0xF000F8DF;
-        *(uint32_t *)(trampoline + 12) = target_addr + 8;
-        return trampoline + 1;
-    }
-    *(uint32_t *)trampoline = *(uint32_t *)target_addr;
-    *(uint32_t *)(trampoline + 4) = *(uint32_t *)(target_addr + 4);
-    *(uint32_t *)(trampoline + 8) = 0xe51ff004;
-    *(uint32_t *)(trampoline + 12) = target_addr + 8;
-    return trampoline;
+void detour_rearm(detour_backup_t backup) {
+    memcpy(backup.addr, backup.detour, backup.len);
 }
 
-static uintptr_t x86_trampoline(uintptr_t target_addr, size_t codelen) {
-    uintptr_t trampoline = trampoline_alloc();
-    trampoline = (trampoline + 3) & ~3;
-    memcpy((void *)trampoline, (void *)target_addr, codelen);
-    *(uint8_t *)(trampoline + codelen) = 0xe9;
-    *(uint32_t *)(trampoline + codelen + 1) = target_addr - trampoline - 5;
-    return trampoline;
-}
-
-void *arm_detour(void *target_addr, void *replacement_addr) {
-    void *trampoline = (void *)arm_trampoline((uintptr_t)target_addr);
+detour_backup_t arm_detour(void *target_addr, void *replacement_addr) {
+    detour_backup_t backup;
+    backup.len = 8;
     if ((uintptr_t)target_addr & 1) {
         uintptr_t addr = (uintptr_t)target_addr & ~1;
+        backup.addr = (void *)addr;
+        memcpy(backup.original, (void *)addr, 8);
         *(uint16_t *)addr = 0xF8DF;
         if (addr % 4 != 0) {
             *(uint16_t *)(addr + 2) = 0xF002;
@@ -54,21 +29,24 @@ void *arm_detour(void *target_addr, void *replacement_addr) {
             *(uint16_t *)(addr + 2) = 0xF000;
         }
         *(uint32_t *)(addr + 4) = (uintptr_t)replacement_addr;
+        memcpy(backup.detour, (void *)addr, 8);
     } else {
+        backup.addr = target_addr;
+        memcpy(backup.original, target_addr, 8);
         *(uint32_t *)target_addr = 0xe51ff004;
         *(uint32_t *)((char *)target_addr + 4) = (uint32_t)replacement_addr;
+        memcpy(backup.detour, target_addr, 8);
     }
-    return trampoline;
+    return backup;
 }
 
-void *x86_detour(void *target_addr, void *replacement_addr, bool jump, size_t codelen) {
-    void *trampoline = NULL;
-    if (jump) {
-        if (codelen >= 5 && codelen <= 0xffb) {
-            trampoline = (void *)x86_trampoline((uintptr_t)target_addr, codelen);
-        }
-    }
+detour_backup_t x86_detour(void *target_addr, void *replacement_addr, bool jump) {
+    detour_backup_t backup;
+    backup.len = 5;
+    backup.addr = target_addr;
+    memcpy(backup.original, target_addr, 5);
     *(uint8_t *)target_addr = jump ? 0xe9 : 0xe8;
     *(uint32_t *)((uintptr_t)target_addr + 1) = (uintptr_t)replacement_addr - (uintptr_t)target_addr - 5;
-    return trampoline;
+    memcpy(backup.detour, target_addr, 5);
+    return backup;
 }
