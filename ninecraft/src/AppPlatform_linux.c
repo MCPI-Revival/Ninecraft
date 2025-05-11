@@ -886,16 +886,13 @@ void AppPlatform_linux$getUserInput(android_vector_t *ret, AppPlatform_linux *ap
 
         fp = popen("zenity --entry --title='Create New World' --text='Enter World Seed:'", "r");
         if (fp == NULL) {
-            android_string_cstr(&seed, "random world");
+            android_string_cstr(&seed, "1234567890");
         } else {
             char input_value[100];
             for (int i = 0; i < 100; ++i) {
                 char c = fgetc(fp);
                 if (c == '\n' || c == '\0' || c == EOF) {
                     input_value[i] = '\0';
-                    break;
-                } else if (c < '0' || c > '9') {
-                    input_value[0] = '\0';
                     break;
                 }
                 input_value[i] = c;
@@ -908,7 +905,7 @@ void AppPlatform_linux$getUserInput(android_vector_t *ret, AppPlatform_linux *ap
 
         fp = popen("zenity --entry --title='Create New World' --text='Enter World Gamemode:' 'creative' 'survival'", "r");
         if (fp == NULL) {
-            android_string_cstr(&seed, "random world");
+            android_string_cstr(&gamemode, "creative");
         } else {
             char input_value[100];
             for (int i = 0; i < 100; ++i) {
