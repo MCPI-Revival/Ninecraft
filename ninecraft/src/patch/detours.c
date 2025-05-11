@@ -9,10 +9,16 @@
 
 void detour_disarm(detour_backup_t backup) {
     memcpy(backup.addr, backup.original, backup.len);
+#if !defined(_MSC_VER) && (defined(__arm__) || defined(_M_ARM))
+    __builtin___clear_cache((char *)backup.addr, (char *)backup.addr + backup.len);
+#endif
 }
 
 void detour_rearm(detour_backup_t backup) {
     memcpy(backup.addr, backup.detour, backup.len);
+#if !defined(_MSC_VER) && (defined(__arm__) || defined(_M_ARM))
+    __builtin___clear_cache((char *)backup.addr, (char *)backup.addr + backup.len);
+#endif
 }
 
 detour_backup_t arm_detour(void *target_addr, void *replacement_addr) {
@@ -37,6 +43,9 @@ detour_backup_t arm_detour(void *target_addr, void *replacement_addr) {
         *(uint32_t *)((char *)target_addr + 4) = (uint32_t)replacement_addr;
         memcpy(backup.detour, target_addr, 8);
     }
+#if !defined(_MSC_VER) && (defined(__arm__) || defined(_M_ARM))
+    __builtin___clear_cache((char *)backup.addr, (char *)backup.addr + backup.len);
+#endif
     return backup;
 }
 
