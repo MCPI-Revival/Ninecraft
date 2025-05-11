@@ -34,12 +34,12 @@ static uintptr_t arm_trampoline(uintptr_t target_addr) {
     return trampoline;
 }
 
-static uintptr_t x86_trampoline(uintptr_t target_addr) {
+static uintptr_t x86_trampoline(uintptr_t target_addr, size_t codelen) {
     uintptr_t trampoline = trampoline_alloc();
     trampoline = (trampoline + 3) & ~3;
-    memcpy((void *)trampoline, (void *)target_addr, 5);
-    *(uint8_t *)(target_addr + 5) = 0xe9;
-    *(uint32_t *)(target_addr + 6) = trampoline - target_addr;
+    memcpy((void *)trampoline, (void *)target_addr, codelen);
+    *(uint8_t *)(trampoline + codelen) = 0xe9;
+    *(uint32_t *)(trampoline + codelen + 1) = target_addr - trampoline - 5;
     return trampoline;
 }
 
@@ -61,10 +61,12 @@ void *arm_detour(void *target_addr, void *replacement_addr) {
     return trampoline;
 }
 
-void *x86_detour(void *target_addr, void *replacement_addr, bool jump) {
+void *x86_detour(void *target_addr, void *replacement_addr, bool jump, size_t codelen) {
     void *trampoline = NULL;
     if (jump) {
-        trampoline = (void *)x86_trampoline((uintptr_t)target_addr);
+        if (codelen >= 5 && codelen <= 0xffb) {
+            trampoline = (void *)x86_trampoline((uintptr_t)target_addr, codelen);
+        }
     }
     *(uint8_t *)target_addr = jump ? 0xe9 : 0xe8;
     *(uint32_t *)((uintptr_t)target_addr + 1) = (uintptr_t)replacement_addr - (uintptr_t)target_addr - 5;
