@@ -5,6 +5,7 @@
 #include <time.h>
 #include <stdlib.h>
 #include <ninecraft/input/minecraft_keys.h>
+#include <ancmp/abi_fix.h>
 
 extern int version_id;
 extern void *handle;
@@ -77,7 +78,7 @@ void text_box_render(text_box_t *__this, void *minecraft, int x, int y) {
         android_string_cstrl(&str, __this->text, __this->text_len);
     } else if (!__this->is_focused && __this->placeholder) {
         android_string_cstr(&str, __this->placeholder);
-        ((void (*)(void *__this, android_string_t *text, float x, float y, int z, bool u))android_dlsym(handle, "_ZN4Font4drawERKSsffib"))(*((void **)minecraft + 174), &str, __this->x + 10.0, __this->y + 5.0, 0xff808080, false);
+        ((FLOAT_ABI_FIX void (*)(void *__this, android_string_t *text, float x, float y, int z, bool u))android_dlsym(handle, "_ZN4Font4drawERKSsffib"))(*((void **)minecraft + 174), &str, __this->x + 10.0, __this->y + 5.0, 0xff808080, false);
         android_string_destroy(&str);
     }
     if (time(NULL) & 1 && __this->is_focused && __this->is_modifyable) {
@@ -87,11 +88,11 @@ void text_box_render(text_box_t *__this, void *minecraft, int x, int y) {
         }
         android_string_t str2;
         android_string_cstr(&str2, "_");
-        ((void (*)(void *__this, android_string_t *text, float x, float y, int z, bool u))android_dlsym(handle, "_ZN4Font4drawERKSsffib"))(*((void **)minecraft + 174), &str2, __this->x + 10.0 + text_w, __this->y + 5.0, __this->is_focused ? 0xffffffff : 0xffBBBBBB, false);
+        ((FLOAT_ABI_FIX void (*)(void *__this, android_string_t *text, float x, float y, int z, bool u))android_dlsym(handle, "_ZN4Font4drawERKSsffib"))(*((void **)minecraft + 174), &str2, __this->x + 10.0 + text_w, __this->y + 5.0, __this->is_focused ? 0xffffffff : 0xffBBBBBB, false);
         android_string_destroy(&str2);
     }
     if (__this->text && __this->text_len != 0) {
-        ((void (*)(void *__this, android_string_t *text, float x, float y, int z, bool u))android_dlsym(handle, "_ZN4Font4drawERKSsffib"))(*((void **)minecraft + 174), &str, __this->x + 10.0, __this->y + 5.0, __this->is_modifyable ? (__this->is_focused ? 0xffffffff : 0xffBBBBBB) : 0xff606060, false);
+        ((FLOAT_ABI_FIX void (*)(void *__this, android_string_t *text, float x, float y, int z, bool u))android_dlsym(handle, "_ZN4Font4drawERKSsffib"))(*((void **)minecraft + 174), &str, __this->x + 10.0, __this->y + 5.0, __this->is_modifyable ? (__this->is_focused ? 0xffffffff : 0xffBBBBBB) : 0xff606060, false);
         android_string_destroy(&str);
     }
 }
