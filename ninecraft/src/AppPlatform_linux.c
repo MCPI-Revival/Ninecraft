@@ -865,7 +865,7 @@ void AppPlatform_linux$getUserInput(android_vector_t *ret, AppPlatform_linux *ap
         android_string_t name;
         android_string_t seed;
         android_string_t gamemode;
-        fp = popen("zenity --entry --title='Create New World' --text='Enter World Name:'", "r");
+        fp = popen("zenity --entry --title=\"Create New World\" --text=\"Enter World Name:\"", "r");
         if (fp == NULL) {
             android_string_cstr(&name, "random world");
         } else {
@@ -884,7 +884,7 @@ void AppPlatform_linux$getUserInput(android_vector_t *ret, AppPlatform_linux *ap
             pclose(fp);
         }
 
-        fp = popen("zenity --entry --title='Create New World' --text='Enter World Seed:'", "r");
+        fp = popen("zenity --entry --title=\"Create New World\" --text=\"Enter World Seed:\"", "r");
         if (fp == NULL) {
             android_string_cstr(&seed, "1234567890");
         } else {
@@ -903,7 +903,7 @@ void AppPlatform_linux$getUserInput(android_vector_t *ret, AppPlatform_linux *ap
             pclose(fp);
         }
 
-        fp = popen("zenity --entry --title='Create New World' --text='Enter World Gamemode:' 'creative' 'survival'", "r");
+        fp = popen("zenity --list --title=\"Create New World\" --text=\"Enter World Gamemode:\" --column=\"gamemode\" \"creative\" \"survival\"", "r");
         if (fp == NULL) {
             android_string_cstr(&gamemode, "creative");
         } else {
@@ -930,7 +930,7 @@ void AppPlatform_linux$getUserInput(android_vector_t *ret, AppPlatform_linux *ap
     } else if (current_dialog_id == did_chat) {
         android_string_t message;
 
-        fp = popen("zenity --entry --title='Chat' --text='Enter char message:'", "r");
+        fp = popen("zenity --entry --title=\"Chat\" --text=\"Enter message:\"", "r");
         if (fp) {
             char input_value[100];
             for (int i = 0; i < 100; ++i) {
@@ -954,7 +954,7 @@ void AppPlatform_linux$getUserInput(android_vector_t *ret, AppPlatform_linux *ap
     } else if (current_dialog_id == did_rename_world) {
         android_string_t name;
 
-        fp = popen("zenity --entry --title='Rename world' --text='Enter a new name:'", "r");
+        fp = popen("zenity --entry --title=\"Rename world\" --text=\"Enter a new name:\"", "r");
         if (fp) {
             char input_value[100];
             for (int i = 0; i < 100; ++i) {
