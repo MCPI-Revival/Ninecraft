@@ -865,14 +865,16 @@ void AppPlatform_linux$getUserInput(android_vector_t *ret, AppPlatform_linux *ap
         android_string_t name;
         android_string_t seed;
         android_string_t gamemode;
-        fp = popen("zenity --entry --title=\"Create New World\" --text=\"Enter World Name:\"", "r");
+
+		fp = popen("zenity --forms --add-entry=\"World Name\" --add-entry=\"Seed\" --add-combo=\"Gamemode\" --combo-values=\"creative|survival\" ", "r");
+        // fp = popen("zenity --entry --title=\"Create New World\" --text=\"Enter World Name:\"", "r");
         if (fp == NULL) {
             android_string_cstr(&name, "random world");
         } else {
             char input_value[100];
             for (int i = 0; i < 100; ++i) {
                 char c = fgetc(fp);
-                if (c == '\n' || c == '\0' || c == EOF) {
+                if (c == '\n' || c == '\0' || c == EOF || c == '|') {
                     input_value[i] = '\0';
                     break;
                 }
@@ -884,14 +886,14 @@ void AppPlatform_linux$getUserInput(android_vector_t *ret, AppPlatform_linux *ap
             pclose(fp);
         }
 
-        fp = popen("zenity --entry --title=\"Create New World\" --text=\"Enter World Seed:\"", "r");
+        // fp = popen("zenity --entry --title=\"Create New World\" --text=\"Enter World Seed:\"", "r");
         if (fp == NULL) {
             android_string_cstr(&seed, "1234567890");
         } else {
             char input_value[100];
             for (int i = 0; i < 100; ++i) {
                 char c = fgetc(fp);
-                if (c == '\n' || c == '\0' || c == EOF) {
+                if (c == '\n' || c == '\0' || c == EOF || c == "|") {
                     input_value[i] = '\0';
                     break;
                 }
@@ -903,14 +905,14 @@ void AppPlatform_linux$getUserInput(android_vector_t *ret, AppPlatform_linux *ap
             pclose(fp);
         }
 
-        fp = popen("zenity --list --title=\"Create New World\" --text=\"Enter World Gamemode:\" --column=\"gamemode\" \"creative\" \"survival\"", "r");
+        // fp = popen("zenity --list --title=\"Create New World\" --text=\"Enter World Gamemode:\" --column=\"gamemode\" \"creative\" \"survival\"", "r");
         if (fp == NULL) {
             android_string_cstr(&gamemode, "creative");
         } else {
             char input_value[100];
             for (int i = 0; i < 100; ++i) {
                 char c = fgetc(fp);
-                if (c == '\n' || c == '\0' || c == EOF) {
+                if (c == '\n' || c == '\0' || c == EOF || c == "|") {
                     input_value[i] = '\0';
                     break;
                 }
