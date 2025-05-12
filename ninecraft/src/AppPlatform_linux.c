@@ -866,7 +866,9 @@ void AppPlatform_linux$getUserInput(android_vector_t *ret, AppPlatform_linux *ap
         android_string_t seed;
         android_string_t gamemode;
 
-		fp = popen("zenity --forms --add-entry=\"World Name\" --add-entry=\"Seed\" --add-combo=\"Gamemode\" --combo-values=\"creative|survival\"", "r");
+		fp = popen("zenity --forms --text=\"Create a world\" --text=\"Create a world\" --add-entry=\"World name\" --add-entry=\"World Generator seed. leave blank for random.\" --add-combo=\"Game Mode\" --combo-values=\"creative|survival\"", "r");
+
+
         // fp = popen("zenity --entry --title=\"Create New World\" --text=\"Enter World Name:\"", "r");
         if (fp == NULL) {
             android_string_cstr(&name, "random world");
