@@ -883,7 +883,7 @@ void AppPlatform_linux$getUserInput(android_vector_t *ret, AppPlatform_linux *ap
             input_value[99] = '\0';
             printf("%s\n", input_value);
             android_string_cstr(&name, input_value);
-            pclose(fp);
+            // pclose(fp);
         }
 
         // fp = popen("zenity --entry --title=\"Create New World\" --text=\"Enter World Seed:\"", "r");
@@ -893,7 +893,7 @@ void AppPlatform_linux$getUserInput(android_vector_t *ret, AppPlatform_linux *ap
             char input_value[100];
             for (int i = 0; i < 100; ++i) {
                 char c = fgetc(fp);
-                if (c == '\n' || c == '\0' || c == EOF || c == "|") {
+                if (c == '\n' || c == '\0' || c == EOF || c == '|') {
                     input_value[i] = '\0';
                     break;
                 }
@@ -902,7 +902,7 @@ void AppPlatform_linux$getUserInput(android_vector_t *ret, AppPlatform_linux *ap
             input_value[99] = '\0';
             printf("%s\n", input_value);
             android_string_cstr(&seed, input_value);
-            pclose(fp);
+            // pclose(fp);
         }
 
         // fp = popen("zenity --list --title=\"Create New World\" --text=\"Enter World Gamemode:\" --column=\"gamemode\" \"creative\" \"survival\"", "r");
@@ -912,7 +912,7 @@ void AppPlatform_linux$getUserInput(android_vector_t *ret, AppPlatform_linux *ap
             char input_value[100];
             for (int i = 0; i < 100; ++i) {
                 char c = fgetc(fp);
-                if (c == '\n' || c == '\0' || c == EOF || c == "|") {
+                if (c == '\n' || c == '\0' || c == EOF ) {
                     input_value[i] = '\0';
                     break;
                 }
