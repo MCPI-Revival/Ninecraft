@@ -100,7 +100,7 @@ void inputs_fix_mod_inject(void *handle, int version_id) {
     _version_id = version_id;
     if (version_id >= version_id_0_5_0 && version_id <= version_id_0_8_1) {
         ((void **)android_dlsym(handle, "_ZTV15XperiaPlayInput"))[4] = xperia_play_input_tick;
-    } else if (version_id >= version_id_0_9_0 && version_id <= version_id_0_10_5) {
+    } else if (version_id >= version_id_0_9_0 && version_id <= version_id_0_11_0) {
         ((void **)android_dlsym(handle, "_ZTV19ControllerMoveInput"))[4] = xperia_play_input_tick;
     }
 }
