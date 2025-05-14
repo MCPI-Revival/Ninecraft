@@ -26,7 +26,7 @@ in {
             (makeDesktopItem {
               desktopName = "Ninecraft";
               name = "ninecraft";
-              icon = "applications-games";
+              icon = ../../res/drawable/iconx.png;
               exec = "ninecraft";
             })
             cfg.package
