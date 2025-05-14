@@ -1,11 +1,6 @@
 #include <ninecraft/patch/detours.h>
 #include <stdint.h>
 #include <string.h>
-#ifdef _WIN32
-#include <windows.h>
-#else
-#include <sys/mman.h>
-#endif
 
 void detour_disarm(detour_backup_t backup) {
     memcpy(backup.addr, backup.original, backup.len);
