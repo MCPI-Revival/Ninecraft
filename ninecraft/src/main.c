@@ -8,7 +8,6 @@
 #include <sys/types.h>
 #ifndef _WIN32
 #include <sys/mman.h>
-#include <fnmatch.h>
 #else
 #include <direct.h>
 #define mkdir(x, y) _mkdir(x)
@@ -1120,6 +1119,8 @@ int main(int argc, char **argv) {
             version_id = version_id_0_10_4;
         } else if (strcmp(verstr, "v0.10.5 alpha") == 0) {
             version_id = version_id_0_10_5;
+        } else if (strcmp(verstr, "v0.11.0 alpha") == 0) {
+            version_id = version_id_0_11_0;
         } else {
             puts("Unsupported Version!");
             return 1;
@@ -1385,6 +1386,27 @@ int main(int argc, char **argv) {
             platform_vtable_0_10_0.isNetworkEnabled = (void *)AppPlatform_linux$isNetworkEnabled;
             platform_vtable_0_10_0.getPixelsPerMillimeter = (void *)AppPlatform_linux$getPixelsPerMillimeter;
             platform_vtable_0_10_0.swapBuffers = (void *)AppPlatform_linux$swapBuffers;
+        } else if (version_id == version_id_0_11_0) {
+            memcpy(&platform_vtable_0_11_0, plat->vtable, sizeof(app_platform_vtable_0_11_0_t));
+            plat->vtable = (void **)&platform_vtable_0_11_0;
+            platform_vtable_0_11_0.getImagePath = (void *)GET_SYSV_WRAPPER(AppPlatform_linux$getImagePath);
+            platform_vtable_0_11_0.loadPNG = (void *)AppPlatform_linux$loadPNG_0_9_0;
+            platform_vtable_0_11_0.loadTGA = (void *)AppPlatform_linux$loadTGA_0_9_0;
+            platform_vtable_0_11_0.getDateString = (void *)GET_SYSV_WRAPPER(AppPlatform_linux$getDateString);
+            platform_vtable_0_11_0.readAssetFile = (void *)GET_SYSV_WRAPPER(AppPlatform_linux$readAssetFile_0_9_0);
+            platform_vtable_0_11_0.getScreenHeight = (void *)AppPlatform_linux$getScreenHeight;
+            platform_vtable_0_11_0.getScreenWidth = (void *)AppPlatform_linux$getScreenWidth;
+            platform_vtable_0_11_0.showKeyboard = (void *)AppPlatform_linux$showKeyboard;
+            platform_vtable_0_11_0.hideKeyboard = (void *)AppPlatform_linux$hideKeyboard;
+            platform_vtable_0_11_0.getBroadcastAddresses = (void *)GET_SYSV_WRAPPER(AppPlatform_linux$getBroadcastAddresses);
+            platform_vtable_0_11_0.getAvailableMemory = (void *)AppPlatform_linux$getAvailableMemory;
+            platform_vtable_0_11_0.getPlatformStringVar = (void *)GET_SYSV_WRAPPER(AppPlatform_linux$getPlatformStringVar);
+            platform_vtable_0_11_0.getLoginInformation = (void *)GET_SYSV_WRAPPER(AppPlatform_linux$getLoginInformation);
+            platform_vtable_0_11_0.setLoginInformation = (void *)AppPlatform_linux$setLoginInformation;
+            platform_vtable_0_11_0.supportsTouchscreen = (void *)AppPlatform_linux$supportsTouchscreen;
+            platform_vtable_0_11_0.isNetworkEnabled = (void *)AppPlatform_linux$isNetworkEnabled;
+            platform_vtable_0_11_0.getPixelsPerMillimeter = (void *)AppPlatform_linux$getPixelsPerMillimeter;
+            platform_vtable_0_11_0.swapBuffers = (void *)AppPlatform_linux$swapBuffers;
         }
         context.platform = plat;
         app_init(ninecraft_app, &context);
