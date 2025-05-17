@@ -1407,6 +1407,19 @@ int main(int argc, char **argv) {
             platform_vtable_0_11_0.isNetworkEnabled = (void *)AppPlatform_linux$isNetworkEnabled;
             platform_vtable_0_11_0.getPixelsPerMillimeter = (void *)AppPlatform_linux$getPixelsPerMillimeter;
             platform_vtable_0_11_0.swapBuffers = (void *)AppPlatform_linux$swapBuffers;
+            platform_vtable_0_11_0.getSystemRegion = (void *)GET_SYSV_WRAPPER(AppPlatform_linux$getSystemRegion);
+            platform_vtable_0_11_0.getGraphicsVendor = (void *)GET_SYSV_WRAPPER(AppPlatform_linux$getGraphicsVendor);
+            platform_vtable_0_11_0.getGraphicsRenderer = (void *)GET_SYSV_WRAPPER(AppPlatform_linux$getGraphicsRenderer);
+            platform_vtable_0_11_0.getGraphicsVersion = (void *)GET_SYSV_WRAPPER(AppPlatform_linux$getGraphicsVersion);
+            platform_vtable_0_11_0.getGraphicsExtensions = (void *)GET_SYSV_WRAPPER(AppPlatform_linux$getGraphicsExtensions);
+            platform_vtable_0_11_0.getExternalStoragePath = (void *)GET_SYSV_WRAPPER(AppPlatform_linux$getExternalStoragePath);
+            platform_vtable_0_11_0.getInternalStoragePath = (void *)GET_SYSV_WRAPPER(AppPlatform_linux$getInternalStoragePath);
+            platform_vtable_0_11_0.getApplicationId = (void *)GET_SYSV_WRAPPER(AppPlatform_linux$getApplicationId);
+            platform_vtable_0_11_0.getDeviceId = (void *)GET_SYSV_WRAPPER(AppPlatform_linux$getDeviceId);
+            platform_vtable_0_11_0.createUUID = (void *)GET_SYSV_WRAPPER(AppPlatform_linux$createUUID);
+            platform_vtable_0_11_0.isFirstSnoopLaunch = (void *)AppPlatform_linux$isFirstSnoopLaunch;
+            platform_vtable_0_11_0.hasHardwareInformationChanged = (void *)AppPlatform_linux$hasHardwareInformationChanged;
+            platform_vtable_0_11_0.isTablet = (void *)AppPlatform_linux$isTablet;
         }
         context.platform = plat;
         app_init(ninecraft_app, &context);

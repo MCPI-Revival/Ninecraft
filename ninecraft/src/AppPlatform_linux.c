@@ -10,6 +10,7 @@
 #include <ninecraft/audio/audio_engine.h>
 #include <ninecraft/utils.h>
 #include <stb_image.h>
+#include <ninecraft/gfx/gles_compat.h>
 #ifdef _WIN32
 #include <direct.h>
 #define popen _popen
@@ -1176,4 +1177,89 @@ void AppPlatform_linux$vibrate(AppPlatform_linux *app_platform, int milliseconds
 
 void AppPlatform_linux$destroy(AppPlatform_linux *app_platform) {
     //puts("debug: AppPlatform_linux::destroy");
+}
+
+SYSV_WRAPPER(AppPlatform_linux$getSystemRegion, 2)
+void AppPlatform_linux$getSystemRegion(android_string_t *ret, AppPlatform_linux *app_platform) {
+    //puts("debug: AppPlatform_linux::getSystemRegion");
+    android_string_cstr(ret, "US");
+}
+
+SYSV_WRAPPER(AppPlatform_linux$getGraphicsVendor, 2)
+void AppPlatform_linux$getGraphicsVendor(android_string_t *ret, AppPlatform_linux *app_platform) {
+    //puts("debug: AppPlatform_linux::getGraphicsVendor");
+    android_string_cstr(ret, (char *)glGetString(GL_VENDOR));
+}
+
+SYSV_WRAPPER(AppPlatform_linux$getGraphicsRenderer, 2)
+void AppPlatform_linux$getGraphicsRenderer(android_string_t *ret, AppPlatform_linux *app_platform) {
+    //puts("debug: AppPlatform_linux::getGraphicsRenderer");
+    android_string_cstr(ret, (char *)glGetString(GL_RENDERER));
+}
+
+SYSV_WRAPPER(AppPlatform_linux$getGraphicsVersion, 2)
+void AppPlatform_linux$getGraphicsVersion(android_string_t *ret, AppPlatform_linux *app_platform) {
+    //puts("debug: AppPlatform_linux::getGraphicsVersion");
+    android_string_cstr(ret, (char *)glGetString(GL_VERSION));
+}
+
+SYSV_WRAPPER(AppPlatform_linux$getGraphicsExtensions, 2)
+void AppPlatform_linux$getGraphicsExtensions(android_string_t *ret, AppPlatform_linux *app_platform) {
+    //puts("debug: AppPlatform_linux::getGraphicsExtensions");
+    android_string_cstr(ret, (char *)glGetString(GL_EXTENSIONS));
+}
+
+SYSV_WRAPPER(AppPlatform_linux$getExternalStoragePath, 2)
+void AppPlatform_linux$getExternalStoragePath(android_string_t *ret, AppPlatform_linux *app_platform) {
+    //puts("debug: AppPlatform_linux::getExternalStoragePath");
+    char *storage_path = (char *)malloc(1024);
+    storage_path[0] = '\0';
+    getcwd(storage_path, 1024);
+    strcat(storage_path, "/storage/");
+    android_string_cstr(ret, storage_path);
+    free(storage_path);
+}
+
+SYSV_WRAPPER(AppPlatform_linux$getInternalStoragePath, 2)
+void AppPlatform_linux$getInternalStoragePath(android_string_t *ret, AppPlatform_linux *app_platform) {
+    //puts("debug: AppPlatform_linux::getInternalStoragePath");
+    char *storage_path = (char *)malloc(1024);
+    storage_path[0] = '\0';
+    getcwd(storage_path, 1024);
+    strcat(storage_path, "/storage/");
+    android_string_cstr(ret, storage_path);
+    free(storage_path);
+}
+
+SYSV_WRAPPER(AppPlatform_linux$getApplicationId, 2)
+void AppPlatform_linux$getApplicationId(android_string_t *ret, AppPlatform_linux *app_platform) {
+    //puts("debug: AppPlatform_linux::getApplicationId");
+    android_string_cstr(ret, "com.mojang.minecraftpe");
+}
+
+SYSV_WRAPPER(AppPlatform_linux$getDeviceId, 2)
+void AppPlatform_linux$getDeviceId(android_string_t *ret, AppPlatform_linux *app_platform) {
+    //puts("debug: AppPlatform_linux::getDeviceId");
+    android_string_cstr(ret, "Ninecraft");
+}
+
+SYSV_WRAPPER(AppPlatform_linux$createUUID, 2)
+void AppPlatform_linux$createUUID(android_string_t *ret, AppPlatform_linux *app_platform) {
+    //puts("debug: AppPlatform_linux::createUUID");
+    android_string_cstr(ret, "bef07706-f3c5-489d-b251-fb6a297e9b1c");
+}
+
+bool AppPlatform_linux$isFirstSnoopLaunch(AppPlatform_linux *app_platform) {
+    //puts("debug: AppPlatform_linux::isFirstSnoopLaunch");
+    return false;
+}
+
+bool AppPlatform_linux$hasHardwareInformationChanged(AppPlatform_linux *app_platform) {
+    //puts("debug: AppPlatform_linux::hasHardwareInformationChanged");
+    return false;
+}
+
+bool AppPlatform_linux$isTablet(AppPlatform_linux *app_platform) {
+    //puts("debug: AppPlatform_linux::isTablet");
+    return false;
 }

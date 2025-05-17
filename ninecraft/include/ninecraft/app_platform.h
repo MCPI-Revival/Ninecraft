@@ -191,7 +191,7 @@ typedef struct {
     bool (*supportsTouchscreen)(void *__this);
     bool (*hasIDEProfiler)(void *__this);
     android_string_t (*getPlatformStringVar)(void *__this, int reserved);
-    void (*getApplicationId)(void *__this);
+    android_string_t (*getApplicationId)(void *__this);
     uint64_t (*getAvailableMemory)(void *__this);
     android_vector_t (*getBroadcastAddresses)(void *__this);
     android_string_t (*getModelName)(void *__this);
