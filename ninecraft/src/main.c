@@ -502,18 +502,27 @@ static void key_callback(GLFWwindow *window, int key, int scancode, int action, 
                 bool is_creative = ((bool (*)(void *))android_dlsym(handle, "_ZN9Minecraft14isCreativeModeEv"))(ninecraft_app);
                 if (!is_creative) {
                     void *player_inventory = *(void **)((char *)player + inventory_offset);
-                    void *item_instance = ((void *(*)(void *))android_dlsym(handle, "_ZN9Inventory11getSelectedEv"))(player_inventory);
+                    void *item_instance = NULL;
+                    if (version_id >= version_id_0_11_0) {
+                        item_instance = ((void *(*)(void *))android_dlsym(handle, "_ZNK9Inventory15getSelectedItemEv"))(player_inventory);
+                    } else {
+                        item_instance = ((void *(*)(void *))android_dlsym(handle, "_ZN9Inventory11getSelectedEv"))(player_inventory);
+                    }
                     if (item_instance) {
                         bool is_empty = ((bool (*)(void *))android_dlsym(handle, "_ZNK12ItemInstance6isNullEv"))(item_instance);
                         if (!is_empty) {
                             void *item_instance_copy = ((void *(*)(void *, void *))android_dlsym(handle, "_ZN12ItemInstance5cloneEPKS_"))(item_instance, NULL);
                             if (!ctrl_pressed) {
-                                *(int *)item_instance_copy = 1;
-                                *(int *)item_instance -= 1;
+                                *(int8_t *)item_instance_copy = 1;
+                                *(int8_t *)item_instance -= 1;
                             }
-
-                            if (*(int *)item_instance < 1 || ctrl_pressed) {
-                                android_vector_t *slots = ((android_vector_t *(*)(void *))android_dlsym(handle, "_ZN16FillingContainer11getSlotListERi"))(player_inventory);
+                            if (*(int8_t *)item_instance < 1 || ctrl_pressed) {
+                                android_vector_t *slots = NULL;
+                                if (version_id >= version_id_0_11_0) { 
+                                    slots = (android_vector_t *)((char *)player_inventory + 16);
+                                } else {
+                                    slots = ((android_vector_t *(*)(void *))android_dlsym(handle, "_ZN16FillingContainer11getSlotListERi"))(player_inventory);
+                                }
                                 size_t slot = 0;
                                 for (; slot < android_vector_size(slots, sizeof(void *)); ++slot) {
                                     if (*(void **)android_vector_at(slots, slot, sizeof(void *)) == item_instance) {
