@@ -45,6 +45,8 @@
 
 #include <ninecraft/options.h>
 #include <ninecraft/mods/chat_mod.h>
+#include <ninecraft/ninecraft_http.h>
+#include <ninecraft/ninecraft_store.h>
 
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb_image.h>
@@ -1335,14 +1337,13 @@ int main(int argc, char **argv) {
 
     if (version_id >= version_id_0_9_0) {
         app_platform_0_9_0_t *plat = malloc(sizeof(app_platform_0_9_0_t));
-        static app_context_0_9_0_t context = {
-            .egl_context = NULL,
-            .egl_display = NULL,
-            .egl_surface = NULL,
-            .u0 = NULL,
-            .platform = NULL,
-            .do_render = false
-        };
+        app_context_0_9_0_t *context = (app_context_0_9_0_t *)malloc(sizeof(app_context_0_9_0_t));
+        context->egl_context = NULL;
+        context->egl_display = NULL;
+        context->egl_surface = NULL;
+        context->u0 = NULL;
+        context->platform = NULL;
+        context->do_render = false;
 
         app_platform_construct(plat);
         if (version_id >= version_id_0_9_0 && version_id <= version_id_0_9_5) {
@@ -1407,22 +1408,27 @@ int main(int argc, char **argv) {
             platform_vtable_0_11_0.isNetworkEnabled = (void *)AppPlatform_linux$isNetworkEnabled;
             platform_vtable_0_11_0.getPixelsPerMillimeter = (void *)AppPlatform_linux$getPixelsPerMillimeter;
             platform_vtable_0_11_0.swapBuffers = (void *)AppPlatform_linux$swapBuffers;
-            platform_vtable_0_11_0.getSystemRegion = (void *)GET_SYSV_WRAPPER(AppPlatform_linux$getSystemRegion);
+            platform_vtable_0_11_0.getSystemRegion = (void *)AppPlatform_linux$getSystemRegion;
             platform_vtable_0_11_0.getGraphicsVendor = (void *)GET_SYSV_WRAPPER(AppPlatform_linux$getGraphicsVendor);
             platform_vtable_0_11_0.getGraphicsRenderer = (void *)GET_SYSV_WRAPPER(AppPlatform_linux$getGraphicsRenderer);
             platform_vtable_0_11_0.getGraphicsVersion = (void *)GET_SYSV_WRAPPER(AppPlatform_linux$getGraphicsVersion);
             platform_vtable_0_11_0.getGraphicsExtensions = (void *)GET_SYSV_WRAPPER(AppPlatform_linux$getGraphicsExtensions);
-            platform_vtable_0_11_0.getExternalStoragePath = (void *)GET_SYSV_WRAPPER(AppPlatform_linux$getExternalStoragePath);
-            platform_vtable_0_11_0.getInternalStoragePath = (void *)GET_SYSV_WRAPPER(AppPlatform_linux$getInternalStoragePath);
+            platform_vtable_0_11_0.getExternalStoragePath = (void *)AppPlatform_linux$getExternalStoragePath;
+            platform_vtable_0_11_0.getInternalStoragePath = (void *)AppPlatform_linux$getInternalStoragePath;
             platform_vtable_0_11_0.getApplicationId = (void *)GET_SYSV_WRAPPER(AppPlatform_linux$getApplicationId);
             platform_vtable_0_11_0.getDeviceId = (void *)GET_SYSV_WRAPPER(AppPlatform_linux$getDeviceId);
             platform_vtable_0_11_0.createUUID = (void *)GET_SYSV_WRAPPER(AppPlatform_linux$createUUID);
             platform_vtable_0_11_0.isFirstSnoopLaunch = (void *)AppPlatform_linux$isFirstSnoopLaunch;
             platform_vtable_0_11_0.hasHardwareInformationChanged = (void *)AppPlatform_linux$hasHardwareInformationChanged;
             platform_vtable_0_11_0.isTablet = (void *)AppPlatform_linux$isTablet;
+
+            DETOUR(android_dlsym(handle, "_ZN26HTTPRequestInternalAndroidC2ER11HTTPRequest"), ninecraft_http_construct, 1);
+            DETOUR(android_dlsym(handle, "_ZN26HTTPRequestInternalAndroid4sendEv"), ninecraft_http_send, 1);
+            DETOUR(android_dlsym(handle, "_ZN26HTTPRequestInternalAndroid5abortEv"), ninecraft_http_abort, 1);
+            DETOUR(android_dlsym(handle, "_ZN12AndroidStore21createGooglePlayStoreERKSsR13StoreListener"), ninecraft_store_create, 1);
         }
-        context.platform = plat;
-        app_init(ninecraft_app, &context);
+        context->platform = plat;
+        app_init(ninecraft_app, context);
     } else {
         AppPlatform_linux$AppPlatform_linux(&platform, handle, version_id);
         printf("%p\n", &platform);

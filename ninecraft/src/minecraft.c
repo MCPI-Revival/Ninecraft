@@ -92,7 +92,7 @@ void *minecraft_get_options(void *minecraft, int version_id) {
         mc_options = (char *)minecraft + MINECRAFT_OPTIONS_OFFSET_0_9_4;
     } else if (version_id == version_id_0_9_5) {
         mc_options = (char *)minecraft + MINECRAFT_OPTIONS_OFFSET_0_9_5;
-    } else if (version_id >= version_id_0_10_0 && version_id <= version_id_0_10_5) {
+    } else if (version_id >= version_id_0_10_0 && version_id <= version_id_0_11_0) {
         mc_options = (char *)minecraft_client_get_options(minecraft);
     }
     return (void *)mc_options;

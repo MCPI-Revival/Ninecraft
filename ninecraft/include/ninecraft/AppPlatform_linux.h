@@ -181,8 +181,7 @@ extern void AppPlatform_linux$vibrate(AppPlatform_linux *app_platform, int32_t m
 
 extern void AppPlatform_linux$destroy(AppPlatform_linux *app_platform);
 
-EXTERN_SYSV_WRAPPER(AppPlatform_linux$getSystemRegion);
-void AppPlatform_linux$getSystemRegion(android_string_t *ret, AppPlatform_linux *app_platform);
+android_string_t *AppPlatform_linux$getSystemRegion(AppPlatform_linux *app_platform);
 
 EXTERN_SYSV_WRAPPER(AppPlatform_linux$getGraphicsVendor);
 void AppPlatform_linux$getGraphicsVendor(android_string_t *ret, AppPlatform_linux *app_platform);
@@ -196,11 +195,9 @@ void AppPlatform_linux$getGraphicsVersion(android_string_t *ret, AppPlatform_lin
 EXTERN_SYSV_WRAPPER(AppPlatform_linux$getGraphicsExtensions);
 void AppPlatform_linux$getGraphicsExtensions(android_string_t *ret, AppPlatform_linux *app_platform);
 
-EXTERN_SYSV_WRAPPER(AppPlatform_linux$getExternalStoragePath);
-void AppPlatform_linux$getExternalStoragePath(android_string_t *ret, AppPlatform_linux *app_platform);
+android_string_t *AppPlatform_linux$getExternalStoragePath(AppPlatform_linux *app_platform);
 
-EXTERN_SYSV_WRAPPER(AppPlatform_linux$getInternalStoragePath);
-void AppPlatform_linux$getInternalStoragePath(android_string_t *ret, AppPlatform_linux *app_platform);
+android_string_t *AppPlatform_linux$getInternalStoragePath(AppPlatform_linux *app_platform);
 
 EXTERN_SYSV_WRAPPER(AppPlatform_linux$getApplicationId);
 void AppPlatform_linux$getApplicationId(android_string_t *ret, AppPlatform_linux *app_platform);
