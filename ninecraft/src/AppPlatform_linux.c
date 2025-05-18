@@ -1179,10 +1179,11 @@ void AppPlatform_linux$destroy(AppPlatform_linux *app_platform) {
     //puts("debug: AppPlatform_linux::destroy");
 }
 
-SYSV_WRAPPER(AppPlatform_linux$getSystemRegion, 2)
-void AppPlatform_linux$getSystemRegion(android_string_t *ret, AppPlatform_linux *app_platform) {
+android_string_t *AppPlatform_linux$getSystemRegion(AppPlatform_linux *app_platform) {
     //puts("debug: AppPlatform_linux::getSystemRegion");
-    android_string_cstr(ret, "US");
+    android_string_t *str = (android_string_t *)malloc(sizeof(android_string_t));
+    android_string_cstr(str, "US");
+    return str;
 }
 
 SYSV_WRAPPER(AppPlatform_linux$getGraphicsVendor, 2)
@@ -1209,26 +1210,28 @@ void AppPlatform_linux$getGraphicsExtensions(android_string_t *ret, AppPlatform_
     android_string_cstr(ret, (char *)glGetString(GL_EXTENSIONS));
 }
 
-SYSV_WRAPPER(AppPlatform_linux$getExternalStoragePath, 2)
-void AppPlatform_linux$getExternalStoragePath(android_string_t *ret, AppPlatform_linux *app_platform) {
+android_string_t *AppPlatform_linux$getExternalStoragePath(AppPlatform_linux *app_platform) {
     //puts("debug: AppPlatform_linux::getExternalStoragePath");
+    android_string_t *str = (android_string_t *)malloc(sizeof(android_string_t));
     char *storage_path = (char *)malloc(1024);
     storage_path[0] = '\0';
     getcwd(storage_path, 1024);
     strcat(storage_path, "/storage/");
-    android_string_cstr(ret, storage_path);
+    android_string_cstr(str, storage_path);
     free(storage_path);
+    return str;
 }
 
-SYSV_WRAPPER(AppPlatform_linux$getInternalStoragePath, 2)
-void AppPlatform_linux$getInternalStoragePath(android_string_t *ret, AppPlatform_linux *app_platform) {
+android_string_t *AppPlatform_linux$getInternalStoragePath(AppPlatform_linux *app_platform) {
     //puts("debug: AppPlatform_linux::getInternalStoragePath");
+    android_string_t *str = (android_string_t *)malloc(sizeof(android_string_t));
     char *storage_path = (char *)malloc(1024);
     storage_path[0] = '\0';
     getcwd(storage_path, 1024);
     strcat(storage_path, "/storage/");
-    android_string_cstr(ret, storage_path);
+    android_string_cstr(str, storage_path);
     free(storage_path);
+    return str;
 }
 
 SYSV_WRAPPER(AppPlatform_linux$getApplicationId, 2)
