@@ -11,12 +11,12 @@ void *ninecraft_store_vtable[] = {
     (void *)ninecraft_store_query_purchases,
 };
 
-SYSV_WRAPPER(ninecraft_store_create, 2);
 void ninecraft_store_create(ninecraft_store_context_t *ret, void *listener) {
     puts("NINECRAFT_STORE: create");
     ret->store = (ninecraft_store_t *)malloc(sizeof(ninecraft_store_t));
     ret->store->vtable = ninecraft_store_vtable;
 }
+SYSV_WRAPPER(ninecraft_store_create, 2);
 
 void ninecraft_store_destory(void *ninecraft_store) {
     puts("NINECRAFT_STORE: destory");
