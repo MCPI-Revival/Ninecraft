@@ -419,7 +419,7 @@ static void key_callback(GLFWwindow *window, int key, int scancode, int action, 
             }
         }
         int game_keycode = getGameKeyCode(key);
-        if (key == GLFW_KEY_Q && action == GLFW_PRESS && mouse_pointer_hidden && version_id >= version_id_0_5_0 && version_id <= version_id_0_11_0) {
+        if (key == GLFW_KEY_Q && action == GLFW_PRESS && mouse_pointer_hidden && version_id >= version_id_0_5_0 && version_id <= version_id_0_11_1) {
             size_t player_offset, inventory_offset;
             if (version_id == version_id_0_5_0) {
                 player_offset = MINECRAFT_LOCAL_PLAYER_OFFSET_0_5_0;
@@ -492,11 +492,13 @@ static void key_callback(GLFWwindow *window, int key, int scancode, int action, 
                 inventory_offset = PLAYER_INVENTORY_OFFSET_0_10_5;
             } else if (version_id == version_id_0_11_0) {
                 inventory_offset = PLAYER_INVENTORY_OFFSET_0_11_0;
+            } else if (version_id == version_id_0_11_1) {
+                inventory_offset = PLAYER_INVENTORY_OFFSET_0_11_1;
             }
             void *player = NULL;
             if (version_id >= version_id_0_5_0 && version_id <= version_id_0_9_5) {
                 player = *(void **)((char *)ninecraft_app + player_offset);
-            } else if (version_id >= version_id_0_10_0 && version_id <= version_id_0_11_0) {
+            } else if (version_id >= version_id_0_10_0 && version_id <= version_id_0_11_1) {
                 player = minecraft_client_get_local_player(ninecraft_app);
             }
             if (player) {
@@ -504,7 +506,7 @@ static void key_callback(GLFWwindow *window, int key, int scancode, int action, 
                 if (!is_creative) {
                     void *player_inventory = *(void **)((char *)player + inventory_offset);
                     void *item_instance = NULL;
-                    if (version_id >= version_id_0_11_0) {
+                    if (version_id >= version_id_0_11_0 && version_id <= version_id_0_11_1) {
                         item_instance = ((void *(*)(void *))android_dlsym(handle, "_ZNK9Inventory15getSelectedItemEv"))(player_inventory);
                     } else {
                         item_instance = ((void *(*)(void *))android_dlsym(handle, "_ZN9Inventory11getSelectedEv"))(player_inventory);
@@ -519,7 +521,7 @@ static void key_callback(GLFWwindow *window, int key, int scancode, int action, 
                             }
                             if (*(int8_t *)item_instance < 1 || ctrl_pressed) {
                                 android_vector_t *slots = NULL;
-                                if (version_id >= version_id_0_11_0) { 
+                                if (version_id >= version_id_0_11_0 && version_id <= version_id_0_11_1) { 
                                     slots = (android_vector_t *)((char *)player_inventory + 16);
                                 } else {
                                     slots = ((android_vector_t *(*)(void *))android_dlsym(handle, "_ZN16FillingContainer11getSlotListERi"))(player_inventory);
@@ -536,7 +538,7 @@ static void key_callback(GLFWwindow *window, int key, int scancode, int action, 
 
                             if (version_id >= version_id_0_5_0 && version_id <= version_id_0_7_1) {
                                 ((void (*)(void *, void *, bool))android_dlsym(handle, "_ZN11LocalPlayer4dropEP12ItemInstanceb"))(player, item_instance_copy, false);
-                            } else if (version_id >= version_id_0_7_2 && version_id <= version_id_0_11_0) {
+                            } else if (version_id >= version_id_0_7_2 && version_id <= version_id_0_11_1) {
                                 ((void (*)(void *, void *, bool))android_dlsym(handle, "_ZN11LocalPlayer4dropEPK12ItemInstanceb"))(player, item_instance_copy, false);
                             }
                         }
@@ -553,7 +555,7 @@ static void key_callback(GLFWwindow *window, int key, int scancode, int action, 
             }
         } else if (mouse_pointer_hidden && key == GLFW_KEY_T) {
             if (action == GLFW_PRESS) {
-                if (version_id >= version_id_0_7_0 && version_id <= version_id_0_11_0) {
+                if (version_id >= version_id_0_7_0 && version_id <= version_id_0_11_1) {
                     size_t minecraft_screenchooser_offset;
                     if (version_id == version_id_0_7_0) {
                         minecraft_screenchooser_offset = MINECRAFT_SCREENCHOOSER_OFFSET_0_7_0;
@@ -599,6 +601,8 @@ static void key_callback(GLFWwindow *window, int key, int scancode, int action, 
                         minecraft_screenchooser_offset = MINECRAFT_SCREENCHOOSER_OFFSET_0_10_5;
                     } else if (version_id == version_id_0_11_0) {
                         minecraft_screenchooser_offset = MINECRAFT_SCREENCHOOSER_OFFSET_0_11_0;
+                    } else if (version_id == version_id_0_11_1) {
+                        minecraft_screenchooser_offset = MINECRAFT_SCREENCHOOSER_OFFSET_0_11_1;
                     }
                     void *minecraft_screenchooser = NULL;
                     if (version_id >= version_id_0_10_0) {
@@ -1142,6 +1146,8 @@ int main(int argc, char **argv) {
             version_id = version_id_0_10_5;
         } else if (strcmp(verstr, "v0.11.0 alpha") == 0) {
             version_id = version_id_0_11_0;
+        } else if (strcmp(verstr, "v0.11.1 alpha") == 0) {
+            version_id = version_id_0_11_1;
         } else {
             puts("Unsupported Version!");
             return 1;
@@ -1326,6 +1332,8 @@ int main(int argc, char **argv) {
         ninecraft_app_size = MINECRAFTCLIENT_SIZE_0_10_5;
     } else if (version_id == version_id_0_11_0) {
         ninecraft_app_size = MINECRAFTCLIENT_SIZE_0_11_0;
+    } else if (version_id == version_id_0_11_1) {
+        ninecraft_app_size = MINECRAFTCLIENT_SIZE_0_11_1;
     }
     ninecraft_app = malloc(ninecraft_app_size);
     if (version_id >= version_id_0_9_0 && version_id <= version_id_0_9_5) {
@@ -1406,7 +1414,7 @@ int main(int argc, char **argv) {
             platform_vtable_0_10_0.isNetworkEnabled = (void *)AppPlatform_linux$isNetworkEnabled;
             platform_vtable_0_10_0.getPixelsPerMillimeter = (void *)AppPlatform_linux$getPixelsPerMillimeter;
             platform_vtable_0_10_0.swapBuffers = (void *)AppPlatform_linux$swapBuffers;
-        } else if (version_id == version_id_0_11_0) {
+        } else if (version_id >= version_id_0_11_0 && version_id <= version_id_0_11_1) {
             memcpy(&platform_vtable_0_11_0, plat->vtable, sizeof(app_platform_vtable_0_11_0_t));
             plat->vtable = (void **)&platform_vtable_0_11_0;
             platform_vtable_0_11_0.getImagePath = (void *)GET_SYSV_WRAPPER(AppPlatform_linux$getImagePath);
@@ -1475,7 +1483,7 @@ int main(int argc, char **argv) {
 
     char *minecraft_options = minecraft_get_options(ninecraft_app, version_id);
 
-    if (version_id >= version_id_0_5_0 && version_id <= version_id_0_11_0 && minecraft_options && minecraft_options != ninecraft_app) {
+    if (version_id >= version_id_0_5_0 && version_id <= version_id_0_11_1 && minecraft_options && minecraft_options != ninecraft_app) {
         if (version_id >= version_id_0_7_0 && options_set_key) {
             options_set_key((void *)minecraft_options, MCKEY_ID_SNEAK, MCKEY_SNEAK);
         } else if (version_id >= version_id_0_5_0 && version_id <= version_id_0_6_1) {
@@ -1505,7 +1513,9 @@ int main(int argc, char **argv) {
     }
 
     size_t minecraft_isgrabbed_offset;
-    if (version_id == version_id_0_11_0) {
+    if (version_id == version_id_0_11_1) {
+        minecraft_isgrabbed_offset = MINECRAFTCLIENT_ISGRABBED_OFFSET_0_11_1;
+    } else if (version_id == version_id_0_11_0) {
         minecraft_isgrabbed_offset = MINECRAFTCLIENT_ISGRABBED_OFFSET_0_11_0;
     } else if (version_id == version_id_0_10_5) {
         minecraft_isgrabbed_offset = MINECRAFTCLIENT_ISGRABBED_OFFSET_0_10_5;

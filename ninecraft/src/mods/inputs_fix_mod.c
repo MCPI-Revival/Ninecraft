@@ -120,7 +120,7 @@ typedef union {
 } keyboard_input_t;
 
 void xperia_play_input_tick(keyboard_input_t *__this, void *player) {
-    if (_version_id >= version_id_0_11_0) {
+    if (_version_id >= version_id_0_11_0 && _version_id <= version_id_0_11_1) {
         ((void (*)(keyboard_input_t *, void *))android_dlsym(_handle, "_ZN13KeyboardInput4tickER6Player"))(__this, player);
     } else {
         ((void (*)(keyboard_input_t *, void *))android_dlsym(_handle, "_ZN13KeyboardInput4tickEP6Player"))(__this, player);
@@ -139,7 +139,7 @@ void xperia_play_input_tick(keyboard_input_t *__this, void *player) {
         sneak_pressed = &__this->v_0_6_0.sneak_pressed;
         is_flying_down = &__this->v_0_6_0.is_flying_down;
         is_flying_up = &__this->v_0_6_0.is_flying_up;
-    } else if (_version_id == version_id_0_11_0) {
+    } else if (_version_id >= version_id_0_11_0 && _version_id <= version_id_0_11_1) {
         jump_pressed = &__this->v_0_11_0.jump_pressed;
         sneak_pressed = &__this->v_0_11_0.sneak_pressed;
         is_flying_down = &__this->v_0_11_0.is_flying_down;
@@ -154,12 +154,12 @@ void xperia_play_input_tick(keyboard_input_t *__this, void *player) {
             *is_flying_up = false;
         }
         if (*sneak_pressed) {
-            if (_version_id == version_id_0_11_0) {
+            if (_version_id >= version_id_0_11_0 && _version_id <= version_id_0_11_1) {
                 ((void (*)(void *, bool))android_dlsym(_handle, "_ZN3Mob11setSneakingEb"))(player, true);
             }
             *is_flying_down = true;
         } else {
-            if (_version_id == version_id_0_11_0) {
+            if (_version_id >= version_id_0_11_0 && _version_id <= version_id_0_11_1) {
                 ((void (*)(void *, bool))android_dlsym(_handle, "_ZN3Mob11setSneakingEb"))(player, false);
             }
             *is_flying_down = false;
@@ -189,11 +189,11 @@ void inputs_fix_mod_inject(void *handle, int version_id) {
     _version_id = version_id;
     if (version_id >= version_id_0_5_0 && version_id <= version_id_0_8_1) {
         ((void **)android_dlsym(handle, "_ZTV15XperiaPlayInput"))[4] = xperia_play_input_tick;
-    } else if (version_id >= version_id_0_9_0 && version_id <= version_id_0_11_0) {
+    } else if (version_id >= version_id_0_9_0 && version_id <= version_id_0_11_1) {
         ((void **)android_dlsym(handle, "_ZTV19ControllerMoveInput"))[4] = xperia_play_input_tick;
         ((void **)android_dlsym(handle, "_ZTV19ControllerMoveInput"))[6] = xperia_play_input_set_key;
     }
-    if (version_id >= version_id_0_11_0) {
+    if (_version_id >= version_id_0_11_0 && _version_id <= version_id_0_11_1) {
         ((void **)android_dlsym(handle, "_ZTV23BoatControllerMoveInput"))[4] = boat_input_tick;
         ((void **)android_dlsym(handle, "_ZTV23BoatControllerMoveInput"))[6] = xperia_play_input_set_key;
     }

@@ -23,6 +23,7 @@
 #define OFFSET_FOR_0_10_4 79
 #define OFFSET_FOR_0_10_5 76
 #define OFFSET_FOR_0_11_0 72
+#define OFFSET_FOR_0_11_1 72
 
 #else
 #if defined(__arm__) || defined(_M_ARM) 
@@ -41,12 +42,13 @@
 #define OFFSET_FOR_0_10_4 41
 #define OFFSET_FOR_0_10_5 41
 #define OFFSET_FOR_0_11_0 41
+#define OFFSET_FOR_0_11_1 41
 
 #endif
 #endif
 
 void header_buttons_fix_mod_inject(void *handle, int version_id) {
-    if (version_id >= version_id_0_9_0 && version_id <= version_id_0_11_0) {
+    if (version_id >= version_id_0_9_0 && version_id <= version_id_0_11_1) {
         char *play_screen_reset_base_buttons = (char *)android_dlsym(handle, "_ZN10PlayScreen16resetBaseButtonsEv");
         if (play_screen_reset_base_buttons) {
             if (version_id == version_id_0_9_0) {
@@ -81,6 +83,8 @@ void header_buttons_fix_mod_inject(void *handle, int version_id) {
 #endif
             } else if (version_id == version_id_0_11_0) {
                 *(short *)(play_screen_reset_base_buttons + OFFSET_FOR_0_11_0) = INST_PATCH;
+            } else if (version_id == version_id_0_11_1) {
+                *(short *)(play_screen_reset_base_buttons + OFFSET_FOR_0_11_1) = INST_PATCH;
             }
         }
     }
