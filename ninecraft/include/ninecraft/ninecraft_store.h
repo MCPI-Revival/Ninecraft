@@ -17,7 +17,8 @@ typedef struct {
     ninecraft_store_t *store;
 } ninecraft_store_context_t;
 
-void ninecraft_store_create(ninecraft_store_context_t *ret, android_string_t *str, void *listener);
+EXTERN_SYSV_WRAPPER(ninecraft_store_create);
+void ninecraft_store_create(ninecraft_store_context_t *ret, void *listener);
 
 void ninecraft_store_destory(void *ninecraft_store);
 
