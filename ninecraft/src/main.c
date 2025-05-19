@@ -291,7 +291,11 @@ static void set_ninecraft_size(int width, int height) {
         minecraft_set_size(ninecraft_app, width, height);
     }
     size_t screen_offset;
-    if (version_id == version_id_0_10_5) {
+    if (version_id == version_id_0_11_1) {
+        screen_offset = MINECRAFTCLIENT_SCREEN_OFFSET_0_11_1;
+    } else if (version_id == version_id_0_11_0) {
+        screen_offset = MINECRAFTCLIENT_SCREEN_OFFSET_0_11_0;
+    } else if (version_id == version_id_0_10_5) {
         screen_offset = MINECRAFTCLIENT_SCREEN_OFFSET_0_10_5;
     } else if (version_id == version_id_0_10_4) {
         screen_offset = MINECRAFTCLIENT_SCREEN_OFFSET_0_10_4;
