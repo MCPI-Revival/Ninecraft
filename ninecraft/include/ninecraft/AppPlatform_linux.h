@@ -8,6 +8,7 @@
 #include <ninecraft/android/android_vector.h>
 #include <ninecraft/options.h>
 #include <ancmp/abi_fix.h>
+#include <ninecraft/app_platform.h>
 
 typedef struct {
     void **vtable;
@@ -213,5 +214,7 @@ bool AppPlatform_linux$isFirstSnoopLaunch(AppPlatform_linux *app_platform);
 bool AppPlatform_linux$hasHardwareInformationChanged(AppPlatform_linux *app_platform);
 
 bool AppPlatform_linux$isTablet(AppPlatform_linux *app_platform);
+
+void AppPlatform_linux$pickImage(AppPlatform_linux *__this, image_picking_callback_0_11_0_t *callback);
 
 #endif

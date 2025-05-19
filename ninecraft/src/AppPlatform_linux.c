@@ -1266,3 +1266,25 @@ bool AppPlatform_linux$isTablet(AppPlatform_linux *app_platform) {
     //puts("debug: AppPlatform_linux::isTablet");
     return false;
 }
+
+void AppPlatform_linux$pickImage(AppPlatform_linux *__this, image_picking_callback_0_11_0_t *callback) {
+    android_string_t path;
+    FILE *fp = popen("zenity --file-selection", "r");
+    if (fp) {
+        char input_value[256];
+        for (int i = 0; i < 100; ++i) {
+            char c = fgetc(fp);
+            if (c == '\n' || c == '\0' || c == EOF) {
+                input_value[i] = '\0';
+                break;
+            }
+            input_value[i] = c;
+        }
+        input_value[255] = '\0';
+        android_string_cstr(&path, input_value);
+        pclose(fp);
+        callback->vtable->onImagePickingSuccess(callback, &path);
+    } else {
+        callback->vtable->onImagePickingCanceled(callback);
+    }
+}
