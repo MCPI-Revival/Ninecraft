@@ -3,11 +3,11 @@
     "ancmp": {
       "flake": false,
       "locked": {
-        "lastModified": 1747514314,
-        "narHash": "sha256-fXnyKpcrjTlDG7+Q6uAJJ1aeQVBYQjp3wRbDcuNeY2c=",
+        "lastModified": 1747666279,
+        "narHash": "sha256-+TX+o6Vgo67f6/nzqzFyqtH42n67RWqbeRvuVhBXPU0=",
         "owner": "MFDGaming",
         "repo": "ancmp",
-        "rev": "e383f035985af0c2a1ac736a4943bc2ddcac3309",
+        "rev": "0f8a9d9a27e5436d6ea3d2a4f8da3a24d151edb5",
         "type": "github"
       },
       "original": {
@@ -76,11 +76,11 @@
     },
     "nixpkgs": {
       "locked": {
-        "lastModified": 1747327360,
-        "narHash": "sha256-LSmTbiq/nqZR9B2t4MRnWG7cb0KVNU70dB7RT4+wYK4=",
+        "lastModified": 1747542820,
+        "narHash": "sha256-GaOZntlJ6gPPbbkTLjbd8BMWaDYafhuuYRNrxCGnPJw=",
         "owner": "nixos",
         "repo": "nixpkgs",
-        "rev": "e06158e58f3adee28b139e9c2bcfcc41f8625b46",
+        "rev": "292fa7d4f6519c074f0a50394dbbe69859bb6043",
         "type": "github"
       },
       "original": {
