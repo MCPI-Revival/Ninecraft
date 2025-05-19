@@ -1440,6 +1440,7 @@ int main(int argc, char **argv) {
             platform_vtable_0_11_0.isFirstSnoopLaunch = (void *)AppPlatform_linux$isFirstSnoopLaunch;
             platform_vtable_0_11_0.hasHardwareInformationChanged = (void *)AppPlatform_linux$hasHardwareInformationChanged;
             platform_vtable_0_11_0.isTablet = (void *)AppPlatform_linux$isTablet;
+            platform_vtable_0_11_0.pickImage = (void *)AppPlatform_linux$pickImage;
 
             DETOUR(android_dlsym(handle, "_ZN26HTTPRequestInternalAndroidC2ER11HTTPRequest"), ninecraft_http_construct, 1);
             DETOUR(android_dlsym(handle, "_ZN26HTTPRequestInternalAndroid4sendEv"), ninecraft_http_send, 1);
