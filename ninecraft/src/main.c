@@ -37,6 +37,7 @@
 #include <ninecraft/audio/sles.h>
 #include <ninecraft/audio/audio_engine.h>
 #include <zlib.h>
+#include <ancmp/android_stat.h>
 
 #include <ancmp/hooks.h>
 #include <ancmp/android_dlfcn.h>
@@ -931,6 +932,15 @@ bool leveldb_zlib_decompress(void *__this, const char *input, unsigned int lengt
 	return ret == Z_STREAM_END ? true : false;
 }
 
+int64_t _size(android_string_t *path) {
+    puts(android_string_to_str(path));
+    struct stat statbuf;
+    if (!stat(android_string_to_str(path), &statbuf)) {
+        return statbuf.st_size;
+    }
+    return 0;
+}
+
 int main(int argc, char **argv) {
     android_linker_init();
     static struct stat st = {0};
@@ -1434,7 +1444,11 @@ int main(int argc, char **argv) {
             DETOUR(android_dlsym(handle, "_ZN26HTTPRequestInternalAndroidC2ER11HTTPRequest"), ninecraft_http_construct, 1);
             DETOUR(android_dlsym(handle, "_ZN26HTTPRequestInternalAndroid4sendEv"), ninecraft_http_send, 1);
             DETOUR(android_dlsym(handle, "_ZN26HTTPRequestInternalAndroid5abortEv"), ninecraft_http_abort, 1);
-            DETOUR(android_dlsym(handle, "_ZN12AndroidStore21createGooglePlayStoreERKSsR13StoreListener"), ninecraft_store_create, 1);
+            DETOUR(android_dlsym(handle, "_ZN12StoreFactory11createStoreER13StoreListener"), GET_SYSV_WRAPPER(ninecraft_store_create), 1);
+            DETOUR(android_dlsym(handle, "_Z5_sizeRKSs"), _size, 1);
+            
+            
+            
         }
         context->platform = plat;
         app_init(ninecraft_app, context);
