@@ -154,8 +154,14 @@ void xperia_play_input_tick(keyboard_input_t *__this, void *player) {
             *is_flying_up = false;
         }
         if (*sneak_pressed) {
+            if (_version_id == version_id_0_11_0) {
+                ((void (*)(void *, bool))android_dlsym(_handle, "_ZN3Mob11setSneakingEb"))(player, true);
+            }
             *is_flying_down = true;
         } else {
+            if (_version_id == version_id_0_11_0) {
+                ((void (*)(void *, bool))android_dlsym(_handle, "_ZN3Mob11setSneakingEb"))(player, false);
+            }
             *is_flying_down = false;
         }
     }
