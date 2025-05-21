@@ -760,6 +760,11 @@ void gles_hook() {
     add_custom_hook("glUniformMatrix4fv", (void *)gl_uniform_matrix_4_f_v);
     add_custom_hook("glUseProgram", (void *)gl_use_program);
     add_custom_hook("glVertexAttribPointer", (void *)gl_vertex_attrib_pointer);
+    add_custom_hook("glStencilFuncSeparate", (void *)gl_stencil_func_separate);
+    add_custom_hook("glStencilOpSeparate", (void *)gl_stencil_op_separate);
+    add_custom_hook("glDeleteShader", (void *)gl_delete_shader);
+    add_custom_hook("glUniform1i", (void *)gl_uniform_1_i);
+    add_custom_hook("glBufferSubData", (void *)gl_buffer_sub_data);
 }
 
 int __my_srget(FILE *astream) {
@@ -1457,7 +1462,7 @@ int main(int argc, char **argv) {
             DETOUR(android_dlsym(handle, "_ZN26HTTPRequestInternalAndroidC2ER11HTTPRequest"), ninecraft_http_construct, 1);
             DETOUR(android_dlsym(handle, "_ZN26HTTPRequestInternalAndroid4sendEv"), ninecraft_http_send, 1);
             DETOUR(android_dlsym(handle, "_ZN26HTTPRequestInternalAndroid5abortEv"), ninecraft_http_abort, 1);
-            DETOUR(android_dlsym(handle, "_ZN12StoreFactory11createStoreER13StoreListener"), GET_SYSV_WRAPPER(ninecraft_store_create), 1);
+            DETOUR(android_dlsym(handle, "_ZN12AndroidStore21createGooglePlayStoreERKSsR13StoreListener"), GET_SYSV_WRAPPER(ninecraft_store_create), 1);
             DETOUR(android_dlsym(handle, "_Z5_sizeRKSs"), _size, 1);
             
             

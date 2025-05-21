@@ -363,3 +363,23 @@ void gl_use_program(GLuint program) {
 void gl_vertex_attrib_pointer(GLuint index, GLint size, GLenum type, GLboolean normalized, GLsizei stride, const void *pointer) {
     glVertexAttribPointer(index, size, type, normalized, stride, pointer);
 }
+
+void gl_stencil_func_separate(GLenum face, GLenum func, GLint ref, GLuint mask) {
+    glStencilFuncSeparate(face, func, ref, mask);
+}
+
+void gl_stencil_op_separate(GLenum face, GLenum sfail, GLenum dpfail, GLenum dppass) {
+    glStencilOpSeparate(face, sfail, dpfail, dppass);
+}
+
+void gl_delete_shader(GLuint shader) {
+    glDeleteShader(shader);
+}
+
+void gl_uniform_1_i(GLint location, GLint v0) {
+    glUniform1i(location, v0);
+}
+
+void gl_buffer_sub_data(GLenum target, GLintptr offset, GLsizeiptr size, const void *data) {
+    glBufferSubData(target, offset, size, data);
+}
