@@ -189,4 +189,14 @@ extern void gl_use_program(GLuint program);
 
 extern void gl_vertex_attrib_pointer(GLuint index, GLint size, GLenum type, GLboolean normalized, GLsizei stride, const void *pointer);
 
+extern void gl_stencil_func_separate(GLenum face, GLenum func, GLint ref, GLuint mask);
+
+extern void gl_stencil_op_separate(GLenum face, GLenum sfail, GLenum dpfail, GLenum dppass);
+
+extern void gl_delete_shader(GLuint shader);
+
+extern void gl_uniform_1_i(GLint location, GLint v0);
+
+extern void gl_buffer_sub_data(GLenum target, GLintptr offset, GLsizeiptr size, const void *data);
+
 #endif
