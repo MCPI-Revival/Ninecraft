@@ -19,19 +19,7 @@ in {
 
   config = lib.mkIf cfg.enable {
     environment.systemPackages = with pkgs; [
-      (symlinkJoin
-        {
-          name = "ninecraft-game";
-          paths = [
-            (makeDesktopItem {
-              desktopName = "Ninecraft";
-              name = "ninecraft";
-              icon = ../../res/drawable/iconx.png;
-              exec = "ninecraft";
-            })
-            cfg.package
-          ];
-        })
+      cfg.package
     ];
 
     networking.firewall = lib.mkIf cfg.openFirewall {
