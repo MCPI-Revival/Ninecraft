@@ -8,6 +8,7 @@
 #include <ninecraft/android/android_vector.h>
 #include <ninecraft/options.h>
 #include <ancmp/abi_fix.h>
+#include <ninecraft/app_platform.h>
 
 typedef struct {
     void **vtable;
@@ -180,5 +181,40 @@ extern void AppPlatform_linux$uploadPlatformDependentData(AppPlatform_linux *app
 extern void AppPlatform_linux$vibrate(AppPlatform_linux *app_platform, int32_t milliseconds);
 
 extern void AppPlatform_linux$destroy(AppPlatform_linux *app_platform);
+
+android_string_t *AppPlatform_linux$getSystemRegion(AppPlatform_linux *app_platform);
+
+EXTERN_SYSV_WRAPPER(AppPlatform_linux$getGraphicsVendor);
+void AppPlatform_linux$getGraphicsVendor(android_string_t *ret, AppPlatform_linux *app_platform);
+
+EXTERN_SYSV_WRAPPER(AppPlatform_linux$getGraphicsRenderer);
+void AppPlatform_linux$getGraphicsRenderer(android_string_t *ret, AppPlatform_linux *app_platform);
+
+EXTERN_SYSV_WRAPPER(AppPlatform_linux$getGraphicsVersion);
+void AppPlatform_linux$getGraphicsVersion(android_string_t *ret, AppPlatform_linux *app_platform);
+
+EXTERN_SYSV_WRAPPER(AppPlatform_linux$getGraphicsExtensions);
+void AppPlatform_linux$getGraphicsExtensions(android_string_t *ret, AppPlatform_linux *app_platform);
+
+android_string_t *AppPlatform_linux$getExternalStoragePath(AppPlatform_linux *app_platform);
+
+android_string_t *AppPlatform_linux$getInternalStoragePath(AppPlatform_linux *app_platform);
+
+EXTERN_SYSV_WRAPPER(AppPlatform_linux$getApplicationId);
+void AppPlatform_linux$getApplicationId(android_string_t *ret, AppPlatform_linux *app_platform);
+
+EXTERN_SYSV_WRAPPER(AppPlatform_linux$getDeviceId);
+void AppPlatform_linux$getDeviceId(android_string_t *ret, AppPlatform_linux *app_platform);
+
+EXTERN_SYSV_WRAPPER(AppPlatform_linux$createUUID);
+void AppPlatform_linux$createUUID(android_string_t *ret, AppPlatform_linux *app_platform);
+
+bool AppPlatform_linux$isFirstSnoopLaunch(AppPlatform_linux *app_platform);
+
+bool AppPlatform_linux$hasHardwareInformationChanged(AppPlatform_linux *app_platform);
+
+bool AppPlatform_linux$isTablet(AppPlatform_linux *app_platform);
+
+void AppPlatform_linux$pickImage(AppPlatform_linux *__this, image_picking_callback_0_11_0_t *callback);
 
 #endif

@@ -8,7 +8,6 @@
 #include <sys/types.h>
 #ifndef _WIN32
 #include <sys/mman.h>
-#include <fnmatch.h>
 #else
 #include <direct.h>
 #define mkdir(x, y) _mkdir(x)
@@ -38,6 +37,7 @@
 #include <ninecraft/audio/sles.h>
 #include <ninecraft/audio/audio_engine.h>
 #include <zlib.h>
+#include <ancmp/android_stat.h>
 
 #include <ancmp/hooks.h>
 #include <ancmp/android_dlfcn.h>
@@ -46,6 +46,9 @@
 
 #include <ninecraft/options.h>
 #include <ninecraft/mods/chat_mod.h>
+#include <ninecraft/ninecraft_http.h>
+#include <ninecraft/ninecraft_store.h>
+#include <ninecraft/android/android_keycodes.h>
 
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb_image.h>
@@ -207,6 +210,361 @@ static void mouse_pos_callback(GLFWwindow *window, double xpos, double ypos) {
     }
 }
 
+int glfw_to_android_key(int keycode) {
+    if (keycode == GLFW_KEY_0) {
+        return AKEYCODE_0;
+    }
+    if (keycode == GLFW_KEY_1) {
+        return AKEYCODE_1;
+    }
+    if (keycode == GLFW_KEY_2) {
+        return AKEYCODE_2;
+    }
+    if (keycode == GLFW_KEY_3) {
+        return AKEYCODE_3;
+    }
+    if (keycode == GLFW_KEY_4) {
+        return AKEYCODE_4;
+    }
+    if (keycode == GLFW_KEY_5) {
+        return AKEYCODE_5;
+    }
+    if (keycode == GLFW_KEY_6) {
+        return AKEYCODE_6;
+    }
+    if (keycode == GLFW_KEY_7) {
+        return AKEYCODE_7;
+    }
+    if (keycode == GLFW_KEY_8) {
+        return AKEYCODE_8;
+    }
+    if (keycode == GLFW_KEY_9) {
+        return AKEYCODE_9;
+    }
+    if (keycode == GLFW_KEY_A) {
+        return AKEYCODE_A;
+    }
+    if (keycode == GLFW_KEY_B) {
+        return AKEYCODE_B;
+    }
+    if (keycode == GLFW_KEY_C) {
+        return AKEYCODE_C;
+    }
+    if (keycode == GLFW_KEY_D) {
+        return AKEYCODE_D;
+    }
+    if (keycode == GLFW_KEY_E) {
+        return AKEYCODE_E;
+    }
+    if (keycode == GLFW_KEY_F) {
+        return AKEYCODE_F;
+    }
+    if (keycode == GLFW_KEY_G) {
+        return AKEYCODE_G;
+    }
+    if (keycode == GLFW_KEY_H) {
+        return AKEYCODE_H;
+    }
+    if (keycode == GLFW_KEY_I) {
+        return AKEYCODE_I;
+    }
+    if (keycode == GLFW_KEY_J) {
+        return AKEYCODE_J;
+    }
+    if (keycode == GLFW_KEY_K) {
+        return AKEYCODE_K;
+    }
+    if (keycode == GLFW_KEY_L) {
+        return AKEYCODE_L;
+    }
+    if (keycode == GLFW_KEY_M) {
+        return AKEYCODE_M;
+    }
+    if (keycode == GLFW_KEY_N) {
+        return AKEYCODE_N;
+    }
+    if (keycode == GLFW_KEY_O) {
+        return AKEYCODE_O;
+    }
+    if (keycode == GLFW_KEY_P) {
+        return AKEYCODE_P;
+    }
+    if (keycode == GLFW_KEY_Q) {
+        return AKEYCODE_Q;
+    }
+    if (keycode == GLFW_KEY_R) {
+        return AKEYCODE_R;
+    }
+    if (keycode == GLFW_KEY_S) {
+        return AKEYCODE_S;
+    }
+    if (keycode == GLFW_KEY_T) {
+        return AKEYCODE_T;
+    }
+    if (keycode == GLFW_KEY_U) {
+        return AKEYCODE_U;
+    }
+    if (keycode == GLFW_KEY_V) {
+        return AKEYCODE_V;
+    }
+    if (keycode == GLFW_KEY_W) {
+        return AKEYCODE_W;
+    }
+    if (keycode == GLFW_KEY_X) {
+        return AKEYCODE_X;
+    }
+    if (keycode == GLFW_KEY_Y) {
+        return AKEYCODE_Y;
+    }
+    if (keycode == GLFW_KEY_Z) {
+        return AKEYCODE_Z;
+    }
+    if (keycode == GLFW_KEY_COMMA) {
+        return AKEYCODE_COMMA;
+    }
+    if (keycode == GLFW_KEY_PERIOD) {
+        return AKEYCODE_PERIOD;
+    }
+    if (keycode == GLFW_KEY_LEFT_ALT) {
+        return AKEYCODE_ALT_LEFT;
+    }
+    if (keycode == GLFW_KEY_RIGHT_ALT) {
+        return AKEYCODE_ALT_RIGHT;
+    }
+    if (keycode == GLFW_KEY_LEFT_SHIFT) {
+        return AKEYCODE_SHIFT_LEFT;
+    }
+    if (keycode == GLFW_KEY_RIGHT_SHIFT) {
+        return AKEYCODE_SHIFT_RIGHT;
+    }
+    if (keycode == GLFW_KEY_TAB) {
+        return AKEYCODE_TAB;
+    }
+    if (keycode == GLFW_KEY_SPACE) {
+        return AKEYCODE_SPACE;
+    }
+    if (keycode == GLFW_KEY_ENTER) {
+        return AKEYCODE_ENTER;
+    }
+    if (keycode == GLFW_KEY_BACKSPACE) {
+        return AKEYCODE_DEL;
+    }
+    if (keycode == GLFW_KEY_DELETE) {
+        return AKEYCODE_FORWARD_DEL;
+    }
+    if (keycode == GLFW_KEY_GRAVE_ACCENT) {
+        return AKEYCODE_GRAVE;
+    }
+    if (keycode == GLFW_KEY_MINUS) {
+        return AKEYCODE_MINUS;
+    }
+    if (keycode == GLFW_KEY_EQUAL) {
+        return AKEYCODE_EQUALS;
+    }
+    if (keycode == GLFW_KEY_LEFT_BRACKET) {
+        return AKEYCODE_LEFT_BRACKET;
+    }
+    if (keycode == GLFW_KEY_RIGHT_BRACKET) {
+        return AKEYCODE_RIGHT_BRACKET;
+    }
+    if (keycode == GLFW_KEY_BACKSLASH) {
+        return AKEYCODE_BACKSLASH;
+    }
+    if (keycode == GLFW_KEY_SEMICOLON) {
+        return AKEYCODE_SEMICOLON;
+    }
+    if (keycode == GLFW_KEY_APOSTROPHE) {
+        return AKEYCODE_APOSTROPHE;
+    }
+    if (keycode == GLFW_KEY_SLASH) {
+        return AKEYCODE_SLASH;
+    }
+    if (keycode == GLFW_KEY_LEFT_CONTROL) {
+        return AKEYCODE_CTRL_LEFT;
+    }
+    if (keycode == GLFW_KEY_RIGHT_CONTROL) {
+        return AKEYCODE_CTRL_RIGHT;
+    }
+    if (keycode == GLFW_KEY_CAPS_LOCK) {
+        return AKEYCODE_CAPS_LOCK;
+    }
+    if (keycode == GLFW_KEY_PRINT_SCREEN) {
+        return AKEYCODE_SYSRQ;
+    }
+    if (keycode == GLFW_KEY_PAUSE) {
+        return AKEYCODE_BREAK;
+    }
+    if (keycode == GLFW_KEY_HOME) {
+        return AKEYCODE_MOVE_HOME;
+    }
+    if (keycode == GLFW_KEY_END) {
+        return AKEYCODE_MOVE_END;
+    }
+    if (keycode == GLFW_KEY_INSERT) {
+        return AKEYCODE_INSERT;
+    }
+    if (keycode == GLFW_KEY_SCROLL_LOCK) {
+        return AKEYCODE_SCROLL_LOCK;
+    }
+    if (keycode == GLFW_KEY_PAGE_UP) {
+        return AKEYCODE_PAGE_UP;
+    }
+    if (keycode == GLFW_KEY_PAGE_DOWN) {
+        return AKEYCODE_PAGE_DOWN;
+    }
+    if (keycode == GLFW_KEY_F1) {
+        return AKEYCODE_F1;
+    }
+    if (keycode == GLFW_KEY_F2) {
+        return AKEYCODE_F2;
+    }
+    if (keycode == GLFW_KEY_F3) {
+        return AKEYCODE_F3;
+    }
+    if (keycode == GLFW_KEY_F4) {
+        return AKEYCODE_F4;
+    }
+    if (keycode == GLFW_KEY_F5) {
+        return AKEYCODE_F5;
+    }
+    if (keycode == GLFW_KEY_F6) {
+        return AKEYCODE_F6;
+    }
+    if (keycode == GLFW_KEY_F7) {
+        return AKEYCODE_F7;
+    }
+    if (keycode == GLFW_KEY_F8) {
+        return AKEYCODE_F8;
+    }
+    if (keycode == GLFW_KEY_F9) {
+        return AKEYCODE_F9;
+    }
+    if (keycode == GLFW_KEY_F10) {
+        return AKEYCODE_F10;
+    }
+    if (keycode == GLFW_KEY_F11) {
+        return AKEYCODE_F11;
+    }
+    if (keycode == GLFW_KEY_F12) {
+        return AKEYCODE_F12;
+    }
+    if (keycode == GLFW_KEY_F13) {
+        return AKEYCODE_F13;
+    }
+    if (keycode == GLFW_KEY_F14) {
+        return AKEYCODE_F14;
+    }
+    if (keycode == GLFW_KEY_F15) {
+        return AKEYCODE_F15;
+    }
+    if (keycode == GLFW_KEY_F16) {
+        return AKEYCODE_F16;
+    }
+    if (keycode == GLFW_KEY_F17) {
+        return AKEYCODE_F17;
+    }
+    if (keycode == GLFW_KEY_F18) {
+        return AKEYCODE_F18;
+    }
+    if (keycode == GLFW_KEY_F19) {
+        return AKEYCODE_F19;
+    }
+    if (keycode == GLFW_KEY_F20) {
+        return AKEYCODE_F20;
+    }
+    if (keycode == GLFW_KEY_F21) {
+        return AKEYCODE_F21;
+    }
+    if (keycode == GLFW_KEY_F22) {
+        return AKEYCODE_F22;
+    }
+    if (keycode == GLFW_KEY_F23) {
+        return AKEYCODE_F23;
+    }
+    if (keycode == GLFW_KEY_F24) {
+        return AKEYCODE_F24;
+    }
+    if (keycode == GLFW_KEY_ESCAPE) {
+        return AKEYCODE_ESCAPE;
+    }
+    if (keycode == GLFW_KEY_UP) {
+        return AKEYCODE_DPAD_UP;
+    }
+    if (keycode == GLFW_KEY_DOWN) {
+        return AKEYCODE_DPAD_DOWN;
+    }
+    if (keycode == GLFW_KEY_LEFT) {
+        return AKEYCODE_DPAD_LEFT;
+    }
+    if (keycode == GLFW_KEY_RIGHT) {
+        return AKEYCODE_DPAD_RIGHT;
+    }
+    if (keycode == GLFW_KEY_MENU) {
+        return AKEYCODE_MENU;
+    }
+    if (keycode == GLFW_KEY_LEFT_SUPER) {
+        return AKEYCODE_META_LEFT;
+    }
+    if (keycode == GLFW_KEY_RIGHT_SUPER) {
+        return AKEYCODE_META_RIGHT;
+    }
+    if (keycode == GLFW_KEY_NUM_LOCK) {
+        return AKEYCODE_NUM_LOCK;
+    }
+    if (keycode == GLFW_KEY_KP_0) {
+        return AKEYCODE_NUMPAD_0;
+    }
+    if (keycode == GLFW_KEY_KP_1) {
+        return AKEYCODE_NUMPAD_1;
+    }
+    if (keycode == GLFW_KEY_KP_2) {
+        return AKEYCODE_NUMPAD_2;
+    }
+    if (keycode == GLFW_KEY_KP_3) {
+        return AKEYCODE_NUMPAD_3;
+    }
+    if (keycode == GLFW_KEY_KP_4) {
+        return AKEYCODE_NUMPAD_4;
+    }
+    if (keycode == GLFW_KEY_KP_5) {
+        return AKEYCODE_NUMPAD_5;
+    }
+    if (keycode == GLFW_KEY_KP_6) {
+        return AKEYCODE_NUMPAD_6;
+    }
+    if (keycode == GLFW_KEY_KP_7) {
+        return AKEYCODE_NUMPAD_7;
+    }
+    if (keycode == GLFW_KEY_KP_8) {
+        return AKEYCODE_NUMPAD_8;
+    }
+    if (keycode == GLFW_KEY_KP_9) {
+        return AKEYCODE_NUMPAD_9;
+    }
+    if (keycode == GLFW_KEY_KP_DIVIDE) {
+        return AKEYCODE_NUMPAD_DIVIDE;
+    }
+    if (keycode == GLFW_KEY_KP_MULTIPLY) {
+        return AKEYCODE_NUMPAD_MULTIPLY;
+    }
+    if (keycode == GLFW_KEY_KP_SUBTRACT) {
+        return AKEYCODE_NUMPAD_SUBTRACT;
+    }
+    if (keycode == GLFW_KEY_KP_ADD) {
+        return AKEYCODE_NUMPAD_ADD;
+    }
+    if (keycode == GLFW_KEY_KP_DECIMAL) {
+        return AKEYCODE_NUMPAD_DOT;
+    }
+    if (keycode == GLFW_KEY_KP_ENTER) {
+        return AKEYCODE_NUMPAD_ENTER;
+    }
+    if (keycode == GLFW_KEY_KP_EQUAL) {
+        return AKEYCODE_NUMPAD_EQUALS;
+    }
+    return AKEYCODE_UNKNOWN;
+}
+
 int getGameKeyCode(int keycode) {
     if (keycode == GLFW_KEY_W) {
         return MCKEY_FORWARD;
@@ -289,7 +647,11 @@ static void set_ninecraft_size(int width, int height) {
         minecraft_set_size(ninecraft_app, width, height);
     }
     size_t screen_offset;
-    if (version_id == version_id_0_10_5) {
+    if (version_id == version_id_0_11_1) {
+        screen_offset = MINECRAFTCLIENT_SCREEN_OFFSET_0_11_1;
+    } else if (version_id == version_id_0_11_0) {
+        screen_offset = MINECRAFTCLIENT_SCREEN_OFFSET_0_11_0;
+    } else if (version_id == version_id_0_10_5) {
         screen_offset = MINECRAFTCLIENT_SCREEN_OFFSET_0_10_5;
     } else if (version_id == version_id_0_10_4) {
         screen_offset = MINECRAFTCLIENT_SCREEN_OFFSET_0_10_4;
@@ -397,6 +759,12 @@ void *chat_screen_create() {
 }
 
 static void key_callback(GLFWwindow *window, int key, int scancode, int action, int mods) {
+    int android_key = glfw_to_android_key(key);
+    if (action == GLFW_PRESS) {
+        mod_loader_execute_on_key_pressed(android_key);
+    } else if (action == GLFW_RELEASE) {
+        mod_loader_execute_on_key_released(android_key);
+    }
     if (key == GLFW_KEY_F11) {
         if (action == GLFW_PRESS) {
             if (glfwGetWindowMonitor(_window) == NULL) {
@@ -417,7 +785,7 @@ static void key_callback(GLFWwindow *window, int key, int scancode, int action, 
             }
         }
         int game_keycode = getGameKeyCode(key);
-        if (key == GLFW_KEY_Q && action == GLFW_PRESS && mouse_pointer_hidden && version_id >= version_id_0_5_0 && version_id <= version_id_0_10_5) {
+        if (key == GLFW_KEY_Q && action == GLFW_PRESS && mouse_pointer_hidden && version_id >= version_id_0_5_0 && version_id <= version_id_0_11_1) {
             size_t player_offset, inventory_offset;
             if (version_id == version_id_0_5_0) {
                 player_offset = MINECRAFT_LOCAL_PLAYER_OFFSET_0_5_0;
@@ -488,29 +856,42 @@ static void key_callback(GLFWwindow *window, int key, int scancode, int action, 
                 inventory_offset = PLAYER_INVENTORY_OFFSET_0_10_4;
             } else if (version_id == version_id_0_10_5) {
                 inventory_offset = PLAYER_INVENTORY_OFFSET_0_10_5;
+            } else if (version_id == version_id_0_11_0) {
+                inventory_offset = PLAYER_INVENTORY_OFFSET_0_11_0;
+            } else if (version_id == version_id_0_11_1) {
+                inventory_offset = PLAYER_INVENTORY_OFFSET_0_11_1;
             }
             void *player = NULL;
             if (version_id >= version_id_0_5_0 && version_id <= version_id_0_9_5) {
                 player = *(void **)((char *)ninecraft_app + player_offset);
-            } else if (version_id >= version_id_0_10_0 && version_id <= version_id_0_10_5) {
+            } else if (version_id >= version_id_0_10_0 && version_id <= version_id_0_11_1) {
                 player = minecraft_client_get_local_player(ninecraft_app);
             }
             if (player) {
                 bool is_creative = ((bool (*)(void *))android_dlsym(handle, "_ZN9Minecraft14isCreativeModeEv"))(ninecraft_app);
                 if (!is_creative) {
                     void *player_inventory = *(void **)((char *)player + inventory_offset);
-                    void *item_instance = ((void *(*)(void *))android_dlsym(handle, "_ZN9Inventory11getSelectedEv"))(player_inventory);
+                    void *item_instance = NULL;
+                    if (version_id >= version_id_0_11_0 && version_id <= version_id_0_11_1) {
+                        item_instance = ((void *(*)(void *))android_dlsym(handle, "_ZNK9Inventory15getSelectedItemEv"))(player_inventory);
+                    } else {
+                        item_instance = ((void *(*)(void *))android_dlsym(handle, "_ZN9Inventory11getSelectedEv"))(player_inventory);
+                    }
                     if (item_instance) {
                         bool is_empty = ((bool (*)(void *))android_dlsym(handle, "_ZNK12ItemInstance6isNullEv"))(item_instance);
                         if (!is_empty) {
                             void *item_instance_copy = ((void *(*)(void *, void *))android_dlsym(handle, "_ZN12ItemInstance5cloneEPKS_"))(item_instance, NULL);
                             if (!ctrl_pressed) {
-                                *(int *)item_instance_copy = 1;
-                                *(int *)item_instance -= 1;
+                                *(int8_t *)item_instance_copy = 1;
+                                *(int8_t *)item_instance -= 1;
                             }
-
-                            if (*(int *)item_instance < 1 || ctrl_pressed) {
-                                android_vector_t *slots = ((android_vector_t *(*)(void *))android_dlsym(handle, "_ZN16FillingContainer11getSlotListERi"))(player_inventory);
+                            if (*(int8_t *)item_instance < 1 || ctrl_pressed) {
+                                android_vector_t *slots = NULL;
+                                if (version_id >= version_id_0_11_0 && version_id <= version_id_0_11_1) { 
+                                    slots = (android_vector_t *)((char *)player_inventory + 16);
+                                } else {
+                                    slots = ((android_vector_t *(*)(void *))android_dlsym(handle, "_ZN16FillingContainer11getSlotListERi"))(player_inventory);
+                                }
                                 size_t slot = 0;
                                 for (; slot < android_vector_size(slots, sizeof(void *)); ++slot) {
                                     if (*(void **)android_vector_at(slots, slot, sizeof(void *)) == item_instance) {
@@ -523,7 +904,7 @@ static void key_callback(GLFWwindow *window, int key, int scancode, int action, 
 
                             if (version_id >= version_id_0_5_0 && version_id <= version_id_0_7_1) {
                                 ((void (*)(void *, void *, bool))android_dlsym(handle, "_ZN11LocalPlayer4dropEP12ItemInstanceb"))(player, item_instance_copy, false);
-                            } else if (version_id >= version_id_0_7_2 && version_id <= version_id_0_10_5) {
+                            } else if (version_id >= version_id_0_7_2 && version_id <= version_id_0_11_1) {
                                 ((void (*)(void *, void *, bool))android_dlsym(handle, "_ZN11LocalPlayer4dropEPK12ItemInstanceb"))(player, item_instance_copy, false);
                             }
                         }
@@ -540,7 +921,7 @@ static void key_callback(GLFWwindow *window, int key, int scancode, int action, 
             }
         } else if (mouse_pointer_hidden && key == GLFW_KEY_T) {
             if (action == GLFW_PRESS) {
-                if (version_id >= version_id_0_7_0 && version_id <= version_id_0_10_5) {
+                if (version_id >= version_id_0_7_0 && version_id <= version_id_0_11_1) {
                     size_t minecraft_screenchooser_offset;
                     if (version_id == version_id_0_7_0) {
                         minecraft_screenchooser_offset = MINECRAFT_SCREENCHOOSER_OFFSET_0_7_0;
@@ -584,6 +965,10 @@ static void key_callback(GLFWwindow *window, int key, int scancode, int action, 
                         minecraft_screenchooser_offset = MINECRAFT_SCREENCHOOSER_OFFSET_0_10_4;
                     } else if (version_id == version_id_0_10_5) {
                         minecraft_screenchooser_offset = MINECRAFT_SCREENCHOOSER_OFFSET_0_10_5;
+                    } else if (version_id == version_id_0_11_0) {
+                        minecraft_screenchooser_offset = MINECRAFT_SCREENCHOOSER_OFFSET_0_11_0;
+                    } else if (version_id == version_id_0_11_1) {
+                        minecraft_screenchooser_offset = MINECRAFT_SCREENCHOOSER_OFFSET_0_11_1;
                     }
                     void *minecraft_screenchooser = NULL;
                     if (version_id >= version_id_0_10_0) {
@@ -737,6 +1122,11 @@ void gles_hook() {
     add_custom_hook("glUniformMatrix4fv", (void *)gl_uniform_matrix_4_f_v);
     add_custom_hook("glUseProgram", (void *)gl_use_program);
     add_custom_hook("glVertexAttribPointer", (void *)gl_vertex_attrib_pointer);
+    add_custom_hook("glStencilFuncSeparate", (void *)gl_stencil_func_separate);
+    add_custom_hook("glStencilOpSeparate", (void *)gl_stencil_op_separate);
+    add_custom_hook("glDeleteShader", (void *)gl_delete_shader);
+    add_custom_hook("glUniform1i", (void *)gl_uniform_1_i);
+    add_custom_hook("glBufferSubData", (void *)gl_buffer_sub_data);
 }
 
 int __my_srget(FILE *astream) {
@@ -915,6 +1305,15 @@ bool leveldb_zlib_decompress(void *__this, const char *input, unsigned int lengt
     free(buf);
     free(out);
 	return ret == Z_STREAM_END ? true : false;
+}
+
+int64_t _size(android_string_t *path) {
+    puts(android_string_to_str(path));
+    struct stat statbuf;
+    if (!stat(android_string_to_str(path), &statbuf)) {
+        return statbuf.st_size;
+    }
+    return 0;
 }
 
 int main(int argc, char **argv) {
@@ -1116,6 +1515,10 @@ int main(int argc, char **argv) {
             version_id = version_id_0_10_4;
         } else if (strcmp(verstr, "v0.10.5 alpha") == 0) {
             version_id = version_id_0_10_5;
+        } else if (strcmp(verstr, "v0.11.0 alpha") == 0) {
+            version_id = version_id_0_11_0;
+        } else if (strcmp(verstr, "v0.11.1 alpha") == 0) {
+            version_id = version_id_0_11_1;
         } else {
             puts("Unsupported Version!");
             return 1;
@@ -1298,6 +1701,10 @@ int main(int argc, char **argv) {
         ninecraft_app_size = MINECRAFTCLIENT_SIZE_0_10_4;
     } else if (version_id == version_id_0_10_5) {
         ninecraft_app_size = MINECRAFTCLIENT_SIZE_0_10_5;
+    } else if (version_id == version_id_0_11_0) {
+        ninecraft_app_size = MINECRAFTCLIENT_SIZE_0_11_0;
+    } else if (version_id == version_id_0_11_1) {
+        ninecraft_app_size = MINECRAFTCLIENT_SIZE_0_11_1;
     }
     ninecraft_app = malloc(ninecraft_app_size);
     if (version_id >= version_id_0_9_0 && version_id <= version_id_0_9_5) {
@@ -1313,27 +1720,28 @@ int main(int argc, char **argv) {
     getcwd(storage_path, 1024);
     strcat(storage_path, "/storage/");
 
-    uintptr_t int_off = get_ninecraftapp_internal_storage_offset(version_id);
-    uintptr_t ext_off = get_ninecraftapp_external_storage_offset(version_id);
-    if (int_off) {
-        android_string_equ((android_string_t *)((char *)ninecraft_app + int_off), storage_path);
-    }
-    if (ext_off) {
-        android_string_equ((android_string_t *)((char *)ninecraft_app + ext_off), storage_path);
+    if (version_id <= version_id_0_10_5) {
+        uintptr_t int_off = get_ninecraftapp_internal_storage_offset(version_id);
+        uintptr_t ext_off = get_ninecraftapp_external_storage_offset(version_id);
+        if (int_off) {
+            android_string_equ((android_string_t *)((char *)ninecraft_app + int_off), storage_path);
+        }
+        if (ext_off) {
+            android_string_equ((android_string_t *)((char *)ninecraft_app + ext_off), storage_path);
+        }
     }
 
     mod_loader_execute_on_minecraft_construct(ninecraft_app, version_id);
 
     if (version_id >= version_id_0_9_0) {
         app_platform_0_9_0_t *plat = malloc(sizeof(app_platform_0_9_0_t));
-        static app_context_0_9_0_t context = {
-            .egl_context = NULL,
-            .egl_display = NULL,
-            .egl_surface = NULL,
-            .u0 = NULL,
-            .platform = NULL,
-            .do_render = false
-        };
+        app_context_0_9_0_t *context = (app_context_0_9_0_t *)malloc(sizeof(app_context_0_9_0_t));
+        context->egl_context = NULL;
+        context->egl_display = NULL;
+        context->egl_surface = NULL;
+        context->u0 = NULL;
+        context->platform = NULL;
+        context->do_render = false;
 
         app_platform_construct(plat);
         if (version_id >= version_id_0_9_0 && version_id <= version_id_0_9_5) {
@@ -1377,9 +1785,53 @@ int main(int argc, char **argv) {
             platform_vtable_0_10_0.isNetworkEnabled = (void *)AppPlatform_linux$isNetworkEnabled;
             platform_vtable_0_10_0.getPixelsPerMillimeter = (void *)AppPlatform_linux$getPixelsPerMillimeter;
             platform_vtable_0_10_0.swapBuffers = (void *)AppPlatform_linux$swapBuffers;
+        } else if (version_id >= version_id_0_11_0 && version_id <= version_id_0_11_1) {
+            memcpy(&platform_vtable_0_11_0, plat->vtable, sizeof(app_platform_vtable_0_11_0_t));
+            plat->vtable = (void **)&platform_vtable_0_11_0;
+            platform_vtable_0_11_0.getImagePath = (void *)GET_SYSV_WRAPPER(AppPlatform_linux$getImagePath);
+            platform_vtable_0_11_0.loadPNG = (void *)AppPlatform_linux$loadPNG_0_9_0;
+            platform_vtable_0_11_0.loadTGA = (void *)AppPlatform_linux$loadTGA_0_9_0;
+            platform_vtable_0_11_0.getDateString = (void *)GET_SYSV_WRAPPER(AppPlatform_linux$getDateString);
+            platform_vtable_0_11_0.readAssetFile = (void *)GET_SYSV_WRAPPER(AppPlatform_linux$readAssetFile_0_9_0);
+            platform_vtable_0_11_0.getScreenHeight = (void *)AppPlatform_linux$getScreenHeight;
+            platform_vtable_0_11_0.getScreenWidth = (void *)AppPlatform_linux$getScreenWidth;
+            platform_vtable_0_11_0.showKeyboard = (void *)AppPlatform_linux$showKeyboard;
+            platform_vtable_0_11_0.hideKeyboard = (void *)AppPlatform_linux$hideKeyboard;
+            platform_vtable_0_11_0.getBroadcastAddresses = (void *)GET_SYSV_WRAPPER(AppPlatform_linux$getBroadcastAddresses);
+            platform_vtable_0_11_0.getAvailableMemory = (void *)AppPlatform_linux$getAvailableMemory;
+            platform_vtable_0_11_0.getPlatformStringVar = (void *)GET_SYSV_WRAPPER(AppPlatform_linux$getPlatformStringVar);
+            platform_vtable_0_11_0.getLoginInformation = (void *)GET_SYSV_WRAPPER(AppPlatform_linux$getLoginInformation);
+            platform_vtable_0_11_0.setLoginInformation = (void *)AppPlatform_linux$setLoginInformation;
+            platform_vtable_0_11_0.supportsTouchscreen = (void *)AppPlatform_linux$supportsTouchscreen;
+            platform_vtable_0_11_0.isNetworkEnabled = (void *)AppPlatform_linux$isNetworkEnabled;
+            platform_vtable_0_11_0.getPixelsPerMillimeter = (void *)AppPlatform_linux$getPixelsPerMillimeter;
+            platform_vtable_0_11_0.swapBuffers = (void *)AppPlatform_linux$swapBuffers;
+            platform_vtable_0_11_0.getSystemRegion = (void *)AppPlatform_linux$getSystemRegion;
+            platform_vtable_0_11_0.getGraphicsVendor = (void *)GET_SYSV_WRAPPER(AppPlatform_linux$getGraphicsVendor);
+            platform_vtable_0_11_0.getGraphicsRenderer = (void *)GET_SYSV_WRAPPER(AppPlatform_linux$getGraphicsRenderer);
+            platform_vtable_0_11_0.getGraphicsVersion = (void *)GET_SYSV_WRAPPER(AppPlatform_linux$getGraphicsVersion);
+            platform_vtable_0_11_0.getGraphicsExtensions = (void *)GET_SYSV_WRAPPER(AppPlatform_linux$getGraphicsExtensions);
+            platform_vtable_0_11_0.getExternalStoragePath = (void *)AppPlatform_linux$getExternalStoragePath;
+            platform_vtable_0_11_0.getInternalStoragePath = (void *)AppPlatform_linux$getInternalStoragePath;
+            platform_vtable_0_11_0.getApplicationId = (void *)GET_SYSV_WRAPPER(AppPlatform_linux$getApplicationId);
+            platform_vtable_0_11_0.getDeviceId = (void *)GET_SYSV_WRAPPER(AppPlatform_linux$getDeviceId);
+            platform_vtable_0_11_0.createUUID = (void *)GET_SYSV_WRAPPER(AppPlatform_linux$createUUID);
+            platform_vtable_0_11_0.isFirstSnoopLaunch = (void *)AppPlatform_linux$isFirstSnoopLaunch;
+            platform_vtable_0_11_0.hasHardwareInformationChanged = (void *)AppPlatform_linux$hasHardwareInformationChanged;
+            platform_vtable_0_11_0.isTablet = (void *)AppPlatform_linux$isTablet;
+            platform_vtable_0_11_0.pickImage = (void *)AppPlatform_linux$pickImage;
+
+            DETOUR(android_dlsym(handle, "_ZN26HTTPRequestInternalAndroidC2ER11HTTPRequest"), ninecraft_http_construct, 1);
+            DETOUR(android_dlsym(handle, "_ZN26HTTPRequestInternalAndroid4sendEv"), ninecraft_http_send, 1);
+            DETOUR(android_dlsym(handle, "_ZN26HTTPRequestInternalAndroid5abortEv"), ninecraft_http_abort, 1);
+            DETOUR(android_dlsym(handle, "_ZN12AndroidStore21createGooglePlayStoreERKSsR13StoreListener"), GET_SYSV_WRAPPER(ninecraft_store_create), 1);
+            DETOUR(android_dlsym(handle, "_Z5_sizeRKSs"), _size, 1);
+            
+            
+            
         }
-        context.platform = plat;
-        app_init(ninecraft_app, &context);
+        context->platform = plat;
+        app_init(ninecraft_app, context);
     } else {
         AppPlatform_linux$AppPlatform_linux(&platform, handle, version_id);
         printf("%p\n", &platform);
@@ -1402,7 +1854,7 @@ int main(int argc, char **argv) {
 
     char *minecraft_options = minecraft_get_options(ninecraft_app, version_id);
 
-    if (version_id >= version_id_0_5_0 && version_id <= version_id_0_10_5 && minecraft_options && minecraft_options != ninecraft_app) {
+    if (version_id >= version_id_0_5_0 && version_id <= version_id_0_11_1 && minecraft_options && minecraft_options != ninecraft_app) {
         if (version_id >= version_id_0_7_0 && options_set_key) {
             options_set_key((void *)minecraft_options, MCKEY_ID_SNEAK, MCKEY_SNEAK);
         } else if (version_id >= version_id_0_5_0 && version_id <= version_id_0_6_1) {
@@ -1432,7 +1884,11 @@ int main(int argc, char **argv) {
     }
 
     size_t minecraft_isgrabbed_offset;
-    if (version_id == version_id_0_10_5) {
+    if (version_id == version_id_0_11_1) {
+        minecraft_isgrabbed_offset = MINECRAFTCLIENT_ISGRABBED_OFFSET_0_11_1;
+    } else if (version_id == version_id_0_11_0) {
+        minecraft_isgrabbed_offset = MINECRAFTCLIENT_ISGRABBED_OFFSET_0_11_0;
+    } else if (version_id == version_id_0_10_5) {
         minecraft_isgrabbed_offset = MINECRAFTCLIENT_ISGRABBED_OFFSET_0_10_5;
     } else if (version_id == version_id_0_10_4) {
         minecraft_isgrabbed_offset = MINECRAFTCLIENT_ISGRABBED_OFFSET_0_10_4;
