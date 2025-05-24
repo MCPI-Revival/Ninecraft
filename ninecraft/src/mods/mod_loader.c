@@ -74,6 +74,28 @@ void mod_loader_execute_on_minecraft_release_mouse(void *minecraft, int version_
     }
 }
 
+void mod_loader_execute_on_key_pressed(int keycode) {
+    for (ninecraft_mods_t *mod = ninecraft_mods; mod != NULL; mod = mod->next) {
+        if (mod->handle) {
+            void *on_key_pressed = android_dlsym(mod->handle, "ninecraft_mod_on_key_pressed");
+            if (on_key_pressed) {
+                ((void (*)(int))on_key_pressed)(keycode);
+            }
+        }
+    }
+}
+
+void mod_loader_execute_on_key_released(int keycode) {
+    for (ninecraft_mods_t *mod = ninecraft_mods; mod != NULL; mod = mod->next) {
+        if (mod->handle) {
+            void *on_key_released = android_dlsym(mod->handle, "ninecraft_mod_on_key_released");
+            if (on_key_released) {
+                ((void (*)(int))on_key_released)(keycode);
+            }
+        }
+    }
+}
+
 void mod_loader_load_all(void *minecraft_handle, int version_id) {
     char *mods_path = (char *)malloc(1024);
     mods_path[0] = '\0';

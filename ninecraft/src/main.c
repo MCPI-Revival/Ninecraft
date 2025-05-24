@@ -48,6 +48,7 @@
 #include <ninecraft/mods/chat_mod.h>
 #include <ninecraft/ninecraft_http.h>
 #include <ninecraft/ninecraft_store.h>
+#include <ninecraft/android/android_keycodes.h>
 
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb_image.h>
@@ -206,6 +207,360 @@ static void mouse_pos_callback(GLFWwindow *window, double xpos, double ypos) {
             y_cam -= ((float)ypos - (float)cy) / 1.7;
             x_cam += ((float)xpos - (float)cx) / 0.7;
         }
+    }
+}
+
+int glfw_to_android_key(int keycode) {
+    if (keycode == GLFW_KEY_0) {
+        return AKEYCODE_0;
+    }
+    if (keycode == GLFW_KEY_1) {
+        return AKEYCODE_1;
+    }
+    if (keycode == GLFW_KEY_2) {
+        return AKEYCODE_2;
+    }
+    if (keycode == GLFW_KEY_3) {
+        return AKEYCODE_3;
+    }
+    if (keycode == GLFW_KEY_4) {
+        return AKEYCODE_4;
+    }
+    if (keycode == GLFW_KEY_5) {
+        return AKEYCODE_5;
+    }
+    if (keycode == GLFW_KEY_6) {
+        return AKEYCODE_6;
+    }
+    if (keycode == GLFW_KEY_7) {
+        return AKEYCODE_7;
+    }
+    if (keycode == GLFW_KEY_8) {
+        return AKEYCODE_8;
+    }
+    if (keycode == GLFW_KEY_9) {
+        return AKEYCODE_9;
+    }
+    if (keycode == GLFW_KEY_A) {
+        return AKEYCODE_A;
+    }
+    if (keycode == GLFW_KEY_B) {
+        return AKEYCODE_B;
+    }
+    if (keycode == GLFW_KEY_C) {
+        return AKEYCODE_C;
+    }
+    if (keycode == GLFW_KEY_D) {
+        return AKEYCODE_D;
+    }
+    if (keycode == GLFW_KEY_E) {
+        return AKEYCODE_E;
+    }
+    if (keycode == GLFW_KEY_F) {
+        return AKEYCODE_F;
+    }
+    if (keycode == GLFW_KEY_G) {
+        return AKEYCODE_G;
+    }
+    if (keycode == GLFW_KEY_H) {
+        return AKEYCODE_H;
+    }
+    if (keycode == GLFW_KEY_I) {
+        return AKEYCODE_I;
+    }
+    if (keycode == GLFW_KEY_J) {
+        return AKEYCODE_J;
+    }
+    if (keycode == GLFW_KEY_K) {
+        return AKEYCODE_K;
+    }
+    if (keycode == GLFW_KEY_L) {
+        return AKEYCODE_L;
+    }
+    if (keycode == GLFW_KEY_M) {
+        return AKEYCODE_M;
+    }
+    if (keycode == GLFW_KEY_N) {
+        return AKEYCODE_N;
+    }
+    if (keycode == GLFW_KEY_O) {
+        return AKEYCODE_O;
+    }
+    if (keycode == GLFW_KEY_P) {
+        return AKEYCODE_P;
+    }
+    if (keycode == GLFW_KEY_Q) {
+        return AKEYCODE_Q;
+    }
+    if (keycode == GLFW_KEY_R) {
+        return AKEYCODE_R;
+    }
+    if (keycode == GLFW_KEY_S) {
+        return AKEYCODE_S;
+    }
+    if (keycode == GLFW_KEY_T) {
+        return AKEYCODE_T;
+    }
+    if (keycode == GLFW_KEY_U) {
+        return AKEYCODE_U;
+    }
+    if (keycode == GLFW_KEY_V) {
+        return AKEYCODE_V;
+    }
+    if (keycode == GLFW_KEY_W) {
+        return AKEYCODE_W;
+    }
+    if (keycode == GLFW_KEY_X) {
+        return AKEYCODE_X;
+    }
+    if (keycode == GLFW_KEY_Y) {
+        return AKEYCODE_Y;
+    }
+    if (keycode == GLFW_KEY_Z) {
+        return AKEYCODE_Z;
+    }
+    if (keycode == GLFW_KEY_COMMA) {
+        return AKEYCODE_COMMA;
+    }
+    if (keycode == GLFW_KEY_PERIOD) {
+        return AKEYCODE_PERIOD;
+    }
+    if (keycode == GLFW_KEY_LEFT_ALT) {
+        return AKEYCODE_ALT_LEFT;
+    }
+    if (keycode == GLFW_KEY_RIGHT_ALT) {
+        return AKEYCODE_ALT_RIGHT;
+    }
+    if (keycode == GLFW_KEY_LEFT_SHIFT) {
+        return AKEYCODE_SHIFT_LEFT;
+    }
+    if (keycode == GLFW_KEY_RIGHT_SHIFT) {
+        return AKEYCODE_SHIFT_RIGHT;
+    }
+    if (keycode == GLFW_KEY_TAB) {
+        return AKEYCODE_TAB;
+    }
+    if (keycode == GLFW_KEY_SPACE) {
+        return AKEYCODE_SPACE;
+    }
+    if (keycode == GLFW_KEY_ENTER) {
+        return AKEYCODE_ENTER;
+    }
+    if (keycode == GLFW_KEY_BACKSPACE) {
+        return AKEYCODE_DEL;
+    }
+    if (keycode == GLFW_KEY_DELETE) {
+        return AKEYCODE_FORWARD_DEL;
+    }
+    if (keycode == GLFW_KEY_GRAVE_ACCENT) {
+        return AKEYCODE_GRAVE;
+    }
+    if (keycode == GLFW_KEY_MINUS) {
+        return AKEYCODE_MINUS;
+    }
+    if (keycode == GLFW_KEY_EQUAL) {
+        return AKEYCODE_EQUALS;
+    }
+    if (keycode == GLFW_KEY_LEFT_BRACKET) {
+        return AKEYCODE_LEFT_BRACKET;
+    }
+    if (keycode == GLFW_KEY_RIGHT_BRACKET) {
+        return AKEYCODE_RIGHT_BRACKET;
+    }
+    if (keycode == GLFW_KEY_BACKSLASH) {
+        return AKEYCODE_BACKSLASH;
+    }
+    if (keycode == GLFW_KEY_SEMICOLON) {
+        return AKEYCODE_SEMICOLON;
+    }
+    if (keycode == GLFW_KEY_APOSTROPHE) {
+        return AKEYCODE_APOSTROPHE;
+    }
+    if (keycode == GLFW_KEY_SLASH) {
+        return AKEYCODE_SLASH;
+    }
+    if (keycode == GLFW_KEY_LEFT_CONTROL) {
+        return AKEYCODE_CTRL_LEFT;
+    }
+    if (keycode == GLFW_KEY_RIGHT_CONTROL) {
+        return AKEYCODE_CTRL_RIGHT;
+    }
+    if (keycode == GLFW_KEY_CAPS_LOCK) {
+        return AKEYCODE_CAPS_LOCK;
+    }
+    if (keycode == GLFW_KEY_PRINT_SCREEN) {
+        return AKEYCODE_SYSRQ;
+    }
+    if (keycode == GLFW_KEY_PAUSE) {
+        return AKEYCODE_BREAK;
+    }
+    if (keycode == GLFW_KEY_HOME) {
+        return AKEYCODE_MOVE_HOME;
+    }
+    if (keycode == GLFW_KEY_END) {
+        return AKEYCODE_MOVE_END;
+    }
+    if (keycode == GLFW_KEY_INSERT) {
+        return AKEYCODE_INSERT;
+    }
+    if (keycode == GLFW_KEY_SCROLL_LOCK) {
+        return AKEYCODE_SCROLL_LOCK;
+    }
+    if (keycode == GLFW_KEY_PAGE_UP) {
+        return AKEYCODE_PAGE_UP;
+    }
+    if (keycode == GLFW_KEY_PAGE_DOWN) {
+        return AKEYCODE_PAGE_DOWN;
+    }
+    if (keycode == GLFW_KEY_F1) {
+        return AKEYCODE_F1;
+    }
+    if (keycode == GLFW_KEY_F2) {
+        return AKEYCODE_F2;
+    }
+    if (keycode == GLFW_KEY_F3) {
+        return AKEYCODE_F3;
+    }
+    if (keycode == GLFW_KEY_F4) {
+        return AKEYCODE_F4;
+    }
+    if (keycode == GLFW_KEY_F5) {
+        return AKEYCODE_F5;
+    }
+    if (keycode == GLFW_KEY_F6) {
+        return AKEYCODE_F6;
+    }
+    if (keycode == GLFW_KEY_F7) {
+        return AKEYCODE_F7;
+    }
+    if (keycode == GLFW_KEY_F8) {
+        return AKEYCODE_F8;
+    }
+    if (keycode == GLFW_KEY_F9) {
+        return AKEYCODE_F9;
+    }
+    if (keycode == GLFW_KEY_F10) {
+        return AKEYCODE_F10;
+    }
+    if (keycode == GLFW_KEY_F11) {
+        return AKEYCODE_F11;
+    }
+    if (keycode == GLFW_KEY_F12) {
+        return AKEYCODE_F12;
+    }
+    if (keycode == GLFW_KEY_F13) {
+        return AKEYCODE_F13;
+    }
+    if (keycode == GLFW_KEY_F14) {
+        return AKEYCODE_F14;
+    }
+    if (keycode == GLFW_KEY_F15) {
+        return AKEYCODE_F15;
+    }
+    if (keycode == GLFW_KEY_F16) {
+        return AKEYCODE_F16;
+    }
+    if (keycode == GLFW_KEY_F17) {
+        return AKEYCODE_F17;
+    }
+    if (keycode == GLFW_KEY_F18) {
+        return AKEYCODE_F18;
+    }
+    if (keycode == GLFW_KEY_F19) {
+        return AKEYCODE_F19;
+    }
+    if (keycode == GLFW_KEY_F20) {
+        return AKEYCODE_F20;
+    }
+    if (keycode == GLFW_KEY_F21) {
+        return AKEYCODE_F21;
+    }
+    if (keycode == GLFW_KEY_F22) {
+        return AKEYCODE_F22;
+    }
+    if (keycode == GLFW_KEY_F23) {
+        return AKEYCODE_F23;
+    }
+    if (keycode == GLFW_KEY_F24) {
+        return AKEYCODE_F24;
+    }
+    if (keycode == GLFW_KEY_ESCAPE) {
+        return AKEYCODE_ESCAPE;
+    }
+    if (keycode == GLFW_KEY_UP) {
+        return AKEYCODE_DPAD_UP;
+    }
+    if (keycode == GLFW_KEY_DOWN) {
+        return AKEYCODE_DPAD_DOWN;
+    }
+    if (keycode == GLFW_KEY_LEFT) {
+        return AKEYCODE_DPAD_LEFT;
+    }
+    if (keycode == GLFW_KEY_RIGHT) {
+        return AKEYCODE_DPAD_RIGHT;
+    }
+    if (keycode == GLFW_KEY_MENU) {
+        return AKEYCODE_MENU;
+    }
+    if (keycode == GLFW_KEY_LEFT_SUPER) {
+        return AKEYCODE_META_LEFT;
+    }
+    if (keycode == GLFW_KEY_RIGHT_SUPER) {
+        return AKEYCODE_META_RIGHT;
+    }
+    if (keycode == GLFW_KEY_NUM_LOCK) {
+        return AKEYCODE_NUM_LOCK;
+    }
+    if (keycode == GLFW_KEY_KP_0) {
+        return AKEYCODE_NUMPAD_0;
+    }
+    if (keycode == GLFW_KEY_KP_1) {
+        return AKEYCODE_NUMPAD_1;
+    }
+    if (keycode == GLFW_KEY_KP_2) {
+        return AKEYCODE_NUMPAD_2;
+    }
+    if (keycode == GLFW_KEY_KP_3) {
+        return AKEYCODE_NUMPAD_3;
+    }
+    if (keycode == GLFW_KEY_KP_4) {
+        return AKEYCODE_NUMPAD_4;
+    }
+    if (keycode == GLFW_KEY_KP_5) {
+        return AKEYCODE_NUMPAD_5;
+    }
+    if (keycode == GLFW_KEY_KP_6) {
+        return AKEYCODE_NUMPAD_6;
+    }
+    if (keycode == GLFW_KEY_KP_7) {
+        return AKEYCODE_NUMPAD_7;
+    }
+    if (keycode == GLFW_KEY_KP_8) {
+        return AKEYCODE_NUMPAD_8;
+    }
+    if (keycode == GLFW_KEY_KP_9) {
+        return AKEYCODE_NUMPAD_9;
+    }
+    if (keycode == GLFW_KEY_KP_DIVIDE) {
+        return AKEYCODE_NUMPAD_DIVIDE;
+    }
+    if (keycode == GLFW_KEY_KP_MULTIPLY) {
+        return AKEYCODE_NUMPAD_MULTIPLY;
+    }
+    if (keycode == GLFW_KEY_KP_SUBTRACT) {
+        return AKEYCODE_NUMPAD_SUBTRACT;
+    }
+    if (keycode == GLFW_KEY_KP_ADD) {
+        return AKEYCODE_NUMPAD_ADD;
+    }
+    if (keycode == GLFW_KEY_KP_DECIMAL) {
+        return AKEYCODE_NUMPAD_DOT;
+    }
+    if (keycode == GLFW_KEY_KP_ENTER) {
+        return AKEYCODE_NUMPAD_ENTER;
+    }
+    if (keycode == GLFW_KEY_KP_EQUAL) {
+        return AKEYCODE_NUMPAD_EQUALS;
     }
 }
 
@@ -403,6 +758,12 @@ void *chat_screen_create() {
 }
 
 static void key_callback(GLFWwindow *window, int key, int scancode, int action, int mods) {
+    int android_key = glfw_to_android_key(key);
+    if (action == GLFW_PRESS) {
+        mod_loader_execute_on_key_pressed(android_key);
+    } else if (action == GLFW_RELEASE) {
+        mod_loader_execute_on_key_released(android_key);
+    }
     if (key == GLFW_KEY_F11) {
         if (action == GLFW_PRESS) {
             if (glfwGetWindowMonitor(_window) == NULL) {
