@@ -74,6 +74,20 @@ void mod_loader_execute_on_minecraft_release_mouse(void *minecraft, int version_
     }
 }
 
+
+// Give mods ability to fire functions upon keys being pressed or released
+void mod_loader_execute_on_key(int key, int action) {
+    for (ninecraft_mods_t *mod = ninecraft_mods; mod != NULL; mod = mod->next) {
+        if (mod->handle) {
+            void *on_minecraft_key = android_dlsym(mod->handle, "ninecraft_mod_on_key");
+            if (on_minecraft_key) {
+                ((void (*)(int, int))on_minecraft_key)(key, action);
+            }
+        }
+    }
+}
+
+
 void mod_loader_load_all(void *minecraft_handle, int version_id) {
     char *mods_path = (char *)malloc(1024);
     mods_path[0] = '\0';
