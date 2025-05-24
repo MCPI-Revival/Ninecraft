@@ -403,6 +403,7 @@ void *chat_screen_create() {
 }
 
 static void key_callback(GLFWwindow *window, int key, int scancode, int action, int mods) {
+    mod_loader_execute_on_key(key, action); // Give mods ability to fire functions upon keys being pressed or released
     if (key == GLFW_KEY_F11) {
         if (action == GLFW_PRESS) {
             if (glfwGetWindowMonitor(_window) == NULL) {
