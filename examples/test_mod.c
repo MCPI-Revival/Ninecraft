@@ -23,3 +23,11 @@ void ninecraft_mod_on_minecraft_grab_mouse(void *minecraft, int version_id) {
 void ninecraft_mod_on_minecraft_release_mouse(void *minecraft, int version_id) {
     puts("[test_mod] minecraft released the mouse");
 }
+
+void ninecraft_mod_on_key_pressed(int keycode) {
+    //printf("[test_mod] key(%d) pressed\n", keycode);
+}
+
+void ninecraft_mod_on_key_released(int keycode) {
+    //printf("[test_mod] key(%d) released\n", keycode);
+}
