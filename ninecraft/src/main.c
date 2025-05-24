@@ -562,6 +562,7 @@ int glfw_to_android_key(int keycode) {
     if (keycode == GLFW_KEY_KP_EQUAL) {
         return AKEYCODE_NUMPAD_EQUALS;
     }
+    return -1;
 }
 
 int getGameKeyCode(int keycode) {
