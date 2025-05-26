@@ -1,6 +1,3 @@
-[submodule "glfw"]
-	path = glfw
-	url = https://github.com/glfw/glfw.git
 [submodule "stb"]
 	path = stb
 	url = https://github.com/nothings/stb.git
@@ -13,6 +10,7 @@
 [submodule "glad"]
 	path = glad
 	url = https://github.com/Dav1dde/glad
-[submodule "openal-soft"]
-	path = openal-soft
-	url = https://github.com/kcat/openal-soft
+[submodule "SDL"]
+	path = SDL
+	url = https://github.com/libsdl-org/SDL
+	branch = SDL2

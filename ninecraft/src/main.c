@@ -14,8 +14,7 @@
 #endif
 #include <sys/types.h>
 #include <sys/stat.h>
-#define GLFW_INCLUDE_NONE
-#include <GLFW/glfw3.h>
+#include <SDL.h>
 #include <ninecraft/patch/detours.h>
 #include <ninecraft/gfx/gles_compat.h>
 #include <ninecraft/version_ids.h>
@@ -54,10 +53,11 @@
 #include <stb_image.h>
 
 void *handle = NULL;
-GLFWwindow *_window = NULL;
+struct SDL_Window *_window = NULL;
 bool ctrl_pressed = false;
+bool is_fullscreen = false;
 
-int default_mouse_mode = GLFW_CURSOR_NORMAL;
+int default_mouse_mode = SDL_ENABLE;
 
 int version_id = 0;
 
@@ -133,64 +133,55 @@ void egl_stub() {
 }
 
 int mouseToGameKeyCode(int keyCode) {
-    if (keyCode == GLFW_MOUSE_BUTTON_LEFT) {
+    if (keyCode == SDL_BUTTON_LEFT) {
         return MCKEY_DESTROY;
-    } else if (keyCode == GLFW_MOUSE_BUTTON_RIGHT) {
+    } else if (keyCode == SDL_BUTTON_RIGHT) {
         return MCKEY_USE;
     }
     return 0;
 }
 
-static void mouse_click_callback(GLFWwindow *window, int button, int action, int mods) {
-    double xpos, ypos;
-    glfwGetCursorPos(window, &xpos, &ypos);
+static void mouse_click_callback(struct SDL_Window *window, int button, int action, int x, int y) {
     if (!mouse_pointer_hidden) {
-        int mc_button = (button == GLFW_MOUSE_BUTTON_LEFT ? 1 : (button == GLFW_MOUSE_BUTTON_RIGHT ? 2 : 0));
+        int mc_button = (button == SDL_BUTTON_LEFT ? 1 : (button == SDL_BUTTON_RIGHT ? 2 : 0));
         if (version_id == version_id_0_1_0) {
-            ((void (*)(int, int, int, int))android_dlsym(handle, "_ZN5Mouse4feedEiiii"))((int)mc_button, (int)(action == GLFW_PRESS ? 1 : 0), (int)xpos, (int)ypos);
+            ((void (*)(int, int, int, int))android_dlsym(handle, "_ZN5Mouse4feedEiiii"))((int)mc_button, (int)(action == SDL_PRESSED ? 1 : 0), (int)x, (int)y0);
         } else if (version_id >= version_id_0_6_0) {
-            mouse_device_feed_0_6(android_dlsym(handle, "_ZN5Mouse9_instanceE"), (char)mc_button, (char)(action == GLFW_PRESS ? 1 : 0), (short)xpos, (short)ypos, 0, 0);
-            multitouch_feed_0_6((char)mc_button, (char)(action == GLFW_PRESS ? 1 : 0), (short)xpos, (short)ypos, 0);
+            mouse_device_feed_0_6(android_dlsym(handle, "_ZN5Mouse9_instanceE"), (char)mc_button, (char)(action == SDL_PRESSED ? 1 : 0), (short)x, (short)y, 0, 0);
+            multitouch_feed_0_6((char)mc_button, (char)(action == SDL_PRESSED ? 1 : 0), (short)x, (short)y, 0);
         } else if (version_id <= version_id_0_5_0_j) {
-            mouse_device_feed_0_5(android_dlsym(handle, "_ZN5Mouse9_instanceE"), (char)mc_button, (char)(action == GLFW_PRESS ? 1 : 0), (short)xpos, (short)ypos);
-            multitouch_feed_0_5((char)mc_button, (char)(action == GLFW_PRESS ? 1 : 0), (short)xpos, (short)ypos, 0);
+            mouse_device_feed_0_5(android_dlsym(handle, "_ZN5Mouse9_instanceE"), (char)mc_button, (char)(action == SDL_PRESSED ? 1 : 0), (short)x, (short)y);
+            multitouch_feed_0_5((char)mc_button, (char)(action == SDL_PRESSED ? 1 : 0), (short)x, (short)y, 0);
         }
     } else {
         int game_keycode = mouseToGameKeyCode(button);
 
-        if (action == GLFW_PRESS) {
+        if (action == SDL_PRESSED) {
             keyboard_feed(game_keycode, 1);
-        } else if (action == GLFW_RELEASE) {
+        } else if (action == SDL_RELEASED) {
             keyboard_feed(game_keycode, 0);
         }
     }
 }
 
-static void mouse_scroll_callback(GLFWwindow *window, double xoffset, double yoffset) {
-    double xpos, ypos;
-    glfwGetCursorPos(window, &xpos, &ypos);
+static void mouse_scroll_callback(struct SDL_Window *window, float xoffset, float yoffset, int direction) {
     char key_code = 0;
-    if (yoffset > 0) {
+    float offset = (direction == SDL_MOUSEWHEEL_NORMAL) ? yoffset : xoffset;
+    if (offset > 0) {
         key_code = MCKEY_MENU_PREVIOUS;
-    } else if (yoffset < 0) {
+    } else if (offset < 0) {
         key_code = MCKEY_MENU_NEXT;
     }
     keyboard_feed(key_code, 1);
     keyboard_feed(key_code, 0);
 }
 
-static double last_mouse_x = 0;
-static double last_mouse_y = 0;
-static bool ignore_relative_motion = false;
-static void mouse_pos_callback(GLFWwindow *window, double xpos, double ypos) {
+static void mouse_pos_callback(struct SDL_Window *window, int xpos, int ypos, int xrel, int yrel) {
     if (!mouse_pointer_hidden || version_id >= version_id_0_6_0) {
         if (version_id == version_id_0_1_0) {
             ((void (*)(int, int, int, int))android_dlsym(handle, "_ZN5Mouse4feedEiiii"))(0, 0, (int)xpos, (int)ypos);
         } else if (version_id >= version_id_0_6_0) {
-            mouse_device_feed_0_6(android_dlsym(handle, "_ZN5Mouse9_instanceE"), 0, 0, (short)xpos, (short)ypos, (short)(!ignore_relative_motion ? (xpos - last_mouse_x) : 0), (short)(!ignore_relative_motion ? (ypos - last_mouse_y) : 0));
-            ignore_relative_motion = false;
-            last_mouse_x = xpos;
-            last_mouse_y = ypos;
+            mouse_device_feed_0_6(android_dlsym(handle, "_ZN5Mouse9_instanceE"), 0, 0, (short)xpos, (short)ypos, (short)xrel, (short)yrel);
             multitouch_feed_0_6(0, 0, (short)xpos, (short)ypos, 0);
         } else if (version_id <= version_id_0_5_0_j) {
             mouse_device_feed_0_5(android_dlsym(handle, "_ZN5Mouse9_instanceE"), 0, 0, (short)xpos, (short)ypos);
@@ -199,398 +190,398 @@ static void mouse_pos_callback(GLFWwindow *window, double xpos, double ypos) {
     } else {
         int cx;
         int cy;
-        glfwGetWindowSize(window, &cx, &cy);
+        SDL_GetWindowSize(window, &cx, &cy);
         cx /= 2;
         cy /= 2;
         if ((int)xpos != cy || (int)ypos != cy) {
-            glfwSetCursorPos(window, cx, cy);
+            SDL_WarpMouseInWindow(window, cx, cy);
             y_cam -= ((float)ypos - (float)cy) / 1.7;
             x_cam += ((float)xpos - (float)cx) / 0.7;
         }
     }
 }
 
-int glfw_to_android_key(int keycode) {
-    if (keycode == GLFW_KEY_0) {
+int sdl_to_android_key(int keycode) {
+    if (keycode == SDLK_0) {
         return AKEYCODE_0;
     }
-    if (keycode == GLFW_KEY_1) {
+    if (keycode == SDLK_1) {
         return AKEYCODE_1;
     }
-    if (keycode == GLFW_KEY_2) {
+    if (keycode == SDLK_2) {
         return AKEYCODE_2;
     }
-    if (keycode == GLFW_KEY_3) {
+    if (keycode == SDLK_3) {
         return AKEYCODE_3;
     }
-    if (keycode == GLFW_KEY_4) {
+    if (keycode == SDLK_4) {
         return AKEYCODE_4;
     }
-    if (keycode == GLFW_KEY_5) {
+    if (keycode == SDLK_5) {
         return AKEYCODE_5;
     }
-    if (keycode == GLFW_KEY_6) {
+    if (keycode == SDLK_6) {
         return AKEYCODE_6;
     }
-    if (keycode == GLFW_KEY_7) {
+    if (keycode == SDLK_7) {
         return AKEYCODE_7;
     }
-    if (keycode == GLFW_KEY_8) {
+    if (keycode == SDLK_8) {
         return AKEYCODE_8;
     }
-    if (keycode == GLFW_KEY_9) {
+    if (keycode == SDLK_9) {
         return AKEYCODE_9;
     }
-    if (keycode == GLFW_KEY_A) {
+    if (keycode == SDLK_a) {
         return AKEYCODE_A;
     }
-    if (keycode == GLFW_KEY_B) {
+    if (keycode == SDLK_b) {
         return AKEYCODE_B;
     }
-    if (keycode == GLFW_KEY_C) {
+    if (keycode == SDLK_c) {
         return AKEYCODE_C;
     }
-    if (keycode == GLFW_KEY_D) {
+    if (keycode == SDLK_d) {
         return AKEYCODE_D;
     }
-    if (keycode == GLFW_KEY_E) {
+    if (keycode == SDLK_e) {
         return AKEYCODE_E;
     }
-    if (keycode == GLFW_KEY_F) {
+    if (keycode == SDLK_f) {
         return AKEYCODE_F;
     }
-    if (keycode == GLFW_KEY_G) {
+    if (keycode == SDLK_g) {
         return AKEYCODE_G;
     }
-    if (keycode == GLFW_KEY_H) {
+    if (keycode == SDLK_h) {
         return AKEYCODE_H;
     }
-    if (keycode == GLFW_KEY_I) {
+    if (keycode == SDLK_i) {
         return AKEYCODE_I;
     }
-    if (keycode == GLFW_KEY_J) {
+    if (keycode == SDLK_j) {
         return AKEYCODE_J;
     }
-    if (keycode == GLFW_KEY_K) {
+    if (keycode == SDLK_k) {
         return AKEYCODE_K;
     }
-    if (keycode == GLFW_KEY_L) {
+    if (keycode == SDLK_l) {
         return AKEYCODE_L;
     }
-    if (keycode == GLFW_KEY_M) {
+    if (keycode == SDLK_m) {
         return AKEYCODE_M;
     }
-    if (keycode == GLFW_KEY_N) {
+    if (keycode == SDLK_n) {
         return AKEYCODE_N;
     }
-    if (keycode == GLFW_KEY_O) {
+    if (keycode == SDLK_o) {
         return AKEYCODE_O;
     }
-    if (keycode == GLFW_KEY_P) {
+    if (keycode == SDLK_p) {
         return AKEYCODE_P;
     }
-    if (keycode == GLFW_KEY_Q) {
+    if (keycode == SDLK_q) {
         return AKEYCODE_Q;
     }
-    if (keycode == GLFW_KEY_R) {
+    if (keycode == SDLK_r) {
         return AKEYCODE_R;
     }
-    if (keycode == GLFW_KEY_S) {
+    if (keycode == SDLK_s) {
         return AKEYCODE_S;
     }
-    if (keycode == GLFW_KEY_T) {
+    if (keycode == SDLK_t) {
         return AKEYCODE_T;
     }
-    if (keycode == GLFW_KEY_U) {
+    if (keycode == SDLK_u) {
         return AKEYCODE_U;
     }
-    if (keycode == GLFW_KEY_V) {
+    if (keycode == SDLK_v) {
         return AKEYCODE_V;
     }
-    if (keycode == GLFW_KEY_W) {
+    if (keycode == SDLK_w) {
         return AKEYCODE_W;
     }
-    if (keycode == GLFW_KEY_X) {
+    if (keycode == SDLK_x) {
         return AKEYCODE_X;
     }
-    if (keycode == GLFW_KEY_Y) {
+    if (keycode == SDLK_y) {
         return AKEYCODE_Y;
     }
-    if (keycode == GLFW_KEY_Z) {
+    if (keycode == SDLK_z) {
         return AKEYCODE_Z;
     }
-    if (keycode == GLFW_KEY_COMMA) {
+    if (keycode == SDLK_COMMA) {
         return AKEYCODE_COMMA;
     }
-    if (keycode == GLFW_KEY_PERIOD) {
+    if (keycode == SDLK_PERIOD) {
         return AKEYCODE_PERIOD;
     }
-    if (keycode == GLFW_KEY_LEFT_ALT) {
+    if (keycode == SDLK_LALT) {
         return AKEYCODE_ALT_LEFT;
     }
-    if (keycode == GLFW_KEY_RIGHT_ALT) {
+    if (keycode == SDLK_RALT) {
         return AKEYCODE_ALT_RIGHT;
     }
-    if (keycode == GLFW_KEY_LEFT_SHIFT) {
+    if (keycode == SDLK_LSHIFT) {
         return AKEYCODE_SHIFT_LEFT;
     }
-    if (keycode == GLFW_KEY_RIGHT_SHIFT) {
+    if (keycode == SDLK_RSHIFT) {
         return AKEYCODE_SHIFT_RIGHT;
     }
-    if (keycode == GLFW_KEY_TAB) {
+    if (keycode == SDLK_TAB) {
         return AKEYCODE_TAB;
     }
-    if (keycode == GLFW_KEY_SPACE) {
+    if (keycode == SDLK_SPACE) {
         return AKEYCODE_SPACE;
     }
-    if (keycode == GLFW_KEY_ENTER) {
+    if (keycode == SDLK_RETURN) {
         return AKEYCODE_ENTER;
     }
-    if (keycode == GLFW_KEY_BACKSPACE) {
+    if (keycode == SDLK_BACKSPACE) {
         return AKEYCODE_DEL;
     }
-    if (keycode == GLFW_KEY_DELETE) {
+    if (keycode == SDLK_DELETE) {
         return AKEYCODE_FORWARD_DEL;
     }
-    if (keycode == GLFW_KEY_GRAVE_ACCENT) {
+    if (keycode == SDLK_BACKQUOTE) {
         return AKEYCODE_GRAVE;
     }
-    if (keycode == GLFW_KEY_MINUS) {
+    if (keycode == SDLK_MINUS) {
         return AKEYCODE_MINUS;
     }
-    if (keycode == GLFW_KEY_EQUAL) {
+    if (keycode == SDLK_EQUALS) {
         return AKEYCODE_EQUALS;
     }
-    if (keycode == GLFW_KEY_LEFT_BRACKET) {
+    if (keycode == SDLK_LEFTBRACKET) {
         return AKEYCODE_LEFT_BRACKET;
     }
-    if (keycode == GLFW_KEY_RIGHT_BRACKET) {
+    if (keycode == SDLK_RIGHTBRACKET) {
         return AKEYCODE_RIGHT_BRACKET;
     }
-    if (keycode == GLFW_KEY_BACKSLASH) {
+    if (keycode == SDLK_BACKSLASH) {
         return AKEYCODE_BACKSLASH;
     }
-    if (keycode == GLFW_KEY_SEMICOLON) {
+    if (keycode == SDLK_SEMICOLON) {
         return AKEYCODE_SEMICOLON;
     }
-    if (keycode == GLFW_KEY_APOSTROPHE) {
+    if (keycode == SDLK_QUOTE) {
         return AKEYCODE_APOSTROPHE;
     }
-    if (keycode == GLFW_KEY_SLASH) {
+    if (keycode == SDLK_SLASH) {
         return AKEYCODE_SLASH;
     }
-    if (keycode == GLFW_KEY_LEFT_CONTROL) {
+    if (keycode == SDLK_LCTRL) {
         return AKEYCODE_CTRL_LEFT;
     }
-    if (keycode == GLFW_KEY_RIGHT_CONTROL) {
+    if (keycode == SDLK_RCTRL) {
         return AKEYCODE_CTRL_RIGHT;
     }
-    if (keycode == GLFW_KEY_CAPS_LOCK) {
+    if (keycode == SDLK_CAPSLOCK) {
         return AKEYCODE_CAPS_LOCK;
     }
-    if (keycode == GLFW_KEY_PRINT_SCREEN) {
+    if (keycode == SDLK_SYSREQ) {
         return AKEYCODE_SYSRQ;
     }
-    if (keycode == GLFW_KEY_PAUSE) {
+    if (keycode == SDLK_PAUSE) {
         return AKEYCODE_BREAK;
     }
-    if (keycode == GLFW_KEY_HOME) {
+    if (keycode == SDLK_HOME) {
         return AKEYCODE_MOVE_HOME;
     }
-    if (keycode == GLFW_KEY_END) {
+    if (keycode == SDLK_END) {
         return AKEYCODE_MOVE_END;
     }
-    if (keycode == GLFW_KEY_INSERT) {
+    if (keycode == SDLK_INSERT) {
         return AKEYCODE_INSERT;
     }
-    if (keycode == GLFW_KEY_SCROLL_LOCK) {
+    if (keycode == SDLK_SCROLLLOCK) {
         return AKEYCODE_SCROLL_LOCK;
     }
-    if (keycode == GLFW_KEY_PAGE_UP) {
+    if (keycode == SDLK_PAGEUP) {
         return AKEYCODE_PAGE_UP;
     }
-    if (keycode == GLFW_KEY_PAGE_DOWN) {
+    if (keycode == SDLK_PAGEDOWN) {
         return AKEYCODE_PAGE_DOWN;
     }
-    if (keycode == GLFW_KEY_F1) {
+    if (keycode == SDLK_F1) {
         return AKEYCODE_F1;
     }
-    if (keycode == GLFW_KEY_F2) {
+    if (keycode == SDLK_F2) {
         return AKEYCODE_F2;
     }
-    if (keycode == GLFW_KEY_F3) {
+    if (keycode == SDLK_F3) {
         return AKEYCODE_F3;
     }
-    if (keycode == GLFW_KEY_F4) {
+    if (keycode == SDLK_F4) {
         return AKEYCODE_F4;
     }
-    if (keycode == GLFW_KEY_F5) {
+    if (keycode == SDLK_F5) {
         return AKEYCODE_F5;
     }
-    if (keycode == GLFW_KEY_F6) {
+    if (keycode == SDLK_F6) {
         return AKEYCODE_F6;
     }
-    if (keycode == GLFW_KEY_F7) {
+    if (keycode == SDLK_F7) {
         return AKEYCODE_F7;
     }
-    if (keycode == GLFW_KEY_F8) {
+    if (keycode == SDLK_F8) {
         return AKEYCODE_F8;
     }
-    if (keycode == GLFW_KEY_F9) {
+    if (keycode == SDLK_F9) {
         return AKEYCODE_F9;
     }
-    if (keycode == GLFW_KEY_F10) {
+    if (keycode == SDLK_F10) {
         return AKEYCODE_F10;
     }
-    if (keycode == GLFW_KEY_F11) {
+    if (keycode == SDLK_F11) {
         return AKEYCODE_F11;
     }
-    if (keycode == GLFW_KEY_F12) {
+    if (keycode == SDLK_F12) {
         return AKEYCODE_F12;
     }
-    if (keycode == GLFW_KEY_F13) {
+    if (keycode == SDLK_F13) {
         return AKEYCODE_F13;
     }
-    if (keycode == GLFW_KEY_F14) {
+    if (keycode == SDLK_F14) {
         return AKEYCODE_F14;
     }
-    if (keycode == GLFW_KEY_F15) {
+    if (keycode == SDLK_F15) {
         return AKEYCODE_F15;
     }
-    if (keycode == GLFW_KEY_F16) {
+    if (keycode == SDLK_F16) {
         return AKEYCODE_F16;
     }
-    if (keycode == GLFW_KEY_F17) {
+    if (keycode == SDLK_F17) {
         return AKEYCODE_F17;
     }
-    if (keycode == GLFW_KEY_F18) {
+    if (keycode == SDLK_F18) {
         return AKEYCODE_F18;
     }
-    if (keycode == GLFW_KEY_F19) {
+    if (keycode == SDLK_F19) {
         return AKEYCODE_F19;
     }
-    if (keycode == GLFW_KEY_F20) {
+    if (keycode == SDLK_F20) {
         return AKEYCODE_F20;
     }
-    if (keycode == GLFW_KEY_F21) {
+    if (keycode == SDLK_F21) {
         return AKEYCODE_F21;
     }
-    if (keycode == GLFW_KEY_F22) {
+    if (keycode == SDLK_F22) {
         return AKEYCODE_F22;
     }
-    if (keycode == GLFW_KEY_F23) {
+    if (keycode == SDLK_F23) {
         return AKEYCODE_F23;
     }
-    if (keycode == GLFW_KEY_F24) {
+    if (keycode == SDLK_F24) {
         return AKEYCODE_F24;
     }
-    if (keycode == GLFW_KEY_ESCAPE) {
+    if (keycode == SDLK_ESCAPE) {
         return AKEYCODE_ESCAPE;
     }
-    if (keycode == GLFW_KEY_UP) {
+    if (keycode == SDLK_UP) {
         return AKEYCODE_DPAD_UP;
     }
-    if (keycode == GLFW_KEY_DOWN) {
+    if (keycode == SDLK_DOWN) {
         return AKEYCODE_DPAD_DOWN;
     }
-    if (keycode == GLFW_KEY_LEFT) {
+    if (keycode == SDLK_LEFT) {
         return AKEYCODE_DPAD_LEFT;
     }
-    if (keycode == GLFW_KEY_RIGHT) {
+    if (keycode == SDLK_RIGHT) {
         return AKEYCODE_DPAD_RIGHT;
     }
-    if (keycode == GLFW_KEY_MENU) {
+    if (keycode == SDLK_MENU) {
         return AKEYCODE_MENU;
     }
-    if (keycode == GLFW_KEY_LEFT_SUPER) {
+    if (keycode == SDLK_LGUI) {
         return AKEYCODE_META_LEFT;
     }
-    if (keycode == GLFW_KEY_RIGHT_SUPER) {
+    if (keycode == SDLK_RGUI) {
         return AKEYCODE_META_RIGHT;
     }
-    if (keycode == GLFW_KEY_NUM_LOCK) {
+    if (keycode == SDLK_NUMLOCKCLEAR) {
         return AKEYCODE_NUM_LOCK;
     }
-    if (keycode == GLFW_KEY_KP_0) {
+    if (keycode == SDLK_KP_0) {
         return AKEYCODE_NUMPAD_0;
     }
-    if (keycode == GLFW_KEY_KP_1) {
+    if (keycode == SDLK_KP_1) {
         return AKEYCODE_NUMPAD_1;
     }
-    if (keycode == GLFW_KEY_KP_2) {
+    if (keycode == SDLK_KP_2) {
         return AKEYCODE_NUMPAD_2;
     }
-    if (keycode == GLFW_KEY_KP_3) {
+    if (keycode == SDLK_KP_3) {
         return AKEYCODE_NUMPAD_3;
     }
-    if (keycode == GLFW_KEY_KP_4) {
+    if (keycode == SDLK_KP_4) {
         return AKEYCODE_NUMPAD_4;
     }
-    if (keycode == GLFW_KEY_KP_5) {
+    if (keycode == SDLK_KP_5) {
         return AKEYCODE_NUMPAD_5;
     }
-    if (keycode == GLFW_KEY_KP_6) {
+    if (keycode == SDLK_KP_6) {
         return AKEYCODE_NUMPAD_6;
     }
-    if (keycode == GLFW_KEY_KP_7) {
+    if (keycode == SDLK_KP_7) {
         return AKEYCODE_NUMPAD_7;
     }
-    if (keycode == GLFW_KEY_KP_8) {
+    if (keycode == SDLK_KP_8) {
         return AKEYCODE_NUMPAD_8;
     }
-    if (keycode == GLFW_KEY_KP_9) {
+    if (keycode == SDLK_KP_9) {
         return AKEYCODE_NUMPAD_9;
     }
-    if (keycode == GLFW_KEY_KP_DIVIDE) {
+    if (keycode == SDLK_KP_DIVIDE) {
         return AKEYCODE_NUMPAD_DIVIDE;
     }
-    if (keycode == GLFW_KEY_KP_MULTIPLY) {
+    if (keycode == SDLK_KP_MULTIPLY) {
         return AKEYCODE_NUMPAD_MULTIPLY;
     }
-    if (keycode == GLFW_KEY_KP_SUBTRACT) {
+    if (keycode == SDLK_KP_MINUS) {
         return AKEYCODE_NUMPAD_SUBTRACT;
     }
-    if (keycode == GLFW_KEY_KP_ADD) {
+    if (keycode == SDLK_KP_PLUS) {
         return AKEYCODE_NUMPAD_ADD;
     }
-    if (keycode == GLFW_KEY_KP_DECIMAL) {
+    if (keycode == SDLK_KP_DECIMAL) {
         return AKEYCODE_NUMPAD_DOT;
     }
-    if (keycode == GLFW_KEY_KP_ENTER) {
+    if (keycode == SDLK_KP_ENTER) {
         return AKEYCODE_NUMPAD_ENTER;
     }
-    if (keycode == GLFW_KEY_KP_EQUAL) {
+    if (keycode == SDLK_KP_EQUALS) {
         return AKEYCODE_NUMPAD_EQUALS;
     }
     return AKEYCODE_UNKNOWN;
 }
 
 int getGameKeyCode(int keycode) {
-    if (keycode == GLFW_KEY_W) {
+    if (keycode == SDLK_w) {
         return MCKEY_FORWARD;
-    } else if (keycode == GLFW_KEY_A) {
+    } else if (keycode == SDLK_a) {
         return MCKEY_LEFT;
-    } else if (keycode == GLFW_KEY_S) {
+    } else if (keycode == SDLK_s) {
         return MCKEY_BACK;
-    } else if (keycode == GLFW_KEY_D) {
+    } else if (keycode == SDLK_d) {
         return MCKEY_RIGHT;
-    } else if (keycode == GLFW_KEY_SPACE && !is_keyboard_visible) {
+    } else if (keycode == SDLK_SPACE && !is_keyboard_visible) {
         return MCKEY_JUMP;
-    } else if (keycode == GLFW_KEY_E) {
+    } else if (keycode == SDLK_e) {
         return MCKEY_INVENTORY;
-    } else if (keycode == GLFW_KEY_ESCAPE) {
+    } else if (keycode == SDLK_ESCAPE) {
         return MCKEY_PAUSE;
-    } else if (keycode == GLFW_KEY_C) {
+    } else if (keycode == SDLK_c) {
         return MCKEY_CRAFTING;
-    } else if (keycode == GLFW_KEY_ENTER) {
+    } else if (keycode == SDLK_RETURN) {
         return MCKEY_SIGN_ENTER;
-    } else if (keycode == GLFW_KEY_BACKSPACE) {
+    } else if (keycode == SDLK_BACKSPACE) {
         return MCKEY_SIGN_BACKSPACE;
-    } else if (keycode == GLFW_KEY_LEFT_CONTROL) {
+    } else if (keycode == SDLK_LCTRL) {
         return MCKEY_MENU_CANCEL;
-    } else if (keycode == GLFW_KEY_LEFT_SHIFT) {
+    } else if (keycode == SDLK_LSHIFT) {
         return MCKEY_SNEAK;
-    } else if (keycode == GLFW_KEY_Q) {
+    } else if (keycode == SDLK_q) {
         return MCKEY_DROP;
     } else {
         return 0;
@@ -704,7 +695,7 @@ static void set_ninecraft_size(int width, int height) {
     }
 }
 
-static void resize_callback(GLFWwindow *window, int width, int height) {
+static void resize_callback(struct SDL_Window *window, int width, int height) {
     if (version_id == version_id_0_1_0) {
         set_ninecraft_size_0_1_0(width, height);
     } else {
@@ -712,32 +703,14 @@ static void resize_callback(GLFWwindow *window, int width, int height) {
     }
 }
 
-static void char_callback(GLFWwindow *window, unsigned int codepoint) {
+static void char_callback(struct SDL_Window *window, char *codepoint) {
     if (is_keyboard_visible) {
-        chat_mod_append_char(codepoint);
+        chat_mod_append_char(codepoint[0]);
         if (version_id >= version_id_0_6_0 && version_id <= version_id_0_7_1) {
-            keyboard_feed_text_0_6_0((char)codepoint);
+            keyboard_feed_text_0_6_0(codepoint[0]);
         } else if (version_id >= version_id_0_7_2) {
-            char p_codepoint[5] = {'\0', '\0', '\0', '\0', '\0'};
-
-            if (codepoint <= 0x7f) {
-                p_codepoint[0] = (char)codepoint;
-            } else if (codepoint <= 0x7fff) {
-                p_codepoint[0] = (char)(0xc0 | ((codepoint >> 6) & 0x1f));
-                p_codepoint[1] = (char)(0x80 | ((codepoint & 0x3f)));
-            } else if (codepoint <= 0xffff) {
-                p_codepoint[0] = (char)(0xe0 | ((codepoint >> 12) & 0x0f));
-                p_codepoint[1] = (char)(0x80 | ((codepoint >> 6) & 0x3f));
-                p_codepoint[2] = (char)(0x80 | (codepoint & 0x3f));
-            } else {
-                p_codepoint[0] = (char)(0xf0 | ((codepoint >> 18) & 0x07));
-                p_codepoint[1] = (char)(0x80 | ((codepoint >> 12) & 0x3f));
-                p_codepoint[2] = (char)(0x80 | ((codepoint >> 6) & 0x3f));
-                p_codepoint[3] = (char)(0x80 | (codepoint & 0x3f));
-            }
-
             android_string_t str;
-            android_string_cstr(&str, p_codepoint);
+            android_string_cstr(&str, codepoint);
             keyboard_feed_text_0_7_2(&str, false);
         }
     }
@@ -758,34 +731,33 @@ void *chat_screen_create() {
     return chat_screen;
 }
 
-static void key_callback(GLFWwindow *window, int key, int scancode, int action, int mods) {
-    int android_key = glfw_to_android_key(key);
-    if (action == GLFW_PRESS) {
+static void key_callback(struct SDL_Window *window, int key, int scancode, int action, int mod) {
+    int android_key = sdl_to_android_key(key);
+    if (action == SDL_KEYDOWN) {
         mod_loader_execute_on_key_pressed(android_key);
-    } else if (action == GLFW_RELEASE) {
+    } else if (action == SDL_KEYUP) {
         mod_loader_execute_on_key_released(android_key);
     }
-    if (key == GLFW_KEY_F11) {
-        if (action == GLFW_PRESS) {
-            if (glfwGetWindowMonitor(_window) == NULL) {
-                glfwGetWindowPos(_window, &old_pos_x, &old_pos_y);
-                glfwGetWindowSize(_window, &old_width, &old_height);
-                const GLFWvidmode *mode = glfwGetVideoMode(glfwGetPrimaryMonitor());
-                glfwSetWindowMonitor(_window, glfwGetPrimaryMonitor(), 0, 0, mode->width, mode->height, 0);
+    if (key == SDLK_F11) {
+        if (action == SDL_KEYDOWN) {
+            if (is_fullscreen) {
+                is_fullscreen = false;
+                SDL_SetWindowFullscreen(_window, 0);
             } else {
-                glfwSetWindowMonitor(_window, NULL, old_pos_x, old_pos_y, old_width, old_height, 0);
+                is_fullscreen = true;
+                SDL_SetWindowFullscreen(_window, SDL_WINDOW_FULLSCREEN_DESKTOP);
             }
         }
     } else {
-        if (key == GLFW_KEY_LEFT_CONTROL) {
-            if (action == GLFW_PRESS) {
+        if (key == SDLK_LCTRL) {
+            if (action == SDL_KEYDOWN) {
                 ctrl_pressed = true;
-            } else if (action == GLFW_RELEASE) {
+            } else if (action == SDL_KEYUP) {
                 ctrl_pressed = false;
             }
         }
         int game_keycode = getGameKeyCode(key);
-        if (key == GLFW_KEY_Q && action == GLFW_PRESS && mouse_pointer_hidden && version_id >= version_id_0_5_0 && version_id <= version_id_0_11_1) {
+        if (key == SDLK_q && action == SDL_KEYDOWN && mouse_pointer_hidden && version_id >= version_id_0_5_0 && version_id <= version_id_0_11_1) {
             size_t player_offset, inventory_offset;
             if (version_id == version_id_0_5_0) {
                 player_offset = MINECRAFT_LOCAL_PLAYER_OFFSET_0_5_0;
@@ -911,16 +883,16 @@ static void key_callback(GLFWwindow *window, int key, int scancode, int action, 
                     }
                 }
             }         
-        } else if (mouse_pointer_hidden && key == GLFW_KEY_LEFT_SHIFT && version_id <= version_id_0_4_0_j) {
+        } else if (mouse_pointer_hidden && key == SDLK_LSHIFT && version_id <= version_id_0_4_0_j) {
             if (controller_states) {
-                if (action == GLFW_PRESS) {
+                if (action == SDL_KEYDOWN) {
                     controller_states[0] = 1;
-                } else if (action == GLFW_RELEASE) {
+                } else if (action == SDL_KEYUP) {
                     controller_states[0] = 0;
                 }
             }
-        } else if (mouse_pointer_hidden && key == GLFW_KEY_T) {
-            if (action == GLFW_PRESS) {
+        } else if (mouse_pointer_hidden && key == SDLK_t) {
+            if (action == SDL_KEYDOWN) {
                 if (version_id >= version_id_0_7_0 && version_id <= version_id_0_11_1) {
                     size_t minecraft_screenchooser_offset;
                     if (version_id == version_id_0_7_0) {
@@ -988,45 +960,37 @@ static void key_callback(GLFWwindow *window, int key, int scancode, int action, 
                     }
                 }
             }
-        } else if (version_id >= version_id_0_1_1 && key == GLFW_KEY_ESCAPE) {
-            if (action == GLFW_PRESS) {
+        } else if (version_id >= version_id_0_1_1 && key == SDLK_ESCAPE) {
+            if (action == SDL_KEYDOWN) {
                 if (version_id >= version_id_0_10_0) {
                     minecraft_client_handle_back(ninecraft_app, false);
                 } else {
                     ninecraft_app_handle_back(ninecraft_app, false);
                 }
             }
-        } else if (action == GLFW_PRESS && game_keycode) {
+        } else if (action == SDL_KEYDOWN && game_keycode) {
             keyboard_feed(game_keycode, 1);
-        } else if (action == GLFW_RELEASE && game_keycode) {
+        } else if (action == SDL_KEYUP && game_keycode) {
             keyboard_feed(game_keycode, 0);
         }
     }
 }
 
-void window_close_callback(GLFWwindow *window) {
-    audio_engine_destroy();
-    exit(0);
-}
-
 void grab_mouse() {
     puts("grab_mouse");
     mouse_pointer_hidden = true;
-    ignore_relative_motion = true;
-    glfwSetInputMode(_window, GLFW_CURSOR, GLFW_CURSOR_DISABLED);
-    //glfwSetInputMode(_window, GLFW_RAW_MOUSE_MOTION, GLFW_TRUE);
+    SDL_ShowCursor(SDL_DISABLE);
+    SDL_SetRelativeMouseMode(true);
+    SDL_SetWindowGrab(_window, true);
     mod_loader_execute_on_minecraft_grab_mouse(ninecraft_app, version_id);
 }
 
 void release_mouse() {
     puts("release_mouse");
     mouse_pointer_hidden = false;
-    glfwSetInputMode(_window, GLFW_CURSOR, default_mouse_mode);
-    //glfwSetInputMode(_window, GLFW_RAW_MOUSE_MOTION, GLFW_TRUE);
-    double cursor_x;
-    double cursor_y;
-    glfwGetCursorPos(_window, &cursor_x, &cursor_y);
-    mouse_pos_callback(_window, cursor_x, cursor_y);
+    SDL_ShowCursor(default_mouse_mode);
+    SDL_SetRelativeMouseMode(false);
+    SDL_SetWindowGrab(_window, false);
     mod_loader_execute_on_minecraft_release_mouse(ninecraft_app, version_id);
 }
 
@@ -1338,37 +1302,52 @@ int main(int argc, char **argv) {
     ninecraft_read_options_file(&platform_options, "options.txt");
     ninecraft_set_default_options(&platform_options, "options.txt");
 
-    if (!glfwInit()) {
-        puts("init failed");
+    if (SDL_Init(SDL_INIT_VIDEO) < 0) {
+        printf("SDL_Init Error: %s\n", SDL_GetError());
         return 1;
     }
 
-    glfwWindowHint(GLFW_CLIENT_API, GLFW_OPENGL_API);
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 2);
-    glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 0);
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 2);
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 0);
+    SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
 
-    glfwWindowHint(GLFW_CONTEXT_CREATION_API, GLFW_NATIVE_CONTEXT_API);
-    _window = glfwCreateWindow(720, 480, "Ninecraft", NULL, NULL);
+    _window = SDL_CreateWindow(
+        "Ninecraft",
+        SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
+        720, 480,
+        SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE
+    );
     if (!_window) {
-        puts("Cant create window");
+        printf("SDL_CreateWindow Error: %s\n", SDL_GetError());
+        SDL_Quit();
         return 1;
     }
-    GLFWimage icon;
-    icon.pixels = stbi_load("./res/drawable/iconx.png", &icon.width, &icon.height, NULL, STBI_rgb_alpha);
-    glfwSetWindowIcon(_window, 1, &icon);
-    stbi_image_free(icon.pixels);
 
-    glfwSetKeyCallback(_window, key_callback);
-    glfwSetCharCallback(_window, char_callback);
-    glfwSetMouseButtonCallback(_window, mouse_click_callback);
-    glfwSetScrollCallback(_window, mouse_scroll_callback);
-    glfwSetCursorPosCallback(_window, mouse_pos_callback);
-    glfwSetWindowSizeCallback(_window, resize_callback);
-    glfwSetWindowCloseCallback(_window, window_close_callback);
+    int icon_width, icon_height;
+    void *icon_pixels = (void *)stbi_load("./res/drawable/iconx.png", &icon_width, &icon_height, NULL, STBI_rgb_alpha);
+    if (icon_pixels) {
+        SDL_Surface *icon = SDL_CreateRGBSurfaceFrom(
+            icon_pixels, icon_width, icon_height, 32, icon_width * 4,
+#if SDL_BYTEORDER == SDL_BIG_ENDIAN
+            0xff000000, 0x00ff0000, 0x0000ff00, 0x000000ff
+#else
+            0x000000ff, 0x0000ff00, 0x00ff0000, 0xff000000
+#endif
+        );
+        SDL_SetWindowIcon(_window, icon);
+        SDL_FreeSurface(icon);
+        stbi_image_free(icon_pixels);
+    }
 
-    glfwMakeContextCurrent(_window);
+    SDL_GLContext gl_context = SDL_GL_CreateContext(_window);
+    if (!gl_context) {
+        printf("SDL_GL_CreateContext Error: %s\n", SDL_GetError());
+        SDL_DestroyWindow(_window);
+        SDL_Quit();
+        return 1;
+    }
 
-    gladLoadGL(glfwGetProcAddress);
+    gladLoadGL((GLADloadfunc)SDL_GL_GetProcAddress);
 
     audio_engine_init();
 
@@ -1594,10 +1573,10 @@ int main(int argc, char **argv) {
     controller_y_stick = (float *)android_dlsym(handle, "_ZN10Controller12stickValuesYE");
 
     if (version_id >= version_id_0_6_0 && version_id <= version_id_0_9_5) {
-        default_mouse_mode = GLFW_CURSOR_HIDDEN;
+        default_mouse_mode = SDL_DISABLE;
     }
 
-    glfwSetInputMode(_window, GLFW_CURSOR, default_mouse_mode);
+    SDL_ShowCursor(default_mouse_mode);
 
     if (version_id >= version_id_0_9_0 && version_id <= version_id_0_9_5) {
         printf("nine construct %p\n", ninecraft_app_construct_2);
@@ -1981,8 +1960,11 @@ int main(int argc, char **argv) {
     } else if (version_id == version_id_0_1_0) {
         minecraft_isgrabbed_offset = MINECRAFT_ISGRABBED_OFFSET_0_1_0;
     }
+
+    bool running = true;
+    SDL_Event event;
     
-    while (true) {
+    while (running) {
         if (((bool *)ninecraft_app)[minecraft_isgrabbed_offset]) {
             if (!mouse_pointer_hidden) {
                 grab_mouse();
@@ -2018,19 +2000,39 @@ int main(int argc, char **argv) {
         }
         mod_loader_execute_on_minecraft_update(ninecraft_app, version_id);
 
-        if (!mouse_pointer_hidden) {
-            if (version_id >= version_id_0_6_0 && version_id <= version_id_0_9_5) {
-                float inv_gui_scale = *((float *)android_dlsym(handle, "_ZN3Gui11InvGuiScaleE"));
-                double xpos, ypos;
-                glfwGetCursorPos(_window, &xpos, &ypos);
-                short cx = (short)(xpos * inv_gui_scale);
-                short cy = (short)(ypos * inv_gui_scale);
-                ((FLOAT_ABI_FIX void (*)(float, float, void *))android_dlsym(handle, "_Z12renderCursorffP9Minecraft"))(cx, cy, ninecraft_app);
+        if (!mouse_pointer_hidden && version_id >= version_id_0_6_0 && version_id <= version_id_0_9_5) {
+            float inv_gui_scale = *((float *)android_dlsym(handle, "_ZN3Gui11InvGuiScaleE"));
+            int xpos, ypos;
+            SDL_GetMouseState(&xpos, &ypos);
+            short cx = (short)(xpos * inv_gui_scale);
+            short cy = (short)(ypos * inv_gui_scale);
+            ((FLOAT_ABI_FIX void (*)(float, float, void *))android_dlsym(handle, "_Z12renderCursorffP9Minecraft"))(cx, cy, ninecraft_app);
+        }
+
+        audio_engine_tick();
+        SDL_GL_SwapWindow(_window);
+
+        while (SDL_PollEvent(&event)) {
+            if (event.type == SDL_QUIT) {
+                running = false;
+            } else if (event.type == SDL_KEYDOWN || event.type == SDL_KEYUP) {
+                key_callback(_window, event.key.keysym.sym, event.key.keysym.scancode, event.type, event.key.keysym.mod);
+            } else if (event.type == SDL_TEXTINPUT) {
+                char_callback(_window, event.text.text);
+            } else if (event.type == SDL_MOUSEMOTION) {
+                mouse_pos_callback(_window, event.motion.x, event.motion.y, event.motion.xrel, event.motion.yrel);
+            } else if (event.type == SDL_MOUSEBUTTONDOWN || event.type == SDL_MOUSEBUTTONUP) {
+                mouse_click_callback(_window, event.button.button, event.button.state, event.button.x, event.button.y);
+            } else if (event.type == SDL_MOUSEWHEEL) {
+                mouse_scroll_callback(_window, event.wheel.preciseX, event.wheel.preciseY, event.wheel.direction);
+            } else if (event.type == SDL_WINDOWEVENT && event.window.event == SDL_WINDOWEVENT_SIZE_CHANGED) {
+                resize_callback(_window, event.window.data1, event.window.data2);
             }
         }
-        audio_engine_tick();
-        glfwSwapBuffers(_window);
-        glfwPollEvents();
     }
+    audio_engine_destroy();
+    SDL_GL_DeleteContext(gl_context);
+    SDL_DestroyWindow(_window);
+    SDL_Quit();
     return 0;
 }
