@@ -89,21 +89,23 @@ static void audio_engine_mix(audio_engine_stream_t *stream, Uint8 *out_stream, i
         float frac = stream->sample_pos - (float)frame_pos;
         uint8_t *frame1 = &stream->buffer[frame_pos * stream->frame_size];
         uint8_t *frame2 = &stream->buffer[(frame_pos + 1) * stream->frame_size];
+        uint32_t num_channels = (stream->num_channels < audio_engine_audio_spec.channels) ? audio_engine_audio_spec.channels : stream->num_channels;
 
-        for (int ch = 0; ch < stream->num_channels; ++ch) {
-            size_t idx = i + (ch % audio_engine_audio_spec.channels);
-            float sample1 = audio_engine_decode_sample(&frame1[ch * sample_size], sample_size, stream->format);
-            float sample2 = audio_engine_decode_sample(&frame2[ch * sample_size], sample_size, stream->format);
+        for (int ch = 0; ch < num_channels; ++ch) {
+            size_t idx1 = i + (ch % audio_engine_audio_spec.channels);
+            size_t idx2 = (ch % stream->num_channels) * sample_size;
+            float sample1 = audio_engine_decode_sample(&frame1[idx2], sample_size, stream->format);
+            float sample2 = audio_engine_decode_sample(&frame2[idx2], sample_size, stream->format);
             float interpolated = sample1 + (sample2 - sample1) * frac;
 
             interpolated *= stream->gain;
-            out[idx] += interpolated;
+            out[idx1] += interpolated;
 
-            if (out[idx] > 1.0f) {
-                out[idx] = 1.0f;
+            if (out[idx1] > 1.0f) {
+                out[idx1] = 1.0f;
             }
-            if (out[idx] < -1.0f) {
-                out[idx] = -1.0f;
+            if (out[idx1] < -1.0f) {
+                out[idx1] = -1.0f;
             }
         }
         stream->sample_pos += stream->rate_ratio;
