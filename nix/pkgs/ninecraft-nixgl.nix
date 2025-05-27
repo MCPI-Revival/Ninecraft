@@ -1,7 +1,6 @@
 {
   ninecraft,
   nixgl,
-  lib,
   symlinkJoin,
   makeWrapper,
   writeScriptBin,
