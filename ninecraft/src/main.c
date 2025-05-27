@@ -61,9 +61,6 @@ int default_mouse_mode = SDL_ENABLE;
 
 int version_id = 0;
 
-float y_cam = 0.0;
-float x_cam = 0.0;
-
 void *ninecraft_app;
 AppPlatform_linux platform;
 
@@ -188,16 +185,16 @@ static void mouse_pos_callback(struct SDL_Window *window, int xpos, int ypos, in
             multitouch_feed_0_5(0, 0, (short)xpos, (short)ypos, 0);
         }
     } else {
-        int cx;
-        int cy;
-        SDL_GetWindowSize(window, &cx, &cy);
-        cx /= 2;
-        cy /= 2;
-        if ((int)xpos != cy || (int)ypos != cy) {
-            SDL_WarpMouseInWindow(window, cx, cy);
-            y_cam -= ((float)ypos - (float)cy) / 1.7;
-            x_cam += ((float)xpos - (float)cx) / 0.7;
+        if (controller_states && controller_y_stick && controller_x_stick && version_id <= version_id_0_5_0_j) {
+            controller_states[1] = 1;
+            controller_x_stick[1] += (float)xrel * 0.003;
+            controller_y_stick[1] -= (float)yrel * 0.003;
         }
+    }
+    if (mouse_pointer_hidden) {
+        int w, h;
+        SDL_GetWindowSize(window, &w, &h);
+        SDL_WarpMouseInWindow(window, w / 2, h / 2);
     }
 }
 
@@ -1983,13 +1980,6 @@ int main(int argc, char **argv) {
                 }
             } else {
                 mcpi_api_initialized = 0;
-            }
-        }
-        if (mouse_pointer_hidden) {
-            if (controller_states && controller_y_stick && controller_x_stick && version_id <= version_id_0_5_0_j) {
-                controller_states[1] = 1;
-                controller_y_stick[1] = (float)(y_cam - 180.0) * 0.0055555557;
-                controller_x_stick[1] = ((float)((x_cam - 483.0)) * 0.0020703934);
             }
         }
 
