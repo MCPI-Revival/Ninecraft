@@ -84,7 +84,17 @@ void header_buttons_fix_mod_inject(void *handle, int version_id) {
             } else if (version_id == version_id_0_11_0) {
                 *(short *)(play_screen_reset_base_buttons + OFFSET_FOR_0_11_0) = INST_PATCH;
             } else if (version_id == version_id_0_11_1) {
+#if defined(__i386__) || defined(_M_IX86)
+                if (*(int *)play_screen_reset_base_buttons == 0x57E58955) {
+                    *(short *)(play_screen_reset_base_buttons + OFFSET_FOR_0_11_1) = INST_PATCH;
+                } else {
+                    play_screen_reset_base_buttons[OFFSET_FOR_0_11_1] = 0xeb;
+                }
+#else
+#if defined(__arm__) || defined(_M_ARM)
                 *(short *)(play_screen_reset_base_buttons + OFFSET_FOR_0_11_1) = INST_PATCH;
+#endif
+#endif
             }
         }
     }
