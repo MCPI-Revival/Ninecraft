@@ -189,6 +189,11 @@ static void mouse_pos_callback(struct SDL_Window *window, int xpos, int ypos, in
             controller_y_stick[1] -= (float)yrel * 0.003;
         }
     }
+    if (mouse_pointer_hidden) {
+        int w, h;
+        SDL_GetWindowSize(window, &w, &h);
+        SDL_WarpMouseInWindow(window, w / 2, h / 2);
+    }
 }
 
 int sdl_to_android_key(int keycode) {
