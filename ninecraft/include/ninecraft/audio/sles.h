@@ -29,6 +29,7 @@ typedef struct {
 	uint32_t container_size;
 	uint32_t channel_mask;
 	uint32_t endianness;
+    uint32_t representation;
 } sles_pcm_format_t;
 
 struct sles_engine_interface {

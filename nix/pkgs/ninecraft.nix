@@ -3,8 +3,6 @@
   pkg-config,
   cmake,
   python312Packages,
-  openal,
-  glfw,
   zlib,
   lib,
   writeShellApplication,
@@ -12,8 +10,6 @@
   zenity,
   ninecraft-extract,
   wrapGAppsHook,
-  unzip,
-  nixgl,
   internal_overrides,
   glad,
   ancmp,
@@ -22,6 +18,7 @@
   makeWrapper,
   ninecraft-desktop-entry,
   symlinkJoin,
+  SDL2,
   ...
 }: let
   ninecraft = stdenv.mkDerivation {
@@ -49,10 +46,9 @@
 
     patches = [./use-system-dependancies.patch];
     buildInputs = [
-      openal
       python312Packages.jinja2
-      glfw
       zlib
+      SDL2
     ];
     installPhase = ''
        mkdir -p $out/bin

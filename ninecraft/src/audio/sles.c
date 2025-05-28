@@ -2,6 +2,9 @@
 #include <ninecraft/audio/audio_engine.h>
 #include <stdio.h>
 
+#define SL_DATAFORMAT_PCM ((uint32_t) 0x00000002)
+#define SL_DATAFORMAT_PCM_EX ((uint32_t) 0x00000004)
+
 uint32_t sles_iid_engine_ = 0;
 uint32_t sles_iid_bufferqueue_ = 1;
 uint32_t sles_iid_volume_ = 2;
@@ -19,7 +22,13 @@ uint32_t sles_bufferqueue_interface_enquire(struct sles_bufferqueue_interface **
     int16_t max_vol = 0;
     float gain = (float)((sles_volume_level + 2000) - max_vol) / 2000.0f;
     sles_pcm_format_t *metadata = (sles_pcm_format_t *)sles_data_source->format;
-    audio_engine_play(buffer, size, metadata->num_channels, metadata->bits_per_sample, metadata->samples_per_sec / 1000, gain, 1.0f);
+    uint32_t format = 0;
+    if (metadata->format_type == SL_DATAFORMAT_PCM_EX) {
+        format = metadata->representation;
+    } else if (metadata->format_type == SL_DATAFORMAT_PCM) {
+        format = 1;
+    }
+    audio_engine_play(buffer, size, metadata->num_channels, metadata->bits_per_sample, metadata->samples_per_sec / 1000, format, metadata->endianness, gain, 1.0f);
     return 0;
 }
 

@@ -4,13 +4,12 @@
 #include <stdio.h>
 #include <ninecraft/android/android_alloc.h>
 #include <ninecraft/version_ids.h>
-#define GLFW_INCLUDE_NONE
-#include <GLFW/glfw3.h>
 #include <ninecraft/audio/sound_repository.h>
 #include <ninecraft/audio/audio_engine.h>
 #include <ninecraft/utils.h>
 #include <stb_image.h>
 #include <ninecraft/gfx/gles_compat.h>
+#include <SDL.h>
 #ifdef _WIN32
 #include <direct.h>
 #define popen _popen
@@ -21,7 +20,7 @@
 
 int current_dialog_id = -1;
 
-extern GLFWwindow *_window;
+extern struct SDL_Window *_window;
 int status = -1;
 ninecraft_options_t platform_options = {
     .options = NULL,
@@ -827,7 +826,7 @@ void AppPlatform_linux$getOptionStrings(android_vector_t *ret, AppPlatform_linux
 FLOAT_ABI_FIX float AppPlatform_linux$getPixelsPerMillimeter(AppPlatform_linux *app_platform) {
     //puts("debug: AppPlatform_linux::getPixelsPerMillimeter");
     int cw, ch;
-    glfwGetWindowSize(_window, &cw, &ch);
+    SDL_GetWindowSize(_window, &cw, &ch);
     return (((float)cw + (float)ch) * 0.5f ) / 25.4f;
 }
 
@@ -842,7 +841,7 @@ int AppPlatform_linux$getScreenHeight(AppPlatform_linux *app_platform) {
     //puts("debug: AppPlatform_linux::getScreenHeight");
     int cw;
     int ch;
-    glfwGetWindowSize(_window, &cw, &ch);
+    SDL_GetWindowSize(_window, &cw, &ch);
     return ch;
 }
 
@@ -850,7 +849,7 @@ int AppPlatform_linux$getScreenWidth(AppPlatform_linux *app_platform) {
     //puts("debug: AppPlatform_linux::getScreenWidth");
     int cw;
     int ch;
-    glfwGetWindowSize(_window, &cw, &ch);
+    SDL_GetWindowSize(_window, &cw, &ch);
     return cw;
 }
 
@@ -1090,7 +1089,7 @@ void AppPlatform_linux$loadTextureOld(texture_data_old_t *ret, AppPlatform_linux
 FLOAT_ABI_FIX void AppPlatform_linux$playSound(AppPlatform_linux *app_platform, android_string_t *sound_name, float volume, float pitch) {
     //puts("debug: AppPlatform_linux::playSound");
     ninecraft_sound_resource_t *res = ninecraft_get_sound_buffer(android_string_to_str(sound_name));
-    audio_engine_play(res->buffer, res->buffer_size, res->num_channels, res->bits_per_sample, res->freq, volume, pitch);
+    audio_engine_play(res->buffer, res->buffer_size, res->num_channels, res->bits_per_sample, res->freq, 1, 2, volume, pitch);
 }
 
 SYSV_WRAPPER(AppPlatform_linux$readAssetFile, 3)
