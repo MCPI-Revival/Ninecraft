@@ -70,8 +70,6 @@ static float *controller_y_stick;
 
 bool mouse_pointer_hidden = false;
 
-int old_pos_x, old_pos_y, old_width, old_height;
-
 void *load_library(const char *name) {
 #if defined(__i386__) || defined(_M_IX86)
     char *arch = "x86";
@@ -190,11 +188,6 @@ static void mouse_pos_callback(struct SDL_Window *window, int xpos, int ypos, in
             controller_x_stick[1] += (float)xrel * 0.003;
             controller_y_stick[1] -= (float)yrel * 0.003;
         }
-    }
-    if (mouse_pointer_hidden) {
-        int w, h;
-        SDL_GetWindowSize(window, &w, &h);
-        SDL_WarpMouseInWindow(window, w / 2, h / 2);
     }
 }
 
