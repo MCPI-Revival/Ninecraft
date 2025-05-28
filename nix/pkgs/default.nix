@@ -2,11 +2,13 @@
   commits ? import ../commits.nix,
   flakeLock ? builtins.fromJSON (builtins.readFile ../../flake.lock),
   getHash ? name: flakeLock.nodes.${name}.locked.narHash,
-  nixgl ? (pkgs.fetchFromGitHub {
+  getRev ? name: flakeLock.nodes.${name}.locked.rev,
+  nixgl ? (pkgs.fetchFromGitHub rec {
+    name = "nixgl";
     owner = "nix-community";
-    repo = "nixGL";
-    rev = "main";
-    hash = getHash "nixgl";
+    repo = name;
+    rev = getRev name;
+    hash = getHash name;
   }),
   pkgs ? (import <nixpkgs> {
     config.allowUnfree = true;
@@ -23,23 +25,26 @@
     ];
   }),
   internal_overrides ? ../../internal_overrides,
-  glad ? (pkgs.fetchFromGitHub {
+  glad ? (pkgs.fetchFromGitHub rec {
+    name = "glad";
     owner = "Dav1dde";
-    repo = "glad";
-    rev = "56e406e90a802e963bb18d9c94cf6589e5a6b0a9";
-    hash = getHash "glad";
+    repo = name;
+    rev = getRev name;
+    hash = getHash name;
   }),
-  ancmp ? (pkgs.fetchFromGitHub {
+  ancmp ? (pkgs.fetchFromGitHub rec {
+    name = "ancmp";
     owner = "MFDGaming";
-    repo = "ancmp";
-    rev = "main";
-    hash = getHash "ancmp";
+    repo = name;
+    rev = getRev name;
+    hash = getHash name;
   }),
-  stb ? (pkgs.fetchFromGitHub {
+  stb ? (pkgs.fetchFromGitHub rec {
+    name = "stb";
     owner = "nothings";
-    repo = "stb";
-    rev = "5736b15f7ea0ffb08dd38af21067c314d6a3aae9";
-    hash = getHash "stb";
+    repo = name;
+    rev = getRev name;
+    hash = getHash name;
   }),
 }: rec {
   extract = pkgs.callPackage ./extract.nix {};

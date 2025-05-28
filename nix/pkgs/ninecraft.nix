@@ -17,9 +17,15 @@
   SDL2,
   ...
 }: let
-  ninecraft = stdenv.mkDerivation {
+  ninecraft = stdenv.mkDerivation rec {
     pname = "ninecraft";
     version = "1.2.0";
+    # srcs = [../.. stb glad ancmp];
+    # setSourceRoot = ''      sourceRoot=$(if [[ "${pname}" == "source" ]]; then
+    #               echo "."
+    #             else
+    #               echo ${pname}-*
+    #             fi)'';
     src = ../..;
     prePhases = ["submoduleFetchPhase"];
     submoduleFetchPhase = ''
@@ -31,7 +37,8 @@
       cp --no-preserve=mode,ownership -r ${ancmp} $ancmp
       cp --no-preserve=mode,ownership -r ${stb} $stb
 
-         	 ls -al deps_src
+      ls -al deps_src
+      # echo $src
     '';
     nativeBuildInputs = [
       pkg-config
@@ -40,10 +47,11 @@
       wrapGAppsHook
     ];
 
-    patches = [./use-system-dependancies.patch];
+    #patches = [./use-system-dependancies.patch];
     buildInputs = [
       python312Packages.jinja2
       zlib
+      stb
       SDL2
     ];
     installPhase = ''
@@ -62,7 +70,7 @@ in
 
     runtimeInputs = [curl ninecraft ninecraft-extract];
     text = ''
-      set +u
+      set +ue
         export NINECRAFT_DATA=''${XDG_DATA_HOME:-$HOME/.local/share}/ninecraft
         if [[ ! -d "$NINECRAFT_DATA" ]]; then
         echo "Setting up data folder at: $NINECRAFT_DATA"
@@ -73,7 +81,8 @@ in
 
         if [[ ! -d "internal_overrides" ]]; then
           echo "copying internal_overrides..."
-          cp -r ${internal_overrides} .
+          cp -r ${internal_overrides} internal_overrides
+
         fi
 
         export VERSION=$1
