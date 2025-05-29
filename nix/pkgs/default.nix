@@ -41,12 +41,12 @@
     rev = "5736b15f7ea0ffb08dd38af21067c314d6a3aae9";
     hash = getHash "stb";
   }),
+  ninecraft-desktop-entry ? (pkgs.callPackage ./desktop.nix {}),
 }: rec {
   extract = pkgs.callPackage ./extract.nix {};
   ninecraft = pkgs.pkgsi686Linux.callPackage ./ninecraft.nix {
     ninecraft-extract = extract;
-    inherit internal_overrides;
-    inherit glad ancmp stb;
+    inherit internal_overrides glad ancmp stb ninecraft-desktop-entry;
   };
   ninecraft-nixgl = pkgs.callPackage ./ninecraft-nixgl.nix {
     inherit ninecraft;

@@ -14,6 +14,10 @@
   glad,
   ancmp,
   stb,
+  tree,
+  makeWrapper,
+  ninecraft-desktop-entry,
+  symlinkJoin,
   SDL2,
   ...
 }: let
@@ -56,8 +60,7 @@
       ]}
     '';
   };
-in
-  writeShellApplication {
+  ninecraft-script = writeShellApplication {
     name = "ninecraft";
 
     runtimeInputs = [curl ninecraft ninecraft-extract];
@@ -96,6 +99,7 @@ in
 
           echo "Extracting APK..."
           ninecraft-extract mcpe.apk
+          cp res/drawable/iconx.png  "''${XDG_DATA_HOME:-$HOME/.local/share}/icons/ninecraft.png"
 
         fi
         pwd
@@ -103,4 +107,13 @@ in
         echo "Starting Ninecraft..."
         ninecraft
     '';
+  };
+in
+  symlinkJoin
+  {
+    name = "ninecraft";
+    paths = [
+      ninecraft-desktop-entry
+      ninecraft-script
+    ];
   }
