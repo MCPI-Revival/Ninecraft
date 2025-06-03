@@ -1143,26 +1143,7 @@ void piapi_init() {
     command_server_init(command_server, 4711);
 }
 
-int64_t _size(android_string_t *path) {
-    puts(android_string_to_str(path));
-    struct stat statbuf;
-    if (!stat(android_string_to_str(path), &statbuf)) {
-        return statbuf.st_size;
-    }
-    return 0;
-}
-
-int real_main(int argc, char **argv);
-
 int main(int argc, char **argv) {
-#ifdef _WIN32
-    int retval;
-    call_with_custom_stack(real_main, &retval, 1024 * 1024 * 8, 2, argc, argv);
-    return 0;
-}
-
-int real_main(int argc, char **argv) {
-#endif
     android_linker_init();
     static struct stat st = {0};
     if (stat("storage", &st) == -1) {
@@ -1683,13 +1664,13 @@ int real_main(int argc, char **argv) {
             DETOUR(android_dlsym(handle, "_ZN26HTTPRequestInternalAndroid4sendEv"), ninecraft_http_send, 1);
             DETOUR(android_dlsym(handle, "_ZN26HTTPRequestInternalAndroid5abortEv"), ninecraft_http_abort, 1);
             DETOUR(android_dlsym(handle, "_ZN12AndroidStore21createGooglePlayStoreERKSsR13StoreListener"), GET_SYSV_WRAPPER(ninecraft_store_create), 1);
-            DETOUR(android_dlsym(handle, "_Z5_sizeRKSs"), _size, 1);
-            
-            
-            
         }
         context->platform = plat;
+#ifdef _WIN32
+        call_with_custom_stack(app_init, NULL, 1024 * 1024, 2, ninecraft_app, context);
+#else
         app_init(ninecraft_app, context);
+#endif
     } else {
         AppPlatform_linux$AppPlatform_linux(&platform, handle, version_id);
         printf("%p\n", &platform);
@@ -1703,7 +1684,11 @@ int real_main(int argc, char **argv) {
             *(uint8_t *)((char *)ninecraft_app + 0x18) = 0; // do_render
         }
 
+#ifdef _WIN32
+        call_with_custom_stack(ninecraft_app_init, NULL, 1024 * 1024, 1, ninecraft_app);
+#else
         ninecraft_app_init(ninecraft_app);
+#endif
 
         if (version_id >= version_id_0_1_0_touch) {
             *(uint8_t *)((char *)ninecraft_app + 4) = 1; // is_inited
@@ -1865,11 +1850,19 @@ int real_main(int argc, char **argv) {
             }
         }
 
+#ifdef _WIN32
+        if (version_id >= version_id_0_10_0) {
+            call_with_custom_stack(minecraft_update, NULL, 1024 * 1024, 1, ninecraft_app);
+        } else {
+            call_with_custom_stack(ninecraft_app_update, NULL, 1024 * 1024, 1, ninecraft_app);
+        }
+#else
         if (version_id >= version_id_0_10_0) {
             minecraft_update(ninecraft_app);
         } else {
             ninecraft_app_update(ninecraft_app);
         }
+#endif
         mod_loader_execute_on_minecraft_update(ninecraft_app, version_id);
 
         if (!mouse_pointer_hidden && version_id >= version_id_0_6_0 && version_id <= version_id_0_9_5) {
