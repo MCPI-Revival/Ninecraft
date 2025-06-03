@@ -1143,6 +1143,14 @@ void piapi_init() {
     command_server_init(command_server, 4711);
 }
 
+int64_t _size(android_string_t *path) {
+    struct stat statbuf;
+    if (!stat(android_string_to_str(path), &statbuf)) {
+        return statbuf.st_size;
+    }
+    return 0;
+}
+
 int main(int argc, char **argv) {
     android_linker_init();
     static struct stat st = {0};
@@ -1664,6 +1672,7 @@ int main(int argc, char **argv) {
             DETOUR(android_dlsym(handle, "_ZN26HTTPRequestInternalAndroid4sendEv"), ninecraft_http_send, 1);
             DETOUR(android_dlsym(handle, "_ZN26HTTPRequestInternalAndroid5abortEv"), ninecraft_http_abort, 1);
             DETOUR(android_dlsym(handle, "_ZN12AndroidStore21createGooglePlayStoreERKSsR13StoreListener"), GET_SYSV_WRAPPER(ninecraft_store_create), 1);
+            DETOUR(android_dlsym(handle, "_Z5_sizeRKSs"), _size, 1); 
         }
         context->platform = plat;
 #ifdef _WIN32
