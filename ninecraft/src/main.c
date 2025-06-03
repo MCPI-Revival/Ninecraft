@@ -621,7 +621,6 @@ void set_ninecraft_size_0_1_0(int width, int height) {
 }
 
 static void set_ninecraft_size(int width, int height) {
-    glClear(GL_DEPTH_BUFFER_BIT);
     if (version_id >= version_id_0_10_0) {
         minecraft_client_set_size(ninecraft_app, width, height, 2.f);
     } else {
@@ -1193,6 +1192,9 @@ int real_main(int argc, char **argv) {
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 2);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 0);
     SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_COMPATIBILITY);
+    SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
+    SDL_GL_SetAttribute(SDL_GL_STENCIL_SIZE, 8);
 
     _window = SDL_CreateWindow(
         "Ninecraft",
