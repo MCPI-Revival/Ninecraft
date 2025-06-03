@@ -3,11 +3,11 @@
     "ancmp": {
       "flake": false,
       "locked": {
-        "lastModified": 1748477601,
-        "narHash": "sha256-64ud/pewRuoS6vCIT4Yz21RkPQoEn4syrlCXYePGUxU=",
+        "lastModified": 1748932098,
+        "narHash": "sha256-XHRqeALPqhoDV43mlOIpHAEA2rPt5lqh58GyV6RUGzk=",
         "owner": "MFDGaming",
         "repo": "ancmp",
-        "rev": "f7a3d71f47370414a2e375f92f54db12c3d8cd92",
+        "rev": "0d917d5e414c1625e7a110e6c9e28a83c054dba8",
         "type": "github"
       },
       "original": {
