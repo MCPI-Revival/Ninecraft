@@ -79,6 +79,6 @@ void patch_address(void *address, void *data, size_t size, patch_address_prot_t 
     mprotect((void *)aligned_address, aligned_size, os_prot);
 #endif
 #if !defined(_MSC_VER) && (defined(__arm__) || defined(_M_ARM))
-    __builtin___clear_cache((void *)aligned_address, aligned_size);
+    __builtin___clear_cache((void *)aligned_address, (void *)(aligned_address + aligned_size));
 #endif
 }
