@@ -144,9 +144,12 @@ static void mouse_click_callback(struct SDL_Window *window, int button, int acti
         } else if (version_id >= version_id_0_6_0) {
             mouse_device_feed_0_6(android_dlsym(handle, "_ZN5Mouse9_instanceE"), (char)mc_button, (char)(action == SDL_PRESSED ? 1 : 0), (short)x, (short)y, 0, 0);
             multitouch_feed_0_6((char)mc_button, (char)(action == SDL_PRESSED ? 1 : 0), (short)x, (short)y, 0);
-        } else if (version_id <= version_id_0_5_0_j) {
-            mouse_device_feed_0_5(android_dlsym(handle, "_ZN5Mouse9_instanceE"), (char)mc_button, (char)(action == SDL_PRESSED ? 1 : 0), (short)x, (short)y);
-            multitouch_feed_0_5((char)mc_button, (char)(action == SDL_PRESSED ? 1 : 0), (short)x, (short)y, 0);
+        } else if (version_id <= version_id_0_5_0_j && version_id >= version_id_0_2_1) {
+            mouse_device_feed_0_2_1(android_dlsym(handle, "_ZN5Mouse9_instanceE"), (char)mc_button, (char)(action == SDL_PRESSED ? 1 : 0), (short)x, (short)y);
+            multitouch_feed_0_2_1((char)mc_button, (char)(action == SDL_PRESSED ? 1 : 0), (short)x, (short)y, 0);
+        } else if (version_id <= version_id_0_2_0_j && version_id >= version_id_0_1_0_touch) {
+            mouse_device_feed_0_1(android_dlsym(handle, "_ZN5Mouse9_instanceE"), (char)mc_button, (char)(action == SDL_PRESSED ? 1 : 0), (short)x, (short)y);
+            multitouch_feed_0_1((char)mc_button, (char)(action == SDL_PRESSED ? 1 : 0), (short)x, (short)y, 0);
         }
     } else {
         int game_keycode = mouseToGameKeyCode(button);
@@ -178,9 +181,12 @@ static void mouse_pos_callback(struct SDL_Window *window, int xpos, int ypos, in
         } else if (version_id >= version_id_0_6_0) {
             mouse_device_feed_0_6(android_dlsym(handle, "_ZN5Mouse9_instanceE"), 0, 0, (short)xpos, (short)ypos, (short)xrel, (short)yrel);
             multitouch_feed_0_6(0, 0, (short)xpos, (short)ypos, 0);
-        } else if (version_id <= version_id_0_5_0_j) {
-            mouse_device_feed_0_5(android_dlsym(handle, "_ZN5Mouse9_instanceE"), 0, 0, (short)xpos, (short)ypos);
-            multitouch_feed_0_5(0, 0, (short)xpos, (short)ypos, 0);
+        } else if (version_id <= version_id_0_5_0_j && version_id >= version_id_0_2_1) {
+            mouse_device_feed_0_2_1(android_dlsym(handle, "_ZN5Mouse9_instanceE"), 0, 0, (short)xpos, (short)ypos);
+            multitouch_feed_0_2_1(0, 0, (short)xpos, (short)ypos, 0);
+        } else if (version_id <= version_id_0_2_0_j && version_id >= version_id_0_1_0_touch) {
+            mouse_device_feed_0_1(android_dlsym(handle, "_ZN5Mouse9_instanceE"), 0, 0, (short)xpos, (short)ypos);
+            multitouch_feed_0_1(0, 0, (short)xpos, (short)ypos, 0);
         }
     } else {
         if (controller_states && controller_y_stick && controller_x_stick && version_id <= version_id_0_5_0_j) {

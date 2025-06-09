@@ -19,17 +19,40 @@ void multitouch_setup_hooks(void *handle) {
     multitouch_inputs = (android_vector_t *)android_dlsym(handle, "_ZN10Multitouch7_inputsE");
 }
 
-void multitouch_feed_0_5(char button, char type, short x, short y, char pointer_id) {
-    mouse_action_0_5_t action;
+void multitouch_feed_0_1(char button, char type, short x, short y, char pointer_id) {
+    mouse_action_0_1_t action;
     action.x = x;
     action.y = y;
     action.pointer_id = pointer_id;
     action.button = button;
     action.type = type;
 
-    android_vector_push_back(multitouch_inputs, &action, sizeof(mouse_action_0_5_t));
+    android_vector_push_back(multitouch_inputs, &action, sizeof(mouse_action_0_1_t));
 
-    mouse_device_feed_0_5((mouse_device_0_5_t *)((char *)multitouch_pointers + (action.pointer_id * sizeof(mouse_device_0_5_t))), action.button, action.type, action.x, action.y);
+    mouse_device_feed_0_1((mouse_device_0_1_t *)((char *)multitouch_pointers + (action.pointer_id * sizeof(mouse_device_0_1_t))), action.button, action.type, action.x, action.y);
+    
+    if (action.button) {
+        if (action.type == 1) {
+            multitouch_pressed[action.pointer_id] = 1;
+            multitouch_pressed_ut[action.pointer_id] = 1;
+        } else if (action.type == 0) {
+            multitouch_released[action.pointer_id] = 1;
+            multitouch_released_ut[action.pointer_id] = 1;
+        }
+    }
+}
+
+void multitouch_feed_0_2_1(char button, char type, short x, short y, char pointer_id) {
+    mouse_action_0_1_t action;
+    action.x = x;
+    action.y = y;
+    action.pointer_id = pointer_id;
+    action.button = button;
+    action.type = type;
+
+    android_vector_push_back(multitouch_inputs, &action, sizeof(mouse_action_0_1_t));
+
+    mouse_device_feed_0_2_1((mouse_device_0_2_1_t *)((char *)multitouch_pointers + (action.pointer_id * sizeof(mouse_device_0_2_1_t))), action.button, action.type, action.x, action.y);
     
     if (action.button) {
         if (action.type == 1) {

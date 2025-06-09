@@ -12,7 +12,9 @@ extern android_vector_t *multitouch_inputs;
 
 extern void multitouch_setup_hooks(void *handle);
 
-extern void multitouch_feed_0_5(char button, char type, short x, short y, char pointer_id);
+extern void multitouch_feed_0_1(char button, char type, short x, short y, char pointer_id);
+
+extern void multitouch_feed_0_2_1(char button, char type, short x, short y, char pointer_id);
 
 extern void multitouch_feed_0_6(char button, char type, short x, short y, char pointer_id);
 

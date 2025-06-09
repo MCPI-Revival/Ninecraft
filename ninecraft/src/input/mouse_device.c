@@ -1,15 +1,35 @@
 #include <ninecraft/input/mouse_device.h>
 #include <ninecraft/input/action/mouse_action.h>
 
-void mouse_device_feed_0_5(mouse_device_0_5_t *mouse_device, char button, char type, short x, short y) {
-    mouse_action_0_5_t action;
+void mouse_device_feed_0_1(mouse_device_0_1_t *mouse_device, char button, char type, short x, short y) {
+    mouse_action_0_1_t action;
     action.x = x;
     action.y = y;
     action.button = button;
     action.type = type;
     action.pointer_id = 0;
 
-    android_vector_push_back(&mouse_device->actions, &action, sizeof(mouse_action_0_5_t));
+    android_vector_push_back(&mouse_device->actions, &action, sizeof(mouse_action_0_1_t));
+
+    if (button) {
+        mouse_device->button_states[button] = type;
+    }
+
+    mouse_device->old_x = mouse_device->x;
+    mouse_device->old_y = mouse_device->y;
+    mouse_device->x = x;
+    mouse_device->y = y;
+}
+
+void mouse_device_feed_0_2_1(mouse_device_0_2_1_t *mouse_device, char button, char type, short x, short y) {
+    mouse_action_0_1_t action;
+    action.x = x;
+    action.y = y;
+    action.button = button;
+    action.type = type;
+    action.pointer_id = 0;
+
+    android_vector_push_back(&mouse_device->actions, &action, sizeof(mouse_action_0_1_t));
     
     if (button) {
         mouse_device->button_states[button] = type;

@@ -17,6 +17,6 @@ typedef struct {
     char button;
     char type;
     char pointer_id;
-} mouse_action_0_5_t;
+} mouse_action_0_1_t;
 
 #endif
