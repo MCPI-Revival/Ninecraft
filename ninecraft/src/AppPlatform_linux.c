@@ -1089,7 +1089,9 @@ void AppPlatform_linux$loadTextureOld(texture_data_old_t *ret, AppPlatform_linux
 FLOAT_ABI_FIX void AppPlatform_linux$playSound(AppPlatform_linux *app_platform, android_string_t *sound_name, float volume, float pitch) {
     //puts("debug: AppPlatform_linux::playSound");
     ninecraft_sound_resource_t *res = ninecraft_get_sound_buffer(android_string_to_str(sound_name));
-    audio_engine_play(res->buffer, res->buffer_size, res->num_channels, res->bits_per_sample, res->freq, 1, 2, volume, pitch);
+    if (res) {
+        audio_engine_play(res->buffer, res->buffer_size, res->num_channels, 16, res->freq, 1, 2, volume, pitch);
+    }
 }
 
 SYSV_WRAPPER(AppPlatform_linux$readAssetFile, 3)
