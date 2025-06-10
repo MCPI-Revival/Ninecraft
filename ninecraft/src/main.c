@@ -626,6 +626,15 @@ void set_ninecraft_size_0_1_0(int width, int height) {
     }
 }
 
+float calculate_scale(int width, int height, float dpi) {
+    float dpi_scale = (dpi <= 0.0f) ? 1.0f : (dpi / 96.0f);
+    float width_scale = (float)width / 1920.0f;
+    float height_scale = (float)height / 1080.0f;
+    float combined_scale = (dpi_scale * 1.2) + ((width_scale + height_scale) * 0.8);
+    combined_scale = fminf(fmaxf(combined_scale, 1.0f), 4.0f);
+    return combined_scale;
+}
+
 static void set_ninecraft_size(int width, int height) {
     if (version_id >= version_id_0_10_0) {
         minecraft_client_set_size(ninecraft_app, width, height, 2.f);
@@ -682,11 +691,14 @@ static void set_ninecraft_size(int width, int height) {
     } else {
         return;
     }
-    *(float *)android_dlsym(handle, "_ZN3Gui11InvGuiScaleE") = 0.5f;
-    *(float *)android_dlsym(handle, "_ZN3Gui8GuiScaleE") = 2.0f;
+    float ddpi = 96.0f;
+    SDL_GetDisplayDPI(SDL_GetWindowDisplayIndex(_window), &ddpi, NULL, NULL);
+    float scale = calculate_scale(width, height, ddpi);
+    *(float *)android_dlsym(handle, "_ZN3Gui11InvGuiScaleE") = 1.0f / scale;
+    *(float *)android_dlsym(handle, "_ZN3Gui8GuiScaleE") = scale;
     void *screen = *(void **)((char *)ninecraft_app + screen_offset);
     if (screen) {
-        ((void (*)(void *, int, int))android_dlsym(handle, "_ZN6Screen7setSizeEii"))(screen, width * 0.5f, height * 0.5f);
+        ((void (*)(void *, int, int))android_dlsym(handle, "_ZN6Screen7setSizeEii"))(screen, width / scale, height / scale);
     }
 }
 
