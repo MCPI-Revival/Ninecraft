@@ -567,7 +567,7 @@ int getGameKeyCode(int keycode) {
         return MCKEY_INVENTORY;
     } else if (keycode == SDLK_ESCAPE) {
         return MCKEY_PAUSE;
-    } else if (keycode == SDLK_c) {
+    } else if (keycode == SDLK_c && version_id <= version_id_0_8_1) {
         return MCKEY_CRAFTING;
     } else if (keycode == SDLK_RETURN) {
         return MCKEY_SIGN_ENTER;
