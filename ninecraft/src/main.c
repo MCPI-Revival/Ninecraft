@@ -631,7 +631,7 @@ float calculate_scale(int width, int height, float dpi) {
     float width_scale = (float)width / 1920.0f;
     float height_scale = (float)height / 1080.0f;
     float combined_scale = (dpi_scale * 1.2) + ((width_scale + height_scale) * 0.8);
-    combined_scale = fminf(fmaxf(combined_scale, 1.0f), 4.0f);
+    combined_scale = fminf(fmaxf(roundf(combined_scale), 1.0f), 4.0f);
     return combined_scale;
 }
 
