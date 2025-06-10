@@ -3,7 +3,6 @@
 #include <string.h>
 #include <stdint.h>
 #include <stdarg.h>
-#include <sys/timeb.h>
 #include <sys/stat.h>
 #include <sys/types.h>
 #ifndef _WIN32
@@ -48,6 +47,7 @@
 #include <ninecraft/ninecraft_http.h>
 #include <ninecraft/ninecraft_store.h>
 #include <ninecraft/android/android_keycodes.h>
+#include <ninecraft/game_parameters.h>
 
 #define STB_IMAGE_IMPLEMENTATION
 #include <stb_image.h>
@@ -82,7 +82,7 @@ void *load_library(const char *name) {
 #endif
     char *fullpath = (char *)malloc(1024);
     fullpath[0] = '\0';
-    getcwd(fullpath, 1024);
+    strcat(fullpath, game_parameters.game_path);
     strcat(fullpath, "/lib/");
     strcat(fullpath, arch);
     strcat(fullpath, "/");
@@ -165,6 +165,7 @@ static void mouse_click_callback(struct SDL_Window *window, int button, int acti
 static void mouse_scroll_callback(struct SDL_Window *window, float xoffset, float yoffset, int direction) {
     char key_code = 0;
     float offset = (direction == SDL_MOUSEWHEEL_NORMAL) ? yoffset : xoffset;
+
     if (offset > 0) {
         key_code = MCKEY_MENU_PREVIOUS;
     } else if (offset < 0) {
@@ -621,8 +622,6 @@ void set_ninecraft_size_0_1_0(int width, int height) {
         ((int *)screen)[10] = 0;
         ((int *)screen)[11] = 0;
         ((void (*)(void *))((*(int **)screen)[3]))(screen);
-        
-
     }
 }
 
@@ -1124,7 +1123,9 @@ void missing_hook() {
 unsigned char mcpi_api_initialized = 0;
 
 void piapi_init() {
+    void *command_server;
     size_t minecraft_command_server_offset = version_id_unknown;
+
     if (version_id == version_id_0_6_0) {
         minecraft_command_server_offset = MINECRAFT_COMMANDSERVER_OFFSET_0_6_0;
     } else if (version_id == version_id_0_6_1) {
@@ -1148,7 +1149,7 @@ void piapi_init() {
     } else if (version_id == version_id_0_8_1) {
         minecraft_command_server_offset = MINECRAFT_COMMANDSERVER_OFFSET_0_8_1;
     }
-    void *command_server = *(void **)((char *)ninecraft_app + minecraft_command_server_offset);
+    command_server = *(void **)((char *)ninecraft_app + minecraft_command_server_offset);
     if (command_server != NULL) {
         command_server_deconstruct(command_server);
         if (command_server) {
@@ -1169,123 +1170,33 @@ int64_t _size(android_string_t *path) {
     return 0;
 }
 
-int main(int argc, char **argv) {
-    android_linker_init();
-    static struct stat st = {0};
-    if (stat("storage", &st) == -1) {
-        mkdir("storage", 0700);
-        if (stat("storage/games", &st) == -1) {
-            mkdir("storage/games", 0700);
-            if (stat("storage/games/com.mojang", &st) == -1) {
-                mkdir("storage/games/com.mojang", 0700);
-                if (stat("storage/games/com.mojang/minecraftpe", &st) == -1) {
-                    mkdir("storage/games/com.mojang/minecraftpe", 0700);
-                }
-            }
-        }
-    }
-    if (stat("mods", &st) == -1) {
-        mkdir("mods", 0700);
-    }
-
-    ninecraft_read_options_file(&platform_options, "options.txt");
-    ninecraft_set_default_options(&platform_options, "options.txt");
-
-    if (SDL_Init(SDL_INIT_VIDEO) < 0) {
-        printf("SDL_Init Error: %s\n", SDL_GetError());
-        return 1;
-    }
-
-    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 2);
-    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 0);
-    SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
-    SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_COMPATIBILITY);
-    SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
-    SDL_GL_SetAttribute(SDL_GL_STENCIL_SIZE, 8);
-
-    _window = SDL_CreateWindow(
-        "Ninecraft",
-        SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
-        720, 480,
-        SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE
-    );
-    if (!_window) {
-        printf("SDL_CreateWindow Error: %s\n", SDL_GetError());
-        SDL_Quit();
-        return 1;
-    }
-
-    int icon_width, icon_height;
-    void *icon_pixels = (void *)stbi_load("./res/drawable/iconx.png", &icon_width, &icon_height, NULL, STBI_rgb_alpha);
-    if (icon_pixels) {
-        SDL_Surface *icon = SDL_CreateRGBSurfaceFrom(
-            icon_pixels, icon_width, icon_height, 32, icon_width * 4,
-#if SDL_BYTEORDER == SDL_BIG_ENDIAN
-            0xff000000, 0x00ff0000, 0x0000ff00, 0x000000ff
-#else
-            0x000000ff, 0x0000ff00, 0x00ff0000, 0xff000000
-#endif
-        );
-        SDL_SetWindowIcon(_window, icon);
-        SDL_FreeSurface(icon);
-        stbi_image_free(icon_pixels);
-    }
-
-    SDL_GLContext gl_context = SDL_GL_CreateContext(_window);
-    if (!gl_context) {
-        printf("SDL_GL_CreateContext Error: %s\n", SDL_GetError());
-        SDL_DestroyWindow(_window);
-        SDL_Quit();
-        return 1;
-    }
-
-    gladLoadGL((GLADloadfunc)SDL_GL_GetProcAddress);
-
-    audio_engine_init();
-
-    gles_hook();
-    missing_hook();
-    add_custom_hook("__android_log_print", (void *)__android_log_print);
-    stub_symbols(android_symbols, (void *)android_stub);
-    stub_symbols(egl_symbols, (void *)egl_stub);
-
-    add_custom_hook("SL_IID_VOLUME", &sles_iid_volume);
-    add_custom_hook("SL_IID_ENGINE", &sles_iid_engine);
-    add_custom_hook("SL_IID_BUFFERQUEUE", &sles_iid_bufferqueue);
-    add_custom_hook("SL_IID_PLAY", &sles_iid_play);
-    add_custom_hook("slCreateEngine", sles_create_engine);
-
-    struct soinfo *so_liblog = android_library_create("liblog.so");
-    struct soinfo *so_libgles = android_library_create("libGLESv1_CM.so");
-    struct soinfo *so_libgles2 = android_library_create("libGLESv2.so");
-    struct soinfo *so_libegl = android_library_create("libEGL.so");
-    struct soinfo *so_libandroid = android_library_create("libandroid.so");
-    struct soinfo *so_libopensles = android_library_create("libOpenSLES.so");
-    struct soinfo *so_libz = android_library_create("libz.so");
-
-    handle = load_library("libminecraftpe.so");
+static bool detect_version() {
+    bool found = true;
+    static android_string_t in;
+    void (*get_game_version_string)(android_string_t *, android_string_t *);
+    void (*get_game_version_string_2)(android_string_t *);
 
     if (!handle) {
-        puts("libminecraftpe.so not loaded");
-        return 1;
+        return false;
     }
-    
-    android_alloc_setup_hooks(handle);
 
-    static android_string_t in;
     android_string_cstr(&in, "v%d.%d.%d alpha");
-    void (*get_game_version_string)(android_string_t *, android_string_t *) = (void (*)(android_string_t *, android_string_t *))android_dlsym(handle, "_ZN6Common20getGameVersionStringERKSs");
-    void (*get_game_version_string_2)(android_string_t *) = (void (*)(android_string_t *))android_dlsym(handle, "_ZN6Common20getGameVersionStringEv");
+
+    get_game_version_string = (void (*)(android_string_t *, android_string_t *))android_dlsym(handle, "_ZN6Common20getGameVersionStringERKSs");
+    get_game_version_string_2 = (void (*)(android_string_t *))android_dlsym(handle, "_ZN6Common20getGameVersionStringEv");
+    
     if (get_game_version_string != NULL) {
+        bool is_j = android_dlsym(handle, "Java_com_mojang_minecraftpe_MainActivity_nativeOnCreate") != NULL;
         static android_string_t game_version;
+        char *verstr;
+
 #if defined(__i386__) || defined(_M_IX86)
         sysv_call_func(get_game_version_string, &game_version, 1, &in);
 #else
         get_game_version_string(&game_version, &in);
 #endif
-        char *verstr = android_string_to_str(&game_version);
 
-        bool is_j = android_dlsym(handle, "Java_com_mojang_minecraftpe_MainActivity_nativeOnCreate") != NULL;
+        verstr = android_string_to_str(&game_version);
 
         printf("Ninecraft is running mcpe %.6s%s\n", verstr, is_j ? "j" : "");
 
@@ -1347,17 +1258,22 @@ int main(int argc, char **argv) {
             version_id = version_id_0_7_6;
         } else {
             puts("Unsupported Version!");
-            return 1;
+            found = false;
         }
     } else if (get_game_version_string_2 != NULL) {
         static android_string_t game_version;
+        char *verstr;
+
 #if defined(__i386__) || defined(_M_IX86)
         sysv_call_func(get_game_version_string_2, &game_version, 0);
 #else
         get_game_version_string_2(&game_version);
 #endif
-        char *verstr = android_string_to_str(&game_version);
+
+        verstr = android_string_to_str(&game_version);
+
         printf("Ninecraft is running mcpe %s\n", verstr);
+
         if (strcmp(verstr, "v0.8.0 alpha") == 0) {
             version_id = version_id_0_8_0;
         } else if (strcmp(verstr, "v0.8.1 alpha") == 0) {
@@ -1392,11 +1308,13 @@ int main(int argc, char **argv) {
             version_id = version_id_0_11_1;
         } else {
             puts("Unsupported Version!");
-            return 1;
+            found = false;
         }
     } else {
         android_Dl_info info;
+
         android_dladdr(android_dlsym(handle, "_ZN12NinecraftAppC2Ev"), &info);
+
         if (strncmp((char *)info.dli_fbase + 0x15d3a8, "v0.2.0", 6) == 0) { // v0.2.0
             version_id = version_id_0_2_0;
         } else if (strncmp((char *)info.dli_fbase + 0x15a480, "v0.2.0", 6) == 0) { // v0.2.0-demo
@@ -1443,10 +1361,186 @@ int main(int argc, char **argv) {
             version_id = version_id_0_1_0;
         } else {
             puts("Unsupported Version!");
-            return 1;
+            found = false;
         }
     }
+
     android_string_destroy(&in);
+
+    return found;
+}
+
+int main(int argc, char **argv) {
+    struct soinfo *so_liblog, *so_libgles, *so_libgles2, *so_libegl;
+    struct soinfo *so_libandroid, *so_libopensles, *so_libz;
+    char *storage_path, *mods_path, *ovc_path, *icon_path;
+    static struct stat st = {0};
+    int icon_width, icon_height;
+    SDL_GLContext gl_context;
+    size_t ninecraft_app_size, minecraft_isgrabbed_offset;
+    bool running = true;
+    SDL_Event event;
+    char *minecraft_options;
+    void *icon_pixels;
+
+    storage_path = (char *)malloc(1024);
+    if (!storage_path) {
+        puts("out of memory");
+        return 1;
+    }
+    storage_path[0] = '\0';
+    strcat(storage_path, game_parameters.home_path);
+    strcat(storage_path, "/storage/");
+
+    mods_path = (char *)malloc(1024);
+    if (!mods_path) {
+        puts("out of memory");
+        free(storage_path);
+        return 1;
+    }
+    mods_path[0] = '\0';
+    strcat(mods_path, game_parameters.home_path);
+    strcat(mods_path, "/mods/");
+
+    ovc_path = (char *)malloc(1024);
+    if (!ovc_path) {
+        puts("out of memory");
+        free(storage_path);
+        free(mods_path);
+        return 1;
+    }
+    ovc_path[0] = '\0';
+    strcat(ovc_path, game_parameters.home_path);
+    strcat(ovc_path, "/options.txt");
+
+    icon_path = (char *)malloc(1024);
+    if (!icon_path) {
+        puts("out of memory");
+        free(storage_path);
+        free(mods_path);
+        free(ovc_path);
+        return 1;
+    }
+    icon_path[0] = '\0';
+    strcat(icon_path, game_parameters.game_path);
+    strcat(icon_path, "/res/drawable/iconx.png");
+
+    if (stat(storage_path, &st) == -1) {
+        mkdir(storage_path, 0700);
+    }
+
+    if (stat(mods_path, &st) == -1) {
+        mkdir(mods_path, 0700);
+    }
+
+    ninecraft_read_options_file(&platform_options, ovc_path);
+    ninecraft_set_default_options(&platform_options, ovc_path);
+
+    android_linker_init();
+
+    if (SDL_Init(SDL_INIT_VIDEO) < 0) {
+        printf("SDL_Init Error: %s\n", SDL_GetError());
+        free(storage_path);
+        free(mods_path);
+        free(ovc_path);
+        free(icon_path);
+        return 1;
+    }
+
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 2);
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 0);
+    SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
+    SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_COMPATIBILITY);
+    SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
+    SDL_GL_SetAttribute(SDL_GL_STENCIL_SIZE, 8);
+
+    _window = SDL_CreateWindow(
+        "Ninecraft",
+        SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
+        720, 480,
+        SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE
+    );
+    if (!_window) {
+        printf("SDL_CreateWindow Error: %s\n", SDL_GetError());
+        SDL_Quit();
+        free(storage_path);
+        free(mods_path);
+        free(ovc_path);
+        free(icon_path);
+        return 1;
+    }
+
+    icon_pixels = (void *)stbi_load(icon_path, &icon_width, &icon_height, NULL, STBI_rgb_alpha);
+    if (icon_pixels) {
+        SDL_Surface *icon = SDL_CreateRGBSurfaceFrom(
+            icon_pixels, icon_width, icon_height, 32, icon_width * 4,
+#if SDL_BYTEORDER == SDL_BIG_ENDIAN
+            0xff000000, 0x00ff0000, 0x0000ff00, 0x000000ff
+#else
+            0x000000ff, 0x0000ff00, 0x00ff0000, 0xff000000
+#endif
+        );
+        SDL_SetWindowIcon(_window, icon);
+        SDL_FreeSurface(icon);
+        stbi_image_free(icon_pixels);
+    }
+
+    gl_context = SDL_GL_CreateContext(_window);
+    if (!gl_context) {
+        printf("SDL_GL_CreateContext Error: %s\n", SDL_GetError());
+        SDL_DestroyWindow(_window);
+        SDL_Quit();
+        free(storage_path);
+        free(mods_path);
+        free(ovc_path);
+        free(icon_path);
+        return 1;
+    }
+
+    gladLoadGL((GLADloadfunc)SDL_GL_GetProcAddress);
+
+    audio_engine_init();
+
+    gles_hook();
+    missing_hook();
+    add_custom_hook("__android_log_print", (void *)__android_log_print);
+    stub_symbols(android_symbols, (void *)android_stub);
+    stub_symbols(egl_symbols, (void *)egl_stub);
+
+    add_custom_hook("SL_IID_VOLUME", &sles_iid_volume);
+    add_custom_hook("SL_IID_ENGINE", &sles_iid_engine);
+    add_custom_hook("SL_IID_BUFFERQUEUE", &sles_iid_bufferqueue);
+    add_custom_hook("SL_IID_PLAY", &sles_iid_play);
+    add_custom_hook("slCreateEngine", sles_create_engine);
+
+    so_liblog = android_library_create("liblog.so");
+    so_libgles = android_library_create("libGLESv1_CM.so");
+    so_libgles2 = android_library_create("libGLESv2.so");
+    so_libegl = android_library_create("libEGL.so");
+    so_libandroid = android_library_create("libandroid.so");
+    so_libopensles = android_library_create("libOpenSLES.so");
+    so_libz = android_library_create("libz.so");
+
+    handle = load_library("libminecraftpe.so");
+
+    if (!handle) {
+        puts("libminecraftpe.so not loaded");
+        free(storage_path);
+        free(mods_path);
+        free(ovc_path);
+        free(icon_path);
+        return 1;
+    }
+    
+    android_alloc_setup_hooks(handle);
+
+    if (!detect_version()) {
+        free(storage_path);
+        free(mods_path);
+        free(ovc_path);
+        free(icon_path);
+        return 1;
+    }
 
     multitouch_setup_hooks(handle);
     keyboard_setup_hooks(handle);
@@ -1471,8 +1565,6 @@ int main(int argc, char **argv) {
     } else {
         printf("nine construct %p\n", ninecraft_app_construct);
     }
-
-    size_t ninecraft_app_size;
 
     if (version_id == version_id_0_1_0) {
         ninecraft_app_size = NINECRAFTAPP_SIZE_0_1_0;
@@ -1580,14 +1672,10 @@ int main(int argc, char **argv) {
         ninecraft_app_construct(ninecraft_app);
     }
 
-    char *storage_path = (char *)malloc(1024);
-    storage_path[0] = '\0';
-    getcwd(storage_path, 1024);
-    strcat(storage_path, "/storage/");
-
     if (version_id <= version_id_0_10_5) {
         uintptr_t int_off = get_ninecraftapp_internal_storage_offset(version_id);
         uintptr_t ext_off = get_ninecraftapp_external_storage_offset(version_id);
+
         if (int_off) {
             android_string_equ((android_string_t *)((char *)ninecraft_app + int_off), storage_path);
         }
@@ -1601,6 +1689,7 @@ int main(int argc, char **argv) {
     if (version_id >= version_id_0_9_0) {
         app_platform_0_9_0_t *plat = malloc(sizeof(app_platform_0_9_0_t));
         app_context_0_9_0_t *context = (app_context_0_9_0_t *)malloc(sizeof(app_context_0_9_0_t));
+
         context->egl_context = NULL;
         context->egl_display = NULL;
         context->egl_surface = NULL;
@@ -1722,13 +1811,14 @@ int main(int argc, char **argv) {
         }
     }
 
-    char *minecraft_options = minecraft_get_options(ninecraft_app, version_id);
+    minecraft_options = minecraft_get_options(ninecraft_app, version_id);
 
     if (version_id >= version_id_0_5_0 && version_id <= version_id_0_11_1 && minecraft_options && minecraft_options != ninecraft_app) {
         if (version_id >= version_id_0_7_0 && options_set_key) {
             options_set_key((void *)minecraft_options, MCKEY_ID_SNEAK, MCKEY_SNEAK);
         } else if (version_id >= version_id_0_5_0 && version_id <= version_id_0_6_1) {
             int options_keys_offset = 0;
+
             if (version_id == version_id_0_5_0) {
                 options_keys_offset = OPTIONS_KEYS_OFFSET_0_5_0;
             } else if (version_id == version_id_0_5_0_j) {
@@ -1740,6 +1830,7 @@ int main(int argc, char **argv) {
             }
             if (options_keys_offset) {
                 void **options_keys = (void **)(minecraft_options + options_keys_offset);
+
                 *(int *)((char *)options_keys[MCKEY_ID_SNEAK] + android_string_tsize()) = MCKEY_SNEAK;
             }
         }
@@ -1753,7 +1844,6 @@ int main(int argc, char **argv) {
         set_ninecraft_size_0_1_0(720, 480);
     }
 
-    size_t minecraft_isgrabbed_offset;
     if (version_id == version_id_0_11_1) {
         minecraft_isgrabbed_offset = MINECRAFTCLIENT_ISGRABBED_OFFSET_0_11_1;
     } else if (version_id == version_id_0_11_0) {
@@ -1851,9 +1941,6 @@ int main(int argc, char **argv) {
     } else if (version_id == version_id_0_1_0) {
         minecraft_isgrabbed_offset = MINECRAFT_ISGRABBED_OFFSET_0_1_0;
     }
-
-    bool running = true;
-    SDL_Event event;
     
     while (running) {
         if (((bool *)ninecraft_app)[minecraft_isgrabbed_offset]) {
@@ -1893,11 +1980,13 @@ int main(int argc, char **argv) {
         mod_loader_execute_on_minecraft_update(ninecraft_app, version_id);
 
         if (!mouse_pointer_hidden && version_id >= version_id_0_6_0 && version_id <= version_id_0_9_5) {
-            float inv_gui_scale = *((float *)android_dlsym(handle, "_ZN3Gui11InvGuiScaleE"));
+            short cx, cy;
             int xpos, ypos;
+            float inv_gui_scale = *((float *)android_dlsym(handle, "_ZN3Gui11InvGuiScaleE"));
+            
             SDL_GetMouseState(&xpos, &ypos);
-            short cx = (short)(xpos * inv_gui_scale);
-            short cy = (short)(ypos * inv_gui_scale);
+            cx = (short)(xpos * inv_gui_scale);
+            cy = (short)(ypos * inv_gui_scale);
             ((FLOAT_ABI_FIX void (*)(float, float, void *))android_dlsym(handle, "_Z12renderCursorffP9Minecraft"))(cx, cy, ninecraft_app);
         }
 
@@ -1926,5 +2015,8 @@ int main(int argc, char **argv) {
     SDL_GL_DeleteContext(gl_context);
     SDL_DestroyWindow(_window);
     SDL_Quit();
+    free(storage_path);
+    free(mods_path);
+    free(ovc_path);
     return 0;
 }

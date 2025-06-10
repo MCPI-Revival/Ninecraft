@@ -9,6 +9,7 @@
 #else
 #include <unistd.h>
 #endif
+#include <ninecraft/game_parameters.h>
 
 typedef struct _ninecraft_mods_t {
     struct _ninecraft_mods_t *next;
@@ -99,7 +100,7 @@ void mod_loader_execute_on_key_released(int keycode) {
 void mod_loader_load_all(void *minecraft_handle, int version_id) {
     char *mods_path = (char *)malloc(1024);
     mods_path[0] = '\0';
-    getcwd(mods_path, 1024);
+    strcat(mods_path, game_parameters.home_path);
     strcat(mods_path, "/mods/");
     
     android_DIR *dp = android_opendir(mods_path);

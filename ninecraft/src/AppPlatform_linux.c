@@ -17,6 +17,7 @@
 #else
 #include <unistd.h>
 #endif
+#include <ninecraft/game_parameters.h>
 
 int current_dialog_id = -1;
 
@@ -596,7 +597,7 @@ void AppPlatform_linux$getImagePath(android_string_t *ret, AppPlatform_linux *ap
     if (is_full) {
         char *str = (char *)malloc(1024);
         str[0] = '\0';
-        getcwd(str, 1024);
+        strcat(str, game_parameters.game_path);
         strcat(str, "/assets/images/");
         strcat(str, resource_path_c);
         android_string_cstr(ret, str);
@@ -1032,15 +1033,17 @@ void AppPlatform_linux$loadTexture(texture_data_t *ret, AppPlatform_linux *app_p
     char *resource = android_string_to_str(path_str);
     char *path = (char *)malloc(1024);
     path[0] = '\0';
-    getcwd(path, 1024);
+    strcat(path, game_parameters.game_path);
     strcat(path, "/overrides/assets/");
     strcat(path, resource);
     if (access(path, 0) != 0) {
-        getcwd(path, 1024);
+        path[0] = '\0';
+        strcat(path, game_parameters.game_path);
         strcat(path, "/internal_overrides/assets/");
         strcat(path, resource);
         if (access(path, 0) != 0) {
-            getcwd(path, 1024);
+            path[0] = '\0';
+            strcat(path, game_parameters.game_path);
             strcat(path, "/assets/");
             strcat(path, resource);
         }
@@ -1064,15 +1067,17 @@ void AppPlatform_linux$loadTextureOld(texture_data_old_t *ret, AppPlatform_linux
     char *resource = android_string_to_str(path_str);
     char *path = (char *)malloc(1024);
     path[0] = '\0';
-    getcwd(path, 1024);
+    strcat(path, game_parameters.game_path);
     strcat(path, "/overrides/assets/");
     strcat(path, resource);
     if (access(path, 0) != 0) {
-        getcwd(path, 1024);
+        path[0] = '\0';
+        strcat(path, game_parameters.game_path);
         strcat(path, "/internal_overrides/assets/");
         strcat(path, resource);
         if (access(path, 0) != 0) {
-            getcwd(path, 1024);
+            path[0] = '\0';
+            strcat(path, game_parameters.game_path);
             strcat(path, "/assets/");
             strcat(path, resource);
         }
@@ -1102,15 +1107,17 @@ void AppPlatform_linux$readAssetFile(asset_file *ret, AppPlatform_linux *app_pla
     size_t resourcelen = strlen(resource);
     char *path = (char *)malloc(1024);
     path[0] = '\0';
-    getcwd(path, 1024);
+    strcat(path, game_parameters.game_path);
     strcat(path, "/overrides/assets/");
     strcat(path, resource);
     if (access(path, 0) != 0) {
-        getcwd(path, 1024);
+        path[0] = '\0';
+        strcat(path, game_parameters.game_path);
         strcat(path, "/internal_overrides/assets/");
         strcat(path, resource);
         if (access(path, 0) != 0) {
-            getcwd(path, 1024);
+            path[0] = '\0';
+            strcat(path, game_parameters.game_path);
             strcat(path, "/assets/");
             strcat(path, resource);
         }
@@ -1216,7 +1223,7 @@ android_string_t *AppPlatform_linux$getExternalStoragePath(AppPlatform_linux *ap
     android_string_t *str = (android_string_t *)malloc(sizeof(android_string_t));
     char *storage_path = (char *)malloc(1024);
     storage_path[0] = '\0';
-    getcwd(storage_path, 1024);
+    strcat(storage_path, game_parameters.home_path);
     strcat(storage_path, "/storage/");
     android_string_cstr(str, storage_path);
     free(storage_path);
@@ -1228,7 +1235,7 @@ android_string_t *AppPlatform_linux$getInternalStoragePath(AppPlatform_linux *ap
     android_string_t *str = (android_string_t *)malloc(sizeof(android_string_t));
     char *storage_path = (char *)malloc(1024);
     storage_path[0] = '\0';
-    getcwd(storage_path, 1024);
+    strcat(storage_path, game_parameters.home_path);
     strcat(storage_path, "/storage/");
     android_string_cstr(str, storage_path);
     free(storage_path);

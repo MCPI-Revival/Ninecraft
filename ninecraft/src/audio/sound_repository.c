@@ -9,6 +9,7 @@
 #else
 #include <unistd.h>
 #endif
+#include <ninecraft/game_parameters.h>
 
 static ninecraft_sound_t ninecraft_sound_repository[] = {
     {
@@ -683,10 +684,11 @@ ninecraft_sound_resource_t *ninecraft_get_sound_buffer(char *name) {
             if (resource->buffer == NULL) {
                 char *path = (char *)malloc(1024);
                 path[0] = '\0';
-                getcwd(path, 1024);
+                strcat(path, game_parameters.game_path);
                 strcat(path, "/res/raw/");
                 strcat(path, resource->name);
                 int samples_count = stb_vorbis_decode_filename(path, &resource->num_channels, &resource->freq, (short **)&resource->buffer);
+                free(path);
                 if (samples_count != -1) {
                     resource->buffer_size = samples_count * resource->num_channels * 2;
                 } else {
