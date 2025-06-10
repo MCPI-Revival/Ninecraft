@@ -1427,6 +1427,10 @@ int main(int argc, char **argv) {
     strcat(icon_path, game_parameters.game_path);
     strcat(icon_path, "/res/drawable/iconx.png");
 
+     if (stat(game_parameters.home_path, &st) == -1) {
+        mkdir(game_parameters.home_path, 0700);
+    }
+
     if (stat(storage_path, &st) == -1) {
         mkdir(storage_path, 0700);
     }
