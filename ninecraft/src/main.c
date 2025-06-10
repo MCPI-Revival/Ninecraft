@@ -1383,6 +1383,8 @@ int main(int argc, char **argv) {
     char *minecraft_options;
     void *icon_pixels;
 
+    parse_game_parameters(argc, argv);
+
     storage_path = (char *)malloc(1024);
     if (!storage_path) {
         puts("out of memory");

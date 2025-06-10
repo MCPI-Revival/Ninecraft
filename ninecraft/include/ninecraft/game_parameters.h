@@ -8,4 +8,6 @@ typedef struct {
 
 extern game_parameters_t game_parameters;
 
+void parse_game_parameters(int argc, char **argv);
+
 #endif
