@@ -19,6 +19,7 @@
   ninecraft-desktop-entry,
   symlinkJoin,
   SDL2,
+  copyDesktopItems,
   ...
 }: let
   ninecraft = stdenv.mkDerivation {
@@ -42,6 +43,7 @@
       cmake
 
       wrapGAppsHook
+      copyDesktopItems
     ];
 
     patches = [./use-system-dependancies.patch];
@@ -51,14 +53,21 @@
       SDL2
     ];
     installPhase = ''
+      runHook preInstall
+
        mkdir -p $out/bin
       cp -r ninecraft/ninecraft $out/bin/ninecraft
+      runHook postInstall
+
     '';
     postFixup = ''
       wrapProgram $out/bin/ninecraft --set PATH ${lib.makeBinPath [
         zenity
       ]}
     '';
+
+    dontWrapGApps = true;
+    desktopItems = [ninecraft-desktop-entry];
   };
   ninecraft-script = writeShellApplication {
     name = "ninecraft";
@@ -109,11 +118,4 @@
     '';
   };
 in
-  symlinkJoin
-  {
-    name = "ninecraft";
-    paths = [
-      ninecraft-desktop-entry
-      ninecraft-script
-    ];
-  }
+  ninecraft
