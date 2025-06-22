@@ -6,9 +6,9 @@
   zlib,
   lib,
   writeShellApplication,
+  writeScript,
   curl,
   zenity,
-  ninecraft-extract,
   wrapGAppsHook,
   internal_overrides,
   glad,
@@ -20,8 +20,10 @@
   symlinkJoin,
   SDL2,
   copyDesktopItems,
+  unzip,
   ...
 }: let
+  ninecraft-extract = ../../tools/extract.sh;
   ninecraft = stdenv.mkDerivation {
     pname = "ninecraft";
     version = "1.2.0";
@@ -54,15 +56,18 @@
     ];
     installPhase = ''
       runHook preInstall
-
-       mkdir -p $out/bin
-      cp -r ninecraft/ninecraft $out/bin/ninecraft
+      mkdir -p $out/bin
+      cp ninecraft/ninecraft $out/bin/ninecraft
+      #cp ${ninecraft-extract} $out/bin/ninecraft-extract
       runHook postInstall
 
     '';
     postFixup = ''
       wrapProgram $out/bin/ninecraft --set PATH ${lib.makeBinPath [
         zenity
+      ]}
+      makeWrapper ${ninecraft-extract} $out/bin/ninecraft-extract --set PATH ${lib.makeBinPath [
+        unzip
       ]}
     '';
 
@@ -72,7 +77,7 @@
   ninecraft-script = writeShellApplication {
     name = "ninecraft";
 
-    runtimeInputs = [curl ninecraft ninecraft-extract];
+    runtimeInputs = [curl ninecraft];
     text = ''
       set +u
         export NINECRAFT_DATA=''${XDG_DATA_HOME:-$HOME/.local/share}/ninecraft
@@ -107,7 +112,7 @@
           curl -L --output mcpe.apk "$URL"
 
           echo "Extracting APK..."
-          ninecraft-extract mcpe.apk
+          ${ninecraft-extract} mcpe.apk
           cp res/drawable/iconx.png  "''${XDG_DATA_HOME:-$HOME/.local/share}/icons/ninecraft.png"
 
         fi

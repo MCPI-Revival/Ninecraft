@@ -55,7 +55,6 @@
       formatter = pkgs.alejandra;
       devShell = pkgs.callPackage ./nix/shell.nix {
         inherit (packages) ninecraft ninecraft-nixgl;
-        ninecraft-extract = packages.extract;
       };
     })
     // {
