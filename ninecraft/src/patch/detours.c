@@ -27,7 +27,7 @@ detour_backup_t arm_detour(void *target_addr, void *replacement_addr) {
             *(uint16_t *)(patch + 2) = 0xF000;
         }
         *(uint32_t *)(patch + 4) = (uintptr_t)replacement_addr;
-        patch_address(target_addr, patch, 8, PATCH_ADDRESS_PROT_XR);
+        patch_address((void *)addr, patch, 8, PATCH_ADDRESS_PROT_XR);
         memcpy(backup.detour, (void *)addr, 8);
     } else {
         backup.addr = target_addr;
