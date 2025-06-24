@@ -8,7 +8,6 @@ void detour_disarm(detour_backup_t backup) {
 }
 
 void detour_rearm(detour_backup_t backup) {
-    memcpy(backup.addr, backup.detour, backup.len);
     patch_address(backup.addr, backup.detour, backup.len, PATCH_ADDRESS_PROT_XR);
 }
 
