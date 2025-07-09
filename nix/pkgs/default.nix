@@ -43,12 +43,11 @@
   }),
   ninecraft-desktop-entry ? (pkgs.callPackage ./desktop.nix {}),
 }: rec {
-  extract = pkgs.callPackage ./extract.nix {};
   ninecraft = pkgs.pkgsi686Linux.callPackage ./ninecraft.nix {
-    ninecraft-extract = extract;
-    inherit internal_overrides glad ancmp stb ninecraft-desktop-entry;
+    inherit internal_overrides glad stb ninecraft-desktop-entry ancmp;
   };
   ninecraft-nixgl = pkgs.callPackage ./ninecraft-nixgl.nix {
     inherit ninecraft;
   };
+  inherit internal_overrides;
 }
