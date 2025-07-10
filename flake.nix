@@ -46,13 +46,22 @@
         (import ./nix/pkgs {
           inherit pkgs;
           internal_overrides = ./internal_overrides;
-          inherit glad ancmp stb;
+          inherit glad stb ancmp;
+          # ancmp = ./ancmp;
         })
         // {
           default = packages.ninecraft;
         };
+      apps = {
+        extract = {
+          type = "app";
+          program = "${pkgs.callPackage ./nix/pkgs/extract.nix {}}/bin/ninecraft-extract";
+        };
+      };
       formatter = pkgs.alejandra;
-      devShell = pkgs.callPackage ./nix/shell.nix;
+      devShell = pkgs.callPackage ./nix/shell.nix {
+        inherit (packages) ninecraft ninecraft-nixgl;
+      };
     })
     // {
       nixosModule = {pkgs, ...}: {
