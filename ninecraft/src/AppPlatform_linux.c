@@ -1038,8 +1038,8 @@ void AppPlatform_linux$loadTexture(texture_data_t *ret, AppPlatform_linux *app_p
     strcat(path, resource);
     if (access(path, 0) != 0) {
         path[0] = '\0';
-        strcat(path, game_parameters.game_path);
-        strcat(path, "/internal_overrides/assets/");
+        strcat(path, game_parameters.home_path);
+        strcat(path, "/global_overrides/assets/");
         strcat(path, resource);
         if (access(path, 0) != 0) {
             path[0] = '\0';
@@ -1072,8 +1072,8 @@ void AppPlatform_linux$loadTextureOld(texture_data_old_t *ret, AppPlatform_linux
     strcat(path, resource);
     if (access(path, 0) != 0) {
         path[0] = '\0';
-        strcat(path, game_parameters.game_path);
-        strcat(path, "/internal_overrides/assets/");
+        strcat(path, game_parameters.home_path);
+        strcat(path, "/global_overrides/assets/");
         strcat(path, resource);
         if (access(path, 0) != 0) {
             path[0] = '\0';
@@ -1112,8 +1112,8 @@ void AppPlatform_linux$readAssetFile(asset_file *ret, AppPlatform_linux *app_pla
     strcat(path, resource);
     if (access(path, 0) != 0) {
         path[0] = '\0';
-        strcat(path, game_parameters.game_path);
-        strcat(path, "/internal_overrides/assets/");
+        strcat(path, game_parameters.home_path);
+        strcat(path, "/global_overrides/assets/");
         strcat(path, resource);
         if (access(path, 0) != 0) {
             path[0] = '\0';
