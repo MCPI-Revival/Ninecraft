@@ -25,7 +25,6 @@
       })
     ];
   }),
-  internal_overrides ? ../../internal_overrides,
   glad ? (pkgs.fetchFromGitHub {
     owner = "Dav1dde";
     repo = "glad";

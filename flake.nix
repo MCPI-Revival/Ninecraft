@@ -48,7 +48,6 @@
       packages =
         (import ./nix/pkgs {
           inherit pkgs;
-          internal_overrides = ./internal_overrides;
           inherit glad stb ancmp;
           # ancmp = ./ancmp;
         })
