@@ -57,8 +57,6 @@ struct SDL_Window *_window = NULL;
 bool ctrl_pressed = false;
 bool is_fullscreen = false;
 
-int default_mouse_mode = SDL_ENABLE;
-
 int version_id = 0;
 
 void *ninecraft_app;
@@ -994,7 +992,7 @@ void grab_mouse() {
 void release_mouse() {
     puts("release_mouse");
     mouse_pointer_hidden = false;
-    SDL_ShowCursor(default_mouse_mode);
+    SDL_ShowCursor(SDL_ENABLE);
     SDL_SetRelativeMouseMode(false);
     SDL_SetWindowGrab(_window, false);
     mod_loader_execute_on_minecraft_release_mouse(ninecraft_app, version_id);
@@ -1373,7 +1371,7 @@ static bool detect_version() {
 int main(int argc, char **argv) {
     struct soinfo *so_liblog, *so_libgles, *so_libgles2, *so_libegl;
     struct soinfo *so_libandroid, *so_libopensles, *so_libz;
-    char *storage_path, *mods_path, *ovc_path, *icon_path;
+    char *storage_path, *mods_path, *ovc_path, *icon_path, *global_overrides_path;
     static struct stat st = {0};
     int icon_width, icon_height;
     SDL_GLContext gl_context;
@@ -1391,8 +1389,8 @@ int main(int argc, char **argv) {
         return 1;
     }
     storage_path[0] = '\0';
-    strcat(storage_path, game_parameters.home_path);
-    strcat(storage_path, "/storage/");
+    strncat(storage_path, game_parameters.home_path, 1023);
+    strncat(storage_path, "/storage/", 1023);
 
     mods_path = (char *)malloc(1024);
     if (!mods_path) {
@@ -1401,33 +1399,46 @@ int main(int argc, char **argv) {
         return 1;
     }
     mods_path[0] = '\0';
-    strcat(mods_path, game_parameters.home_path);
-    strcat(mods_path, "/mods/");
+    strncat(mods_path, game_parameters.home_path, 1023);
+    strncat(mods_path, "/mods/", 1023);
+
+    global_overrides_path = (char *)malloc(1024);
+    if (!global_overrides_path) {
+        puts("out of memory");
+        free(storage_path);
+        free(mods_path);
+        return 1;
+    }
+    global_overrides_path[0] = '\0';
+    strncat(global_overrides_path, game_parameters.home_path, 1023);
+    strncat(global_overrides_path, "/global_overrides/", 1023);
 
     ovc_path = (char *)malloc(1024);
     if (!ovc_path) {
         puts("out of memory");
         free(storage_path);
         free(mods_path);
+        free(global_overrides_path);
         return 1;
     }
     ovc_path[0] = '\0';
-    strcat(ovc_path, game_parameters.home_path);
-    strcat(ovc_path, "/options.txt");
+    strncat(ovc_path, game_parameters.home_path, 1023);
+    strncat(ovc_path, "/options.txt", 1023);
 
     icon_path = (char *)malloc(1024);
     if (!icon_path) {
         puts("out of memory");
         free(storage_path);
         free(mods_path);
+        free(global_overrides_path);
         free(ovc_path);
         return 1;
     }
     icon_path[0] = '\0';
-    strcat(icon_path, game_parameters.game_path);
-    strcat(icon_path, "/res/drawable/iconx.png");
+    strncat(icon_path, game_parameters.game_path, 1023);
+    strncat(icon_path, "/res/drawable/iconx.png", 1023);
 
-     if (stat(game_parameters.home_path, &st) == -1) {
+    if (stat(game_parameters.home_path, &st) == -1) {
         mkdir(game_parameters.home_path, 0700);
     }
 
@@ -1439,6 +1450,10 @@ int main(int argc, char **argv) {
         mkdir(mods_path, 0700);
     }
 
+    if (stat(global_overrides_path, &st) == -1) {
+        mkdir(global_overrides_path, 0700);
+    }
+
     ninecraft_read_options_file(&platform_options, ovc_path);
     ninecraft_set_default_options(&platform_options, ovc_path);
 
@@ -1448,6 +1463,7 @@ int main(int argc, char **argv) {
         printf("SDL_Init Error: %s\n", SDL_GetError());
         free(storage_path);
         free(mods_path);
+        free(global_overrides_path);
         free(ovc_path);
         free(icon_path);
         return 1;
@@ -1471,6 +1487,7 @@ int main(int argc, char **argv) {
         SDL_Quit();
         free(storage_path);
         free(mods_path);
+        free(global_overrides_path);
         free(ovc_path);
         free(icon_path);
         return 1;
@@ -1498,6 +1515,7 @@ int main(int argc, char **argv) {
         SDL_Quit();
         free(storage_path);
         free(mods_path);
+        free(global_overrides_path);
         free(ovc_path);
         free(icon_path);
         return 1;
@@ -1533,6 +1551,7 @@ int main(int argc, char **argv) {
         puts("libminecraftpe.so not loaded");
         free(storage_path);
         free(mods_path);
+        free(global_overrides_path);
         free(ovc_path);
         free(icon_path);
         return 1;
@@ -1543,6 +1562,7 @@ int main(int argc, char **argv) {
     if (!detect_version()) {
         free(storage_path);
         free(mods_path);
+        free(global_overrides_path);
         free(ovc_path);
         free(icon_path);
         return 1;
@@ -1557,12 +1577,6 @@ int main(int argc, char **argv) {
     controller_states = (unsigned char *)android_dlsym(handle, "_ZN10Controller15isTouchedValuesE");
     controller_x_stick = (float *)android_dlsym(handle, "_ZN10Controller12stickValuesXE");
     controller_y_stick = (float *)android_dlsym(handle, "_ZN10Controller12stickValuesYE");
-
-    if (version_id >= version_id_0_6_0 && version_id <= version_id_0_9_5) {
-        default_mouse_mode = SDL_DISABLE;
-    }
-
-    SDL_ShowCursor(default_mouse_mode);
 
     if (version_id >= version_id_0_9_0 && version_id <= version_id_0_9_5) {
         printf("nine construct %p\n", ninecraft_app_construct_2);
@@ -1985,17 +1999,6 @@ int main(int argc, char **argv) {
 #endif
         mod_loader_execute_on_minecraft_update(ninecraft_app, version_id);
 
-        if (!mouse_pointer_hidden && version_id >= version_id_0_6_0 && version_id <= version_id_0_9_5) {
-            short cx, cy;
-            int xpos, ypos;
-            float inv_gui_scale = *((float *)android_dlsym(handle, "_ZN3Gui11InvGuiScaleE"));
-            
-            SDL_GetMouseState(&xpos, &ypos);
-            cx = (short)(xpos * inv_gui_scale);
-            cy = (short)(ypos * inv_gui_scale);
-            ((FLOAT_ABI_FIX void (*)(float, float, void *))android_dlsym(handle, "_Z12renderCursorffP9Minecraft"))(cx, cy, ninecraft_app);
-        }
-
         audio_engine_tick();
         SDL_GL_SwapWindow(_window);
 
@@ -2023,6 +2026,7 @@ int main(int argc, char **argv) {
     SDL_Quit();
     free(storage_path);
     free(mods_path);
+    free(global_overrides_path);
     free(ovc_path);
     return 0;
 }
