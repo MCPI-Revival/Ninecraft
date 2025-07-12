@@ -5,8 +5,9 @@
   writeTextDir,
 }:
 buildNinecraftInstance {
-  version = versions.PE-a0_8_0_x86;
+  version = versions.a0_8_0;
   options.mp_username = "bobface";
+  homeDir = "home-dir";
   mods = [
     (buildNinecraftModNDK {
       name = "hello";
@@ -14,7 +15,6 @@ buildNinecraftInstance {
         writeTextDir "main.c"
         ''
           #include <stdio.h>
-
           void ninecraft_mod_on_load(void* m, int v) {
             printf("Hi, hmm\n");
           }

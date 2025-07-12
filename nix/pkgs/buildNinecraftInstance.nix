@@ -5,16 +5,15 @@
   writeShellScript,
   writeText,
   defaultVersion,
-  internal_overrides,
 }: {
   name ? "ninecraft",
   homeDir ? "$(mktemp -d)",
-  gameDir ? "$out/share/ninecraft",
+  gameDir ? null,
   mods ? [],
   options ? null,
   package ? ninecraft,
   version ? defaultVersion,
-  internal_overrides ? internal_overrides,
+  global_overrides ? [],
 }: let
   optionsTxt = writeText "options.txt" (with builtins; let
     opt =
@@ -51,41 +50,36 @@
         else {}
       ))));
   startScript = writeShellScript "start-ninecraft-instance.sh" ''
-    out=$(dirname $0)/..
-    NINECRAFT_HOME=${homeDir}
-    if [[ ! -d $NINECRAFT_HOME ]]; then
-      mkdir -p $NINECRAFT_HOME
-    fi
+    homeDir=${homeDir}
+    ${
+      if (isNull gameDir)
+      then ""
+      else ''
+        gameDir=${gameDir}
+
+        # Version
+        if [ ! -d $gameDir ]; then
+          mkdir -p $gameDir
+        fi
+        cp -sru ${version}/{assets,lib} $gameDir
+      ''
+    }
     ${
       if (builtins.isAttrs options)
       then ''
-        if [[ ! -f $NINECRAFT_HOME/options.txt ]]; then
-          ln -s ${optionsTxt} $NINECRAFT_HOME/options.txt
+        # Options
+        if [[ ! -d $homeDir/storage/games/com.mojang/minecraftpe ]]; then
+          mkdir -p $homeDir/storage/games/com.mojang/minecraftpe
         fi
-
-        if [[ ! -d $NINECRAFT_HOME/storage/games/com.mojang/minecraftpe ]]; then
-          mkdir -p $NINECRAFT_HOME/storage/games/com.mojang/minecraftpe
-        fi
-        if [[ ! -f $NINECRAFT_HOME/storage/games/com.mojang/minecraftpe/options.txt ]]; then
-          ln -s ${optionsTxt} $NINECRAFT_HOME/storage/games/com.mojang/minecraftpe/options.txt
-        fi
+        cp -su ${optionsTxt} $homeDir/options.txt
+        cp -su ${optionsTxt} $homeDir/storage/games/com.mojang/minecraftpe/options.txt
       ''
       else ""
     }
+    # Mods
+    ${lib.concatMapStrings (mod: "cp -rf ${mod}/* $homeDir") mods}
 
-    # INSTALL MODS
-    if [[ ! -d $NINECRAFT_HOME/mods ]]; then
-      mkdir -p $NINECRAFT_HOME/mods
-    fi
-    ${lib.concatMapStrings
-      (mod: ''
-        if [[ ! -f $(basename ${mod}/mods/*.so) ]]; then
-          cp -f ${mod}/mods/*.so $NINECRAFT_HOME/mods
-        fi
-      '')
-      mods}
-
-    "$(dirname $0)/.ninecraft" --game ${gameDir} --home "$NINECRAFT_HOME" "$@"
+    "$(dirname $0)/.ninecraft" --game "${lib.defaultTo "$gameDir" version}" --home "$homeDir" "$@"
   '';
 in
   package.overrideAttrs (old: {
@@ -95,17 +89,5 @@ in
       + ''
         mv $out/bin/ninecraft $out/bin/.ninecraft
         ln -s ${startScript} $out/bin/${name}
-        if [ ! -d ${gameDir} ]; then
-          mkdir ${gameDir}
-        fi
-        if [ ! -d ${gameDir}/internal_overrides ]; then
-          ln -s internal_overrides ${gameDir}/internal_overrides
-        fi
-        if [ ! -d ${gameDir}/assets ]; then
-          ln -s ${version}/assets ${gameDir}/assets
-        fi
-        if [ ! -d ${gameDir}/lib ]; then
-          ln -s ${version}/lib ${gameDir}/lib
-        fi
       '';
   })

@@ -56,8 +56,8 @@
   fetchApk = pkgs.callPackage ./fetchApk.nix {};
   versions = pkgs.callPackage ./versions.nix {inherit fetchApk;};
   buildNinecraftInstance = pkgs.callPackage ./buildNinecraftInstance.nix {
-    inherit ninecraft internal_overrides;
-    defaultVersion = versions.PE-a0_6_1_x86;
+    inherit ninecraft;
+    defaultVersion = versions.a0_6_1;
   };
   buildNinecraftModNDK = pkgs.callPackage ./buildNinecraftModNDK.nix {};
   test = pkgs.callPackage ./test.nix {inherit buildNinecraftInstance versions buildNinecraftModNDK;};

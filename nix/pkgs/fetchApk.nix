@@ -1,12 +1,9 @@
 {
   fetchzip,
   lib,
-}: {
-  url,
-  hash ? lib.fakeHash,
-}:
-fetchzip {
-  inherit url hash;
-  extension = "zip";
-  stripRoot = false;
-}
+}: options:
+fetchzip (options
+  // {
+    extension = "zip";
+    stripRoot = false;
+  })

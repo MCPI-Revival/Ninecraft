@@ -57,9 +57,8 @@
     ];
     installPhase = ''
       runHook preInstall
-      mkdir -p $out/{bin,share/ninecraft}
+      mkdir -p $out/bin
       cp ninecraft/ninecraft $out/bin/ninecraft
-      ln -s ${internal_overrides} $out/share/ninecraft/internal_overrides
       runHook postInstall
 
     '';
@@ -89,11 +88,6 @@
         fi
 
         cd "$NINECRAFT_DATA"
-
-        if [[ ! -d "internal_overrides" ]]; then
-          echo "copying internal_overrides..."
-          cp -r ${internal_overrides} .
-        fi
 
         export VERSION=$1
         export ARCH=$2

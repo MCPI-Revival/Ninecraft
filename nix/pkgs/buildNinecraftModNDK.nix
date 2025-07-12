@@ -12,6 +12,7 @@
   precompiled ? false,
   compiledX86 ? null,
   compiledArm ? null,
+  globalOverrides ? "",
   ...
 }: let
   effectiveName =
@@ -31,9 +32,13 @@
     LOCAL_SRC_FILES := ${mainC}
     include $(BUILD_SHARED_LIBRARY)
   '';
+  abi =
+    if stdenv.hostPlatform.isx86
+    then "x86"
+    else "armeabi-v7a";
   applicationMk = writeText "Application.mk" ''
     APP_PLATFORM := android-21
-    # APP_ABI := x86
+    APP_ABI := ${abi}
   '';
   preCompiledLib = let
     c = {
@@ -58,8 +63,11 @@
     '';
     installPhase = ''
       runHook preInstall
-      mkdir -p $out/mods
+      mkdir -p $out/{mods,global_overrides}
       cp -r libs/*/*.so $out/mods
+      if [[ -d "${globalOverrides}" ]]; then
+        cp -r ${globalOverrides} $out/global_overrides
+      fi
       runHook postInstall
     '';
   };
