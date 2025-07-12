@@ -9,7 +9,10 @@
     hash = getHash "nixgl";
   }),
   pkgs ? (import <nixpkgs> {
-    config.allowUnfree = true;
+    config = {
+      allowUnfree = true;
+      android_sdk.accept_license = true;
+    };
     overlays = [
       (new: old: let
         isIntel86 = new.system == "x86_64-linux";
@@ -50,4 +53,12 @@
     inherit ninecraft;
   };
   inherit internal_overrides;
+  fetchApk = pkgs.callPackage ./fetchApk.nix {};
+  versions = pkgs.callPackage ./versions.nix {inherit fetchApk;};
+  buildNinecraftInstance = pkgs.callPackage ./buildNinecraftInstance.nix {
+    inherit ninecraft internal_overrides;
+    defaultVersion = versions.PE-a0_6_1_x86;
+  };
+  buildNinecraftModNDK = pkgs.callPackage ./buildNinecraftModNDK.nix {};
+  test = pkgs.callPackage ./test.nix {inherit buildNinecraftInstance versions buildNinecraftModNDK;};
 }

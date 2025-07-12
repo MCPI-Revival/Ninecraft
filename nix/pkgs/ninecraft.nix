@@ -59,8 +59,7 @@
       runHook preInstall
       mkdir -p $out/{bin,share/ninecraft}
       cp ninecraft/ninecraft $out/bin/ninecraft
-      #cp ${ninecraft-extract} $out/bin/ninecraft-extract
-      cp -r ${internal_overrides} $out/share/ninecraft/internal_overrides
+      ln -s ${internal_overrides} $out/share/ninecraft/internal_overrides
       runHook postInstall
 
     '';
