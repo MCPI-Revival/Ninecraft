@@ -156,10 +156,8 @@ buildNinecraftModNDK {
     hash = lib.fakeHash;
   };
   precompiled = true;
-  compiled = {
-    x86 = "x86/mod.so";
-    x86 = "arm/mod.so";
-  };
+  compiledX86 = "x86/mod.so";
+compiledArm = "arm/mod.so";
 }
 ```
 

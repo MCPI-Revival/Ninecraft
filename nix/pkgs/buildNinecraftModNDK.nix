@@ -10,8 +10,8 @@
   src,
   mainC ? "main.c",
   precompiled ? false,
-  compiled.x86?null,
-  compiled.arm?null,
+  compiledX86 ? null,
+  compiledArm ? null,
   ...
 }: let
   effectiveName =
@@ -33,44 +33,53 @@
   '';
   applicationMk = writeText "Application.mk" ''
     APP_PLATFORM := android-21
-    APP_ABI := x86
+    # APP_ABI := x86
   '';
-  preCompiledLib = if stdenv.hostPlatform.isx86 then (compiled.x86 or src) else  (compiled.arm or src);
-compile = stdenv.mkDerivation {
-  name = effectiveName;
-  inherit src;
-  buildInputs = with androidToolchain; [androidsdk ndk-bundle];
-  buildPhase = ''
-    runHook preBuild
-    mkdir jni
-    cp -r $src/* jni
-    cp ${androidMk} jni/Android.mk
-    cp ${applicationMk} jni/Application.mk
-    ndk-build
-    runHook postBuild
-  '';
-  installPhase = ''
-    runHook preInstall
-    mkdir -p $out/mods
-    cp -r libs/*/*.so $out/mods
-    runHook postInstall
-  '';
-};
-getLib = stdenv.mkDerivation {
-  name = effectiveName;
-  inherit src;
-  installPhase = ''
-    runHook preInstall
-    mkdir -p $out/mods
+  preCompiledLib = let
+    c = {
+      inherit compiledArm compiledX86;
+    };
+  in
+    if stdenv.hostPlatform.isx86
+    then (c.compiledX86 or src)
+    else (c.compiledArm or src);
+  compile = stdenv.mkDerivation {
+    name = effectiveName;
+    inherit src;
+    buildInputs = with androidToolchain; [androidsdk ndk-bundle];
+    buildPhase = ''
+      runHook preBuild
+      mkdir jni
+      cp -r $src/* jni
+      cp ${androidMk} jni/Android.mk
+      cp ${applicationMk} jni/Application.mk
+      ndk-build
+      runHook postBuild
+    '';
+    installPhase = ''
+      runHook preInstall
+      mkdir -p $out/mods
+      cp -r libs/*/*.so $out/mods
+      runHook postInstall
+    '';
+  };
+  getLib = stdenv.mkDerivation {
+    name = effectiveName;
+    inherit src;
+    installPhase = ''
+      runHook preInstall
+      mkdir -p $out/mods
 
-    if [[ -f "${preCompiledLib}" ]]; then
-      cp -r "${preCompiledLib}" $out/mods
-    fi
-    if [[ -d "${preCompiledLib}" ]]; then
-      cp -r "${preCompiledLib}/*/*.so" $out/mods
-    fi
-    runHook postInstall
-  '';
-};
+      if [[ -f "${preCompiledLib}" ]]; then
+        cp -r "${preCompiledLib}" $out/mods
+      fi
+      if [[ -d "${preCompiledLib}" ]]; then
+        cp -r "${preCompiledLib}/*/*.so" $out/mods
+      fi
+      runHook postInstall
+    '';
+  };
 in
-if precompiled then getLib else compile
+  if precompiled
+  then getLib
+  else compile
