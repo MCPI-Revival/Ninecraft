@@ -5,7 +5,6 @@
   writeTextDir,
 }:
 buildNinecraftInstance {
-  name = "test";
   version = versions.PE-a0_8_0_x86;
   options.mp_username = "bobface";
   mods = [
