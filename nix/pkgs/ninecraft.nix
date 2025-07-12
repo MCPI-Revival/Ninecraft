@@ -10,7 +10,6 @@
   curl,
   zenity,
   wrapGAppsHook,
-  internal_overrides,
   glad,
   ancmp,
   stb,
@@ -88,11 +87,6 @@
         fi
 
         cd "$NINECRAFT_DATA"
-
-        if [[ ! -d "internal_overrides" ]]; then
-          echo "copying internal_overrides..."
-          cp -r ${internal_overrides} .
-        fi
 
         export VERSION=$1
         export ARCH=$2
