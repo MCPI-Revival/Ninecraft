@@ -108,7 +108,7 @@ in
           icon = "${version}/res/drawable/iconx.png";
           path = gameDir;
           exec = "${ninecraft-extract} %u";
-          categories = ["Game" "GameTool"];
+          categories = ["Game"];
           mimeTypes = ["application/vnd.android.package-archive"];
         }
       )
