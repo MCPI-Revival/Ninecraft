@@ -10,7 +10,5 @@ makeDesktopItem {
   name = "ninecraft";
   inherit icon;
   exec = "ninecraft --home \"${homeDir}\" --game \"${gameDir}\"";
-  categories = [
-    "Game"
-  ];
+  categories = ["Game" "AdventureGame"];
 }

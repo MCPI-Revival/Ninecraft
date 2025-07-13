@@ -4,7 +4,10 @@
   stdenvNoCC,
   writeShellScript,
   writeText,
+  writeScript,
   defaultVersion,
+  ninecraft-desktop-entry,
+  makeDesktopItem,
 }: {
   name ? "ninecraft",
   homeDir ? "$(mktemp -d)",
@@ -15,6 +18,7 @@
   version ? defaultVersion,
   global_overrides ? [],
 }: let
+  ninecraft-extract = ../../tools/extract.sh;
   optionsTxt = writeText "options.txt" (with builtins; let
     opt =
       {
@@ -90,4 +94,23 @@ in
         mv $out/bin/ninecraft $out/bin/.ninecraft
         ln -s ${startScript} $out/bin/${name}
       '';
+
+    desktopItems = [
+      (
+        ninecraft-desktop-entry {
+          icon = "${version}/res/drawable/iconx.png";
+        }
+      )
+      (
+        makeDesktopItem {
+          desktopName = "Change Ninecraft Version";
+          name = "ninecraft-install";
+          icon = "${version}/res/drawable/iconx.png";
+          path = gameDir;
+          exec = "${ninecraft-extract} %u";
+          categories = ["Game" "GameTool"];
+          mimeTypes = ["application/vnd.android.package-archive"];
+        }
+      )
+    ];
   })

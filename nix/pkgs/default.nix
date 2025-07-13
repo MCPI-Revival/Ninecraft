@@ -52,12 +52,13 @@
   ninecraft-nixgl = pkgs.callPackage ./ninecraft-nixgl.nix {
     inherit ninecraft;
   };
-  inherit internal_overrides;
+  inherit internal_overrides ninecraft-desktop-entry;
   fetchApk = pkgs.callPackage ./fetchApk.nix {};
   versions = pkgs.callPackage ./versions.nix {inherit fetchApk;};
   buildNinecraftInstance = pkgs.callPackage ./buildNinecraftInstance.nix {
     inherit ninecraft;
     defaultVersion = versions.a0_6_1;
+    ninecraft-desktop-entry = pkgs.callPackage ./desktop.nix;
   };
   buildNinecraftModNDK = pkgs.callPackage ./buildNinecraftModNDK.nix {};
   test = pkgs.callPackage ./test.nix {inherit buildNinecraftInstance versions buildNinecraftModNDK;};

@@ -6,7 +6,7 @@
   ...
 }: let
   name = "ninecraft-extract";
-  script = writeScriptBin name (builtins.readFile ../../tools/extract.sh);
+  script = writeScript name (builtins.readFile ../../tools/extract.sh);
 in
   symlinkJoin {
     inherit name;
