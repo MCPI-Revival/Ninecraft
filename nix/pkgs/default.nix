@@ -22,7 +22,6 @@
       })
     ];
   }),
-  internal_overrides ? ../../internal_overrides,
   glad ? (pkgs.fetchFromGitHub {
     owner = "Dav1dde";
     repo = "glad";
@@ -44,10 +43,9 @@
   ninecraft-desktop-entry ? (pkgs.callPackage ./desktop.nix {}),
 }: rec {
   ninecraft = pkgs.pkgsi686Linux.callPackage ./ninecraft.nix {
-    inherit internal_overrides glad stb ninecraft-desktop-entry ancmp;
+    inherit glad stb ninecraft-desktop-entry ancmp;
   };
   ninecraft-nixgl = pkgs.callPackage ./ninecraft-nixgl.nix {
     inherit ninecraft;
   };
-  inherit internal_overrides;
 }

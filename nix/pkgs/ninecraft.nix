@@ -10,7 +10,6 @@
   curl,
   zenity,
   wrapGAppsHook,
-  internal_overrides,
   glad,
   ancmp,
   stb,
@@ -59,8 +58,6 @@
       runHook preInstall
       mkdir -p $out/{bin,share/ninecraft}
       cp ninecraft/ninecraft $out/bin/ninecraft
-      #cp ${ninecraft-extract} $out/bin/ninecraft-extract
-      cp -r ${internal_overrides} $out/share/ninecraft/internal_overrides
       runHook postInstall
 
     '';
@@ -90,11 +87,6 @@
         fi
 
         cd "$NINECRAFT_DATA"
-
-        if [[ ! -d "internal_overrides" ]]; then
-          echo "copying internal_overrides..."
-          cp -r ${internal_overrides} .
-        fi
 
         export VERSION=$1
         export ARCH=$2
