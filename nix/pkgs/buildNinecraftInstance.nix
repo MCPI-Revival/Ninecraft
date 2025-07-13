@@ -65,7 +65,11 @@
         if [ ! -d $gameDir ]; then
           mkdir -p $gameDir
         fi
-        cp -sru ${version}/{assets,lib} $gameDir
+        if [[ ( ! -d "$gameDir/lib"  ) || ( ! -d "$gameDir/res"  ) || ( ! -d "$gameDir/assets"  ) ]]; then
+          cp -rf "${version}"/{assets,lib,res} "$gameDir"
+          chmod -R u+rw "$gameDir"/{assets,lib,res}
+        fi
+
       ''
     }
     ${
@@ -75,15 +79,24 @@
         if [[ ! -d $homeDir/storage/games/com.mojang/minecraftpe ]]; then
           mkdir -p $homeDir/storage/games/com.mojang/minecraftpe
         fi
-        cp -su ${optionsTxt} $homeDir/options.txt
-        cp -su ${optionsTxt} $homeDir/storage/games/com.mojang/minecraftpe/options.txt
+        if [[ -L $homeDir/options.txt ]] || [[ ! -e $homeDir/options.txt ]]; then
+          cp -sf ${optionsTxt} $homeDir/options.txt
+        fi
+        if [[ -L $homeDir/storage/games/com.mojang/minecraftpe/options.txt ]] || [[ ! -e $homeDir/storage/games/com.mojang/minecraftpe/options.txt ]]; then
+          cp -sf ${optionsTxt} $homeDir/storage/games/com.mojang/minecraftpe/options.txt
+        fi
+
       ''
       else ""
     }
     # Mods
     ${lib.concatMapStrings (mod: "cp -rf ${mod}/* $homeDir") mods}
 
-    "$(dirname $0)/.ninecraft" --game "${lib.defaultTo "$gameDir" version}" --home "$homeDir" "$@"
+    "$(dirname $0)/.ninecraft" --game "${
+      if (isNull gameDir)
+      then version
+      else "$gameDir"
+    }" --home "$homeDir" "$@"
   '';
 in
   package.overrideAttrs (old: {
@@ -95,23 +108,43 @@ in
         ln -s ${startScript} $out/bin/${name}
       '';
 
-    desktopItems = [
+    desktopItems =
       (
-        ninecraft-desktop-entry {
-          icon = "${version}/res/drawable/iconx.png";
-        }
-      )
-      (
-        makeDesktopItem {
+        lib.optional (!(isNull gameDir))
+        (makeDesktopItem {
           desktopName = "Change Ninecraft Version";
-          name = "ninecraft-install";
+          name = "ninecraft-extract";
           icon = "${version}/res/drawable/iconx.png";
           path = gameDir;
           exec = "${ninecraft-extract} %u";
           categories = ["Game"];
           terminal = true;
           mimeTypes = ["application/vnd.android.package-archive"];
-        }
+        })
       )
-    ];
+      ++ [
+        (
+          makeDesktopItem {
+            desktopName = "Ninecraft";
+            name = "ninecraft";
+            genericName = "MCPE Alpha Player";
+            comment = "A mcpe 0.1 .0 - 0.10 .5 launcher for linux and windows";
+            icon = "${version}/res/drawable/iconx.png";
+            exec = "ninecraft ";
+            categories = ["Game" "AdventureGame"];
+            keywords = ["mcpe" "android" "mcpi" "pocket" "edition"];
+          }
+        )
+        (
+          makeDesktopItem {
+            desktopName = "Extract APK to current folder";
+            name = "ninecraft-install";
+            icon = "${version}/res/drawable/iconx.png";
+            exec = "${ninecraft-extract} %u";
+            categories = ["Game"];
+            terminal = true;
+            mimeTypes = ["application/vnd.android.package-archive"];
+          }
+        )
+      ];
   })

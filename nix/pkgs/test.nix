@@ -8,6 +8,7 @@ buildNinecraftInstance {
   version = versions.a0_8_0;
   options.mp_username = "bobface";
   homeDir = "home-dir";
+  gameDir = "game-dir";
   mods = [
     (buildNinecraftModNDK {
       name = "hello";

@@ -79,6 +79,8 @@
       hash,
     }:
       fetchApk {
+        pname = "minecraftpe";
+        inherit version;
         url = "https://archive.org/download/MCPEAlpha/PE-${version}${
           if (arch == "arm")
           then ""
