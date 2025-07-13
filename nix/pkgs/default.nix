@@ -46,20 +46,16 @@
   }),
   ninecraft-desktop-entry ? (pkgs.callPackage ./desktop.nix {}),
 }: rec {
-  ninecraft = pkgs.pkgsi686Linux.callPackage ./ninecraft.nix {
+  fetchApk = pkgs.callPackage ./fetchApk.nix {};
+  versions = pkgs.callPackage ./versions.nix {inherit fetchApk;};
+  buildNinecraftInstance = pkgs.pkgsi686Linux.callPackage ./buildNinecraftInstance.nix {
     inherit internal_overrides glad stb ninecraft-desktop-entry ancmp;
+    defaultVersion = versions.a0_6_1;
   };
+  buildNinecraftModNDK = pkgs.callPackage ./buildNinecraftModNDK.nix {};
+  ninecraft = pkgs.callPackage ./ninecraftNew.nix {inherit buildNinecraftInstance versions buildNinecraftModNDK;};
   ninecraft-nixgl = pkgs.callPackage ./ninecraft-nixgl.nix {
     inherit ninecraft;
   };
-  inherit internal_overrides ninecraft-desktop-entry;
-  fetchApk = pkgs.callPackage ./fetchApk.nix {};
-  versions = pkgs.callPackage ./versions.nix {inherit fetchApk;};
-  buildNinecraftInstance = pkgs.callPackage ./buildNinecraftInstance.nix {
-    inherit ninecraft;
-    defaultVersion = versions.a0_6_1;
-    ninecraft-desktop-entry = pkgs.callPackage ./desktop.nix;
-  };
-  buildNinecraftModNDK = pkgs.callPackage ./buildNinecraftModNDK.nix {};
   test = pkgs.callPackage ./test.nix {inherit buildNinecraftInstance versions buildNinecraftModNDK;};
 }

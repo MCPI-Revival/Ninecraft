@@ -1,22 +1,34 @@
 {
+  copyDesktopItems,
+  cmake,
+  defaultVersion,
   lib,
-  ninecraft,
-  stdenvNoCC,
+  stdenv,
   writeShellScript,
   writeText,
-  writeScript,
-  defaultVersion,
+  wrapGAppsHook,
   ninecraft-desktop-entry,
   makeDesktopItem,
+  makeWrapper,
+  pkg-config,
+  python312Packages,
+  zlib,
+  zenity,
+  glad,
+  ancmp,
+  stb,
+  SDL2,
+  bash,
+  unzip,
+  ...
 }: {
   name ? "ninecraft",
   homeDir ? "$(mktemp -d)",
+  dontManage ? false,
   gameDir ? null,
   mods ? [],
   options ? null,
-  package ? ninecraft,
   version ? defaultVersion,
-  global_overrides ? [],
 }: let
   ninecraft-extract = ../../tools/extract.sh;
   optionsTxt = writeText "options.txt" (with builtins; let
@@ -92,28 +104,74 @@
     # Mods
     ${lib.concatMapStrings (mod: "cp -rf ${mod}/* $homeDir") mods}
 
-    "$(dirname $0)/.ninecraft" --game "${
+    "$(dirname $0)../share/ninecraft" --game "${
       if (isNull gameDir)
       then version
       else "$gameDir"
     }" --home "$homeDir" "$@"
   '';
 in
-  package.overrideAttrs (old: {
+  stdenv.mkDerivation {
     pname = name;
-    postFixup =
-      (old.postFixup or "")
-      + ''
-        mv $out/bin/ninecraft $out/bin/.ninecraft
-        ln -s ${startScript} $out/bin/${name}
-      '';
+    version = "1.2.0";
+    src = ../..;
+    nativeBuildInputs = [
+      pkg-config
+      cmake
+
+      wrapGAppsHook
+      copyDesktopItems
+    ];
+
+    patches = [./use-system-dependancies.patch];
+    buildInputs = [
+      python312Packages.jinja2
+      zlib
+      SDL2
+    ];
+    dontWrapGApps = true;
+    prePhases = ["submoduleFetchPhase"];
+    submoduleFetchPhase = ''
+         export glad=$PWD/deps_src/glad
+         export ancmp=$PWD/deps_src/ancmp
+         export stb=$PWD/deps_src/stb
+      mkdir -p deps_src
+      cp --no-preserve=mode,ownership -r ${glad} $glad
+      cp --no-preserve=mode,ownership -r ${ancmp} $ancmp
+      cp --no-preserve=mode,ownership -r ${stb} $stb
+      ls -al deps_src
+    '';
+
+    installPhase = ''
+      runHook preInstall
+      mkdir -p $out/bin
+      install ninecraft/ninecraft $out/bin/ninecraft
+      runHook postInstall
+    '';
+    postFixup = ''
+      wrapProgram $out/bin/ninecraft --set PATH ${lib.makeBinPath [
+        zenity
+      ]}
+      makeWrapper ${ninecraft-extract} $out/bin/ninecraft-extract --set PATH ${lib.makeBinPath [
+        bash
+        unzip
+      ]}
+      ${
+        if dontManage
+        then ""
+        else ''
+          mv $out/bin/ninecraft $out/share/ninecraft
+          ln -s ${startScript} $out/bin/${name}
+        ''
+      }
+    '';
 
     desktopItems =
       (
         lib.optional (!(isNull gameDir))
         (makeDesktopItem {
-          desktopName = "Change Ninecraft Version";
-          name = "ninecraft-extract";
+          desktopName = "Change Ninecraft ${if (name!="ninecraft") then "(${name})" else ""} Version";
+          name = "ninecraft-extract"${if (name!="ninecraft") then "-${name}" else ""};
           icon = "${version}/res/drawable/iconx.png";
           path = gameDir;
           exec = "${ninecraft-extract} %u";
@@ -125,8 +183,15 @@ in
       ++ [
         (
           makeDesktopItem {
-            desktopName = "Ninecraft";
-            name = "ninecraft";
+            desktopName = "Ninecraft ${if (name!="ninecraft") then "(${name})" else ""}";
+            name =
+              if dontManage
+              then "ninecraft --home \"${homeDir}\" --game \"${
+                if (isNull gameDir)
+                then version
+                else gameDir
+              }\""
+              else "ninecraft${if (name!="ninecraft") then "-${name}" else ""}";
             genericName = "MCPE Alpha Player";
             comment = "A mcpe 0.1 .0 - 0.10 .5 launcher for linux and windows";
             icon = "${version}/res/drawable/iconx.png";
@@ -147,4 +212,4 @@ in
           }
         )
       ];
-  })
+  }
