@@ -109,6 +109,7 @@ in
           path = gameDir;
           exec = "${ninecraft-extract} %u";
           categories = ["Game"];
+          terminal = true;
           mimeTypes = ["application/vnd.android.package-archive"];
         }
       )
