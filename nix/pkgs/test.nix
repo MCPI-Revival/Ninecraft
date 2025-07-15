@@ -1,14 +1,15 @@
 {
   buildNinecraftInstance,
   buildNinecraftModNDK,
-  versions,
+  mcpeVersions,
   writeTextDir,
 }:
 buildNinecraftInstance {
-  version = versions.a0_8_0;
+  name = "test";
+  version = mcpeVersions.a0_7_0;
   options.mp_username = "bobface";
   homeDir = "home-dir";
-  gameDir = "game-dir";
+  useNixGL = true;
   mods = [
     (buildNinecraftModNDK {
       name = "hello";

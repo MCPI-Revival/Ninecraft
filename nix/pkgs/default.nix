@@ -1,5 +1,4 @@
 {
-  commits ? import ../commits.nix,
   flakeLock ? builtins.fromJSON (builtins.readFile ../../flake.lock),
   getHash ? name: flakeLock.nodes.${name}.locked.narHash,
   nixgl ? (pkgs.fetchFromGitHub {
@@ -43,18 +42,34 @@
     rev = "5736b15f7ea0ffb08dd38af21067c314d6a3aae9";
     hash = getHash "stb";
   }),
-  ninecraft-desktop-entry ? (pkgs.callPackage ./desktop.nix {}),
 }: rec {
+  ninecraft-extract = ../../tools/extract.sh;
+
   fetchApk = pkgs.callPackage ./fetchApk.nix {};
-  versions = pkgs.callPackage ./versions.nix {inherit fetchApk;};
-  buildNinecraftInstance = pkgs.pkgsi686Linux.callPackage ./buildNinecraftInstance.nix {
-    inherit internal_overrides glad stb ninecraft-desktop-entry ancmp;
-    defaultVersion = versions.a0_6_1;
+  mcpeVersions =
+    pkgs.callPackage ./versions.nix {inherit fetchApk;};
+
+  makeNinecraftDesktopItems = pkgs.callPackage ./desktop.nix {
+    inherit ninecraft-extract mcpeVersions;
+  };
+  ninecraft = pkgs.pkgsi686Linux.callPackage ./ninecraft.nix {
+    inherit glad stb ancmp ninecraft-extract makeNinecraftDesktopItems mcpeVersions;
+  };
+
+  buildNinecraftInstance = pkgs.callPackage ./buildNinecraftInstance.nix {
+    inherit ninecraft ninecraft-extract mcpeVersions makeNinecraftDesktopItems;
   };
   buildNinecraftModNDK = pkgs.callPackage ./buildNinecraftModNDK.nix {};
-  ninecraft = pkgs.callPackage ./ninecraftNew.nix {inherit buildNinecraftInstance versions buildNinecraftModNDK;};
-  ninecraft-nixgl = pkgs.callPackage ./ninecraft-nixgl.nix {
-    inherit ninecraft;
+
+  ninecraft-nixgl = buildNinecraftInstance {
+    version = mcpeVersions.a0_6_1;
+    useNixGL = true;
   };
-  test = pkgs.callPackage ./test.nix {inherit buildNinecraftInstance versions buildNinecraftModNDK;};
+  test = pkgs.callPackage ./test.nix {
+    inherit
+      buildNinecraftInstance
+      mcpeVersions
+      buildNinecraftModNDK
+      ;
+  };
 }
