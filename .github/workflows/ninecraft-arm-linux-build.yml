@@ -1,0 +1,38 @@
+# This starter workflow is for a CMake project running on a single platform. There is a different starter workflow if you need cross-platform coverage.
+# See: https://github.com/actions/starter-workflows/blob/main/ci/cmake-multi-platform.yml
+name: Ninecraft arm linux build
+
+on:
+  workflow_dispatch:
+
+env:
+  # Customize the CMake build type here (Release, Debug, RelWithDebInfo, etc.)
+  BUILD_TYPE: Release
+
+jobs:
+  build:
+    # The CMake configure and build commands are platform agnostic and should work equally well on Windows or Mac.
+    # You can convert this to a matrix build if you need cross-platform coverage.
+    # See: https://docs.github.com/en/free-pro-team@latest/actions/learn-github-actions/managing-complex-workflows#using-a-build-matrix
+    runs-on: ubuntu-latest
+
+    steps:
+    - uses: actions/checkout@v4
+
+    - name: Install Dependencies
+      run: |
+        sudo dpkg --add-architecture armhf
+        sudo apt update
+        sudo apt install git make cmake unzip python3-jinja2 zenity gcc-arm-linux-gnueabihf g++-arm-linux-gnueabihf libopenal-dev:armhf libx11-dev:armhf libxrandr-dev:armhf libxinerama-dev:armhf libxcursor-dev:armhf libxi-dev:armhf libgl-dev:armhf libwayland-dev:armhf libpulse-dev:armhf libxkbcommon-dev:armhf libegl-dev:armhf
+
+    - name: Gather Submodules
+      run: git submodule update --init
+      
+    - name: Build
+      run: make build-arm
+
+    - name: Upload Artifact
+      uses: actions/upload-artifact@v4
+      with:
+        name: ninecraft
+        path: build-arm/ninecraft/ninecraft
