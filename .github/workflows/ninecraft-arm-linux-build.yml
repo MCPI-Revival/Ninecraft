@@ -27,17 +27,16 @@ jobs:
         apt update
         apt install -y git make cmake unzip python3-jinja2 zenity gcc-arm-linux-gnueabihf g++-arm-linux-gnueabihf libopenal-dev:armhf libx11-dev:armhf libxrandr-dev:armhf libxinerama-dev:armhf libxcursor-dev:armhf libxi-dev:armhf libgl-dev:armhf libwayland-dev:armhf libpulse-dev:armhf libxkbcommon-dev:armhf libegl-dev:armhf
 
-    - name: Gather Submodules
-      run: |
-        cd ${{github.workspace}}
-        git submodule update --init
+    - name: Clone Git Repo
+      run: git clone http://github.com/MCPI-Revival/Ninecraft --recursive
       
     - name: Build
       run: |
+        cd Ninecraft
         make build-arm
 
     - name: Upload Artifact
       uses: actions/upload-artifact@v4
       with:
         name: ninecraft
-        path: build-arm/ninecraft/ninecraft
+        path: Ninecraft/build-arm/ninecraft/ninecraft
