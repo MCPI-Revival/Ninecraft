@@ -29,7 +29,7 @@ jobs:
 
     - name: Gather Submodules
       run: |
-        cd $GITHUB_WORKSPACE
+        cd ${{github.workspace}}
         git submodule update --init
       
     - name: Build
