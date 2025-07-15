@@ -19,11 +19,14 @@ jobs:
     steps:
     - uses: actions/checkout@v4
 
-    - name: Install dependencies
+    - name: Install Dependencies
       run: |
         sudo dpkg --add-architecture i386
         sudo apt update
         sudo apt install git make cmake unzip python3-jinja2 zenity gcc g++ gcc-multilib g++-multilib libopenal-dev:i386 libx11-dev:i386 libxrandr-dev:i386 libxinerama-dev:i386 libxcursor-dev:i386 libxi-dev:i386 libgl-dev:i386 libwayland-dev:i386 libpulse-dev:i386 libxkbcommon-dev:i386 libegl-dev:i386
+
+    - name: Gather Submodules
+      run: git submodule update --init
       
     - name: Build
       run: make build-i686
