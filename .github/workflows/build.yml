@@ -25,6 +25,7 @@ jobs:
         contents: read 
       steps:
         - uses: actions/checkout@v4
+          if: matrix.arch != 'arm'
           with:
             submodules: true
 
