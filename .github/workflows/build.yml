@@ -67,13 +67,14 @@ jobs:
             ${{matrix.arch == 'i686' && 'sudo' || ''}} dpkg --add-architecture ${{steps.debian.outputs.arch}}
             ${{matrix.arch == 'i686' && 'sudo' || ''}} apt update -y
             ${{matrix.arch == 'i686' && 'sudo' || ''}} apt install -y git make cmake unzip python3-jinja2 zenity libopenal-dev:${{steps.debian.outputs.arch}} libx11-dev:${{steps.debian.outputs.arch}} libxrandr-dev:${{steps.debian.outputs.arch}} libxinerama-dev:${{steps.debian.outputs.arch}} libxcursor-dev:${{steps.debian.outputs.arch}} libxi-dev:${{steps.debian.outputs.arch}} libgl-dev:${{steps.debian.outputs.arch}} libwayland-dev:${{steps.debian.outputs.arch}} libpulse-dev:${{steps.debian.outputs.arch}} libxkbcommon-dev:${{steps.debian.outputs.arch}} libegl-dev:${{steps.debian.outputs.arch}}
+        
         - name: Install GCC-Multilib
           if: ${{matrix.target == 'ubuntu-latest' && matrix.arch == 'i686'}}
-          run: ${{matrix.arch == 'i386' && 'sudo' || ''}} apt install -y gcc g++ gcc-multilib g++-multilib
+          run: ${{matrix.arch == 'i686' && 'sudo' || ''}} apt install -y gcc g++ gcc-multilib g++-multilib
 
         - name: Install GCC-gnueabihf
           if: ${{matrix.target == 'ubuntu-latest' && matrix.arch == 'arm'}}
-          run: ${{matrix.arch == 'i386' && 'sudo' || ''}} apt install -y gcc-arm-linux-gnueabihf g++-arm-linux-gnueabihf
+          run: ${{matrix.arch == 'i686' && 'sudo' || ''}} apt install -y gcc-arm-linux-gnueabihf g++-arm-linux-gnueabihf
 
 
 
