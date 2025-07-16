@@ -14,14 +14,14 @@ jobs:
           fail-fast: false
           matrix:
               os: [windows-latest,ubuntu-latest]
-              arch: [i386,armhf]
-              packaging: [portable, deb, appimage]
+              arch: [i686,arm]
+              out: [portable, deb, appimage]
               exclude:
                 - os: windows
-              include: 
+              include:
                 - os: windows
-                  packaging: portable
-                  arch: i386
+                  out: portable
+                  arch: i686
       runs-on: ${{matrix.os}}
       steps:
         - uses: actions/checkout@v4
@@ -41,13 +41,43 @@ jobs:
         - name: Setup ${{matrix.arch}} build
           if: matrix.os == 'ubuntu-latest'
           run: |
-            sudo dpkg --add-architecture ${{matrix.arch}}
+            if [ "${{ matrix.arch }}" = "i686" ]; then
+              DEB_ARCH=i386
+            fi
+            if [ "${{ matrix.arch }}" = "arm" ]; then
+              DEB_ARCH=armf
+            fi
+            sudo dpkg --add-architecture ${DEB_ARCH}
             sudo apt update
-            sudo apt install git make cmake unzip python3-jinja2 zenity libopenal-dev:${{matrix.arch}} libx11-dev:${{matrix.arch}} libxrandr-dev:${{matrix.arch}} libxinerama-dev:${{matrix.arch}} libxcursor-dev:${{matrix.arch}} libxi-dev:${{matrix.arch}} libgl-dev:${{matrix.arch}} libwayland-dev:${{matrix.arch}} libpulse-dev:${{matrix.arch}} libxkbcommon-dev:${{matrix.arch}} libegl-dev:${{matrix.arch}}
+            sudo apt install git make cmake unzip python3-jinja2 zenity libopenal-dev:${DEB_ARCH}libx11-dev:${DEB_ARCH} libxrandr-dev:${DEB_ARCH}libxinerama-dev:${DEB_ARCH} libxcursor-dev:${DEB_ARCH} libxi-dev:${DEB_ARCH libgl-dev:${DEB_ARCH} libwayland-dev:${DEB_ARCH} libpulse-dev:${DEB_ARCH} libxkbcommon-dev:${DEB_ARCH} libegl-dev:${DEB_ARCH}
         - name: Install GCC
-          if: ${{matrix.os == 'ubuntu-latest' && matrix.arch == 'i386'}}
+          if: ${{matrix.os == 'ubuntu-latest' && matrix.arch == 'i686'}}
           run: sudo apt install gcc g++ gcc-multilib g++-multilib
 
         - name: Install GCC
-          if: ${{matrix.os == 'ubuntu-latest' && matrix.arch == 'armf'}}
+          if: ${{matrix.os == 'ubuntu-latest' && matrix.arch == 'arm'}}
           run: sudo apt install gcc-arm-linux-gnueabihf g++-arm-linux-gnueabihf
+
+
+        - name: Build ${{matrix.arch}}-${{matrix.os}}
+          if: matrix.os != 'windows-latest'
+          run: make build-${{matrix.arch}}
+
+        - name: Build ${{matrix.arch}}-${{matrix.os}}
+          if: matrix.os == 'windows-latest'
+          run: cmake --build ${{github.workspace}}/build --config ${{env.BUILD_TYPE}}
+
+
+        - name: Upload Artifact
+          uses: actions/upload-artifact@v4
+          if: matrix.os == 'windows'
+          with:
+            name: ninecraft-${{matrix.arch}}-${{matrix.os}}
+            path: build/${{ env.BUILD_TYPE }}/ninecraft/ninecraft.exe
+
+        - name: Upload Artifact
+          uses: actions/upload-artifact@v4
+          if: matrix.os != 'windows'
+          with:
+            name: ninecraft-${{matrix.arch}}-${{matrix.os}}
+            path: build${{matrix.arch}}/ninecraft/ninecraft.exe
