@@ -43,7 +43,7 @@ jobs:
               DEB_ARCH=i386
             fi
             if [ "${{ matrix.arch }}" = "arm" ]; then
-              DEB_ARCH=armf
+              DEB_ARCH=armhf
             fi
             sudo dpkg --add-architecture ${DEB_ARCH}
             sudo apt update
