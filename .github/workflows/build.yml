@@ -47,7 +47,7 @@ jobs:
             pip list
             pip show jinja2
             python3 -c "import sys; print(sys.path)"
-            python3 -c "import jinja"
+            python3 -c "import jinja2"
         
         - name: Get Debian Architecture
           id: debian
