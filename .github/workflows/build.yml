@@ -173,11 +173,13 @@ jobs:
           if: ${{matrix.target == 'ubuntu-latest'  }}
           run: |
             cp build-${{matrix.arch}}/ninecraft/ninecraft pkgs/arch
-        - name: Build Arch Linux package
-          uses: FFY00/build-arch-package@v1
-          with:
-            PKGBUILD: pkgs/arch/PKGBUILD
-            OUTDIR: $HOME
+            cd pkgs/arch
+            makepkg -si
+        # - name: Build Arch Linux package
+        #   uses: FFY00/build-arch-package@v1
+        #   with:
+        #     PKGBUILD: pkgs/arch/PKGBUILD
+        #     OUTDIR: $HOME
 
         - name: Upload Arch pkg
           if: ${{matrix.target == 'ubuntu-latest' }}
