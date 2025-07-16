@@ -13,33 +13,31 @@ jobs:
       strategy:
           fail-fast: false
           matrix:
-              os: [windows-latest,ubuntu-latest]
+              target: [ ubuntu-latest ]
               arch: [i686,arm]
-              out: [portable, deb, appimage]
-              exclude:
-                - os: windows
+              out: [portable, appimage, deb ]
               include:
-                - os: windows
-                  out: portable
+                - target: windows-latest
                   arch: i686
-      runs-on: ${{matrix.os}}
+                  out: portable
+      runs-on: ${{matrix.target}}
       steps:
         - uses: actions/checkout@v4
           with:
             submodules: true
         - name: Set up Python
-          if: matrix.os == 'windows-latest'
+          if: matrix.target == 'windows-latest'
           uses: actions/setup-python@v4
           with:
             python-version: '3.11'
         - name: Install Python dependencies
-          if: matrix.os == 'windows-latest'
+          if: matrix.target == 'windows-latest'
           run: |
             python -m pip install --upgrade pip
             python -m pip install jinja2
 
-        - name: Setup ${{matrix.arch}} build
-          if: matrix.os == 'ubuntu-latest'
+        - name: Setup APT ${{matrix.arch}}
+          if: matrix.target == 'ubuntu-latest'
           run: |
             if [ "${{ matrix.arch }}" = "i686" ]; then
               DEB_ARCH=i386
@@ -51,33 +49,54 @@ jobs:
             sudo apt update
             sudo apt install git make cmake unzip python3-jinja2 zenity libopenal-dev:${DEB_ARCH}libx11-dev:${DEB_ARCH} libxrandr-dev:${DEB_ARCH}libxinerama-dev:${DEB_ARCH} libxcursor-dev:${DEB_ARCH} libxi-dev:${DEB_ARCH libgl-dev:${DEB_ARCH} libwayland-dev:${DEB_ARCH} libpulse-dev:${DEB_ARCH} libxkbcommon-dev:${DEB_ARCH} libegl-dev:${DEB_ARCH}
         - name: Install GCC
-          if: ${{matrix.os == 'ubuntu-latest' && matrix.arch == 'i686'}}
+          if: ${{matrix.target == 'ubuntu-latest' && matrix.arch == 'i686'}}
           run: sudo apt install gcc g++ gcc-multilib g++-multilib
 
         - name: Install GCC
-          if: ${{matrix.os == 'ubuntu-latest' && matrix.arch == 'arm'}}
+          if: ${{matrix.target == 'ubuntu-latest' && matrix.arch == 'arm'}}
           run: sudo apt install gcc-arm-linux-gnueabihf g++-arm-linux-gnueabihf
 
 
-        - name: Build ${{matrix.arch}}-${{matrix.os}}
-          if: matrix.os != 'windows-latest'
+        - name: Build ${{matrix.arch}}-linux
+          if: matrix.target != 'windows-latest'
           run: make build-${{matrix.arch}}
 
-        - name: Build ${{matrix.arch}}-${{matrix.os}}
-          if: matrix.os == 'windows-latest'
-          run: cmake --build ${{github.workspace}}/build --config ${{env.BUILD_TYPE}}
+        - name: Build ${{matrix.arch}}-windows
+          if: matrix.target == 'windows-latest'
+          run:
+            | 
+            cmake -B ${{github.workspace}}/build -A Win32 -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} -DPYTHON_EXECUTABLE=${{env.pythonLocation}}/python.exe
+              cmake --build ${{github.workspace}}/build --config ${{env.BUILD_TYPE}}
 
+
+       
 
         - name: Upload Artifact
           uses: actions/upload-artifact@v4
-          if: matrix.os == 'windows'
+          if: ${{ matrix.target == 'windows-latest' && matrix.out == 'portable'}}
           with:
-            name: ninecraft-${{matrix.arch}}-${{matrix.os}}
+            name: ninecraft-${{matrix.arch}}-windows
             path: build/${{ env.BUILD_TYPE }}/ninecraft/ninecraft.exe
 
         - name: Upload Artifact
           uses: actions/upload-artifact@v4
-          if: matrix.os != 'windows'
+          if: ${{matrix.target == 'ubuntu-latest' && matrix.out == 'portable' }}
           with:
-            name: ninecraft-${{matrix.arch}}-${{matrix.os}}
-            path: build${{matrix.arch}}/ninecraft/ninecraft.exe
+            name: ninecraft-${{matrix.arch}}-linux
+            path: build${{matrix.arch}}/ninecraft/ninecraft
+            
+        - name: Build Deb
+          if: ${{matrix.target == 'ubuntu-latest' && matrix.out == 'deb' }}
+          run: |
+            mkdir -p pkgs/ninecraft/{usr/bin,usr/share/applications,DEBIAN}
+            cp build-i686/ninecraft/ninecraft pkgs/ninecraft/usr/bin
+            cp tools/extract.sh pkgs/ninecraft/usr/bin/ninecraft-extract
+            cp pkgs/deb/control pkgs/ninecraft/DEBIAN
+            dpkg-deb -b pkgs/ninecraft
+
+        - name: Upload Deb
+          if: ${{matrix.target == 'ubuntu-latest' && matrix.out == 'deb' }}
+          uses: actions/upload-artifact@v4
+          with:
+            name: ninecraft-${{matrix.arch}}-linux.deb
+            path: pkgs/ninecraft.deb
