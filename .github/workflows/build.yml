@@ -33,7 +33,6 @@ jobs:
           uses: actions/setup-python@v4
           with:
             python-version: '3.11'
-            update-environment: false
 
         - name: Install Python dependencies
           if: matrix.target == 'windows-latest'
@@ -47,6 +46,7 @@ jobs:
             pip list
             pip show jinja2
             python3 -c "import sys; print(sys.path)"
+            python3 -c "import jinja"
         
         - name: Get Debian Architecture
           id: debian
@@ -88,7 +88,7 @@ jobs:
 
        
 
-        - name: Upload Wondows
+        - name: Upload Windows
           uses: actions/upload-artifact@v4
           if: ${{ matrix.target == 'windows-latest' }}
           with:
