@@ -18,9 +18,10 @@ jobs:
               packaging: [portable, deb, appimage]
               exclude:
                 - os: windows
-                  packaging: deb
+              include: 
                 - os: windows
-                  packaging: appimage
+                  packaging: portable
+                  arch: i386
       runs-on: ${{matrix.os}}
       steps:
         - uses: actions/checkout@v4
