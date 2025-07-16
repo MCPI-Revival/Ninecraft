@@ -133,8 +133,9 @@ jobs:
           if: ${{matrix.target == 'ubuntu-latest'  }}
           run: |
             mkdir -p pkgs/deb/{usr/bin,usr/share/applications,DEBIAN}
+            mkdir -p pkgs/deb/usr/share/applications
             cp build-${{matrix.arch}}/ninecraft/ninecraft pkgs/deb/usr/bin
-            cp tools/extract.sh pkgs/ninecraft/usr/bin/ninecraft-extract
+            cp tools/extract.sh pkgs/pkgs/usr/bin/ninecraft-extract
             dpkg-deb -b pkgs/deb
 
         - name: Upload Deb
