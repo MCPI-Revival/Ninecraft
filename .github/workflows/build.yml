@@ -42,14 +42,14 @@ jobs:
             pip install jinja2
         
         - name: Get Debian Architecture
-          id: debian-arch
+          id: debian
           if: ${{matrix.target == 'ubuntu-latest'}}
           run: |
             if [ "${{ matrix.arch }}" = "i686" ]; then
-              echo "arch=i386" >> "$GITHUB_OUTPUT"
+              echo arch=i386 >> $GITHUB_OUTPUT
             fi
             if [ "${{ matrix.arch }}" = "arm" ]; then
-              echo "arch=armhf" >> "$GITHUB_OUTPUT"
+              echo arch=armhf >> $GITHUB_OUTPUT
             fi
 
         - name: Setup APT ${{matrix.arch}}
