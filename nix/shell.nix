@@ -1,16 +1,16 @@
 # compilation shell
-with import <nixpkgs> {};
+with (import <nixpkgs> {}).pkgsi686Linux;
   mkShell {
-    nativeBuildInputs = [
+    packages = [
+      gnumake
       pkg-config
       cmake
-    ];
-    buildInputs = [
+      libgcc
       python312Packages.jinja2
       zlib
       SDL2
-    ];
-    packages = [
-      make
+
+      # packaging
+      dpkg
     ];
   }

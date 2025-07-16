@@ -1,0 +1,2 @@
+HERE="$(dirname "$(readlink -f "${0}")")"
+EXEC=$HERE/usr/bin/ninecraft

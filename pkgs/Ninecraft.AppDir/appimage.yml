@@ -1,0 +1,9 @@
+AppDir:
+  app_info:
+    id: mcpi-revival.ninecraft
+    exec: usr/bin/ninecraft
+
+AppImage:
+  arch: x86_64
+  update-information: None
+  sign-key: None

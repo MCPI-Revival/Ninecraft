@@ -1,0 +1,9 @@
+[Desktop Entry]
+Name=Ninecraft
+Exec=ninecraft --game "~/.local/share/ninecraft" --home "~/.local/share/ninecraft"
+Icon=ninecraft
+Type=Application
+Categories=Game;AdventureGame
+Comment=A mcpe 0.1 .0 - 0.10 .5 launcher for linux and windows
+GenericName=MCPE Alpha Player
+Keywords=mcpe;android;mcpi;pocket;edition
