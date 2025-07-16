@@ -20,6 +20,8 @@ jobs:
                   arch: i686
                   out: portable
       runs-on: ${{matrix.target}}
+      permissions:
+        contents: read 
       steps:
         - uses: actions/checkout@v4
           with:
