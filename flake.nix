@@ -35,7 +35,10 @@
     mkPkgs = system:
       import nixpkgs {
         inherit system;
-        config.allowUnfree = true;
+        config = {
+          allowUnfree = true;
+          android_sdk.accept_license = true;
+        };
         overlays = [nixgl.overlay];
       };
   in
@@ -49,7 +52,9 @@
           # ancmp = ./ancmp;
         })
         // {
-          default = packages.ninecraft;
+          default = packages.buildNinecraftInstance {
+            version = packages.mcpeVersions.a0_6_1;
+          };
         };
       apps = {
         extract = {
@@ -58,9 +63,6 @@
         };
       };
       formatter = pkgs.alejandra;
-      devShell = pkgs.callPackage ./nix/shell.nix {
-        inherit (packages) ninecraft ninecraft-nixgl;
-      };
     })
     // {
       nixosModule = {pkgs, ...}: {
