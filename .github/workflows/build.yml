@@ -20,7 +20,7 @@ jobs:
                   arch: i686
                   out: portable
       runs-on: ${{matrix.target}}
-      # container: ${{ matrix.arch == 'arm' && matrix.target == 'ubuntu-latest' && 'debian:bookworm' || null }}
+      container: ${{ matrix.arch == 'arm' && matrix.target == 'ubuntu-latest' && 'debian:bookworm' || null }}
       permissions:
         contents: read 
       steps:
@@ -73,6 +73,11 @@ jobs:
         - name: Install GCC-gnueabihf
           if: ${{matrix.target == 'ubuntu-latest' && matrix.arch == 'arm'}}
           run: sudo apt install gcc-arm-linux-gnueabihf g++-arm-linux-gnueabihf
+
+
+
+        - if: matrix.arch == 'arm'
+          run: git clone http://github.com/MCPI-Revival/Ninecraft . --recursive
 
 
         - name: Build ${{matrix.arch}}-linux
