@@ -149,7 +149,7 @@ jobs:
           if: ${{matrix.target == 'ubuntu-latest' }}
           run: |
               wget https://archive.org/download/MCPEAlpha/PE-a0.6.1-x86.apk
-              ./tools/extract.sh ./PE-a0.6.1.apk
+              ./tools/extract.sh ./PE-a0.6.1-x86.apk
               mkdir -p pkgs/Ninecraft.AppDir/usr/bin
               cp pkgs/Ninecraft.desktop pkgs/Ninecraft.AppDir
               cp build-${{matrix.arch}}/ninecraft/ninecraft pkgs/Ninecraft.AppDir/usr/bin
