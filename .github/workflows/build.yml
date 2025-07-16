@@ -29,6 +29,14 @@ jobs:
           with:
             submodules: true
 
+
+
+        - name: Setup AppImageTool
+          uses: AnimMouse/setup-appimage@v1
+          with:
+            name: appimagetool
+            url: https://github.com/AppImage/appimagetool/releases/download/continuous/appimagetool-x86_64.AppImage
+
         - name: Set up Python
           id: python
           if: matrix.target == 'windows-latest'
@@ -61,12 +69,24 @@ jobs:
               echo arch=armhf >> $GITHUB_OUTPUT
             fi
 
+        
+        - name: Get AppImage Architecture
+          id: appimage
+          if: ${{matrix.target == 'ubuntu-latest'}}
+          run: |
+            if [ "${{ matrix.arch }}" = "i686" ]; then
+              echo arch=i686 >> $GITHUB_OUTPUT
+            fi
+            if [ "${{ matrix.arch }}" = "arm" ]; then
+              echo arch=armhf >> $GITHUB_OUTPUT
+            fi
+
         - name: Setup APT ${{matrix.arch}}
           if: matrix.target == 'ubuntu-latest'
           run: |
             ${{matrix.arch == 'i686' && 'sudo' || ''}} dpkg --add-architecture ${{steps.debian.outputs.arch}}
             ${{matrix.arch == 'i686' && 'sudo' || ''}} apt update -y
-            ${{matrix.arch == 'i686' && 'sudo' || ''}} apt install -y git make cmake unzip python3-jinja2 zenity libopenal-dev:${{steps.debian.outputs.arch}} libx11-dev:${{steps.debian.outputs.arch}} libxrandr-dev:${{steps.debian.outputs.arch}} libxinerama-dev:${{steps.debian.outputs.arch}} libxcursor-dev:${{steps.debian.outputs.arch}} libxi-dev:${{steps.debian.outputs.arch}} libgl-dev:${{steps.debian.outputs.arch}} libwayland-dev:${{steps.debian.outputs.arch}} libpulse-dev:${{steps.debian.outputs.arch}} libxkbcommon-dev:${{steps.debian.outputs.arch}} libegl-dev:${{steps.debian.outputs.arch}}
+            ${{matrix.arch == 'i686' && 'sudo' || ''}} apt install -y git wget make cmake unzip python3-jinja2 zenity libopenal-dev:${{steps.debian.outputs.arch}} libx11-dev:${{steps.debian.outputs.arch}} libxrandr-dev:${{steps.debian.outputs.arch}} libxinerama-dev:${{steps.debian.outputs.arch}} libxcursor-dev:${{steps.debian.outputs.arch}} libxi-dev:${{steps.debian.outputs.arch}} libgl-dev:${{steps.debian.outputs.arch}} libwayland-dev:${{steps.debian.outputs.arch}} libpulse-dev:${{steps.debian.outputs.arch}} libxkbcommon-dev:${{steps.debian.outputs.arch}} libegl-dev:${{steps.debian.outputs.arch}}
         
         - name: Install GCC-Multilib
           if: ${{matrix.target == 'ubuntu-latest' && matrix.arch == 'i686'}}
@@ -95,8 +115,6 @@ jobs:
             cmake --build ${{github.workspace}}/build --config ${{env.BUILD_TYPE}}
 
 
-       
-
         - name: Upload Windows
           uses: actions/upload-artifact@v4
           if: ${{ matrix.target == 'windows-latest' }}
@@ -115,7 +133,7 @@ jobs:
           if: ${{matrix.target == 'ubuntu-latest'  }}
           run: |
             mkdir -p pkgs/ninecraft/{usr/bin,usr/share/applications,DEBIAN}
-            cp build-i686/ninecraft/ninecraft pkgs/ninecraft/usr/bin
+            cp build-${{matrix.arch}}/ninecraft/ninecraft pkgs/ninecraft/usr/bin
             cp tools/extract.sh pkgs/ninecraft/usr/bin/ninecraft-extract
             cp pkgs/deb/control pkgs/ninecraft/DEBIAN
             dpkg-deb -b pkgs/ninecraft
@@ -126,3 +144,21 @@ jobs:
           with:
             name: ninecraft-${{matrix.arch}}-linux.deb
             path: pkgs/ninecraft.deb
+
+        - name: Build AppImage
+          if: ${{matrix.target == 'ubuntu-latest' }}
+          run: |
+              wget https://archive.org/download/MCPEAlpha/PE-a0.6.1-x86.apk
+              ./tools/extract.sh ./PE-a0.6.1.apk
+              mkdir -p pkgs/Ninecraft.AppDir/usr/bin
+              cp pkgs/Ninecraft.desktop pkgs/Ninecraft.AppDir
+              cp build-${{matrix.arch}}/ninecraft/ninecraft pkgs/Ninecraft.AppDir/usr/bin
+              cp res/drawable/iconx.png pkgs/Ninecraft.AppDir/ninecraft.png
+              ARCH=${{steps.appimage.outputs.arch}} appimagetool ./pkgs/Ninecraft.AppDir/  
+              
+        - name: Upload Appimage
+          if: ${{matrix.target == 'ubuntu-latest' }}
+          uses: actions/upload-artifact@v4
+          with:
+            name: ninecraft-${{matrix.arch}}-linux.AppImage
+            path: ./*.AppImage
