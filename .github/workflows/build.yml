@@ -31,12 +31,7 @@ jobs:
 
 
 
-        - name: Setup AppImageTool
-          uses: AnimMouse/setup-appimage@v1
-          with:
-            name: appimagetool
-            url: https://github.com/AppImage/appimagetool/releases/download/continuous/appimagetool-x86_64.AppImage
-
+       
         - name: Set up Python
           id: python
           if: matrix.target == 'windows-latest'
@@ -96,7 +91,12 @@ jobs:
           if: ${{matrix.target == 'ubuntu-latest' && matrix.arch == 'arm'}}
           run: ${{matrix.arch == 'i686' && 'sudo' || ''}} apt install -y gcc-arm-linux-gnueabihf g++-arm-linux-gnueabihf
 
-
+        - name: Setup AppImageTool
+          if: ${{matrix.target == 'ubuntu-latest' }}
+          uses: AnimMouse/setup-appimage@v1
+          with:
+            name: appimagetool
+            url: https://github.com/AppImage/appimagetool/releases/download/continuous/appimagetool-x86_64.AppImage
 
 
         - if: matrix.arch == 'arm'
@@ -155,7 +155,7 @@ jobs:
               cp build-${{matrix.arch}}/ninecraft/ninecraft pkgs/Ninecraft.AppDir/usr/bin
               cp res/drawable/iconx.png pkgs/Ninecraft.AppDir/ninecraft.png
               ARCH=${{steps.appimage.outputs.arch}} appimagetool ./pkgs/Ninecraft.AppDir/  
-              
+
         - name: Upload Appimage
           if: ${{matrix.target == 'ubuntu-latest' }}
           uses: actions/upload-artifact@v4
