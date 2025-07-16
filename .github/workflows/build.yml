@@ -132,8 +132,11 @@ jobs:
         - name: Build Deb
           if: ${{matrix.target == 'ubuntu-latest'  }}
           run: |
+            ls -al
             mkdir -p pkgs/deb/usr/bin
             mkdir -p pkgs/deb/usr/share/applications
+            ls -al pkgs
+            ls -al pkgs/deb
             cp build-${{matrix.arch}}/ninecraft/ninecraft pkgs/deb/usr/bin
             cp tools/extract.sh pkgs/deb/usr/bin/ninecraft-extract
             dpkg-deb -b pkgs/deb
