@@ -53,11 +53,20 @@ jobs:
         name: ninecraft.deb
         path: pkgs/ninecraft.deb
 
+
+    - name: Setup AppImageTool
+      uses: AnimMouse/setup-appimage@v1
+      with:
+        name: appimagetoool
+        url: https://github.com/AppImage/appimagetool/releases/download/continuous/appimagetool-x86_64.AppImage
+
     - name: Build Appimage
       run: |
           mkdir -p pkgs/Ninecraft.AppDir/usr/bin
           cp build-i686/ninecraft/ninecraft pkgs/Ninecraft.AppDir/usr/bin
-    - name: "Create AppImage"
-      uses: AppImageCrafters/build-appimage@master
+          ARCH=X86_64 appimagetool ./pkgs/Ninecraft.AppDir/  
+    - name: Upload Appimage
+      uses: actions/upload-artifact@v4
       with:
-        recipe: "./pkgs/Ninecraft.AppDir/appimage.yml"
+        name: ninecraft.AppImage
+        path: ./*.AppImage

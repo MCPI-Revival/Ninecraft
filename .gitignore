@@ -30,3 +30,4 @@ result
 result*
 *.deb
 /pkgs/ninecraft/*/bin
+pkgs/Ninecraft.AppDir/.DirIcon
