@@ -57,7 +57,7 @@ jobs:
     - name: Setup AppImageTool
       uses: AnimMouse/setup-appimage@v1
       with:
-        name: appimagetoool
+        name: appimagetool
         url: https://github.com/AppImage/appimagetool/releases/download/continuous/appimagetool-x86_64.AppImage
 
     - name: Build Appimage
