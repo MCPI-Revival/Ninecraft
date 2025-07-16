@@ -16,8 +16,8 @@
   mods ? [],
   options ? null,
   version ? mcpeVersions.a0_6_1,
-  useNixGL ? !stdenvNoCC
-.isNixOS,
+  useNixGL ? false,
+  ...
 }: let
   optionsTxtContent = lib.concatStringsSep "\n" (
     lib.mapAttrsToList (
@@ -52,7 +52,7 @@
     )
   );
   optionsTxt = writeText "options.txt" optionsTxtContent;
-  startScript = writeShellScript "start-ninecraft-instance.sh" ''
+  startScript = writeShellScript "start-ninecraft-${name}.sh" ''
     homeDir=${homeDir}
     ${
       lib.optionalString (gameDir != null) ''
@@ -84,12 +84,15 @@
     # Mods
     ${lib.concatMapStrings (mod: "cp -r ${mod}/* $homeDir") mods}
 
-    ${lib.optionalString useNixGL "\"${nixgl.auto.nixGLDefault}\"/bin/nixGL "}${lib.getExe
-      ninecraft}" --game "${
+    ${lib.optionalString useNixGL "\"${nixgl.auto.nixGLDefault}\" \\:quit"}
+    "${lib.getExe ninecraft}" \
+     --game "${
       if (isNull gameDir)
       then version
       else "$gameDir"
-    }" --home "$homeDir" "$@"
+    }" \
+     --home "$homeDir" \
+     "$@"
   '';
 in
   stdenvNoCC.mkDerivation {

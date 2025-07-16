@@ -2,11 +2,11 @@
   pkgs,
   config,
   lib,
+  osConfig ? null,
   ...
 }: let
   cfg = config.programs.ninecraft;
   types = lib.types;
-  ncPkgs = import ../pkgs {inherit pkgs;};
   mkOptDef = default: lib.mkOption {inherit default;};
   mkOptType = type: lib.mkOption {inherit type;};
   mkOptNamed = options:
@@ -34,7 +34,7 @@ in {
       };
       apk = lib.mkOption {
         type = types.nullOr (types.package);
-        default = ncPkgs.mcpeVersions.a0_6_1;
+        default = pkgs.mcpeVersions.a0_6_1;
       };
       mods = lib.mkOption {
         type = types.listOf types.package;
@@ -44,15 +44,15 @@ in {
   };
 
   config = lib.mkIf cfg.enable {
-    # nixpkgs.overlays = [
-    #   (final: prev: import ../pkgs {pkgs = prev;})
-    # ];
+    nixpkgs.overlays = lib.mkIf (!(osConfig.home-manager.useGlobalPkgs or false)) [
+      (new: old: import ../. {pkgs = new;})
+    ];
     home.packages = builtins.map (
       name: let
         inCfg = cfg.instances.${name};
-        version = inCfg.apk or ncPkgs.mcpeVersions."a${lib.replaceStrings ["."] ["_"] cfg.version}";
+        version = inCfg.apk or pkgs.mcpeVersions."a${lib.replaceStrings ["."] ["_"] cfg.version}";
       in
-        ncPkgs.buildNinecraftInstance (inCfg
+        pkgs.buildNinecraftInstance (inCfg
           // {
             inherit name version;
             homeDir = "~/.local/share/ninecraft/instances/${name}";

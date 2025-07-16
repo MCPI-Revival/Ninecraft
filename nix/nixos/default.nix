@@ -19,8 +19,8 @@ in {
   };
 
   config = lib.mkIf cfg.enable {
-    nixpkgs.overlays = with ninecraftpkgs; [
-      overlay
+    nixpkgs.overlays = [
+      (new: old: import ../. {pkgs = new;})
     ];
     environment.systemPackages = with pkgs; [
       cfg.package
