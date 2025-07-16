@@ -152,7 +152,7 @@ jobs:
               ./tools/extract.sh ./PE-a0.6.1-x86.apk
               mkdir -p pkgs/appimage/usr/bin
               cp build-${{matrix.arch}}/ninecraft/ninecraft pkgs/appimage/usr/bin
-              cp res/drawable/iconx.png pkgs/Nappimage/ninecraft.png
+              cp res/drawable/iconx.png pkgs/appimage/ninecraft.png
               ARCH=${{steps.appimage.outputs.arch}} appimagetool ./pkgs/appimage/  
 
         - name: Upload Appimage
