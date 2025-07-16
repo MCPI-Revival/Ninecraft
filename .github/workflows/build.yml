@@ -150,9 +150,9 @@ jobs:
           run: |
               wget https://archive.org/download/MCPEAlpha/PE-a0.6.1-x86.apk
               ./tools/extract.sh ./PE-a0.6.1-x86.apk
-              mkdir -p pkgs/Ninecraft.AppDir/usr/bin
+              mkdir -p pkgs/appimage/usr/bin
               cp build-${{matrix.arch}}/ninecraft/ninecraft pkgs/appimage/usr/bin
-              cp res/drawable/iconx.png pkgs/Ninecraft.AppDir/ninecraft.png
+              cp res/drawable/iconx.png pkgs/Nappimage/ninecraft.png
               ARCH=${{steps.appimage.outputs.arch}} appimagetool ./pkgs/appimage/  
 
         - name: Upload Appimage
