@@ -47,7 +47,7 @@ jobs:
             fi
             sudo dpkg --add-architecture ${DEB_ARCH}
             sudo apt update
-            sudo apt install git make cmake unzip python3-jinja2 zenity libopenal-dev:${DEB_ARCH}libx11-dev:${DEB_ARCH} libxrandr-dev:${DEB_ARCH}libxinerama-dev:${DEB_ARCH} libxcursor-dev:${DEB_ARCH} libxi-dev:${DEB_ARCH libgl-dev:${DEB_ARCH} libwayland-dev:${DEB_ARCH} libpulse-dev:${DEB_ARCH} libxkbcommon-dev:${DEB_ARCH} libegl-dev:${DEB_ARCH}
+            sudo apt install git make cmake unzip python3-jinja2 zenity libopenal-dev:${DEB_ARCH} libx11-dev:${DEB_ARCH} libxrandr-dev:${DEB_ARCH} libxinerama-dev:${DEB_ARCH} libxcursor-dev:${DEB_ARCH} libxi-dev:${DEB_ARCH} libgl-dev:${DEB_ARCH} libwayland-dev:${DEB_ARCH} libpulse-dev:${DEB_ARCH} libxkbcommon-dev:${DEB_ARCH} libegl-dev:${DEB_ARCH}
         - name: Install GCC
           if: ${{matrix.target == 'ubuntu-latest' && matrix.arch == 'i686'}}
           run: sudo apt install gcc g++ gcc-multilib g++-multilib
