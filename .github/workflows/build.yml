@@ -15,7 +15,6 @@ jobs:
           matrix:
               target: [ ubuntu-latest ]
               arch: [i686,arm]
-              out: [portable, appimage, deb ]
               include:
                 - target: windows-latest
                   arch: i686
@@ -25,34 +24,43 @@ jobs:
         - uses: actions/checkout@v4
           with:
             submodules: true
+
         - name: Set up Python
+          id: python
           if: matrix.target == 'windows-latest'
           uses: actions/setup-python@v4
           with:
             python-version: '3.11'
+            update-environment: false
+
         - name: Install Python dependencies
           if: matrix.target == 'windows-latest'
           run: |
             python -m pip install --upgrade pip
-            python -m pip install jinja2
+            pip install jinja2
+        
+        - name: Get Debian Architecture
+          id: debian-arch
+          if: ${{matrix.target == 'ubuntu-latest'}}
+          run: |
+            if [ "${{ matrix.arch }}" = "i686" ]; then
+              echo "arch=i386" >> "$GITHUB_OUTPUT"
+            fi
+            if [ "${{ matrix.arch }}" = "arm" ]; then
+              echo "arch=armhf" >> "$GITHUB_OUTPUT"
+            fi
 
         - name: Setup APT ${{matrix.arch}}
           if: matrix.target == 'ubuntu-latest'
           run: |
-            if [ "${{ matrix.arch }}" = "i686" ]; then
-              DEB_ARCH=i386
-            fi
-            if [ "${{ matrix.arch }}" = "arm" ]; then
-              DEB_ARCH=armhf
-            fi
-            sudo dpkg --add-architecture ${DEB_ARCH}
+            sudo dpkg --add-architecture ${{steps.debian-arch-outputs.arch}}
             sudo apt update
-            sudo apt install git make cmake unzip python3-jinja2 zenity libopenal-dev:${DEB_ARCH} libx11-dev:${DEB_ARCH} libxrandr-dev:${DEB_ARCH} libxinerama-dev:${DEB_ARCH} libxcursor-dev:${DEB_ARCH} libxi-dev:${DEB_ARCH} libgl-dev:${DEB_ARCH} libwayland-dev:${DEB_ARCH} libpulse-dev:${DEB_ARCH} libxkbcommon-dev:${DEB_ARCH} libegl-dev:${DEB_ARCH}
-        - name: Install GCC
+            sudo apt install git make cmake unzip python3-jinja2 zenity libopenal-dev:${{steps.debian-arch-outputs.arch}} libx11-dev:${{steps.debian-arch-outputs.arch}} libxrandr-dev:${{steps.debian-arch-outputs.arch}} libxinerama-dev:${{steps.debian-arch-outputs.arch}} libxcursor-dev:${{steps.debian-arch-outputs.arch}} libxi-dev:${{steps.debian-arch-outputs.arch}} libgl-dev:${{steps.debian-arch-outputs.arch}} libwayland-dev:${{steps.debian-arch-outputs.arch}} libpulse-dev:${{steps.debian-arch-outputs.arch}} libxkbcommon-dev:${{steps.debian-arch-outputs.arch}} libegl-dev:${{steps.debian-arch-outputs.arch}}
+        - name: Install GCC-Multilib
           if: ${{matrix.target == 'ubuntu-latest' && matrix.arch == 'i686'}}
           run: sudo apt install gcc g++ gcc-multilib g++-multilib
 
-        - name: Install GCC
+        - name: Install GCC-gnueabihf
           if: ${{matrix.target == 'ubuntu-latest' && matrix.arch == 'arm'}}
           run: sudo apt install gcc-arm-linux-gnueabihf g++-arm-linux-gnueabihf
 
@@ -65,28 +73,28 @@ jobs:
           if: matrix.target == 'windows-latest'
           run:
             | 
-            cmake -B ${{github.workspace}}/build -A Win32 -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} -DPYTHON_EXECUTABLE=${{env.pythonLocation}}/python.exe
-              cmake --build ${{github.workspace}}/build --config ${{env.BUILD_TYPE}}
+            cmake -B ${{github.workspace}}/build -A Win32 -DCMAKE_BUILD_TYPE=${{env.BUILD_TYPE}} -DPYTHON_EXECUTABLE=${{steps.python.outputs.python-path}}
+            cmake --build ${{github.workspace}}/build --config ${{env.BUILD_TYPE}}
 
 
        
 
-        - name: Upload Artifact
+        - name: Upload Wondows
           uses: actions/upload-artifact@v4
-          if: ${{ matrix.target == 'windows-latest' && matrix.out == 'portable'}}
+          if: ${{ matrix.target == 'windows-latest' }}
           with:
             name: ninecraft-${{matrix.arch}}-windows
             path: build/${{ env.BUILD_TYPE }}/ninecraft/ninecraft.exe
 
-        - name: Upload Artifact
+        - name: Upload Linux
           uses: actions/upload-artifact@v4
-          if: ${{matrix.target == 'ubuntu-latest' && matrix.out == 'portable' }}
+          if: ${{matrix.target != 'windows-latest'  }}
           with:
             name: ninecraft-${{matrix.arch}}-linux
             path: build${{matrix.arch}}/ninecraft/ninecraft
             
         - name: Build Deb
-          if: ${{matrix.target == 'ubuntu-latest' && matrix.out == 'deb' }}
+          if: ${{matrix.target == 'ubuntu-latest'  }}
           run: |
             mkdir -p pkgs/ninecraft/{usr/bin,usr/share/applications,DEBIAN}
             cp build-i686/ninecraft/ninecraft pkgs/ninecraft/usr/bin
@@ -95,7 +103,7 @@ jobs:
             dpkg-deb -b pkgs/ninecraft
 
         - name: Upload Deb
-          if: ${{matrix.target == 'ubuntu-latest' && matrix.out == 'deb' }}
+          if: ${{matrix.target == 'ubuntu-latest' }}
           uses: actions/upload-artifact@v4
           with:
             name: ninecraft-${{matrix.arch}}-linux.deb
