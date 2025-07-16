@@ -1,3 +1,5 @@
+version: 1
+
 AppDir:
   app_info:
     id: mcpi-revival.ninecraft
