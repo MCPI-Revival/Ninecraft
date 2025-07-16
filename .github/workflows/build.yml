@@ -101,6 +101,7 @@ jobs:
 
         - if: matrix.arch == 'arm'
           run: |
+            git config --global --add safe.directory /__w/Ninecraft/Ninecraft
             git clone http://github.com/$GITHUB_REPOSITORY . --recursive
             git switch $GITHUB_REF_NAME
 
