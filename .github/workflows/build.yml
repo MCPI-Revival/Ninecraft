@@ -25,7 +25,7 @@ jobs:
         contents: read 
       steps:
         - uses: actions/checkout@v4
-          if: matrix.arch != 'arm' || matrix.arch != 'ubuntu-latest'
+          if: matrix.arch != 'arm' || matrix.target != 'ubuntu-latest'
           with:
             submodules: true
 
