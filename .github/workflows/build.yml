@@ -174,7 +174,7 @@ jobs:
           run: |
             cp build-${{matrix.arch}}/ninecraft/ninecraft pkgs/arch
             cd pkgs/arch
-            makepkg -si
+            makepkg -si --nobuild
         # - name: Build Arch Linux package
         #   uses: FFY00/build-arch-package@v1
         #   with:

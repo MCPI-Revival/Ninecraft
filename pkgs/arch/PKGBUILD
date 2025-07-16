@@ -36,12 +36,12 @@ md5sums=('SKIP')
 
 
 
-build() {
+# build() {
 
-}
+# }
 
 package () {
- projectPath=$(cat project-path)
-mkdir -p "$pkgdir/usr/"{"bin","share/applications"}
-install -Dm755 $projectPath/ninecraft $pkgdir/usr/bin
+ 	projectPath=$(cat project-path)
+	mkdir -p "$pkgdir/usr/"{"bin","share/applications"}
+	install -Dm755 $projectPath/ninecraft $pkgdir/usr/bin
 }
