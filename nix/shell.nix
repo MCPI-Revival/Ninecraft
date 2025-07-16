@@ -12,5 +12,6 @@ with (import <nixpkgs> {}).pkgsi686Linux;
 
       # packaging
       dpkg
+      pacman
     ];
   }

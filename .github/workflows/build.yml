@@ -132,18 +132,17 @@ jobs:
         - name: Build Deb
           if: ${{matrix.target == 'ubuntu-latest'  }}
           run: |
-            mkdir -p pkgs/ninecraft/{usr/bin,usr/share/applications,DEBIAN}
-            cp build-${{matrix.arch}}/ninecraft/ninecraft pkgs/ninecraft/usr/bin
+            mkdir -p pkgs/deb/{usr/bin,usr/share/applications,DEBIAN}
+            cp build-${{matrix.arch}}/ninecraft/ninecraft pkgs/deb/usr/bin
             cp tools/extract.sh pkgs/ninecraft/usr/bin/ninecraft-extract
-            cp pkgs/deb/control pkgs/ninecraft/DEBIAN
-            dpkg-deb -b pkgs/ninecraft
+            dpkg-deb -b pkgs/deb
 
         - name: Upload Deb
           if: ${{matrix.target == 'ubuntu-latest' }}
           uses: actions/upload-artifact@v4
           with:
             name: ninecraft-${{matrix.arch}}-linux.deb
-            path: pkgs/ninecraft.deb
+            path: pkgs/deb.deb
 
         - name: Build AppImage
           if: ${{matrix.target == 'ubuntu-latest' }}
@@ -151,10 +150,9 @@ jobs:
               wget https://archive.org/download/MCPEAlpha/PE-a0.6.1-x86.apk
               ./tools/extract.sh ./PE-a0.6.1-x86.apk
               mkdir -p pkgs/Ninecraft.AppDir/usr/bin
-              cp pkgs/Ninecraft.desktop pkgs/Ninecraft.AppDir
-              cp build-${{matrix.arch}}/ninecraft/ninecraft pkgs/Ninecraft.AppDir/usr/bin
+              cp build-${{matrix.arch}}/ninecraft/ninecraft pkgs/appimage/usr/bin
               cp res/drawable/iconx.png pkgs/Ninecraft.AppDir/ninecraft.png
-              ARCH=${{steps.appimage.outputs.arch}} appimagetool ./pkgs/Ninecraft.AppDir/  
+              ARCH=${{steps.appimage.outputs.arch}} appimagetool ./pkgs/appimage/  
 
         - name: Upload Appimage
           if: ${{matrix.target == 'ubuntu-latest' }}
@@ -162,3 +160,21 @@ jobs:
           with:
             name: ninecraft-${{matrix.arch}}-linux.AppImage
             path: ./*.AppImage
+
+
+        - name: Build Arch pkg
+          if: ${{matrix.target == 'ubuntu-latest'  }}
+          run: |
+            cp build-${{matrix.arch}}/ninecraft/ninecraft pkgs/arch
+        - name: Build Arch Linux package
+          uses: FFY00/build-arch-package@v1
+          with:
+            PKGBUILD: pkgs/arch/PKGBUILD
+            OUTDIR: $HOME
+
+        - name: Upload Arch pkg
+          if: ${{matrix.target == 'ubuntu-latest' }}
+          uses: actions/upload-artifact@v4
+          with:
+            name: ninecraft-${{matrix.arch}}-linux.pkgs.tar
+            path: ninecraft.pkg.tar
