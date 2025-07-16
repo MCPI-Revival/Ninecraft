@@ -18,7 +18,7 @@ jobs:
 
     steps:
     - uses: actions/checkout@v4
-	  submodules: true
+      submodules: true
 
     - name: Install Dependencies
       run: |
@@ -26,7 +26,7 @@ jobs:
         sudo apt update
         sudo apt install git make cmake unzip python3-jinja2 zenity gcc g++ gcc-multilib g++-multilib libopenal-dev:i386 libx11-dev:i386 libxrandr-dev:i386 libxinerama-dev:i386 libxcursor-dev:i386 libxi-dev:i386 libgl-dev:i386 libwayland-dev:i386 libpulse-dev:i386 libxkbcommon-dev:i386 libegl-dev:i386
 
-	# not needed because the about actions/checkout has that funtionality: https://github.com/actions/checkout?tab=readme-ov-file#usage
+    # not needed because the about actions/checkout has that funtionality: https://github.com/actions/checkout?tab=readme-ov-file#usage
     # - name: Gather Submodules
     #   run: git submodule update --init
       
