@@ -40,6 +40,13 @@ jobs:
           run: |
             python -m pip install --upgrade pip
             pip install jinja2
+
+        - name: check python
+          if: matrix.target == 'windows-latest'
+          run: |
+            pip list
+            pip show jinja2
+            python3 -c "import sys; print(sys.path)"
         
         - name: Get Debian Architecture
           id: debian
