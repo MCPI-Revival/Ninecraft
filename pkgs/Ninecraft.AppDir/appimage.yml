@@ -4,7 +4,7 @@ AppDir:
   app_info:
     id: mcpi-revival.ninecraft
     exec: usr/bin/ninecraft
-
+    version: 1.2.0
 AppImage:
   arch: x86_64
   update-information: None
