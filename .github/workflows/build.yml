@@ -1,0 +1,51 @@
+name: Ninecraft build
+
+on:
+  workflow_dispatch:
+    
+env:
+  # Customize the CMake build type here (Release, Debug, RelWithDebInfo, etc.)
+  BUILD_TYPE: Release
+
+jobs:
+    build:
+      runs-on: ${{matrix.os}}
+      strategy:
+          fail-fast: false
+          matrix:
+              os: [windows-latest,ubuntu-latest]
+              arch: [i386,armhf]
+              packaging: [portable, deb, appimage]
+              exclude:
+                - os: windows
+                  packaging: deb
+                - os: windows
+                  packaging: appimage
+      steps:
+        - uses: actions/checkout@v4
+          with:
+            submodules: true
+        - name: Set up Python
+          if: matrix.os == 'windows-latest'
+          uses: actions/setup-python@v4
+          with:
+            python-version: '3.11'
+        - name: Install Python dependencies
+          if: matrix.os == 'windows-latest'
+          run: |
+            python -m pip install --upgrade pip
+            python -m pip install jinja2
+
+        - name: Setup ${{matrix.arch}} build
+          if: matrix.os == 'ubuntu-latest'
+          run: |
+            sudo dpkg --add-architecture ${{matrix.arch}}
+            sudo apt update
+            sudo apt install git make cmake unzip python3-jinja2 zenity libopenal-dev:${{matrix.arch}} libx11-dev:${{matrix.arch}} libxrandr-dev:${{matrix.arch}} libxinerama-dev:${{matrix.arch}} libxcursor-dev:${{matrix.arch}} libxi-dev:${{matrix.arch}} libgl-dev:${{matrix.arch}} libwayland-dev:${{matrix.arch}} libpulse-dev:${{matrix.arch}} libxkbcommon-dev:${{matrix.arch}} libegl-dev:${{matrix.arch}}
+        - name: Install GCC
+          if: ${{matrix.os == 'ubuntu-latest' && matrix.arch == 'i386'}}
+          run: sudo apt install gcc g++ gcc-multilib g++-multilib
+
+        - name: Install GCC
+          if: ${{matrix.os == 'ubuntu-latest' && matrix.arch == 'armf'}}
+          run: sudo apt install gcc-arm-linux-gnueabihf g++-arm-linux-gnueabihf
