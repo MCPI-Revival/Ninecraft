@@ -127,7 +127,7 @@ jobs:
           if: ${{matrix.target != 'windows-latest'  }}
           with:
             name: ninecraft-${{matrix.arch}}-linux
-            path: build${{matrix.arch}}/ninecraft/ninecraft
+            path: build-${{matrix.arch}}/ninecraft/ninecraft
             
         - name: Build Deb
           if: ${{matrix.target == 'ubuntu-latest'  }}
