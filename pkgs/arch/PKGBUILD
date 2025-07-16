@@ -2,6 +2,7 @@ projectName=ninecraft
 
 pkgname=$projectName
 pkgrel=1
+pkgver="1.2.0"
 pkgpsc="A mcpe 0.1 .0 - 0.10 .5 launcher for linux and windows"
 arch=("any")
 url=""
