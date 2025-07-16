@@ -60,4 +60,4 @@ jobs:
     - name: "Create AppImage"
       uses: AppImageCrafters/build-appimage@master
       with:
-        recipe: "./pkgs/Ninecraft.AppDir"
+        recipe: "./pkgs/Ninecraft.AppDir/appimage.yml"
