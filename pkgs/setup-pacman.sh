@@ -1,5 +1,4 @@
-#!/bin/bash
-set -euxo pipefail
+#!/bin/sh 
 
 # 1. Ensure pacman dirs exist
 mkdir -p /etc/pacman.d /var/lib/pacman /var/cache/pacman/pkg
