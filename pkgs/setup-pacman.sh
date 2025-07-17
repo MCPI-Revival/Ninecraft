@@ -23,6 +23,7 @@ EOF
 
 # 3. Initialize and populate keyring (force reinstall in case of damage)
 pacman-key --init
+pacman -Syy
 pacman-key --populate archlinux || true
 pacman -Sy --noconfirm archlinux-keyring || true
 
