@@ -18,6 +18,8 @@ jobs:
 
     steps:
     - uses: actions/checkout@v4
+      with:
+       submodules: true
 
     - name: Install Dependencies
       run: |
@@ -25,8 +27,9 @@ jobs:
         sudo apt update
         sudo apt install git make cmake unzip python3-jinja2 zenity gcc g++ gcc-multilib g++-multilib libopenal-dev:i386 libx11-dev:i386 libxrandr-dev:i386 libxinerama-dev:i386 libxcursor-dev:i386 libxi-dev:i386 libgl-dev:i386 libwayland-dev:i386 libpulse-dev:i386 libxkbcommon-dev:i386 libegl-dev:i386
 
-    - name: Gather Submodules
-      run: git submodule update --init
+    # not needed because the about actions/checkout has that funtionality: https://github.com/actions/checkout?tab=readme-ov-file#usage
+    # - name: Gather Submodules
+    #   run: git submodule update --init
       
     - name: Build
       run: make build-i686
@@ -36,3 +39,34 @@ jobs:
       with:
         name: ninecraft
         path: build-i686/ninecraft/ninecraft
+
+    - name: Build Deb
+      run: |
+        mkdir -p pkgs/ninecraft/usr/bin
+        cp build-i686/ninecraft/ninecraft pkgs/ninecraft/usr/bin
+        cp tools/extract.sh pkgs/ninecraft/usr/bin/ninecraft-extract
+        dpkg-deb -b pkgs/ninecraft
+
+    - name: Upload Deb
+      uses: actions/upload-artifact@v4
+      with:
+        name: ninecraft.deb
+        path: pkgs/ninecraft.deb
+
+
+    - name: Setup AppImageTool
+      uses: AnimMouse/setup-appimage@v1
+      with:
+        name: appimagetool
+        url: https://github.com/AppImage/appimagetool/releases/download/continuous/appimagetool-x86_64.AppImage
+
+    - name: Build Appimage
+      run: |
+          mkdir -p pkgs/Ninecraft.AppDir/usr/bin
+          cp build-i686/ninecraft/ninecraft pkgs/Ninecraft.AppDir/usr/bin
+          ARCH=X86_64 appimagetool ./pkgs/Ninecraft.AppDir/  
+    - name: Upload Appimage
+      uses: actions/upload-artifact@v4
+      with:
+        name: ninecraft.AppImage
+        path: ./*.AppImage

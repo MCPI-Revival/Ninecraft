@@ -1,0 +1,42 @@
+projectName=ninecraft
+
+pkgname=$projectName
+pkgrel=1
+pkgpsc="A mcpe 0.1 .0 - 0.10 .5 launcher for linux and windows"
+arch=("any")
+url=""
+license=('MIT')
+groups=()
+depends=('git'
+         'make'
+         'cmake'
+         'gcc'
+         'gcc-multilib'
+         'lib32-openal'
+         'lib32-libx11'
+         'lib32-libxrandr'
+         'lib32-libxinerama'
+         'lib32-libxcursor'
+         'lib32-libxi'
+         'lib32-libglvnd'
+         'zenity'
+         'unzip'
+         'python-jinja')
+optdepends=()
+provides=()
+conflicts=()
+replaces=()
+backup=()
+options=()
+install=
+changelog=
+source=('project-path')
+noextract=()
+md5sums=('SKIP')
+
+
+package () {
+ projectPath=$(cat project-path)
+mkdir -p "$pkgdir/usr/"{"bin","share/applications"}
+install -Dm755 $projectPath/build-(arch)/ninecraft/ninecraft $pkgdir/usr/bin
+}
