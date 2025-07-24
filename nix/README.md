@@ -140,7 +140,7 @@ This is a work in progress and many options may not function yet.
 
 ```nix
 with import <ninecraft/nix/pkgs> {}:
-buildNinecraftModNDK {
+buildNinecraftMod {
   pname = "mymod";
   version = "0.1.0";
   src = ./src;
@@ -148,7 +148,7 @@ buildNinecraftModNDK {
 ```
 ```nix
 with import <ninecraft/nix/pkgs> {}:
-buildNinecraftModNDK {
+buildNinecraftMod {
   pname = "mymod";
   version = "0.1.0";
   src = fetchurl {
@@ -164,7 +164,7 @@ compiledArm = "arm/mod.so";
 ```nix
 with import <nixpkgs> {};
 with import <ninecraft/nix/pkgs> {}:
-buildNinecraftModNDK {
+buildNinecraftMod {
   pname = "mymod";
   version = "0.1.0";
   src = fetchurl {

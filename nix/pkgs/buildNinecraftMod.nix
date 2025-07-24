@@ -2,15 +2,25 @@
   stdenv,
   writeText,
   androidenv,
-  ninecraft-toolchain-build-scripts,
-  defaultUseNDK?false,
+  ninecraft-mod-toolchain-build-scripts,
+  defaultUseNDK ? false,
   fetchurl,
-  libmpc,gmp ,mpfr ,isl ,texinfo ,zlib ,bison ,flex ,python3 ,perl ,help2man,
+  libmpc,
+  gmp,
+  mpfr,
+  isl,
+  texinfo,
+  zlib,
+  bison,
+  flex,
+  python3,
+  perl,
+  help2man,
   ...
 }: {
   pname ? null,
   version ? null,
-  useNDK? defaultUseNDK,
+  useNDK ? defaultUseNDK,
   name ? "${pname}-${version}",
   src,
   mainC ? "main.c",
@@ -45,21 +55,20 @@
     APP_PLATFORM := android-21
     APP_ABI := ${abi}
   '';
-  ninecraftModToolchain = stdenv.mkDerivation rec {
+  ninecraft-mod-toolchain = stdenv.mkDerivation rec {
     name = "ninecraft-mod-toolchain";
 
     dontConfigure = true;
     dontPatch = true;
 
-     buildInputs = [libmpc gmp mpfr isl texinfo zlib bison flex python3 perl help2man];
-    hardeningDisable = [ "format" ];
+    buildInputs = [libmpc gmp mpfr isl texinfo zlib bison flex python3 perl help2man];
+    hardeningDisable = ["format"];
     sourceRoot = ".";
 
-  CHOSEN_GCC_VERSION="13.3.0";
-  CHOSEN_BINUTILS_VERSION="2.40";
+    CHOSEN_GCC_VERSION = "13.3.0";
+    CHOSEN_BINUTILS_VERSION = "2.40";
 
     srcs = [
-        ninecraft-toolchain-build-scripts
       (fetchurl {
         url = "https://ftp.gnu.org/gnu/binutils/binutils-${CHOSEN_BINUTILS_VERSION}.tar.xz";
         hash = "sha256-D4pMJy1/F/Np3tEKSsoouOMEgo6VUm2kgrDMxN/J2OE=";
@@ -71,8 +80,7 @@
     ];
 
     postUnpack = ''
-      cp ninecraft-mod-toolchain-build-scripts/*.sh .
-      cp -r */sysroot .
+      cp -r  ${ninecraft-mod-toolchain-build-scripts}/* .
     '';
 
     buildPhase = ''
@@ -114,8 +122,42 @@
       runHook postInstall
     '';
   };
-  compileToochain = stdenv.mkDerivation {
-    # TODO: Compile mod using ninecraft toolchain
+  compileToochain = stdenv.mkDerivation rec {
+    name = effectiveName;
+    inherit src;
+    buildInputs = [ninecraft-mod-toolchain];
+    ninecraftCC =
+      if stdenv.hostPlatform.isx86
+      then "i686-linux-android-gcc"
+      else "arm-linux-androidabi-gcc";
+    ninecraftCXX =
+      if stdenv.hostPlatform.isx86
+      then "i686-linux-android-g++"
+      else "arm-linux-androidabi-g++";
+    buildPhase = ''
+      runHook preBuild
+      ls $src
+      mkdir -p $out/mods
+
+      if find $src -type f -name "*.cpp" | grep -q .; then
+        echo "building mod with ${ninecraftCXX}"
+        ${ninecraftCXX} --shared -fPIC -static-libstdc++ -static-libgcc -o ${name}.so $src/*.cpp $src/*.c
+      elif find $src -type f -name "*.c" | grep -q .; then
+        echo "building mod with ${ninecraftCC}"
+        ${ninecraftCC} --shared -fPIC -static-libstdc++ -static-libgcc -o ${name}.so $src/*.c
+      fi
+
+      runHook postBuild
+    '';
+    installPhase = ''
+      runHook preInstall
+      mkdir -p $out/{mods,global_overrides}
+      cp -r *.so $out/mods
+      if [[ -d "${globalOverrides}" ]]; then
+        cp -r ${globalOverrides} $out/global_overrides
+      fi
+      runHook postInstall
+    '';
   };
   getLib = stdenv.mkDerivation {
     name = effectiveName;
@@ -136,4 +178,6 @@
 in
   if precompiled
   then getLib
-  else if useNDK then compileNDK else compileToochain
+  else if useNDK
+  then compileNDK
+  else compileToochain

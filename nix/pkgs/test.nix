@@ -1,24 +1,27 @@
 {
   buildNinecraftInstance,
-  buildNinecraftModNDK,
+  buildNinecraftMod,
   mcpeVersions,
   writeTextDir,
 }:
 buildNinecraftInstance {
   name = "test";
-  version = mcpeVersions.a0_7_0;
+  # version = mcpeVersions.a0_7_0;
   options.mp_username = "bobface";
-  homeDir = "home-dir";
-  useNixGL = true;
+  # homeDir = "home-dir";
+  useNixGL = false;
   mods = [
-    (buildNinecraftModNDK {
+    (buildNinecraftMod {
       name = "hello";
       src =
-        writeTextDir "main.c"
+        writeTextDir "main.cpp"
         ''
-          #include <stdio.h>
+          #include <iostream>
+
+          extern "C" {
           void ninecraft_mod_on_load(void* m, int v) {
-            printf("Hi, hmm\n");
+            printf("Hi, hm m\n");
+          }
           }
         '';
     })

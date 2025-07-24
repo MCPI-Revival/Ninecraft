@@ -32,6 +32,7 @@
     hash = lib.getHash "stb";
   }),
   ninecraft-mod-toolchain-build-scripts ? (pkgs.fetchFromGitHub {
+    name = "ninecraft-mod-toolchain-build-scripts";
     owner = "MCPI-Revival";
     repo = "ninecraft-mod-toolchain-build-scripts";
     rev = "main";
@@ -55,8 +56,10 @@
     inherit (lib) nixgl;
   };
   buildNinecraftMod = pkgs.callPackage ./buildNinecraftMod.nix {inherit ninecraft-mod-toolchain-build-scripts;};
-  buildNinecraftModNDK = pkgs.callPackage ./buildNinecraftMod.nix {inherit ninecraft-mod-toolchain-build-scripts;
-  defaultUseNDK = true;};
+  buildNinecraftModNDK = pkgs.callPackage ./buildNinecraftMod.nix {
+    inherit ninecraft-mod-toolchain-build-scripts;
+    defaultUseNDK = true;
+  };
 
   ninecraft-nixgl = buildNinecraftInstance {
     version = mcpeVersions.a0_6_1;
@@ -66,7 +69,7 @@
   #   inherit
   #     buildNinecraftInstance
   #     mcpeVersions
-  #     buildNinecraftModNDK
+  #     buildNinecraftMod
   #     ;
   # };
 }
