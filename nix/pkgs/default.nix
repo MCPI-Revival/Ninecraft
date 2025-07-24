@@ -31,6 +31,12 @@
     rev = "5736b15f7ea0ffb08dd38af21067c314d6a3aae9";
     hash = lib.getHash "stb";
   }),
+  ninecraft-mod-toolchain-build-scripts ? (pkgs.fetchFromGitHub {
+    owner = "MCPI-Revival";
+    repo = "ninecraft-mod-toolchain-build-scripts";
+    rev = "main";
+    hash = lib.getHash "ninecraft-mod-toolchain-build-scripts";
+  }),
   ninecraft-extract ? ../../tools/extract.sh,
 }: rec {
   fetchApk = pkgs.callPackage ./fetchApk.nix {};
@@ -48,7 +54,9 @@
     inherit ninecraft ninecraft-extract mcpeVersions makeNinecraftDesktopItems;
     inherit (lib) nixgl;
   };
-  buildNinecraftModNDK = pkgs.callPackage ./buildNinecraftModNDK.nix {};
+  buildNinecraftMod = pkgs.callPackage ./buildNinecraftMod.nix {inherit ninecraft-mod-toolchain-build-scripts;};
+  buildNinecraftModNDK = pkgs.callPackage ./buildNinecraftMod.nix {inherit ninecraft-mod-toolchain-build-scripts;
+  defaultUseNDK = true;};
 
   ninecraft-nixgl = buildNinecraftInstance {
     version = mcpeVersions.a0_6_1;
