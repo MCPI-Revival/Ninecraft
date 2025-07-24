@@ -115,7 +115,7 @@
   };
   compileToochain = stdenv.mkDerivation {
     # TODO: Compile mod using ninecraft toolchain
-  }
+  };
   getLib = stdenv.mkDerivation {
     name = effectiveName;
     inherit src;
@@ -135,4 +135,4 @@
 in
   if precompiled
   then getLib
-  else compileNDK
+  else if useNDK then compileNDK else compileToochain
