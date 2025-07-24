@@ -79,7 +79,8 @@
       echo $PWD
       ls -lah .
       ./build-all.sh
-      cp -r  toolchain* $out sysroot bin
+      mkdir -p $out
+      cp -r toolchain* sysroot bin $out
     '';
   };
   preCompiledLib = let
