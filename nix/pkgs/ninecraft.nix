@@ -21,7 +21,7 @@
 stdenv.mkDerivation rec {
   pname = "ninecraft";
   version = "1.2.0";
-  dontUnpack = true;
+  # dontUnpack = true;
   src = ../..;
   nativeBuildInputs = [
     cmake
