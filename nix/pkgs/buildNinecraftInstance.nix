@@ -97,9 +97,10 @@
 in
   stdenvNoCC.mkDerivation {
     name = "ninecraft-${name}";
-    src = ninecraft;
+    src = ./.;
 
     nativeBuildInputs = [copyDesktopItems];
+    dontUnpack = true;
     dontConfigure = true;
     dontBuild = true;
     installPhase = ''
