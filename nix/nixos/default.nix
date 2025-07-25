@@ -5,6 +5,7 @@
   ...
 }: let
   cfg = config.programs.ninecraft;
+  ninecraftpkgs = import ../pkgs {};
 in {
   options.programs.ninecraft = let
     types = lib.types;
@@ -13,11 +14,14 @@ in {
     openFirewall = lib.mkEnableOption "Open Ninecraft ports";
     package = lib.mkOption {
       type = types.package;
-      default = with import ../pkgs {}; ninecraft;
+      default = with ninecraftpkgs; ninecraft;
     };
   };
 
   config = lib.mkIf cfg.enable {
+    nixpkgs.overlays = [
+      (new: old: import ../. {pkgs = new;})
+    ];
     environment.systemPackages = with pkgs; [
       cfg.package
     ];

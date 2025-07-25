@@ -1,51 +1,78 @@
 {
-  commits ? import ../commits.nix,
-  flakeLock ? builtins.fromJSON (builtins.readFile ../../flake.lock),
-  getHash ? name: flakeLock.nodes.${name}.locked.narHash,
-  nixgl ? (pkgs.fetchFromGitHub {
-    owner = "nix-community";
-    repo = "nixGL";
-    rev = "main";
-    hash = getHash "nixgl";
-  }),
+  lib ? import ../lib.nix {inherit pkgs;},
   pkgs ? (import <nixpkgs> {
-    config.allowUnfree = true;
+    config = {
+      allowUnfree = true;
+      android_sdk.accept_license = true;
+    };
     overlays = [
       (new: old: let
         isIntel86 = new.system == "x86_64-linux";
       in {
-        nixgl = import nixgl {
-          pkgs = new;
-          enable32bits = isIntel86;
-          enableIntelX86Extensions = isIntel86;
-        };
+        inherit (lib) nixgl;
       })
     ];
   }),
-  glad ? (pkgs.fetchFromGitHub {
+  glad ? (pkgs.fetchFromGitHub rec {
+    name = "glad";
     owner = "Dav1dde";
-    repo = "glad";
+    repo = name;
     rev = "56e406e90a802e963bb18d9c94cf6589e5a6b0a9";
-    hash = getHash "glad";
+    hash = lib.getHash name;
   }),
-  ancmp ? (pkgs.fetchFromGitHub {
+  ancmp ? (pkgs.fetchFromGitHub rec {
+    name = "ancmp";
     owner = "MFDGaming";
-    repo = "ancmp";
+    repo = name;
     rev = "main";
-    hash = getHash "ancmp";
+    hash = lib.getHash name;
   }),
-  stb ? (pkgs.fetchFromGitHub {
+  stb ? (pkgs.fetchFromGitHub rec {
+    name = "stb";
     owner = "nothings";
-    repo = "stb";
+    repo = name;
     rev = "5736b15f7ea0ffb08dd38af21067c314d6a3aae9";
-    hash = getHash "stb";
+    hash = lib.getHash name;
   }),
-  ninecraft-desktop-entry ? (pkgs.callPackage ./desktop.nix {}),
+  ninecraft-mod-toolchain-build-scripts ? (pkgs.fetchFromGitHub rec {
+    name = "ninecraft-mod-toolchain-build-scripts";
+    owner = "MCPI-Revival";
+    repo = name;
+    rev = "main";
+    hash = lib.getHash name;
+  }),
+  ninecraft-extract ? ../../tools/extract.sh,
 }: rec {
+  fetchApk = pkgs.callPackage ./fetchApk.nix {};
+  mcpeVersions =
+    pkgs.callPackage ./versions.nix {inherit fetchApk;};
+
+  makeNinecraftDesktopItems = pkgs.callPackage ./desktop.nix {
+    inherit ninecraft-extract mcpeVersions;
+  };
   ninecraft = pkgs.pkgsi686Linux.callPackage ./ninecraft.nix {
-    inherit glad stb ninecraft-desktop-entry ancmp;
+    inherit glad stb ancmp ninecraft-extract makeNinecraftDesktopItems mcpeVersions;
   };
-  ninecraft-nixgl = pkgs.callPackage ./ninecraft-nixgl.nix {
-    inherit ninecraft;
+
+  buildNinecraftInstance = pkgs.callPackage ./buildNinecraftInstance.nix {
+    inherit ninecraft ninecraft-extract mcpeVersions makeNinecraftDesktopItems;
+    inherit (lib) nixgl;
   };
+  buildNinecraftMod = pkgs.callPackage ./buildNinecraftMod.nix {inherit ninecraft-mod-toolchain-build-scripts;};
+  buildNinecraftModNDK = pkgs.callPackage ./buildNinecraftMod.nix {
+    inherit ninecraft-mod-toolchain-build-scripts;
+    defaultUseNDK = true;
+  };
+
+  ninecraft-nixgl = buildNinecraftInstance {
+    version = mcpeVersions.a0_6_1;
+    useNixGL = true;
+  };
+  # test = pkgs.callPackage ./test.nix {
+  #   inherit
+  #     buildNinecraftInstance
+  #     mcpeVersions
+  #     buildNinecraftMod
+  #     ;
+  # };
 }

@@ -21,6 +21,10 @@
       flake = false;
       url = "github:nothings/stb/5736b15f7ea0ffb08dd38af21067c314d6a3aae9";
     };
+    ninecraft-mod-toolchain-build-scripts = {
+      flake = false;
+      url = "github:MCPI-Revival/ninecraft-mod-toolchain-build-scripts";
+    };
   };
 
   outputs = {
@@ -31,11 +35,15 @@
     glad,
     ancmp,
     stb,
+    ninecraft-mod-toolchain-build-scripts,
   }: let
     mkPkgs = system:
       import nixpkgs {
         inherit system;
-        config.allowUnfree = true;
+        config = {
+          allowUnfree = true;
+          android_sdk.accept_license = true;
+        };
         overlays = [nixgl.overlay];
       };
   in
@@ -45,11 +53,14 @@
       packages =
         (import ./nix/pkgs {
           inherit pkgs;
-          inherit glad stb ancmp;
+          flakeRoot = self;
+          # inherit glad stb ancmp ninecraft-mod-toolchain-build-scripts;
           # ancmp = ./ancmp;
         })
         // {
-          default = packages.ninecraft;
+          default = packages.buildNinecraftInstance {
+            version = packages.mcpeVersions.a0_6_1;
+          };
         };
       apps = {
         extract = {
@@ -58,9 +69,6 @@
         };
       };
       formatter = pkgs.alejandra;
-      devShell = pkgs.callPackage ./nix/shell.nix {
-        inherit (packages) ninecraft ninecraft-nixgl;
-      };
     })
     // {
       nixosModule = {pkgs, ...}: {
