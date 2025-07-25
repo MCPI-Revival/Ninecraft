@@ -53,7 +53,8 @@
       packages =
         (import ./nix/pkgs {
           inherit pkgs;
-          inherit glad stb ancmp ninecraft-mod-toolchain-build-scripts;
+          flakeRoot = self;
+          # inherit glad stb ancmp ninecraft-mod-toolchain-build-scripts;
           # ancmp = ./ancmp;
         })
         // {

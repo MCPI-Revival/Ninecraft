@@ -17,6 +17,7 @@
   zlib,
   mcpeVersions,
   ninecraft-extract ? ../../tools/extract.sh,
+  ...
 }:
 stdenv.mkDerivation rec {
   pname = "ninecraft";

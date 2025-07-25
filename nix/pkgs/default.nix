@@ -13,30 +13,33 @@
       })
     ];
   }),
-  glad ? (pkgs.fetchFromGitHub {
+  glad ? (pkgs.fetchFromGitHub rec {
+    name = "glad";
     owner = "Dav1dde";
-    repo = "glad";
+    repo = name;
     rev = "56e406e90a802e963bb18d9c94cf6589e5a6b0a9";
-    hash = lib.getHash "glad";
+    hash = lib.getHash name;
   }),
-  ancmp ? (pkgs.fetchFromGitHub {
+  ancmp ? (pkgs.fetchFromGitHub rec {
+    name = "ancmp";
     owner = "MFDGaming";
-    repo = "ancmp";
+    repo = name;
     rev = "main";
-    hash = lib.getHash "ancmp";
+    hash = lib.getHash name;
   }),
-  stb ? (pkgs.fetchFromGitHub {
+  stb ? (pkgs.fetchFromGitHub rec {
+    name = "stb";
     owner = "nothings";
-    repo = "stb";
+    repo = name;
     rev = "5736b15f7ea0ffb08dd38af21067c314d6a3aae9";
-    hash = lib.getHash "stb";
+    hash = lib.getHash name;
   }),
-  ninecraft-mod-toolchain-build-scripts ? (pkgs.fetchFromGitHub {
+  ninecraft-mod-toolchain-build-scripts ? (pkgs.fetchFromGitHub rec {
     name = "ninecraft-mod-toolchain-build-scripts";
     owner = "MCPI-Revival";
-    repo = "ninecraft-mod-toolchain-build-scripts";
+    repo = name;
     rev = "main";
-    hash = lib.getHash "ninecraft-mod-toolchain-build-scripts";
+    hash = lib.getHash name;
   }),
   ninecraft-extract ? ../../tools/extract.sh,
 }: rec {
