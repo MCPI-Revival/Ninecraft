@@ -41,8 +41,9 @@
     rev = "main";
     hash = lib.getHash name;
   }),
-  flakeRoot?../..,
+  flakeRoot ? ../..,
   ninecraft-extract ? ../../tools/extract.sh,
+  ...
 }: rec {
   fetchApk = pkgs.callPackage ./fetchApk.nix {};
   mcpeVersions =
@@ -66,7 +67,9 @@
   };
 
   ninecraft-nixgl = buildNinecraftInstance {
-    version = mcpeVersions.a0_6_1;
+    versionParam = true;
+    # homeDir = "$HOME/.local/share}/ninecraft";
+    gameDir = "$(mktemp -d)";
     useNixGL = true;
   };
   # test = pkgs.callPackage ./test.nix {
@@ -76,7 +79,12 @@
   #     buildNinecraftMod
   #     ;
   # };
-  ninecraft-demo = pkgs.callPackage ./ninecraft-demo.nix {
-    inherit ninecraft ninecraft-extract;
+  # ninecraft-demo = pkgs.callPackage ./ninecraft-demo.nix {
+  #   inherit ninecraft ninecraft-extract;
+  # };
+  ninecraft-demo = buildNinecraftInstance {
+    # homeDir = "$HOME/.local/share}/ninecraft";
+    versionParam = true;
+    gameDir = "$(mktemp -d)";
   };
 }

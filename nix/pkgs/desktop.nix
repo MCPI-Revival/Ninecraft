@@ -3,6 +3,7 @@
   lib,
   ninecraft-extract,
   mcpeVersions,
+  ...
 }: {
   instance ? null,
   version ? mcpeVersions.a0_6_1,

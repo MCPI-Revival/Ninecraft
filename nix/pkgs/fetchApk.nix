@@ -1,6 +1,7 @@
 {
   fetchzip,
   lib,
+  ...
 }: options:
 fetchzip (options
   // {
