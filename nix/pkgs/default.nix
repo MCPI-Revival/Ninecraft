@@ -76,4 +76,7 @@
   #     buildNinecraftMod
   #     ;
   # };
+  ninecraft-demo = pkgs.callPackage ./ninecraft-demo.nix {
+    inherit ninecraft ninecraft-extract;
+  };
 }
