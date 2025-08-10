@@ -41,7 +41,7 @@
     rev = "main";
     hash = lib.getHash name;
   }),
-  flakeRoot?../..,
+  flakeRoot ? ../..,
   ninecraft-extract ? ../../tools/extract.sh,
 }: rec {
   fetchApk = pkgs.callPackage ./fetchApk.nix {};
