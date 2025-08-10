@@ -3,6 +3,7 @@
   buildNinecraftMod,
   mcpeVersions,
   writeTextDir,
+  ...
 }:
 buildNinecraftInstance {
   name = "test";
