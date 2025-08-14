@@ -1126,8 +1126,8 @@ void AppPlatform_linux$readAssetFile(asset_file *ret, AppPlatform_linux *app_pla
 
     FILE *file = fopen(path, "rb");
     if (!file) {
-        free(path);
         printf("Error[%d] failed to read %s\n", errno, path);
+        free(path);
         asset.data = NULL;
         asset.size = -1;
         *ret = asset;
