@@ -152,15 +152,15 @@ typedef struct {
     void (*hideKeyboard)(void *__this);
     void (*captureScreen)(void *__this, int width, int height, unsigned int px_width, bool do_capture);
     void (*swapBuffers)(void *__this);
-    android_string_t (*getSystemRegion)(void *__this);
+    android_string_t *(*getSystemRegion)(void *__this);
     android_string_t (*getGraphicsVendor)(void *__this);
     android_string_t (*getGraphicsRenderer)(void *__this);
     android_string_t (*getGraphicsVersion)(void *__this);
     android_string_t (*getGraphicsExtensions)(void *__this);
     void (*pickImage)(void *__this, image_picking_callback_0_11_0_t *callback);
     void (*setSleepEnabled)(void *__this, bool set);
-    android_string_t (*getExternalStoragePath)(void *__this);
-    android_string_t (*getInternalStoragePath)(void *__this);
+    android_string_t *(*getExternalStoragePath)(void *__this);
+    android_string_t *(*getInternalStoragePath)(void *__this);
     void (*playSound)(void *__this, android_string_t *resource_path, float volume, float pitch);
     void (*showDialog)(void *__this, int);
     void (*createUserInput)(void *__this);
