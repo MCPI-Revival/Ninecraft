@@ -967,7 +967,11 @@ static void key_callback(struct SDL_Window *window, int key, int scancode, int a
         } else if (version_id >= version_id_0_1_1 && key == SDLK_ESCAPE) {
             if (action == SDL_KEYDOWN) {
                 if (version_id >= version_id_0_10_0) {
+#ifdef _WIN32
+                    call_with_custom_stack(minecraft_client_handle_back, NULL, 1024*1024, 2, ninecraft_app, false);
+#else
                     minecraft_client_handle_back(ninecraft_app, false);
+#endif
                 } else {
                     ninecraft_app_handle_back(ninecraft_app, false);
                 }
