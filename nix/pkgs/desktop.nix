@@ -3,6 +3,7 @@
   lib,
   ninecraft-extract,
   mcpeVersions,
+  ...
 }: {
   instance ? null,
   version ? mcpeVersions.a0_6_1,
@@ -21,11 +22,12 @@ in [
       icon = "${version}/res/drawable/iconx.png";
       exec = "ninecraft${
         if (instance == null)
-        then " --game \"${gameDir}\" --home \"${homeDir}\""
-        else "-${instance}"
+        then " --game \"${gameDir}\" --home \"${homeDir}\" %u"
+        else "-${instance} %u"
       }";
       categories = ["Game" "AdventureGame"];
       keywords = ["mcpe" "android" "mcpi" "pocket" "edition"];
+      mimeTypes = lib.optional (instance != null) "application/vnd.android.package-archive";
     }
   )
 

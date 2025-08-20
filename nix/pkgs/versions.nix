@@ -2,6 +2,7 @@
   lib,
   fetchApk,
   stdenv,
+  ...
 }: let
   versions = {
     a0_1_0 = {
