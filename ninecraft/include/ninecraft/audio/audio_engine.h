@@ -5,6 +5,8 @@
 #include <stddef.h>
 #include <stdint.h>
 
+void audio_engine_write(uint8_t *buffer, uint32_t buffer_size, uint32_t num_channels, uint32_t bits_per_sample, uint32_t freq, uint32_t format, uint32_t endianess, float gain, float pitch);
+
 void audio_engine_init();
 
 void audio_engine_destroy();

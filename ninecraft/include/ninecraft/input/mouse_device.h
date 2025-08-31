@@ -43,4 +43,6 @@ extern void mouse_device_feed_0_2_1(mouse_device_0_2_1_t *mouse_device, char but
 
 extern void mouse_device_feed_0_6(mouse_device_0_6_t *mouse_device, char button, char type, short x, short y, short dx, short dy);
 
+extern void mouse_device_feed_0_12(mouse_device_0_6_t *mouse_device, char button, char type, short x, short y, short dx, short dy);
+
 #endif

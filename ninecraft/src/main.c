@@ -41,6 +41,7 @@
 #include <ancmp/android_dlfcn.h>
 #include <ancmp/linker.h>
 #include <ancmp/abi_fix.h>
+#include <anjni/anjni.h>
 
 #include <ninecraft/options.h>
 #include <ninecraft/mods/chat_mod.h>
@@ -68,7 +69,7 @@ static float *controller_y_stick;
 
 bool mouse_pointer_hidden = false;
 
-void *load_library(const char *name) {
+void *load_library(const char *name, bool show_error) {
 #if defined(__i386__) || defined(_M_IX86)
     char *arch = "x86";
 #else
@@ -88,7 +89,10 @@ void *load_library(const char *name) {
 
     void *handle = android_dlopen(fullpath, ANDROID_RTLD_LAZY);
     if (handle == NULL) {
-        printf("failed to load library %s: %s\n", fullpath, android_dlerror());
+        const char *e = android_dlerror();
+        if (show_error) {
+            printf("failed to load library %s: %s\n", fullpath, e);
+        }
         return NULL;
     }
     printf("lib: %s: : %p\n", fullpath, handle);
@@ -135,10 +139,15 @@ int mouseToGameKeyCode(int keyCode) {
 }
 
 static void mouse_click_callback(struct SDL_Window *window, int button, int action, int x, int y) {
-    if (!mouse_pointer_hidden) {
-        int mc_button = (button == SDL_BUTTON_LEFT ? 1 : (button == SDL_BUTTON_RIGHT ? 2 : 0));
+    int mc_button = (button == SDL_BUTTON_LEFT ? 1 : (button == SDL_BUTTON_RIGHT ? 2 : 0));
+    if (!mc_button) {
+        return;
+    }
+    if (version_id >= version_id_0_12_1) {
+        mouse_device_feed_0_12(android_dlsym(handle, "_ZN5Mouse9_instanceE"), (char)mc_button, (char)(action == SDL_PRESSED ? 1 : 0), (short)x, (short)y, 0, 0);
+    } else if (!mouse_pointer_hidden) {
         if (version_id == version_id_0_1_0) {
-            ((void (*)(int, int, int, int))android_dlsym(handle, "_ZN5Mouse4feedEiiii"))((int)mc_button, (int)(action == SDL_PRESSED ? 1 : 0), (int)x, (int)y0);
+            ((void (*)(int, int, int, int))android_dlsym(handle, "_ZN5Mouse4feedEiiii"))((int)mc_button, (int)(action == SDL_PRESSED ? 0 : 1), (int)x, (int)y);
         } else if (version_id >= version_id_0_6_0) {
             mouse_device_feed_0_6(android_dlsym(handle, "_ZN5Mouse9_instanceE"), (char)mc_button, (char)(action == SDL_PRESSED ? 1 : 0), (short)x, (short)y, 0, 0);
             multitouch_feed_0_6((char)mc_button, (char)(action == SDL_PRESSED ? 1 : 0), (short)x, (short)y, 0);
@@ -163,18 +172,27 @@ static void mouse_click_callback(struct SDL_Window *window, int button, int acti
 static void mouse_scroll_callback(struct SDL_Window *window, float xoffset, float yoffset, int direction) {
     char key_code = 0;
     float offset = (direction == SDL_MOUSEWHEEL_NORMAL) ? yoffset : xoffset;
-
-    if (offset > 0) {
-        key_code = MCKEY_MENU_PREVIOUS;
-    } else if (offset < 0) {
-        key_code = MCKEY_MENU_NEXT;
+    if (version_id >= version_id_0_12_1) {
+        mouse_device_feed_0_12(android_dlsym(handle, "_ZN5Mouse9_instanceE"), 3, (char)(offset > 0 ? 127 : -128), 0, 0, 0, 0);
+    } else {
+        if (offset > 0) {
+            key_code = MCKEY_MENU_PREVIOUS;
+        } else if (offset < 0) {
+            key_code = MCKEY_MENU_NEXT;
+        }
+        keyboard_feed(key_code, 1);
+        keyboard_feed(key_code, 0);
     }
-    keyboard_feed(key_code, 1);
-    keyboard_feed(key_code, 0);
 }
 
 static void mouse_pos_callback(struct SDL_Window *window, int xpos, int ypos, int xrel, int yrel) {
-    if (!mouse_pointer_hidden || version_id >= version_id_0_6_0) {
+    if (version_id == version_id_0_12_1) {
+        if (mouse_pointer_hidden) {
+            mouse_device_feed_0_12(android_dlsym(handle, "_ZN5Mouse9_instanceE"), 0, 0, (short)xpos, (short)ypos, (short)xrel, (short)yrel);
+        } else {
+            mouse_device_feed_0_12(android_dlsym(handle, "_ZN5Mouse9_instanceE"), 0, 0, (short)xpos, (short)ypos, 0, 0);
+        }
+    } else if (!mouse_pointer_hidden || version_id >= version_id_0_6_0) {
         if (version_id == version_id_0_1_0) {
             ((void (*)(int, int, int, int))android_dlsym(handle, "_ZN5Mouse4feedEiiii"))(0, 0, (int)xpos, (int)ypos);
         } else if (version_id >= version_id_0_6_0) {
@@ -633,29 +651,21 @@ float calculate_scale(int width, int height, float dpi) {
 }
 
 static void set_ninecraft_size(int width, int height) {
+    float ddpi = 96.0f;
+    SDL_GetDisplayDPI(SDL_GetWindowDisplayIndex(_window), &ddpi, NULL, NULL);
+    float scale = calculate_scale(width, height, ddpi);    
     if (version_id >= version_id_0_10_0) {
-        minecraft_client_set_size(ninecraft_app, width, height, 2.f);
+
+#ifdef _WIN32
+        call_with_custom_stack(minecraft_client_set_size, NULL, 1024*1024, 4, ninecraft_app, width, height, *(int *)&scale);
+#else
+        minecraft_client_set_size(ninecraft_app, width, height, scale);
+#endif
     } else {
         minecraft_set_size(ninecraft_app, width, height);
     }
     size_t screen_offset;
-    if (version_id == version_id_0_11_1) {
-        screen_offset = MINECRAFTCLIENT_SCREEN_OFFSET_0_11_1;
-    } else if (version_id == version_id_0_11_0) {
-        screen_offset = MINECRAFTCLIENT_SCREEN_OFFSET_0_11_0;
-    } else if (version_id == version_id_0_10_5) {
-        screen_offset = MINECRAFTCLIENT_SCREEN_OFFSET_0_10_5;
-    } else if (version_id == version_id_0_10_4) {
-        screen_offset = MINECRAFTCLIENT_SCREEN_OFFSET_0_10_4;
-    } else if (version_id == version_id_0_10_3) {
-        screen_offset = MINECRAFTCLIENT_SCREEN_OFFSET_0_10_3;
-    } else if (version_id == version_id_0_10_2) {
-        screen_offset = MINECRAFTCLIENT_SCREEN_OFFSET_0_10_2;
-    } else if (version_id == version_id_0_10_1) {
-        screen_offset = MINECRAFTCLIENT_SCREEN_OFFSET_0_10_1;
-    } else if (version_id == version_id_0_10_0) {
-        screen_offset = MINECRAFTCLIENT_SCREEN_OFFSET_0_10_0;
-    } else if (version_id == version_id_0_9_5) {
+    if (version_id == version_id_0_9_5) {
         screen_offset = NINECRAFTAPP_SCREEN_OFFSET_0_9_5;
     } else if (version_id == version_id_0_9_4) {
         screen_offset = NINECRAFTAPP_SCREEN_OFFSET_0_9_4;
@@ -688,9 +698,6 @@ static void set_ninecraft_size(int width, int height) {
     } else {
         return;
     }
-    float ddpi = 96.0f;
-    SDL_GetDisplayDPI(SDL_GetWindowDisplayIndex(_window), &ddpi, NULL, NULL);
-    float scale = calculate_scale(width, height, ddpi);
     *(float *)android_dlsym(handle, "_ZN3Gui11InvGuiScaleE") = 1.0f / scale;
     *(float *)android_dlsym(handle, "_ZN3Gui8GuiScaleE") = scale;
     void *screen = *(void **)((char *)ninecraft_app + screen_offset);
@@ -708,7 +715,7 @@ static void resize_callback(struct SDL_Window *window, int width, int height) {
 }
 
 static void char_callback(struct SDL_Window *window, char *codepoint) {
-    if (is_keyboard_visible) {
+    if (is_keyboard_visible || version_id >= version_id_0_12_1) {
         chat_mod_append_char(codepoint[0]);
         if (version_id >= version_id_0_6_0 && version_id <= version_id_0_7_1) {
             keyboard_feed_text_0_6_0(codepoint[0]);
@@ -735,6 +742,100 @@ void *chat_screen_create() {
     return chat_screen;
 }
 
+int getGameKeyCode2(int keycode) {
+    if (keycode == SDLK_1) {
+        return 49;
+    }
+    if (keycode == SDLK_2) {
+        return 50;
+    }
+    if (keycode == SDLK_3) {
+        return 51;
+    }
+    if (keycode == SDLK_4) {
+        return 52;
+    }
+    if (keycode == SDLK_5) {
+        return 53;
+    }
+    if (keycode == SDLK_6) {
+        return 54;
+    }
+    if (keycode == SDLK_7) {
+        return 55;
+    }
+    if (keycode == SDLK_8) {
+        return 56;
+    }
+    if (keycode == SDLK_9) {
+        return 57;
+    }
+    if (keycode == SDLK_0) {
+        return 58;
+    }
+    if (keycode == SDLK_UP) {
+        return 38;
+    }
+    if (keycode == SDLK_DOWN) {
+        return 40;
+    }
+    if (keycode == SDLK_LEFT) {
+        return 37;
+    }
+    if (keycode == SDLK_RIGHT) {
+        return 39;
+    }
+    if (keycode == SDLK_BACKSPACE) {
+        return 8;
+    }
+    if (keycode == SDLK_RETURN) {
+        return 65293;
+    }
+    if (keycode == SDLK_SPACE) {
+        return 32;
+    }
+    if (keycode == SDLK_e) {
+        return 69;
+    }
+    if (keycode == SDLK_ESCAPE) {
+        return 27;
+    }
+    if (keycode == SDLK_LCTRL) {
+        return 17;
+    }
+    if (keycode == SDLK_LSHIFT) {
+        return 16;
+    }
+    if (keycode == SDLK_t) {
+        return 84;
+    }
+    if (keycode == SDLK_SLASH) {
+        return 191;
+    }
+    if (keycode == SDLK_F5) {
+        return 116;
+    }
+    if (keycode == SDLK_F1) {
+        return 112;
+    }
+    if (keycode == SDLK_q) {
+        return 81;
+    }
+    if (keycode == SDLK_w) {
+        return 87;
+    }
+    if (keycode == SDLK_a) {
+        return 65;
+    }
+    if (keycode == SDLK_s) {
+        return 83;
+    }
+    if (keycode == SDLK_d) {
+        return 68;
+    }
+    return 0;
+}
+
 static void key_callback(struct SDL_Window *window, int key, int scancode, int action, int mod) {
     int android_key = sdl_to_android_key(key);
     if (action == SDL_KEYDOWN) {
@@ -753,233 +854,248 @@ static void key_callback(struct SDL_Window *window, int key, int scancode, int a
             }
         }
     } else {
-        if (key == SDLK_LCTRL) {
-            if (action == SDL_KEYDOWN) {
-                ctrl_pressed = true;
-            } else if (action == SDL_KEYUP) {
-                ctrl_pressed = false;
+        if (version_id >= version_id_0_12_1) {
+            int game_key = getGameKeyCode2(key);
+            if (key == SDLK_BACKSPACE && action == SDL_KEYDOWN) {
+                android_string_t str;
+                android_string_cstr(&str, "\x08");
+                keyboard_feed_text_0_7_2(&str, false);
+            } else if (game_key) {
+                if (action == SDL_KEYDOWN) {
+                    keyboard_feed(game_key, 1);
+                } else if (action == SDL_KEYUP) {
+                    keyboard_feed(game_key, 0);
+                }
             }
-        }
-        int game_keycode = getGameKeyCode(key);
-        if (key == SDLK_q && action == SDL_KEYDOWN && mouse_pointer_hidden && version_id >= version_id_0_5_0 && version_id <= version_id_0_11_1) {
-            size_t player_offset, inventory_offset;
-            if (version_id == version_id_0_5_0) {
-                player_offset = MINECRAFT_LOCAL_PLAYER_OFFSET_0_5_0;
-                inventory_offset = PLAYER_INVENTORY_OFFSET_0_5_0;
-            } else if (version_id == version_id_0_5_0_j) {
-                player_offset = MINECRAFT_LOCAL_PLAYER_OFFSET_0_5_0_J;
-                inventory_offset = PLAYER_INVENTORY_OFFSET_0_5_0_J;
-            } else if (version_id == version_id_0_6_0) {
-                player_offset = MINECRAFT_LOCAL_PLAYER_OFFSET_0_6_0;
-                inventory_offset = PLAYER_INVENTORY_OFFSET_0_6_0;
-            } else if (version_id == version_id_0_6_1) {
-                player_offset = MINECRAFT_LOCAL_PLAYER_OFFSET_0_6_1;
-                inventory_offset = PLAYER_INVENTORY_OFFSET_0_6_1;
-            } else if (version_id == version_id_0_7_0) {
-                player_offset = MINECRAFT_LOCAL_PLAYER_OFFSET_0_7_0;
-                inventory_offset = PLAYER_INVENTORY_OFFSET_0_7_0;
-            } else if (version_id == version_id_0_7_1) {
-                player_offset = MINECRAFT_LOCAL_PLAYER_OFFSET_0_7_1;
-                inventory_offset = PLAYER_INVENTORY_OFFSET_0_7_1;
-            } else if (version_id == version_id_0_7_2) {
-                player_offset = MINECRAFT_LOCAL_PLAYER_OFFSET_0_7_2;
-                inventory_offset = PLAYER_INVENTORY_OFFSET_0_7_2;
-            } else if (version_id == version_id_0_7_3) {
-                player_offset = MINECRAFT_LOCAL_PLAYER_OFFSET_0_7_3;
-                inventory_offset = PLAYER_INVENTORY_OFFSET_0_7_3;
-            } else if (version_id == version_id_0_7_4) {
-                player_offset = MINECRAFT_LOCAL_PLAYER_OFFSET_0_7_4;
-                inventory_offset = PLAYER_INVENTORY_OFFSET_0_7_4;
-            } else if (version_id == version_id_0_7_5) {
-                player_offset = MINECRAFT_LOCAL_PLAYER_OFFSET_0_7_5;
-                inventory_offset = PLAYER_INVENTORY_OFFSET_0_7_5;
-            } else if (version_id == version_id_0_7_6) {
-                player_offset = MINECRAFT_LOCAL_PLAYER_OFFSET_0_7_6;
-                inventory_offset = PLAYER_INVENTORY_OFFSET_0_7_6;
-            } else if (version_id == version_id_0_8_0) {
-                player_offset = MINECRAFT_LOCAL_PLAYER_OFFSET_0_8_0;
-                inventory_offset = PLAYER_INVENTORY_OFFSET_0_8_0;
-            } else if (version_id == version_id_0_8_1) {
-                player_offset = MINECRAFT_LOCAL_PLAYER_OFFSET_0_8_1;
-                inventory_offset = PLAYER_INVENTORY_OFFSET_0_8_1;
-            } else if (version_id == version_id_0_9_0) {
-                player_offset = MINECRAFT_LOCAL_PLAYER_OFFSET_0_9_0;
-                inventory_offset = PLAYER_INVENTORY_OFFSET_0_9_0;
-            } else if (version_id == version_id_0_9_1) {
-                player_offset = MINECRAFT_LOCAL_PLAYER_OFFSET_0_9_1;
-                inventory_offset = PLAYER_INVENTORY_OFFSET_0_9_1;
-            } else if (version_id == version_id_0_9_2) {
-                player_offset = MINECRAFT_LOCAL_PLAYER_OFFSET_0_9_2;
-                inventory_offset = PLAYER_INVENTORY_OFFSET_0_9_2;
-            } else if (version_id == version_id_0_9_3) {
-                player_offset = MINECRAFT_LOCAL_PLAYER_OFFSET_0_9_3;
-                inventory_offset = PLAYER_INVENTORY_OFFSET_0_9_3;
-            } else if (version_id == version_id_0_9_4) {
-                player_offset = MINECRAFT_LOCAL_PLAYER_OFFSET_0_9_4;
-                inventory_offset = PLAYER_INVENTORY_OFFSET_0_9_4;
-            } else if (version_id == version_id_0_9_5) {
-                player_offset = MINECRAFT_LOCAL_PLAYER_OFFSET_0_9_5;
-                inventory_offset = PLAYER_INVENTORY_OFFSET_0_9_5;
-            } else if (version_id == version_id_0_10_0) {
-                inventory_offset = PLAYER_INVENTORY_OFFSET_0_10_0;
-            } else if (version_id == version_id_0_10_1) {
-                inventory_offset = PLAYER_INVENTORY_OFFSET_0_10_1;
-            } else if (version_id == version_id_0_10_2) {
-                inventory_offset = PLAYER_INVENTORY_OFFSET_0_10_2;
-            } else if (version_id == version_id_0_10_3) {
-                inventory_offset = PLAYER_INVENTORY_OFFSET_0_10_3;
-            } else if (version_id == version_id_0_10_4) {
-                inventory_offset = PLAYER_INVENTORY_OFFSET_0_10_4;
-            } else if (version_id == version_id_0_10_5) {
-                inventory_offset = PLAYER_INVENTORY_OFFSET_0_10_5;
-            } else if (version_id == version_id_0_11_0) {
-                inventory_offset = PLAYER_INVENTORY_OFFSET_0_11_0;
-            } else if (version_id == version_id_0_11_1) {
-                inventory_offset = PLAYER_INVENTORY_OFFSET_0_11_1;
+        } else {
+            if (key == SDLK_LCTRL) {
+                if (action == SDL_KEYDOWN) {
+                    ctrl_pressed = true;
+                } else if (action == SDL_KEYUP) {
+                    ctrl_pressed = false;
+                }
             }
-            void *player = NULL;
-            if (version_id >= version_id_0_5_0 && version_id <= version_id_0_9_5) {
-                player = *(void **)((char *)ninecraft_app + player_offset);
-            } else if (version_id >= version_id_0_10_0 && version_id <= version_id_0_11_1) {
-                player = minecraft_client_get_local_player(ninecraft_app);
-            }
-            if (player) {
-                bool is_creative = ((bool (*)(void *))android_dlsym(handle, "_ZN9Minecraft14isCreativeModeEv"))(ninecraft_app);
-                if (!is_creative) {
-                    void *player_inventory = *(void **)((char *)player + inventory_offset);
-                    void *item_instance = NULL;
-                    if (version_id >= version_id_0_11_0 && version_id <= version_id_0_11_1) {
-                        item_instance = ((void *(*)(void *))android_dlsym(handle, "_ZNK9Inventory15getSelectedItemEv"))(player_inventory);
-                    } else {
-                        item_instance = ((void *(*)(void *))android_dlsym(handle, "_ZN9Inventory11getSelectedEv"))(player_inventory);
-                    }
-                    if (item_instance) {
-                        bool is_empty = ((bool (*)(void *))android_dlsym(handle, "_ZNK12ItemInstance6isNullEv"))(item_instance);
-                        if (!is_empty) {
-                            void *item_instance_copy = ((void *(*)(void *, void *))android_dlsym(handle, "_ZN12ItemInstance5cloneEPKS_"))(item_instance, NULL);
-                            if (!ctrl_pressed) {
-                                *(int8_t *)item_instance_copy = 1;
-                                *(int8_t *)item_instance -= 1;
-                            }
-                            if (*(int8_t *)item_instance < 1 || ctrl_pressed) {
-                                android_vector_t *slots = NULL;
-                                if (version_id >= version_id_0_11_0 && version_id <= version_id_0_11_1) { 
-                                    slots = (android_vector_t *)((char *)player_inventory + 16);
-                                } else {
-                                    slots = ((android_vector_t *(*)(void *))android_dlsym(handle, "_ZN16FillingContainer11getSlotListERi"))(player_inventory);
+            int game_keycode = getGameKeyCode(key);
+            if (key == SDLK_q && action == SDL_KEYDOWN && mouse_pointer_hidden && version_id >= version_id_0_5_0 && version_id <= version_id_0_11_1) {
+                size_t player_offset, inventory_offset;
+                if (version_id == version_id_0_5_0) {
+                    player_offset = MINECRAFT_LOCAL_PLAYER_OFFSET_0_5_0;
+                    inventory_offset = PLAYER_INVENTORY_OFFSET_0_5_0;
+                } else if (version_id == version_id_0_5_0_j) {
+                    player_offset = MINECRAFT_LOCAL_PLAYER_OFFSET_0_5_0_J;
+                    inventory_offset = PLAYER_INVENTORY_OFFSET_0_5_0_J;
+                } else if (version_id == version_id_0_6_0) {
+                    player_offset = MINECRAFT_LOCAL_PLAYER_OFFSET_0_6_0;
+                    inventory_offset = PLAYER_INVENTORY_OFFSET_0_6_0;
+                } else if (version_id == version_id_0_6_1) {
+                    player_offset = MINECRAFT_LOCAL_PLAYER_OFFSET_0_6_1;
+                    inventory_offset = PLAYER_INVENTORY_OFFSET_0_6_1;
+                } else if (version_id == version_id_0_7_0) {
+                    player_offset = MINECRAFT_LOCAL_PLAYER_OFFSET_0_7_0;
+                    inventory_offset = PLAYER_INVENTORY_OFFSET_0_7_0;
+                } else if (version_id == version_id_0_7_1) {
+                    player_offset = MINECRAFT_LOCAL_PLAYER_OFFSET_0_7_1;
+                    inventory_offset = PLAYER_INVENTORY_OFFSET_0_7_1;
+                } else if (version_id == version_id_0_7_2) {
+                    player_offset = MINECRAFT_LOCAL_PLAYER_OFFSET_0_7_2;
+                    inventory_offset = PLAYER_INVENTORY_OFFSET_0_7_2;
+                } else if (version_id == version_id_0_7_3) {
+                    player_offset = MINECRAFT_LOCAL_PLAYER_OFFSET_0_7_3;
+                    inventory_offset = PLAYER_INVENTORY_OFFSET_0_7_3;
+                } else if (version_id == version_id_0_7_4) {
+                    player_offset = MINECRAFT_LOCAL_PLAYER_OFFSET_0_7_4;
+                    inventory_offset = PLAYER_INVENTORY_OFFSET_0_7_4;
+                } else if (version_id == version_id_0_7_5) {
+                    player_offset = MINECRAFT_LOCAL_PLAYER_OFFSET_0_7_5;
+                    inventory_offset = PLAYER_INVENTORY_OFFSET_0_7_5;
+                } else if (version_id == version_id_0_7_6) {
+                    player_offset = MINECRAFT_LOCAL_PLAYER_OFFSET_0_7_6;
+                    inventory_offset = PLAYER_INVENTORY_OFFSET_0_7_6;
+                } else if (version_id == version_id_0_8_0) {
+                    player_offset = MINECRAFT_LOCAL_PLAYER_OFFSET_0_8_0;
+                    inventory_offset = PLAYER_INVENTORY_OFFSET_0_8_0;
+                } else if (version_id == version_id_0_8_1) {
+                    player_offset = MINECRAFT_LOCAL_PLAYER_OFFSET_0_8_1;
+                    inventory_offset = PLAYER_INVENTORY_OFFSET_0_8_1;
+                } else if (version_id == version_id_0_9_0) {
+                    player_offset = MINECRAFT_LOCAL_PLAYER_OFFSET_0_9_0;
+                    inventory_offset = PLAYER_INVENTORY_OFFSET_0_9_0;
+                } else if (version_id == version_id_0_9_1) {
+                    player_offset = MINECRAFT_LOCAL_PLAYER_OFFSET_0_9_1;
+                    inventory_offset = PLAYER_INVENTORY_OFFSET_0_9_1;
+                } else if (version_id == version_id_0_9_2) {
+                    player_offset = MINECRAFT_LOCAL_PLAYER_OFFSET_0_9_2;
+                    inventory_offset = PLAYER_INVENTORY_OFFSET_0_9_2;
+                } else if (version_id == version_id_0_9_3) {
+                    player_offset = MINECRAFT_LOCAL_PLAYER_OFFSET_0_9_3;
+                    inventory_offset = PLAYER_INVENTORY_OFFSET_0_9_3;
+                } else if (version_id == version_id_0_9_4) {
+                    player_offset = MINECRAFT_LOCAL_PLAYER_OFFSET_0_9_4;
+                    inventory_offset = PLAYER_INVENTORY_OFFSET_0_9_4;
+                } else if (version_id == version_id_0_9_5) {
+                    player_offset = MINECRAFT_LOCAL_PLAYER_OFFSET_0_9_5;
+                    inventory_offset = PLAYER_INVENTORY_OFFSET_0_9_5;
+                } else if (version_id == version_id_0_10_0) {
+                    inventory_offset = PLAYER_INVENTORY_OFFSET_0_10_0;
+                } else if (version_id == version_id_0_10_1) {
+                    inventory_offset = PLAYER_INVENTORY_OFFSET_0_10_1;
+                } else if (version_id == version_id_0_10_2) {
+                    inventory_offset = PLAYER_INVENTORY_OFFSET_0_10_2;
+                } else if (version_id == version_id_0_10_3) {
+                    inventory_offset = PLAYER_INVENTORY_OFFSET_0_10_3;
+                } else if (version_id == version_id_0_10_4) {
+                    inventory_offset = PLAYER_INVENTORY_OFFSET_0_10_4;
+                } else if (version_id == version_id_0_10_5) {
+                    inventory_offset = PLAYER_INVENTORY_OFFSET_0_10_5;
+                } else if (version_id == version_id_0_11_0) {
+                    inventory_offset = PLAYER_INVENTORY_OFFSET_0_11_0;
+                } else if (version_id == version_id_0_11_1) {
+                    inventory_offset = PLAYER_INVENTORY_OFFSET_0_11_1;
+                }
+                void *player = NULL;
+                if (version_id >= version_id_0_5_0 && version_id <= version_id_0_9_5) {
+                    player = *(void **)((char *)ninecraft_app + player_offset);
+                } else if (version_id >= version_id_0_10_0 && version_id <= version_id_0_11_1) {
+                    player = minecraft_client_get_local_player(ninecraft_app);
+                }
+                if (player) {
+                    bool is_creative = ((bool (*)(void *))android_dlsym(handle, "_ZN9Minecraft14isCreativeModeEv"))(ninecraft_app);
+                    if (!is_creative) {
+                        void *player_inventory = *(void **)((char *)player + inventory_offset);
+                        void *item_instance = NULL;
+                        if (version_id >= version_id_0_11_0 && version_id <= version_id_0_11_1) {
+                            item_instance = ((void *(*)(void *))android_dlsym(handle, "_ZNK9Inventory15getSelectedItemEv"))(player_inventory);
+                        } else {
+                            item_instance = ((void *(*)(void *))android_dlsym(handle, "_ZN9Inventory11getSelectedEv"))(player_inventory);
+                        }
+                        if (item_instance) {
+                            bool is_empty = ((bool (*)(void *))android_dlsym(handle, "_ZNK12ItemInstance6isNullEv"))(item_instance);
+                            if (!is_empty) {
+                                void *item_instance_copy = ((void *(*)(void *, void *))android_dlsym(handle, "_ZN12ItemInstance5cloneEPKS_"))(item_instance, NULL);
+                                if (!ctrl_pressed) {
+                                    *(int8_t *)item_instance_copy = 1;
+                                    *(int8_t *)item_instance -= 1;
                                 }
-                                size_t slot = 0;
-                                for (; slot < android_vector_size(slots, sizeof(void *)); ++slot) {
-                                    if (*(void **)android_vector_at(slots, slot, sizeof(void *)) == item_instance) {
-                                        break;
+                                if (*(int8_t *)item_instance < 1 || ctrl_pressed) {
+                                    android_vector_t *slots = NULL;
+                                    if (version_id >= version_id_0_11_0 && version_id <= version_id_0_11_1) { 
+                                        slots = (android_vector_t *)((char *)player_inventory + 16);
+                                    } else {
+                                        slots = ((android_vector_t *(*)(void *))android_dlsym(handle, "_ZN16FillingContainer11getSlotListERi"))(player_inventory);
                                     }
+                                    size_t slot = 0;
+                                    for (; slot < android_vector_size(slots, sizeof(void *)); ++slot) {
+                                        if (*(void **)android_vector_at(slots, slot, sizeof(void *)) == item_instance) {
+                                            break;
+                                        }
+                                    }
+                                    ((void (*)(void *, int))android_dlsym(handle, "_ZN16FillingContainer7releaseEi"))(player_inventory, slot);
+                                    ((void (*)(void *, int))android_dlsym(handle, "_ZN16FillingContainer22compressLinkedSlotListEi"))(player_inventory, slot);
                                 }
-                                ((void (*)(void *, int))android_dlsym(handle, "_ZN16FillingContainer7releaseEi"))(player_inventory, slot);
-                                ((void (*)(void *, int))android_dlsym(handle, "_ZN16FillingContainer22compressLinkedSlotListEi"))(player_inventory, slot);
-                            }
 
-                            if (version_id >= version_id_0_5_0 && version_id <= version_id_0_7_1) {
-                                ((void (*)(void *, void *, bool))android_dlsym(handle, "_ZN11LocalPlayer4dropEP12ItemInstanceb"))(player, item_instance_copy, false);
-                            } else if (version_id >= version_id_0_7_2 && version_id <= version_id_0_11_1) {
-                                ((void (*)(void *, void *, bool))android_dlsym(handle, "_ZN11LocalPlayer4dropEPK12ItemInstanceb"))(player, item_instance_copy, false);
+                                if (version_id >= version_id_0_5_0 && version_id <= version_id_0_7_1) {
+                                    ((void (*)(void *, void *, bool))android_dlsym(handle, "_ZN11LocalPlayer4dropEP12ItemInstanceb"))(player, item_instance_copy, false);
+                                } else if (version_id >= version_id_0_7_2 && version_id <= version_id_0_11_1) {
+                                    ((void (*)(void *, void *, bool))android_dlsym(handle, "_ZN11LocalPlayer4dropEPK12ItemInstanceb"))(player, item_instance_copy, false);
+                                }
                             }
                         }
                     }
+                }         
+            } else if (mouse_pointer_hidden && key == SDLK_LSHIFT && version_id <= version_id_0_4_0_j) {
+                if (controller_states) {
+                    if (action == SDL_KEYDOWN) {
+                        controller_states[0] = 1;
+                    } else if (action == SDL_KEYUP) {
+                        controller_states[0] = 0;
+                    }
                 }
-            }         
-        } else if (mouse_pointer_hidden && key == SDLK_LSHIFT && version_id <= version_id_0_4_0_j) {
-            if (controller_states) {
+            } else if (mouse_pointer_hidden && key == SDLK_t) {
                 if (action == SDL_KEYDOWN) {
-                    controller_states[0] = 1;
-                } else if (action == SDL_KEYUP) {
-                    controller_states[0] = 0;
-                }
-            }
-        } else if (mouse_pointer_hidden && key == SDLK_t) {
-            if (action == SDL_KEYDOWN) {
-                if (version_id >= version_id_0_7_0 && version_id <= version_id_0_11_1) {
-                    size_t minecraft_screenchooser_offset;
-                    if (version_id == version_id_0_7_0) {
-                        minecraft_screenchooser_offset = MINECRAFT_SCREENCHOOSER_OFFSET_0_7_0;
-                    } else if (version_id == version_id_0_7_1) {
-                        minecraft_screenchooser_offset = MINECRAFT_SCREENCHOOSER_OFFSET_0_7_1;
-                    } else if (version_id == version_id_0_7_2) {
-                        minecraft_screenchooser_offset = MINECRAFT_SCREENCHOOSER_OFFSET_0_7_2;
-                    } else if (version_id == version_id_0_7_3) {
-                        minecraft_screenchooser_offset = MINECRAFT_SCREENCHOOSER_OFFSET_0_7_3;
-                    } else if (version_id == version_id_0_7_4) {
-                        minecraft_screenchooser_offset = MINECRAFT_SCREENCHOOSER_OFFSET_0_7_4;
-                    } else if (version_id == version_id_0_7_5) {
-                        minecraft_screenchooser_offset = MINECRAFT_SCREENCHOOSER_OFFSET_0_7_5;
-                    } else if (version_id == version_id_0_7_6) {
-                        minecraft_screenchooser_offset = MINECRAFT_SCREENCHOOSER_OFFSET_0_7_6;
-                    } else if (version_id == version_id_0_8_0) {
-                        minecraft_screenchooser_offset = MINECRAFT_SCREENCHOOSER_OFFSET_0_8_0;
-                    } else if (version_id == version_id_0_8_1) {
-                        minecraft_screenchooser_offset = MINECRAFT_SCREENCHOOSER_OFFSET_0_8_1;
-                    } else if (version_id == version_id_0_9_0) {
-                        minecraft_screenchooser_offset = MINECRAFT_SCREENCHOOSER_OFFSET_0_9_0;
-                    } else if (version_id == version_id_0_9_1) {
-                        minecraft_screenchooser_offset = MINECRAFT_SCREENCHOOSER_OFFSET_0_9_1;
-                    } else if (version_id == version_id_0_9_2) {
-                        minecraft_screenchooser_offset = MINECRAFT_SCREENCHOOSER_OFFSET_0_9_2;
-                    } else if (version_id == version_id_0_9_3) {
-                        minecraft_screenchooser_offset = MINECRAFT_SCREENCHOOSER_OFFSET_0_9_3;
-                    } else if (version_id == version_id_0_9_4) {
-                        minecraft_screenchooser_offset = MINECRAFT_SCREENCHOOSER_OFFSET_0_9_4;
-                    } else if (version_id == version_id_0_9_5) {
-                        minecraft_screenchooser_offset = MINECRAFT_SCREENCHOOSER_OFFSET_0_9_5;
-                    } else if (version_id == version_id_0_10_0) {
-                        minecraft_screenchooser_offset = MINECRAFT_SCREENCHOOSER_OFFSET_0_10_0;
-                    } else if (version_id == version_id_0_10_1) {
-                        minecraft_screenchooser_offset = MINECRAFT_SCREENCHOOSER_OFFSET_0_10_1;
-                    } else if (version_id == version_id_0_10_2) {
-                        minecraft_screenchooser_offset = MINECRAFT_SCREENCHOOSER_OFFSET_0_10_2;
-                    } else if (version_id == version_id_0_10_3) {
-                        minecraft_screenchooser_offset = MINECRAFT_SCREENCHOOSER_OFFSET_0_10_3;
-                    } else if (version_id == version_id_0_10_4) {
-                        minecraft_screenchooser_offset = MINECRAFT_SCREENCHOOSER_OFFSET_0_10_4;
-                    } else if (version_id == version_id_0_10_5) {
-                        minecraft_screenchooser_offset = MINECRAFT_SCREENCHOOSER_OFFSET_0_10_5;
-                    } else if (version_id == version_id_0_11_0) {
-                        minecraft_screenchooser_offset = MINECRAFT_SCREENCHOOSER_OFFSET_0_11_0;
-                    } else if (version_id == version_id_0_11_1) {
-                        minecraft_screenchooser_offset = MINECRAFT_SCREENCHOOSER_OFFSET_0_11_1;
+                    if (version_id >= version_id_0_7_0 && version_id <= version_id_0_11_1) {
+                        size_t minecraft_screenchooser_offset;
+                        if (version_id == version_id_0_7_0) {
+                            minecraft_screenchooser_offset = MINECRAFT_SCREENCHOOSER_OFFSET_0_7_0;
+                        } else if (version_id == version_id_0_7_1) {
+                            minecraft_screenchooser_offset = MINECRAFT_SCREENCHOOSER_OFFSET_0_7_1;
+                        } else if (version_id == version_id_0_7_2) {
+                            minecraft_screenchooser_offset = MINECRAFT_SCREENCHOOSER_OFFSET_0_7_2;
+                        } else if (version_id == version_id_0_7_3) {
+                            minecraft_screenchooser_offset = MINECRAFT_SCREENCHOOSER_OFFSET_0_7_3;
+                        } else if (version_id == version_id_0_7_4) {
+                            minecraft_screenchooser_offset = MINECRAFT_SCREENCHOOSER_OFFSET_0_7_4;
+                        } else if (version_id == version_id_0_7_5) {
+                            minecraft_screenchooser_offset = MINECRAFT_SCREENCHOOSER_OFFSET_0_7_5;
+                        } else if (version_id == version_id_0_7_6) {
+                            minecraft_screenchooser_offset = MINECRAFT_SCREENCHOOSER_OFFSET_0_7_6;
+                        } else if (version_id == version_id_0_8_0) {
+                            minecraft_screenchooser_offset = MINECRAFT_SCREENCHOOSER_OFFSET_0_8_0;
+                        } else if (version_id == version_id_0_8_1) {
+                            minecraft_screenchooser_offset = MINECRAFT_SCREENCHOOSER_OFFSET_0_8_1;
+                        } else if (version_id == version_id_0_9_0) {
+                            minecraft_screenchooser_offset = MINECRAFT_SCREENCHOOSER_OFFSET_0_9_0;
+                        } else if (version_id == version_id_0_9_1) {
+                            minecraft_screenchooser_offset = MINECRAFT_SCREENCHOOSER_OFFSET_0_9_1;
+                        } else if (version_id == version_id_0_9_2) {
+                            minecraft_screenchooser_offset = MINECRAFT_SCREENCHOOSER_OFFSET_0_9_2;
+                        } else if (version_id == version_id_0_9_3) {
+                            minecraft_screenchooser_offset = MINECRAFT_SCREENCHOOSER_OFFSET_0_9_3;
+                        } else if (version_id == version_id_0_9_4) {
+                            minecraft_screenchooser_offset = MINECRAFT_SCREENCHOOSER_OFFSET_0_9_4;
+                        } else if (version_id == version_id_0_9_5) {
+                            minecraft_screenchooser_offset = MINECRAFT_SCREENCHOOSER_OFFSET_0_9_5;
+                        } else if (version_id == version_id_0_10_0) {
+                            minecraft_screenchooser_offset = MINECRAFT_SCREENCHOOSER_OFFSET_0_10_0;
+                        } else if (version_id == version_id_0_10_1) {
+                            minecraft_screenchooser_offset = MINECRAFT_SCREENCHOOSER_OFFSET_0_10_1;
+                        } else if (version_id == version_id_0_10_2) {
+                            minecraft_screenchooser_offset = MINECRAFT_SCREENCHOOSER_OFFSET_0_10_2;
+                        } else if (version_id == version_id_0_10_3) {
+                            minecraft_screenchooser_offset = MINECRAFT_SCREENCHOOSER_OFFSET_0_10_3;
+                        } else if (version_id == version_id_0_10_4) {
+                            minecraft_screenchooser_offset = MINECRAFT_SCREENCHOOSER_OFFSET_0_10_4;
+                        } else if (version_id == version_id_0_10_5) {
+                            minecraft_screenchooser_offset = MINECRAFT_SCREENCHOOSER_OFFSET_0_10_5;
+                        } else if (version_id == version_id_0_11_0) {
+                            minecraft_screenchooser_offset = MINECRAFT_SCREENCHOOSER_OFFSET_0_11_0;
+                        } else if (version_id == version_id_0_11_1) {
+                            minecraft_screenchooser_offset = MINECRAFT_SCREENCHOOSER_OFFSET_0_11_1;
+                        }
+                        void *minecraft_screenchooser = NULL;
+                        if (version_id >= version_id_0_10_0) {
+                            minecraft_screenchooser = *(void **)((char *)ninecraft_app + minecraft_screenchooser_offset);
+                        } else {
+                            minecraft_screenchooser = (void *)((char *)ninecraft_app + minecraft_screenchooser_offset);
+                        }
+                        if (version_id >= version_id_0_9_0) {
+                            ((void (*)(void *, int))android_dlsym(handle, "_ZN13ScreenChooser9setScreenE8ScreenId"))(minecraft_screenchooser, 5);
+                        } else {
+                            ((void (*)(void *, int))android_dlsym(handle, "_ZN13ScreenChooser9setScreenE8ScreenId"))(minecraft_screenchooser, 7);
+                        }
+                    } else if (version_id >= version_id_0_1_0 && version_id <= version_id_0_6_1) {
+                        void *chat_screen = chat_screen_create();
+                        if (chat_screen) {
+                            minecraft_set_screen(ninecraft_app, chat_screen);
+                        }
                     }
-                    void *minecraft_screenchooser = NULL;
+                }
+            } else if (version_id >= version_id_0_1_1 && key == SDLK_ESCAPE) {
+                if (action == SDL_KEYDOWN) {
                     if (version_id >= version_id_0_10_0) {
-                        minecraft_screenchooser = *(void **)((char *)ninecraft_app + minecraft_screenchooser_offset);
-                    } else {
-                        minecraft_screenchooser = (void *)((char *)ninecraft_app + minecraft_screenchooser_offset);
-                    }
-                    if (version_id >= version_id_0_9_0) {
-                        ((void (*)(void *, int))android_dlsym(handle, "_ZN13ScreenChooser9setScreenE8ScreenId"))(minecraft_screenchooser, 5);
-                    } else {
-                        ((void (*)(void *, int))android_dlsym(handle, "_ZN13ScreenChooser9setScreenE8ScreenId"))(minecraft_screenchooser, 7);
-                    }
-                } else if (version_id >= version_id_0_1_0 && version_id <= version_id_0_6_1) {
-                    void *chat_screen = chat_screen_create();
-                    if (chat_screen) {
-                        minecraft_set_screen(ninecraft_app, chat_screen);
-                    }
-                }
-            }
-        } else if (version_id >= version_id_0_1_1 && key == SDLK_ESCAPE) {
-            if (action == SDL_KEYDOWN) {
-                if (version_id >= version_id_0_10_0) {
 #ifdef _WIN32
-                    call_with_custom_stack(minecraft_client_handle_back, NULL, 1024*1024, 2, ninecraft_app, false);
+                        call_with_custom_stack(minecraft_client_handle_back, NULL, 1024*1024, 2, ninecraft_app, false);
 #else
-                    minecraft_client_handle_back(ninecraft_app, false);
+                        minecraft_client_handle_back(ninecraft_app, false);
 #endif
-                } else {
-                    ninecraft_app_handle_back(ninecraft_app, false);
+                    } else {
+                        ninecraft_app_handle_back(ninecraft_app, false);
+                    }
                 }
+            } else if (action == SDL_KEYDOWN && game_keycode) {
+                keyboard_feed(game_keycode, 1);
+            } else if (action == SDL_KEYUP && game_keycode) {
+                keyboard_feed(game_keycode, 0);
             }
-        } else if (action == SDL_KEYDOWN && game_keycode) {
-            keyboard_feed(game_keycode, 1);
-        } else if (action == SDL_KEYUP && game_keycode) {
-            keyboard_feed(game_keycode, 0);
         }
     }
 }
@@ -1300,6 +1416,8 @@ static bool detect_version() {
             version_id = version_id_0_11_0;
         } else if (strcmp(verstr, "v0.11.1 alpha") == 0) {
             version_id = version_id_0_11_1;
+        } else if (strcmp(verstr, "v0.12.1 alpha") == 0) {
+            version_id = version_id_0_12_1;
         } else {
             puts("Unsupported Version!");
             found = false;
@@ -1364,9 +1482,67 @@ static bool detect_version() {
     return found;
 }
 
+int AppPlatform_android$getKeyboardHeight(void *__this) {
+    return 0;
+}
+
+jvalue org_fmod_fmod_checkinit(jobject obj, va_list ap) {
+    puts("org/fmod/FMOD::checkInit()");
+    return (jvalue)JNI_TRUE;
+}
+
+jvalue org_fmod_audiodevice_audiodevice(jobject obj, va_list ap) {
+    puts("org/fmod/AudioDevice::AudioDevice()");
+    return (jvalue)NULL;
+}
+
+int fmod_channels, fmod_sample_rate, fmod_frames_count, fmod_frame_size;
+
+jvalue org_fmod_audiodevice_init(jobject obj, va_list ap) {
+    jint channels = va_arg(ap, jint);
+    jint sample_rate = va_arg(ap, jint);
+    jint frames_count = va_arg(ap, jint);
+    jint frame_size = va_arg(ap, jint);
+    fmod_channels = channels;
+    fmod_sample_rate = sample_rate;
+    fmod_frames_count = frames_count;
+    fmod_frame_size = frame_size;
+    printf("org/fmod/AudioDevice::init(%d, %d, %d, %d)\n", channels, sample_rate, frame_size, frames_count);
+    return (jvalue)JNI_TRUE;
+}
+
+jvalue org_fmod_audiodevice_write(jobject obj, va_list ap) {
+    jbyteArray buffer = va_arg(ap, jbyteArray);
+    jint buffer_size = va_arg(ap, jint);
+    audio_engine_write(buffer, buffer_size, fmod_channels, 16, fmod_sample_rate, 1, 2, 1.0, 1.0);
+    return (jvalue)NULL;
+}
+
+jvalue org_fmod_audiodevice_close(jobject obj, va_list ap) {
+    puts("org/fmod/AudioDevice::close()");
+    return (jvalue)NULL;
+}
+
+void fmod_anjni() {
+    anjni_class_t *org_fmod_audiodevice, *org_fmod_mediacodec, *org_fmod_fmod;
+    anjni_create_class("org/fmod/AudioDevice", NULL, &org_fmod_audiodevice);
+    anjni_create_class("org/fmod/MediaCodec", NULL, &org_fmod_mediacodec);
+    anjni_create_class("org/fmod/FMOD", NULL, &org_fmod_fmod);
+
+    printf("org/fmod/AudioDevice: %p\n", org_fmod_audiodevice);
+    printf("org/fmod/MediaCodec: %p\n", org_fmod_mediacodec);
+    printf("org/fmod/FMOD: %p\n", org_fmod_fmod);
+    
+    anjni_add_method(org_fmod_fmod, ANJNI_METHOD_TYPE_BOOLEAN, "checkInit", "()Z", 1, 1, org_fmod_fmod_checkinit);
+    anjni_add_method(org_fmod_audiodevice, ANJNI_METHOD_TYPE_VOID, "<init>", "()V", 0, 0, org_fmod_audiodevice_audiodevice);
+    anjni_add_method(org_fmod_audiodevice, ANJNI_METHOD_TYPE_BOOLEAN, "init", "(IIII)Z", 0, 0, org_fmod_audiodevice_init);
+    anjni_add_method(org_fmod_audiodevice, ANJNI_METHOD_TYPE_VOID, "write", "([BI)V", 0, 0, org_fmod_audiodevice_write);
+    anjni_add_method(org_fmod_audiodevice, ANJNI_METHOD_TYPE_VOID, "close", "()V", 0, 0, org_fmod_audiodevice_close);
+}
+
 int main(int argc, char **argv) {
     struct soinfo *so_liblog, *so_libgles, *so_libgles2, *so_libegl;
-    struct soinfo *so_libandroid, *so_libopensles, *so_libz;
+    struct soinfo *so_libandroid, *so_libopensles, *so_libz, *so_libgnustl_shared, *so_libfmod;
     char *storage_path, *mods_path, *ovc_path, *icon_path, *global_overrides_path;
     static struct stat st = {0};
     int icon_width, icon_height;
@@ -1541,7 +1717,15 @@ int main(int argc, char **argv) {
     so_libopensles = android_library_create("libOpenSLES.so");
     so_libz = android_library_create("libz.so");
 
-    handle = load_library("libminecraftpe.so");
+    so_libgnustl_shared = load_library("libgnustl_shared.so", false);
+    so_libfmod = load_library("libfmod.so", false);
+
+    if (so_libfmod) {
+        fmod_anjni();
+        ((void (*)(JavaVM *, void *))android_dlsym(so_libfmod, "JNI_OnLoad"))(android_JavaVM, NULL);
+    }
+
+    handle = load_library("libminecraftpe.so", true);
 
     if (!handle) {
         puts("libminecraftpe.so not loaded");
@@ -1678,6 +1862,8 @@ int main(int argc, char **argv) {
         ninecraft_app_size = MINECRAFTCLIENT_SIZE_0_11_0;
     } else if (version_id == version_id_0_11_1) {
         ninecraft_app_size = MINECRAFTCLIENT_SIZE_0_11_1;
+    } else if (version_id == version_id_0_12_1) {
+        ninecraft_app_size = MINECRAFTCLIENT_SIZE_0_12_1;
     }
     ninecraft_app = malloc(ninecraft_app_size);
     if (version_id >= version_id_0_9_0 && version_id <= version_id_0_9_5) {
@@ -1795,6 +1981,49 @@ int main(int argc, char **argv) {
             DETOUR(android_dlsym(handle, "_ZN26HTTPRequestInternalAndroid4sendEv"), ninecraft_http_send, 1);
             DETOUR(android_dlsym(handle, "_ZN26HTTPRequestInternalAndroid5abortEv"), ninecraft_http_abort, 1);
             DETOUR(android_dlsym(handle, "_ZN12AndroidStore21createGooglePlayStoreERKSsR13StoreListener"), GET_SYSV_WRAPPER(ninecraft_store_create), 1);
+        } else if (version_id == version_id_0_12_1) {
+            memcpy(&platform_vtable_0_12_1, plat->vtable, sizeof(app_platform_vtable_0_12_1_t));
+            plat->vtable = (void **)&platform_vtable_0_12_1;
+            platform_vtable_0_12_1.getDataUrl = (void *)GET_SYSV_WRAPPER(AppPlatform_linux$getDataUrl);
+            platform_vtable_0_12_1.getImagePath = (void *)GET_SYSV_WRAPPER(AppPlatform_linux$getImagePath);
+            platform_vtable_0_12_1.loadPNG = (void *)AppPlatform_linux$loadPNG_0_9_0;
+            platform_vtable_0_12_1.loadTGA = (void *)AppPlatform_linux$loadTGA_0_9_0;
+            platform_vtable_0_12_1.getDateString = (void *)GET_SYSV_WRAPPER(AppPlatform_linux$getDateString);
+            platform_vtable_0_12_1.readAssetFile = (void *)GET_SYSV_WRAPPER(AppPlatform_linux$readAssetFile_0_9_0);
+            platform_vtable_0_12_1.getScreenHeight = (void *)AppPlatform_linux$getScreenHeight;
+            platform_vtable_0_12_1.getScreenWidth = (void *)AppPlatform_linux$getScreenWidth;
+            platform_vtable_0_12_1.showKeyboard = (void *)AppPlatform_linux$showKeyboard;
+            platform_vtable_0_12_1.hideKeyboard = (void *)AppPlatform_linux$hideKeyboard;
+            platform_vtable_0_12_1.getBroadcastAddresses = (void *)GET_SYSV_WRAPPER(AppPlatform_linux$getBroadcastAddresses);
+            platform_vtable_0_12_1.getAvailableMemory = (void *)AppPlatform_linux$getAvailableMemory;
+            platform_vtable_0_12_1.getPlatformStringVar = (void *)GET_SYSV_WRAPPER(AppPlatform_linux$getPlatformStringVar);
+            platform_vtable_0_12_1.getLoginInformation = (void *)GET_SYSV_WRAPPER(AppPlatform_linux$getLoginInformation);
+            platform_vtable_0_12_1.setLoginInformation = (void *)AppPlatform_linux$setLoginInformation;
+            platform_vtable_0_12_1.isNetworkEnabled = (void *)AppPlatform_linux$isNetworkEnabled;
+            platform_vtable_0_12_1.getPixelsPerMillimeter = (void *)AppPlatform_linux$getPixelsPerMillimeter;
+            platform_vtable_0_12_1.swapBuffers = (void *)AppPlatform_linux$swapBuffers;
+            platform_vtable_0_12_1.getSystemRegion = (void *)AppPlatform_linux$getSystemRegion;
+            platform_vtable_0_12_1.getGraphicsVendor = (void *)GET_SYSV_WRAPPER(AppPlatform_linux$getGraphicsVendor);
+            platform_vtable_0_12_1.getGraphicsRenderer = (void *)GET_SYSV_WRAPPER(AppPlatform_linux$getGraphicsRenderer);
+            platform_vtable_0_12_1.getGraphicsVersion = (void *)GET_SYSV_WRAPPER(AppPlatform_linux$getGraphicsVersion);
+            platform_vtable_0_12_1.getGraphicsExtensions = (void *)GET_SYSV_WRAPPER(AppPlatform_linux$getGraphicsExtensions);
+            platform_vtable_0_12_1.getExternalStoragePath = (void *)AppPlatform_linux$getExternalStoragePath;
+            platform_vtable_0_12_1.getInternalStoragePath = (void *)AppPlatform_linux$getInternalStoragePath;
+            platform_vtable_0_12_1.getApplicationId = (void *)GET_SYSV_WRAPPER(AppPlatform_linux$getApplicationId);
+            platform_vtable_0_12_1.getDeviceId = (void *)GET_SYSV_WRAPPER(AppPlatform_linux$getDeviceId);
+            platform_vtable_0_12_1.createUUID = (void *)GET_SYSV_WRAPPER(AppPlatform_linux$createUUID);
+            platform_vtable_0_12_1.isFirstSnoopLaunch = (void *)AppPlatform_linux$isFirstSnoopLaunch;
+            platform_vtable_0_12_1.hasHardwareInformationChanged = (void *)AppPlatform_linux$hasHardwareInformationChanged;
+            platform_vtable_0_12_1.isTablet = (void *)AppPlatform_linux$isTablet;
+            platform_vtable_0_12_1.pickImage = (void *)AppPlatform_linux$pickImage;
+            platform_vtable_0_12_1.hideMousePointer = (void *)grab_mouse;
+            platform_vtable_0_12_1.showMousePointer = (void *)release_mouse;
+
+            DETOUR(android_dlsym(handle, "_ZN26HTTPRequestInternalAndroidC2ER11HTTPRequest"), ninecraft_http_construct, 1);
+            DETOUR(android_dlsym(handle, "_ZN26HTTPRequestInternalAndroid4sendEv"), ninecraft_http_send, 1);
+            DETOUR(android_dlsym(handle, "_ZN26HTTPRequestInternalAndroid5abortEv"), ninecraft_http_abort, 1);
+            DETOUR(android_dlsym(handle, "_ZN12AndroidStore21createGooglePlayStoreERKSsR13StoreListener"), GET_SYSV_WRAPPER(ninecraft_store_create), 1);
+            DETOUR(android_dlsym(handle, "_ZN19AppPlatform_android17getKeyboardHeightEv"), AppPlatform_android$getKeyboardHeight, 1);
         }
         context->platform = plat;
 #ifdef _WIN32
@@ -1825,7 +2054,7 @@ int main(int argc, char **argv) {
             *(uint8_t *)((char *)ninecraft_app + 4) = 1; // is_inited
         }
     }
-
+    
     minecraft_options = minecraft_get_options(ninecraft_app, version_id);
 
     if (version_id >= version_id_0_5_0 && version_id <= version_id_0_11_1 && minecraft_options && minecraft_options != ninecraft_app) {
@@ -1958,13 +2187,15 @@ int main(int argc, char **argv) {
     }
     
     while (running) {
-        if (((bool *)ninecraft_app)[minecraft_isgrabbed_offset]) {
-            if (!mouse_pointer_hidden) {
-                grab_mouse();
-            }
-        } else {
-            if (mouse_pointer_hidden) {
-                release_mouse();
+        if (version_id <= version_id_0_11_1) {
+            if (((bool *)ninecraft_app)[minecraft_isgrabbed_offset]) {
+                if (!mouse_pointer_hidden) {
+                    grab_mouse();
+                }
+            } else {
+                if (mouse_pointer_hidden) {
+                    release_mouse();
+                }
             }
         }
         if (version_id >= version_id_0_6_0 && version_id <= version_id_0_8_1) {

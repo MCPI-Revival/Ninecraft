@@ -8,6 +8,16 @@ typedef struct {
     short dy;
     char button;
     char type;
+    int pointer_id;
+} mouse_action_0_12_t;
+
+typedef struct {
+    short x;
+    short y;
+    short dx;
+    short dy;
+    char button;
+    char type;
     char pointer_id;
 } mouse_action_0_6_t;
 

@@ -44,6 +44,9 @@ typedef union {
 extern ninecraft_options_t platform_options;
 extern bool is_keyboard_visible;
 
+EXTERN_SYSV_WRAPPER(AppPlatform_linux$getDataUrl);
+void AppPlatform_linux$getDataUrl(android_string_t *ret, AppPlatform_linux *app_platform);
+
 void AppPlatform_linux$saveImage(AppPlatform_linux *app_platform, android_string_t *resource_path, android_string_t *pixels, int width, int height);
 
 void AppPlatform_linux$swapBuffers(AppPlatform_linux *app_platform);

@@ -14,3 +14,6 @@
 	path = SDL
 	url = https://github.com/libsdl-org/SDL
 	branch = SDL2
+[submodule "anjni"]
+	path = anjni
+	url = http://github.com/MFDGaming/anjni

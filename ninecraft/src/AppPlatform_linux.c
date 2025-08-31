@@ -521,6 +521,17 @@ void *app_platform_vtable_0_10_0[] = {
     (void *)AppPlatform_linux$updateStatsUserData,
 };
 
+SYSV_WRAPPER(AppPlatform_linux$getDataUrl, 2)
+void AppPlatform_linux$getDataUrl(android_string_t *ret, AppPlatform_linux *app_platform) {
+    //puts("debug: AppPlatform_linux::getDataUrl");
+    char *str = (char *)malloc(1024);
+    str[0] = '\0';
+    strcat(str, game_parameters.game_path);
+    strcat(str, "/assets/");
+    android_string_cstr(ret, str);
+    free(str);
+}
+
 void AppPlatform_linux$saveImage(AppPlatform_linux *app_platform, android_string_t *resource_path, android_string_t *pixels, int width, int height) {
     //puts("debug: AppPlatform_linux::saveImage");
 }

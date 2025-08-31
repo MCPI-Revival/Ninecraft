@@ -26,7 +26,7 @@ void controller_turn_input_get_turn_delta(struct turn_delta *ret, void *turn_inp
 SYSV_WRAPPER(controller_turn_input_get_turn_delta, 2)
 
 void mouse_input_mod_inject(void *handle, int version_id) {
-    if (version_id >= version_id_0_6_0) {
+    if (version_id >= version_id_0_6_0 && version_id <= version_id_0_11_1) {
         mouse_get_dx = (mouse_get_dx_t)android_dlsym(handle, "_ZN5Mouse5getDXEv");
         mouse_get_dy = (mouse_get_dx_t)android_dlsym(handle, "_ZN5Mouse5getDYEv");
         ((void **)android_dlsym(handle, "_ZTV19ControllerTurnInput"))[5] = GET_SYSV_WRAPPER(controller_turn_input_get_turn_delta);

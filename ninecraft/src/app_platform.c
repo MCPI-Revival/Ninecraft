@@ -3,3 +3,4 @@
 app_platform_vtable_0_9_0_t platform_vtable_0_9_0;
 app_platform_vtable_0_10_0_t platform_vtable_0_10_0;
 app_platform_vtable_0_11_0_t platform_vtable_0_11_0;
+app_platform_vtable_0_12_1_t platform_vtable_0_12_1;
