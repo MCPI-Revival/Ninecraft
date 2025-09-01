@@ -58,9 +58,7 @@
           # ancmp = ./ancmp;
         })
         // {
-          default = packages.buildNinecraftInstance {
-            version = packages.mcpeVersions.a0_6_1;
-          };
+          default = packages.ninecraft-demo;
         };
       apps = {
         extract = {
