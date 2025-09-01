@@ -1496,6 +1496,7 @@ jvalue org_fmod_fmod_checkinit(jobject obj, va_list ap) {
 jvalue org_fmod_audiodevice_audiodevice(jobject obj, va_list ap) {
     jvalue ret;
     puts("org/fmod/AudioDevice::AudioDevice()");
+    memset(&ret, 0, sizeof(jvalue));
     return ret;
 }
 
@@ -1521,12 +1522,14 @@ jvalue org_fmod_audiodevice_write(jobject obj, va_list ap) {
     jbyteArray buffer = va_arg(ap, jbyteArray);
     jint buffer_size = va_arg(ap, jint);
     audio_engine_write(buffer, buffer_size, fmod_channels, 16, fmod_sample_rate, 1, 2, 1.0, 1.0);
+    memset(&ret, 0, sizeof(jvalue));
     return ret;
 }
 
 jvalue org_fmod_audiodevice_close(jobject obj, va_list ap) {
     jvalue ret;
     puts("org/fmod/AudioDevice::close()");
+    memset(&ret, 0, sizeof(jvalue));
     return ret;
 }
 
