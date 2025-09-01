@@ -1487,18 +1487,23 @@ int AppPlatform_android$getKeyboardHeight(void *__this) {
 }
 
 jvalue org_fmod_fmod_checkinit(jobject obj, va_list ap) {
+    jvalue ret;
+    ret.z = JNI_TRUE;
     puts("org/fmod/FMOD::checkInit()");
-    return (jvalue)JNI_TRUE;
+    return ret;
 }
 
 jvalue org_fmod_audiodevice_audiodevice(jobject obj, va_list ap) {
+    jvalue ret;
     puts("org/fmod/AudioDevice::AudioDevice()");
-    return (jvalue)NULL;
+    return ret;
 }
 
 int fmod_channels, fmod_sample_rate, fmod_frames_count, fmod_frame_size;
 
 jvalue org_fmod_audiodevice_init(jobject obj, va_list ap) {
+    jvalue ret;
+    ret.z = JNI_TRUE;
     jint channels = va_arg(ap, jint);
     jint sample_rate = va_arg(ap, jint);
     jint frames_count = va_arg(ap, jint);
@@ -1508,19 +1513,21 @@ jvalue org_fmod_audiodevice_init(jobject obj, va_list ap) {
     fmod_frames_count = frames_count;
     fmod_frame_size = frame_size;
     printf("org/fmod/AudioDevice::init(%d, %d, %d, %d)\n", channels, sample_rate, frame_size, frames_count);
-    return (jvalue)JNI_TRUE;
+    return ret;
 }
 
 jvalue org_fmod_audiodevice_write(jobject obj, va_list ap) {
+    jvalue ret;
     jbyteArray buffer = va_arg(ap, jbyteArray);
     jint buffer_size = va_arg(ap, jint);
     audio_engine_write(buffer, buffer_size, fmod_channels, 16, fmod_sample_rate, 1, 2, 1.0, 1.0);
-    return (jvalue)NULL;
+    return ret;
 }
 
 jvalue org_fmod_audiodevice_close(jobject obj, va_list ap) {
+    jvalue ret;
     puts("org/fmod/AudioDevice::close()");
-    return (jvalue)NULL;
+    return ret;
 }
 
 void fmod_anjni() {
