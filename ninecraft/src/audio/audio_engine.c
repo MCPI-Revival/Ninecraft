@@ -3,7 +3,6 @@
 #include <stdint.h>
 #include <string.h>
 #include <stdio.h>
-#include <ancmp/android_atomic.h>
 
 #define AUDIO_ENGINE_MAX_STREAMS 64
 
@@ -36,8 +35,8 @@ static SDL_AudioSpec audio_engine_audio_spec;
 
 static bool audio_engine_initialized = false;
 
-uint8_t *audio_engine_buffer = NULL;
-volatile int is_full = 0;
+static uint8_t *audio_engine_buffer = NULL;
+static SDL_sem *audio_engine_sem = NULL;
 
 static float audio_engine_decode_sample(uint8_t *sample_data, uint32_t sample_size, uint32_t format) {
     float sample = 0;
@@ -120,11 +119,9 @@ static void audio_engine_mix(audio_engine_stream_t *stream, Uint8 *out_stream, i
 }
 
 static void SDLCALL audio_engine_audio_callback(void *userdata, Uint8 *stream, int len) {
-    memset(stream, 0, len);
-    if (!android_atomic_cmpxchg(1, 1, &is_full)) {
-        memcpy(stream, audio_engine_buffer, len);
-        android_atomic_cmpxchg(1, 0, &is_full);
-    }
+    memcpy(stream, audio_engine_buffer, len);
+    memset(audio_engine_buffer, 0, len);
+    SDL_SemPost(audio_engine_sem);
     for (int i = 0; i < AUDIO_ENGINE_MAX_STREAMS; ++i) {
         audio_engine_stream_t *audio_engine_stream = &audio_engine_streams[i];
         if (audio_engine_stream->active) {
@@ -178,15 +175,13 @@ void audio_engine_write(uint8_t *buffer, uint32_t buffer_size, uint32_t num_chan
         size_t remaining = out_stream_size - len_nr;
 
         for (int i = 0; i < c; ++i) {
-            while (android_atomic_cmpxchg(0, 1, &is_full)) {
-            }
+            SDL_SemWait(audio_engine_sem);
             SDL_LockAudioDevice(audio_engine_device);
             memcpy(audio_engine_buffer, &out_stream[i * audio_engine_audio_spec.size], audio_engine_audio_spec.size);
             SDL_UnlockAudioDevice(audio_engine_device);
         }
         if (remaining) {
-            while (android_atomic_cmpxchg(0, 1, &is_full)) {
-            }
+            SDL_SemWait(audio_engine_sem);
             SDL_LockAudioDevice(audio_engine_device);
             memcpy(audio_engine_buffer, &out_stream[len_nr], remaining);
             SDL_UnlockAudioDevice(audio_engine_device);
@@ -213,11 +208,17 @@ void audio_engine_init() {
         desired_spec.channels = 2;
         desired_spec.samples = 1024;
         desired_spec.callback = audio_engine_audio_callback;
-
+        
         audio_engine_device = SDL_OpenAudioDevice(NULL, 0, &desired_spec, &audio_engine_audio_spec, 0);
 
         if (!audio_engine_device) {
             printf("SDL_OpenAudioDevice failed: %s\n", SDL_GetError());
+            return;
+        }
+
+        audio_engine_sem = SDL_CreateSemaphore(0);
+        if (!audio_engine_sem) {
+            printf("SDL_CreateSemaphore failed: %s\n", SDL_GetError());
             return;
         }
 
