@@ -186,7 +186,7 @@ static void mouse_scroll_callback(struct SDL_Window *window, float xoffset, floa
 }
 
 static void mouse_pos_callback(struct SDL_Window *window, int xpos, int ypos, int xrel, int yrel) {
-    if (version_id == version_id_0_12_1) {
+    if (version_id >= version_id_0_12_1) {
         if (mouse_pointer_hidden) {
             mouse_device_feed_0_12(android_dlsym(handle, "_ZN5Mouse9_instanceE"), 0, 0, (short)xpos, (short)ypos, (short)(xrel / 2), (short)(yrel / 2));
         } else {
@@ -1418,6 +1418,10 @@ static bool detect_version() {
             version_id = version_id_0_11_1;
         } else if (strcmp(verstr, "v0.12.1 alpha") == 0) {
             version_id = version_id_0_12_1;
+        } else if (strcmp(verstr, "v0.12.2 alpha") == 0) {
+            version_id = version_id_0_12_2;
+        } else if (strcmp(verstr, "v0.12.3 alpha") == 0) {
+            version_id = version_id_0_12_3;
         } else {
             puts("Unsupported Version!");
             found = false;
@@ -1874,6 +1878,10 @@ int main(int argc, char **argv) {
         ninecraft_app_size = MINECRAFTCLIENT_SIZE_0_11_1;
     } else if (version_id == version_id_0_12_1) {
         ninecraft_app_size = MINECRAFTCLIENT_SIZE_0_12_1;
+    } else if (version_id == version_id_0_12_2) {
+        ninecraft_app_size = MINECRAFTCLIENT_SIZE_0_12_2;
+    } else if (version_id == version_id_0_12_3) {
+        ninecraft_app_size = MINECRAFTCLIENT_SIZE_0_12_3;
     }
     ninecraft_app = malloc(ninecraft_app_size);
     if (version_id >= version_id_0_9_0 && version_id <= version_id_0_9_5) {
@@ -1991,7 +1999,7 @@ int main(int argc, char **argv) {
             DETOUR(android_dlsym(handle, "_ZN26HTTPRequestInternalAndroid4sendEv"), ninecraft_http_send, 1);
             DETOUR(android_dlsym(handle, "_ZN26HTTPRequestInternalAndroid5abortEv"), ninecraft_http_abort, 1);
             DETOUR(android_dlsym(handle, "_ZN12AndroidStore21createGooglePlayStoreERKSsR13StoreListener"), GET_SYSV_WRAPPER(ninecraft_store_create), 1);
-        } else if (version_id == version_id_0_12_1) {
+        } else if (version_id >= version_id_0_12_1) {
             memcpy(&platform_vtable_0_12_1, plat->vtable, sizeof(app_platform_vtable_0_12_1_t));
             plat->vtable = (void **)&platform_vtable_0_12_1;
             platform_vtable_0_12_1.getDataUrl = (void *)GET_SYSV_WRAPPER(AppPlatform_linux$getDataUrl);
