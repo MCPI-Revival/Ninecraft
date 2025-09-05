@@ -96,6 +96,8 @@ void mouse_device_feed_0_12(mouse_device_0_6_t *mouse_device, char button, char 
         mouse_device->button_states[button] = type;
         if (button == 1) {
             mouse_device->last_pressed = -1;
+        } else if (button == 3) {
+            return;
         }
     } else {
         if (mouse_device->dx == -9999) {

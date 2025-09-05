@@ -188,7 +188,7 @@ static void mouse_scroll_callback(struct SDL_Window *window, float xoffset, floa
 static void mouse_pos_callback(struct SDL_Window *window, int xpos, int ypos, int xrel, int yrel) {
     if (version_id >= version_id_0_12_1) {
         if (mouse_pointer_hidden) {
-            mouse_device_feed_0_12(android_dlsym(handle, "_ZN5Mouse9_instanceE"), 0, 0, (short)xpos, (short)ypos, (short)(xrel / 3), (short)(yrel / 3));
+            mouse_device_feed_0_12(android_dlsym(handle, "_ZN5Mouse9_instanceE"), 0, 0, (short)xpos, (short)ypos, (short)xrel, (short)yrel);
         } else {
             mouse_device_feed_0_12(android_dlsym(handle, "_ZN5Mouse9_instanceE"), 0, 0, (short)xpos, (short)ypos, 0, 0);
         }
