@@ -1,4 +1,4 @@
-build/
+build*/
 buil/
 build2/
 build-arm/
@@ -28,3 +28,6 @@ a.out
 result/
 result
 result*
+!/docker/build
+/docker/run/ninecraft
+/.idea

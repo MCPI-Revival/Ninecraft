@@ -29,6 +29,7 @@
 #include <ninecraft/mods/inject.h>
 #include <ninecraft/mods/mod_loader.h>
 #include <ninecraft/app_platform.h>
+#include <ninecraft/ptpatch/apply.h>
 #include <math.h>
 #include <wchar.h>
 #include <wctype.h>
@@ -55,6 +56,7 @@
 
 void *handle = NULL;
 struct SDL_Window *_window = NULL;
+SDL_Haptic *_haptic = NULL;
 bool ctrl_pressed = false;
 bool is_fullscreen = false;
 
@@ -69,7 +71,7 @@ static float *controller_y_stick;
 
 bool mouse_pointer_hidden = false;
 
-void *load_library(const char *name, bool show_error) {
+void *load_library(const char *name, bool show_error, bool apply_ptpatch) {
 #if defined(__i386__) || defined(_M_IX86)
     char *arch = "x86";
 #else
@@ -87,7 +89,24 @@ void *load_library(const char *name, bool show_error) {
     strcat(fullpath, "/");
     strcat(fullpath, name);
 
-    void *handle = android_dlopen(fullpath, ANDROID_RTLD_LAZY);
+    void *handle;
+    if (apply_ptpatch) {
+        char *patches_path = (char *)malloc(1024);
+        patches_path[0] = '\0';
+        strcat(patches_path, game_parameters.home_path);
+        strcat(patches_path, "/patches");
+        char *patched_file_path = (char *)malloc(1024);
+        strcat(patched_file_path, patches_path);
+        strcat(patched_file_path, "/");
+        strcat(patched_file_path, name);
+        const int ret = apply_ptpatches(fullpath, patched_file_path, patches_path);
+        handle = android_dlopen(ret ? patched_file_path : fullpath, ANDROID_RTLD_LAZY);
+        unlink(patched_file_path);
+        free(patched_file_path);
+        free(patches_path);
+    } else {
+        handle = android_dlopen(fullpath, ANDROID_RTLD_LAZY);
+    }
     if (handle == NULL) {
         const char *e = android_dlerror();
         if (show_error) {
@@ -138,7 +157,27 @@ int mouseToGameKeyCode(int keyCode) {
     return 0;
 }
 
+static void convert_window_xy_to_framebuffer_xy(struct SDL_Window *window, int *x, int *y) {
+    if (SDL_GetRelativeMouseMode() == SDL_TRUE) {
+        return;
+    }
+    int window_width = 0;
+    int window_height = 0;
+    SDL_GetWindowSize(window, &window_width, &window_height);
+    if (window_width <= 0 || window_height <= 0) {
+        return;
+    }
+    int framebuffer_width = 0;
+    int framebuffer_height = 0;
+    SDL_GL_GetDrawableSize(window, &framebuffer_width, &framebuffer_height);
+    float scale_x = ((float) framebuffer_width) / ((float) window_width);
+    float scale_y = ((float) framebuffer_height) / ((float) window_height);
+    *x *= scale_x;
+    *y *= scale_y;
+}
+
 static void mouse_click_callback(struct SDL_Window *window, int button, int action, int x, int y) {
+    convert_window_xy_to_framebuffer_xy(window, &x, &y);
     int mc_button = (button == SDL_BUTTON_LEFT ? 1 : (button == SDL_BUTTON_RIGHT ? 2 : 0));
     if (!mc_button) {
         return;
@@ -186,6 +225,8 @@ static void mouse_scroll_callback(struct SDL_Window *window, float xoffset, floa
 }
 
 static void mouse_pos_callback(struct SDL_Window *window, int xpos, int ypos, int xrel, int yrel) {
+    convert_window_xy_to_framebuffer_xy(window, &xpos, &ypos);
+    convert_window_xy_to_framebuffer_xy(window, &xrel, &yrel);
     if (version_id >= version_id_0_12_1) {
         if (mouse_pointer_hidden) {
             mouse_device_feed_0_12(android_dlsym(handle, "_ZN5Mouse9_instanceE"), 0, 0, (short)xpos, (short)ypos, (short)xrel, (short)yrel);
@@ -210,6 +251,83 @@ static void mouse_pos_callback(struct SDL_Window *window, int xpos, int ypos, in
             controller_states[1] = 1;
             controller_x_stick[1] += (float)xrel * 0.003;
             controller_y_stick[1] -= (float)yrel * 0.003;
+        }
+    }
+}
+
+static void touch_feed(struct SDL_Window *window, char button, char type, float xpos, float ypos, float xrel, float yrel, char pointer_id) {
+    int width = 0;
+    int height = 0;
+    SDL_GL_GetDrawableSize(window, &width, &height);
+    xpos *= width;
+    ypos *= height;
+    xrel *= width;
+    yrel *= height;
+    // TODO Support 0.12
+    if (version_id == version_id_0_1_0) {
+        ((void (*)(int, int, int, int))android_dlsym(handle, "_ZN5Mouse4feedEiiii"))(button, type, (int)xpos, (int)ypos);
+    } else if (version_id >= version_id_0_6_0 && version_id < version_id_0_12_1) {
+        mouse_device_feed_0_6(android_dlsym(handle, "_ZN5Mouse9_instanceE"), button, type, (short)xpos, (short)ypos, (short)xrel, (short)yrel);
+        multitouch_feed_0_6(button, type, (short)xpos, (short)ypos, pointer_id);
+    } else if (version_id <= version_id_0_5_0_j && version_id >= version_id_0_2_1) {
+        mouse_device_feed_0_2_1(android_dlsym(handle, "_ZN5Mouse9_instanceE"), button, type, (short)xpos, (short)ypos);
+        multitouch_feed_0_2_1(button, type, (short)xpos, (short)ypos, pointer_id);
+    } else if (version_id <= version_id_0_2_0_j && version_id >= version_id_0_1_0_touch) {
+        mouse_device_feed_0_1(android_dlsym(handle, "_ZN5Mouse9_instanceE"), button, type, (short)xpos, (short)ypos);
+        multitouch_feed_0_1(button, type, (short)xpos, (short)ypos, pointer_id);
+    }
+}
+#define MAX_TOUCHES (8)
+struct touch_id_data {
+    int active;
+    SDL_TouchID device;
+    SDL_FingerID finger;
+};
+static struct touch_id_data touch_ids[MAX_TOUCHES];
+static char touch_get_id(SDL_TouchID device, SDL_FingerID finger) {
+    // ID 0 Is Reserved For The Mouse
+    int start = 1;
+    // Search For Active ID
+    for (int i = start; i < MAX_TOUCHES; i++) {
+        struct touch_id_data *data = touch_ids + i;
+        if (data->active && data->device == device && data->finger == finger) {
+            return i;
+        }
+    }
+    // Not Found
+    for (int i = start; i < MAX_TOUCHES; i++) {
+        // Find First Inactive ID, And Activate It
+        struct touch_id_data *data = touch_ids + i;
+        if (!data->active) {
+            data->active = 1;
+            data->device = device;
+            data->finger = finger;
+            return i;
+        }
+    }
+    // Fail
+    return 0;
+}
+static void touch_drop_id(int id) {
+    touch_ids[id].active = 0;
+}
+static void touch_callback(struct SDL_Window *window, float xpos, float ypos, float xrel, float yrel, int type, char id) {
+    if (id == 0) {
+        return;
+    }
+    switch (type) {
+        case SDL_FINGERDOWN:
+        case SDL_FINGERUP: {
+            char data = type == SDL_FINGERUP ? 0 : 1;
+            touch_feed(window, 1, data, xpos, ypos, xrel, yrel, id);
+            if (type == SDL_FINGERUP) {
+                touch_drop_id(id);
+            }
+            break;
+        }
+        case SDL_FINGERMOTION: {
+            touch_feed(window, 0, 0, xpos, ypos, xrel, yrel, id);
+            break;
         }
     }
 }
@@ -651,6 +769,7 @@ float calculate_scale(int width, int height, float dpi) {
 }
 
 static void set_ninecraft_size(int width, int height) {
+    glClear(GL_DEPTH_BUFFER_BIT); // Needed To Fix v0.8.1 On Some Systems
     float ddpi = 96.0f;
     SDL_GetDisplayDPI(SDL_GetWindowDisplayIndex(_window), &ddpi, NULL, NULL);
     float scale = calculate_scale(width, height, ddpi);    
@@ -706,7 +825,10 @@ static void set_ninecraft_size(int width, int height) {
     }
 }
 
-static void resize_callback(struct SDL_Window *window, int width, int height) {
+static void resize_callback(struct SDL_Window *window) {
+    int width;
+    int height;
+    SDL_GL_GetDrawableSize(_window, &width, &height);
     if (version_id == version_id_0_1_0) {
         set_ninecraft_size_0_1_0(width, height);
     } else {
@@ -1079,7 +1201,7 @@ static void key_callback(struct SDL_Window *window, int key, int scancode, int a
                         }
                     }
                 }
-            } else if (version_id >= version_id_0_1_1 && key == SDLK_ESCAPE) {
+            } else if (version_id >= version_id_0_1_1 && (key == SDLK_ESCAPE || key == SDLK_AC_BACK)) {
                 if (action == SDL_KEYDOWN) {
                     if (version_id >= version_id_0_10_0) {
 #ifdef _WIN32
@@ -1654,6 +1776,7 @@ int main(int argc, char **argv) {
         free(icon_path);
         return 1;
     }
+    SDL_StopTextInput();
 
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 2);
     SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 0);
@@ -1666,7 +1789,7 @@ int main(int argc, char **argv) {
         "Ninecraft",
         SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
         720, 480,
-        SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE
+        SDL_WINDOW_OPENGL | SDL_WINDOW_SHOWN | SDL_WINDOW_RESIZABLE | SDL_WINDOW_ALLOW_HIGHDPI
     );
     if (!_window) {
         printf("SDL_CreateWindow Error: %s\n", SDL_GetError());
@@ -1731,18 +1854,22 @@ int main(int argc, char **argv) {
     so_libopensles = android_library_create("libOpenSLES.so");
     so_libz = android_library_create("libz.so");
 
-    so_libgnustl_shared = load_library("libgnustl_shared.so", false);
-    so_libfmod = load_library("libfmod.so", false);
+    so_libgnustl_shared = load_library("libgnustl_shared.so", false, false);
+    so_libfmod = load_library("libfmod.so", false, false);
 
     if (so_libfmod) {
         fmod_anjni();
         ((void (*)(JavaVM *, void *))android_dlsym(so_libfmod, "JNI_OnLoad"))(android_JavaVM, NULL);
     }
 
-    handle = load_library("libminecraftpe.so", true);
+    handle = load_library("libminecraftpe.so", true, true);
 
     if (!handle) {
         puts("libminecraftpe.so not loaded");
+        audio_engine_destroy();
+        SDL_GL_DeleteContext(gl_context);
+        SDL_DestroyWindow(_window);
+        SDL_Quit();
         free(storage_path);
         free(mods_path);
         free(global_overrides_path);
@@ -1754,12 +1881,20 @@ int main(int argc, char **argv) {
     android_alloc_setup_hooks(handle);
 
     if (!detect_version()) {
+        audio_engine_destroy();
+        SDL_GL_DeleteContext(gl_context);
+        SDL_DestroyWindow(_window);
+        SDL_Quit();
         free(storage_path);
         free(mods_path);
         free(global_overrides_path);
         free(ovc_path);
         free(icon_path);
         return 1;
+    }
+
+    if (SDL_Init(SDL_INIT_HAPTIC) >= 0) {
+        _haptic = SDL_HapticOpen(0);
     }
 
     multitouch_setup_hooks(handle);
@@ -2100,11 +2235,7 @@ int main(int argc, char **argv) {
 
     mod_loader_execute_on_minecraft_init(ninecraft_app, version_id);
 
-    if (version_id >= version_id_0_1_0_touch) {
-        set_ninecraft_size(720, 480);
-    } else {
-        set_ninecraft_size_0_1_0(720, 480);
-    }
+    resize_callback(_window);
 
     if (version_id == version_id_0_11_1) {
         minecraft_isgrabbed_offset = MINECRAFTCLIENT_ISGRABBED_OFFSET_0_11_1;
@@ -2254,15 +2385,33 @@ int main(int argc, char **argv) {
             } else if (event.type == SDL_TEXTINPUT) {
                 char_callback(_window, event.text.text);
             } else if (event.type == SDL_MOUSEMOTION) {
-                mouse_pos_callback(_window, event.motion.x, event.motion.y, event.motion.xrel, event.motion.yrel);
+                if (event.motion.which != SDL_TOUCH_MOUSEID) {
+                    mouse_pos_callback(_window, event.motion.x, event.motion.y, event.motion.xrel, event.motion.yrel);
+                }
             } else if (event.type == SDL_MOUSEBUTTONDOWN || event.type == SDL_MOUSEBUTTONUP) {
-                mouse_click_callback(_window, event.button.button, event.button.state, event.button.x, event.button.y);
+                if (event.button.which != SDL_TOUCH_MOUSEID) {
+                    mouse_click_callback(_window, event.button.button, event.button.state, event.button.x, event.button.y);
+                }
             } else if (event.type == SDL_MOUSEWHEEL) {
                 mouse_scroll_callback(_window, event.wheel.preciseX, event.wheel.preciseY, event.wheel.direction);
-            } else if (event.type == SDL_WINDOWEVENT && event.window.event == SDL_WINDOWEVENT_SIZE_CHANGED) {
-                resize_callback(_window, event.window.data1, event.window.data2);
+            } else if (event.type == SDL_FINGERDOWN || event.type == SDL_FINGERUP || event.type == SDL_FINGERMOTION) {
+                char id = touch_get_id(event.tfinger.touchId, event.tfinger.fingerId);
+                touch_callback(_window, event.tfinger.x, event.tfinger.y, event.tfinger.dx, event.tfinger.dy, event.type, id);
+            } else if (event.type == SDL_WINDOWEVENT) {
+                if (event.window.event == SDL_WINDOWEVENT_SIZE_CHANGED) {
+                    resize_callback(_window);
+                } else if (event.window.event == SDL_WINDOWEVENT_FOCUS_LOST) {
+                    // SDL_GetWindowGrab() always returns false when focus has been lost.
+                    if (SDL_GetRelativeMouseMode() == SDL_TRUE) {
+                        key_callback(_window, SDLK_ESCAPE, 0, SDL_KEYDOWN, KMOD_NONE);
+                        key_callback(_window, SDLK_ESCAPE, 0, SDL_KEYUP, KMOD_NONE);
+                    }
+                }
             }
         }
+    }
+    if (_haptic) {
+        SDL_HapticClose(_haptic);
     }
     audio_engine_destroy();
     SDL_GL_DeleteContext(gl_context);

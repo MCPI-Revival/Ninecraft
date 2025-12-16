@@ -29,6 +29,7 @@ ninecraft_options_t platform_options = {
     .capasity = 0
 };
 bool is_keyboard_visible = false;
+extern SDL_Haptic *_haptic;
 
 void *app_platform_vtable_0_1_0[] = {
     (void *)AppPlatform_linux$saveScreenshot,
@@ -674,7 +675,7 @@ bool AppPlatform_linux$supportsTouchscreen(AppPlatform_linux *app_platform) {
 
 bool AppPlatform_linux$supportsVibration(AppPlatform_linux *app_platform) {
     //puts("debug: AppPlatform_linux::supportsVibration");
-    return false;
+    return true;
 }
 
 void AppPlatform_linux$getSessionIDAndRefreshToken(AppPlatform_linux *app_platform, android_string_t *session_id, android_string_t *refresh_token) {
@@ -1006,6 +1007,9 @@ bool AppPlatform_linux$hasBuyButtonWhenInvalidLicense(AppPlatform_linux *app_pla
 
 void AppPlatform_linux$hideKeyboard(AppPlatform_linux *app_platform) {
     //puts("debug: AppPlatform_linux::hideKeyboard");
+    if (is_keyboard_visible) {
+        SDL_StopTextInput();
+    }
     is_keyboard_visible = false;
 }
 
@@ -1182,11 +1186,17 @@ void AppPlatform_linux$showDialog(AppPlatform_linux *app_platform, int dialog_id
 
 void AppPlatform_linux$showKeyboard(AppPlatform_linux *app_platform) {
     //puts("debug: AppPlatform_linux::showKeyboard");
+    if (!is_keyboard_visible) {
+        SDL_StartTextInput();
+    }
     is_keyboard_visible = true;
 }
 
 void AppPlatform_linux$showKeyboard2(AppPlatform_linux *app_platform, bool show) {
     //puts("debug: AppPlatform_linux::showKeyboard2");
+    if (!is_keyboard_visible) {
+        SDL_StartTextInput();
+    }
     is_keyboard_visible = true;
 }
 
@@ -1196,6 +1206,15 @@ void AppPlatform_linux$uploadPlatformDependentData(AppPlatform_linux *app_platfo
 
 void AppPlatform_linux$vibrate(AppPlatform_linux *app_platform, int milliseconds) {
     //puts("debug: AppPlatform_linux::vibrate");
+    // Some Vibration Motors Ignore Short Vibrations
+    static int min_milliseconds = 150;
+    if (milliseconds < min_milliseconds) {
+        milliseconds = min_milliseconds;
+    }
+    // Play Vibration
+    if (_haptic && SDL_HapticRumbleInit(_haptic) == 0) {
+        SDL_HapticRumblePlay(_haptic, 1, milliseconds);
+    }
 }
 
 void AppPlatform_linux$destroy(AppPlatform_linux *app_platform) {

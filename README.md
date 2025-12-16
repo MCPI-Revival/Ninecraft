@@ -95,6 +95,15 @@ git clone --recursive http://github.com/MCPI-Revival/Ninecraft.git
 cd Ninecraft
 make build-arm
 ```
+### postmarketOS (Docker)
+```sh
+git clone --recursive https://github.com/MCPI-Revival/Ninecraft.git
+cd Ninecraft/docker
+./build.sh <i686 or arm>
+DIR="$(pwd)"
+cd <Extracted APK>
+"${DIR}/install.sh" <i686 or arm>
+```
 
 ## Before running for the first time
 ```
