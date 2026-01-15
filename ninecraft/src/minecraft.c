@@ -42,6 +42,11 @@ options_set_key_t options_set_key = NULL;
 minecraft_client_get_options_t minecraft_client_get_options = NULL;
 minecraft_client_get_local_player_t minecraft_client_get_local_player = NULL;
 gui_component_fill_t gui_component_fill = NULL;
+external_level_storage_construct_t external_level_storage_construct = NULL;
+server_instance_construct_t server_instance_construct = NULL;
+server_instance_load_level_t server_instance_load_level = NULL;
+server_instance_start_server_t server_instance_start_server = NULL;
+
 
 void gui_component_draw_rect(void *gui_component, int x1, int y1, int x2, int y2, int color, int thickness) {
     if (gui_component_fill) {
@@ -331,6 +336,20 @@ uintptr_t get_ninecraftapp_internal_storage_offset(int version_id) {
     return 0;
 }
 
+size_t get_external_level_storage_size(int version_id) {
+    // TODO: Add others
+    if (version_id == version_id_0_11_1) {
+        return EXTERNALLEVELSTORAGE_SIZE_0_11_1;
+    }
+}
+
+size_t get_server_instance_size(int version_id) {
+    // TODO: Add others
+    if (version_id == version_id_0_11_1) {
+        return SERVERINSTANCE_SIZE_0_11_1;
+    }
+}
+
 void minecraft_setup_hooks(void *handle) {
     minecraft_level_generated = (minecraft_level_generated_t)android_dlsym(handle, "_ZN9Minecraft15_levelGeneratedEv");
     minecraft_tick = (minecraft_tick_t)android_dlsym(handle, "_ZN9Minecraft4tickEii");
@@ -371,4 +390,8 @@ void minecraft_setup_hooks(void *handle) {
     minecraft_client_get_options = (minecraft_client_get_options_t)android_dlsym(handle, "_ZN15MinecraftClient10getOptionsEv");
     minecraft_client_get_local_player = (minecraft_client_get_local_player_t)android_dlsym(handle, "_ZN15MinecraftClient14getLocalPlayerEv");
     gui_component_fill = (gui_component_fill_t)android_dlsym(handle, "_ZN12GuiComponent4fillEiiiii");
+    external_level_storage_construct = (external_level_storage_construct_t)android_dlsym(handle, "_ZN30ExternalFileLevelStorageSourceC1ERKSs");
+    server_instance_construct = (server_instance_construct_t)android_dlsym(handle, "_ZN14ServerInstanceC1ER18LevelStorageSource");
+    server_instance_load_level = (server_instance_load_level_t)android_dlsym(handle, "_ZN14ServerInstance9loadLevelESsSsRK13LevelSettings");
+    server_instance_start_server = (server_instance_start_server_t)android_dlsym(handle, "_ZN14ServerInstance11startServerESsii");
 }

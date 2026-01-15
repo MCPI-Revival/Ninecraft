@@ -1197,25 +1197,41 @@ android_string_t *AppPlatform_linux$getSystemRegion(AppPlatform_linux *app_platf
 SYSV_WRAPPER(AppPlatform_linux$getGraphicsVendor, 2)
 void AppPlatform_linux$getGraphicsVendor(android_string_t *ret, AppPlatform_linux *app_platform) {
     //puts("debug: AppPlatform_linux::getGraphicsVendor");
+#ifndef NINECRAFT_HEADLESS
     android_string_cstr(ret, (char *)glGetString(GL_VENDOR));
+#else
+    android_string_cstr(ret, "null");
+#endif
 }
 
 SYSV_WRAPPER(AppPlatform_linux$getGraphicsRenderer, 2)
 void AppPlatform_linux$getGraphicsRenderer(android_string_t *ret, AppPlatform_linux *app_platform) {
     //puts("debug: AppPlatform_linux::getGraphicsRenderer");
+#ifndef NINECRAFT_HEADLESS
     android_string_cstr(ret, (char *)glGetString(GL_RENDERER));
+#else
+    android_string_cstr(ret, "null");
+#endif
 }
 
 SYSV_WRAPPER(AppPlatform_linux$getGraphicsVersion, 2)
 void AppPlatform_linux$getGraphicsVersion(android_string_t *ret, AppPlatform_linux *app_platform) {
     //puts("debug: AppPlatform_linux::getGraphicsVersion");
+#ifndef NINECRAFT_HEADLESS
     android_string_cstr(ret, (char *)glGetString(GL_VERSION));
+#else
+    android_string_cstr(ret, "null");
+#endif
 }
 
 SYSV_WRAPPER(AppPlatform_linux$getGraphicsExtensions, 2)
 void AppPlatform_linux$getGraphicsExtensions(android_string_t *ret, AppPlatform_linux *app_platform) {
     //puts("debug: AppPlatform_linux::getGraphicsExtensions");
+#ifndef NINECRAFT_HEADLESS
     android_string_cstr(ret, (char *)glGetString(GL_EXTENSIONS));
+#else
+    android_string_cstr(ret, "null");
+#endif
 }
 
 android_string_t *AppPlatform_linux$getExternalStoragePath(AppPlatform_linux *app_platform) {

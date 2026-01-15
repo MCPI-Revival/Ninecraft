@@ -5,6 +5,7 @@
 #include <stdarg.h>
 #include <sys/stat.h>
 #include <sys/types.h>
+#include <unistd.h>
 #ifndef _WIN32
 #include <sys/mman.h>
 #else
@@ -1364,6 +1365,39 @@ static bool detect_version() {
     return found;
 }
 
+
+#define CALL(symbol, ret, ...) ((ret(*)(__VA_ARGS__))android_dlsym(handle, symbol))
+#define CALLV(obj, off, ret, ...) ((ret(*)(__VA_ARGS__))(*(void**)(*(char**)obj + off)))
+
+typedef void ExternalFileLevelStorageSource;
+typedef void ServerInstance;
+typedef void AppPlatform;
+typedef void LevelSettings;
+typedef void MinecraftClient;
+
+ServerInstance* server;
+void init_server(int version_id, char *storage_path) {
+    android_string_t storageRoot;
+    android_string_cstr(&storageRoot, storage_path);
+    
+    android_string_t levelFile, levelName, serverName;
+    android_string_cstr(&levelFile, "Sh0AAKocAAA=");
+    android_string_cstr(&levelName, "Creative test");
+    android_string_cstr(&serverName, "Example motd");
+    
+    ExternalFileLevelStorageSource* source = malloc(get_external_level_storage_size(version_id));
+    external_level_storage_construct(source, &storageRoot);
+    server = malloc(get_server_instance_size(version_id));
+    server_instance_construct(server, source);
+    int settings = -1;
+    server_instance_load_level(server, &levelFile, &levelName, &settings);
+    server_instance_start_server(server, &serverName, 19132, 10);
+}
+
+void tick_server() {
+    CALL("_ZN14ServerInstance4tickEv", void, ServerInstance*)(server);
+}
+
 int main(int argc, char **argv) {
     struct soinfo *so_liblog, *so_libgles, *so_libgles2, *so_libegl;
     struct soinfo *so_libandroid, *so_libopensles, *so_libz;
@@ -1546,7 +1580,9 @@ int main(int argc, char **argv) {
     so_libz = android_library_create("libz.so");
 
     handle = load_library("libminecraftpe.so");
-
+    long baseOffset = (long)(void*)android_dlsym(handle, "_ZN4AABBC1Ev") - 0x00337cf0;
+    printf("Base offset is: %p\n", baseOffset);
+    
     if (!handle) {
         puts("libminecraftpe.so not loaded");
         free(storage_path);
@@ -1856,7 +1892,12 @@ int main(int argc, char **argv) {
     }
 
     mod_loader_execute_on_minecraft_init(ninecraft_app, version_id);
-
+    
+#ifdef NINECRAFT_HEADLESS
+    init_server(version_id, storage_path);
+    *(void **)((char *)ninecraft_app + 0x15c) = server; // serverInstance
+#endif
+    
     if (version_id >= version_id_0_1_0_touch) {
         set_ninecraft_size(720, 480);
     } else {
@@ -2003,7 +2044,7 @@ int main(int argc, char **argv) {
 #ifndef NINECRAFT_HEADLESS
         audio_engine_tick();
         SDL_GL_SwapWindow(_window);
-
+        
         while (SDL_PollEvent(&event)) {
             if (event.type == SDL_QUIT) {
                 running = false;

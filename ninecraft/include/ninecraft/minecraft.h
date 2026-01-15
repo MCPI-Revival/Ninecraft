@@ -570,6 +570,22 @@
 #define MINECRAFT_ISGRABBED_OFFSET_0_1_0_TOUCH 0xd38
 #define MINECRAFT_ISGRABBED_OFFSET_0_1_0 0xd28
 
+#if defined(__i386__) || defined(_M_IX86)
+#define EXTERNALLEVELSTORAGE_SIZE_0_11_1 0x8
+#else
+#if defined(__arm__) || defined(_M_ARM)
+#define EXTERNALLEVELSTORAGE_SIZE_0_11_1 0x8 // TODO: Correct this
+#endif
+#endif
+
+#if defined(__i386__) || defined(_M_IX86)
+#define SERVERINSTANCE_SIZE_0_11_1 0x18
+#else
+#if defined(__arm__) || defined(_M_ARM)
+#define SERVERINSTANCE_SIZE_0_11_1 0x18 // TODO: Correct this
+#endif
+#endif
+
 extern void gui_component_draw_rect(void *gui_component, int x1, int y1, int x2, int y2, int color, int thickness);
 
 extern void *minecraft_get_options(void *minecraft, int version_id);
@@ -577,6 +593,10 @@ extern void *minecraft_get_options(void *minecraft, int version_id);
 extern uintptr_t get_ninecraftapp_external_storage_offset(int version_id);
 
 extern uintptr_t get_ninecraftapp_internal_storage_offset(int version_id);
+
+extern size_t get_external_level_storage_size(int version_id);
+
+extern size_t get_server_instance_size(int version_id);
 
 typedef void (*minecraft_level_generated_t)(void *minecraft);
 
@@ -732,6 +752,22 @@ extern minecraft_client_get_local_player_t minecraft_client_get_local_player;
 
 typedef void (*gui_component_fill_t)(void *gui_component, int x1, int y1, int x2, int y2, int color);
 extern gui_component_fill_t gui_component_fill;
+
+typedef void (*external_level_storage_construct_t)(void *external_file_level_storage_source, android_string_t *storage_path);
+
+extern external_level_storage_construct_t external_level_storage_construct;
+
+typedef void (*server_instance_construct_t)(void *server_instance, void *external_file_level_storage_source);
+
+extern server_instance_construct_t server_instance_construct;
+
+typedef void (*server_instance_load_level_t)(void *server_instance, android_string_t *level_path, android_string_t *level_name, void *level_settings);
+
+extern server_instance_load_level_t server_instance_load_level;
+
+typedef void (*server_instance_start_server_t)(void *server_instance, android_string_t *motd, int port, int max_players);
+
+extern server_instance_start_server_t server_instance_start_server;
 
 extern void minecraft_setup_hooks(void *handle);
 
