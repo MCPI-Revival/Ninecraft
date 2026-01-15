@@ -1421,6 +1421,7 @@ int main(int argc, char **argv) {
     strncat(ovc_path, game_parameters.home_path, 1023);
     strncat(ovc_path, "/options.txt", 1023);
 
+#ifndef NINECRAFT_HEADLESS
     icon_path = (char *)malloc(1024);
     if (!icon_path) {
         puts("out of memory");
@@ -1433,7 +1434,8 @@ int main(int argc, char **argv) {
     icon_path[0] = '\0';
     strncat(icon_path, game_parameters.game_path, 1023);
     strncat(icon_path, "/res/drawable/iconx.png", 1023);
-
+#endif
+    
     if (stat(game_parameters.home_path, &st) == -1) {
         mkdir(game_parameters.home_path, 0700);
     }
@@ -1455,6 +1457,7 @@ int main(int argc, char **argv) {
 
     android_linker_init();
 
+#ifndef NINECRAFT_HEADLESS
     if (SDL_Init(SDL_INIT_VIDEO) < 0) {
         printf("SDL_Init Error: %s\n", SDL_GetError());
         free(storage_path);
@@ -1520,7 +1523,8 @@ int main(int argc, char **argv) {
     gladLoadGL((GLADloadfunc)SDL_GL_GetProcAddress);
 
     audio_engine_init();
-
+#endif
+    
     gles_hook();
     missing_hook();
     add_custom_hook("__android_log_print", (void *)__android_log_print);
@@ -1958,6 +1962,7 @@ int main(int argc, char **argv) {
     }
     
     while (running) {
+#ifndef NINECRAFT_HEADLESS
         if (((bool *)ninecraft_app)[minecraft_isgrabbed_offset]) {
             if (!mouse_pointer_hidden) {
                 grab_mouse();
@@ -1967,6 +1972,7 @@ int main(int argc, char **argv) {
                 release_mouse();
             }
         }
+#endif
         if (version_id >= version_id_0_6_0 && version_id <= version_id_0_8_1) {
             if (minecraft_is_level_generated(ninecraft_app)) {
                 if (!mcpi_api_initialized) {
@@ -1994,6 +2000,7 @@ int main(int argc, char **argv) {
 #endif
         mod_loader_execute_on_minecraft_update(ninecraft_app, version_id);
 
+#ifndef NINECRAFT_HEADLESS
         audio_engine_tick();
         SDL_GL_SwapWindow(_window);
 
@@ -2014,11 +2021,14 @@ int main(int argc, char **argv) {
                 resize_callback(_window, event.window.data1, event.window.data2);
             }
         }
+#endif
     }
+#ifndef NINECRAFT_HEADLESS
     audio_engine_destroy();
     SDL_GL_DeleteContext(gl_context);
     SDL_DestroyWindow(_window);
     SDL_Quit();
+#endif
     free(storage_path);
     free(mods_path);
     free(global_overrides_path);
