@@ -5,7 +5,6 @@
 #include <stdarg.h>
 #include <sys/stat.h>
 #include <sys/types.h>
-#include <unistd.h>
 #ifndef _WIN32
 #include <sys/mman.h>
 #else
@@ -1365,37 +1364,26 @@ static bool detect_version() {
     return found;
 }
 
-
-#define CALL(symbol, ret, ...) ((ret(*)(__VA_ARGS__))android_dlsym(handle, symbol))
-#define CALLV(obj, off, ret, ...) ((ret(*)(__VA_ARGS__))(*(void**)(*(char**)obj + off)))
-
-typedef void ExternalFileLevelStorageSource;
-typedef void ServerInstance;
-typedef void AppPlatform;
-typedef void LevelSettings;
-typedef void MinecraftClient;
-
-ServerInstance* server;
-void init_server(int version_id, char *storage_path) {
-    android_string_t storageRoot;
-    android_string_cstr(&storageRoot, storage_path);
+void *init_server(int version_id, char *storage_path, char *level_path, char *level_name, char *motd, int port, int max_players) {
+    void *external_storage_source, *server_instance;
+    int level_settings;
+    android_string_t storage_path_an, level_path_an, level_name_an, motd_an;
     
-    android_string_t levelFile, levelName, serverName;
-    android_string_cstr(&levelFile, "Sh0AAKocAAA=");
-    android_string_cstr(&levelName, "Creative test");
-    android_string_cstr(&serverName, "Example motd");
+    android_string_cstr(&storage_path_an, storage_path);
+    android_string_cstr(&level_path_an, level_path);
+    android_string_cstr(&level_name_an, level_name);
+    android_string_cstr(&motd_an, motd);
     
-    ExternalFileLevelStorageSource* source = malloc(get_external_level_storage_size(version_id));
-    external_level_storage_construct(source, &storageRoot);
-    server = malloc(get_server_instance_size(version_id));
-    server_instance_construct(server, source);
-    int settings = -1;
-    server_instance_load_level(server, &levelFile, &levelName, &settings);
-    server_instance_start_server(server, &serverName, 19132, 10);
-}
-
-void tick_server() {
-    CALL("_ZN14ServerInstance4tickEv", void, ServerInstance*)(server);
+    external_storage_source = malloc(get_external_level_storage_size(version_id));
+    external_level_storage_construct(external_storage_source, &storage_path_an);
+    
+    server_instance = malloc(get_server_instance_size(version_id));
+    server_instance_construct(server_instance, external_storage_source);
+    
+    level_settings = -1;
+    server_instance_load_level(server_instance, &level_path_an, &level_name_an, &level_settings);
+    server_instance_start_server(server_instance, &motd_an, port, max_players);
+    return server_instance;
 }
 
 int main(int argc, char **argv) {
@@ -1409,7 +1397,7 @@ int main(int argc, char **argv) {
     bool running = true;
     SDL_Event event;
     char *minecraft_options;
-    void *icon_pixels;
+    void *icon_pixels, *server_instance;
 
     parse_game_parameters(argc, argv);
 
@@ -1894,8 +1882,8 @@ int main(int argc, char **argv) {
     mod_loader_execute_on_minecraft_init(ninecraft_app, version_id);
     
 #ifdef NINECRAFT_HEADLESS
-    init_server(version_id, storage_path);
-    *(void **)((char *)ninecraft_app + 0x15c) = server; // serverInstance
+    server_instance = init_server(version_id, storage_path, "Sh0AAKocAAA=", "Server level", "Some MOTD", 19132, 10);
+    *(void **)((char *)ninecraft_app + 0x15c) = server_instance; // serverInstance
 #endif
     
     if (version_id >= version_id_0_1_0_touch) {
