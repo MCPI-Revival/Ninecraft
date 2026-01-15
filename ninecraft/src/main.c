@@ -1568,8 +1568,6 @@ int main(int argc, char **argv) {
     so_libz = android_library_create("libz.so");
 
     handle = load_library("libminecraftpe.so");
-    long baseOffset = (long)(void*)android_dlsym(handle, "_ZN4AABBC1Ev") - 0x00337cf0;
-    printf("Base offset is: %p\n", baseOffset);
     
     if (!handle) {
         puts("libminecraftpe.so not loaded");
