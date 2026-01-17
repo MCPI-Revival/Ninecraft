@@ -769,6 +769,10 @@ typedef void (*server_instance_start_server_t)(void *server_instance, android_st
 
 extern server_instance_start_server_t server_instance_start_server;
 
+typedef void (*minecraft_client_leave_game_t)(void *minecraft_client, bool return_to_title_screen);
+
+extern minecraft_client_leave_game_t minecraft_client_leave_game;
+
 extern void minecraft_setup_hooks(void *handle);
 
 #endif

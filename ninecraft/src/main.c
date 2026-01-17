@@ -1,3 +1,4 @@
+#include <signal.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -1411,6 +1412,11 @@ bool get_level_name(char *storage_path, char *level_file_name, char *level_name,
     return true;
 }
 
+volatile sig_atomic_t sigstop = 0;
+void sighandler(int sigid) {
+    sigstop = 1;
+}
+
 int main(int argc, char **argv) {
     struct soinfo *so_liblog, *so_libgles, *so_libgles2, *so_libegl;
     struct soinfo *so_libandroid, *so_libopensles, *so_libz;
@@ -1425,6 +1431,9 @@ int main(int argc, char **argv) {
     void *icon_pixels, *server_instance;
 #ifdef NINECRAFT_HEADLESS
     char server_level_name[1024];
+    
+    signal(SIGTERM, sighandler);
+    signal(SIGINT, sighandler);
 #endif
     
     parse_game_parameters(argc, argv);
@@ -2082,6 +2091,10 @@ int main(int argc, char **argv) {
                 resize_callback(_window, event.window.data1, event.window.data2);
             }
         }
+#else
+        if (sigstop) {
+            running = false;
+        }
 #endif
     }
 #ifndef NINECRAFT_HEADLESS
@@ -2089,6 +2102,9 @@ int main(int argc, char **argv) {
     SDL_GL_DeleteContext(gl_context);
     SDL_DestroyWindow(_window);
     SDL_Quit();
+#else
+    printf("Stopping server...\n");
+    minecraft_client_leave_game(ninecraft_app, false);
 #endif
     free(storage_path);
     free(mods_path);

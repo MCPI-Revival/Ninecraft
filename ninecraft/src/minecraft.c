@@ -46,7 +46,7 @@ external_level_storage_construct_t external_level_storage_construct = NULL;
 server_instance_construct_t server_instance_construct = NULL;
 server_instance_load_level_t server_instance_load_level = NULL;
 server_instance_start_server_t server_instance_start_server = NULL;
-
+minecraft_client_leave_game_t minecraft_client_leave_game = NULL;
 
 void gui_component_draw_rect(void *gui_component, int x1, int y1, int x2, int y2, int color, int thickness) {
     if (gui_component_fill) {
@@ -394,4 +394,5 @@ void minecraft_setup_hooks(void *handle) {
     server_instance_construct = (server_instance_construct_t)android_dlsym(handle, "_ZN14ServerInstanceC1ER18LevelStorageSource");
     server_instance_load_level = (server_instance_load_level_t)android_dlsym(handle, "_ZN14ServerInstance9loadLevelESsSsRK13LevelSettings");
     server_instance_start_server = (server_instance_start_server_t)android_dlsym(handle, "_ZN14ServerInstance11startServerESsii");
+    minecraft_client_leave_game = (minecraft_client_leave_game_t)android_dlsym(handle, "_ZN15MinecraftClient9leaveGameEb");
 }
