@@ -1386,6 +1386,31 @@ void *init_server(int version_id, char *storage_path, char *level_path, char *le
     return server_instance;
 }
 
+bool get_level_name(char *storage_path, char *level_file_name, char *level_name, int level_name_size) {
+    char *level_name_path;
+    FILE *f;
+    struct stat file_stat;
+    int c;
+
+    level_name_path = (char *)malloc(1024);
+    level_name_path[0] = '\0';
+    strcat(level_name_path, storage_path);
+    strcat(level_name_path, "/games/com.mojang/minecraftWorlds/");
+    strcat(level_name_path, level_file_name);
+    strcat(level_name_path, "/levelname.txt");
+    
+    if (stat(level_name_path, &file_stat) != 0) {
+        strcpy(level_name, "null");
+        return false;
+    }
+    
+    f = fopen(level_name_path, "r");
+    c = fread(level_name, sizeof(char), level_name_size, f);
+    level_name[c] = '\0';
+    fclose(f);
+    return true;
+}
+
 int main(int argc, char **argv) {
     struct soinfo *so_liblog, *so_libgles, *so_libgles2, *so_libegl;
     struct soinfo *so_libandroid, *so_libopensles, *so_libz;
@@ -1398,7 +1423,10 @@ int main(int argc, char **argv) {
     SDL_Event event;
     char *minecraft_options;
     void *icon_pixels, *server_instance;
-
+#ifdef NINECRAFT_HEADLESS
+    char server_level_name[1024];
+#endif
+    
     parse_game_parameters(argc, argv);
 
     storage_path = (char *)malloc(1024);
@@ -1880,7 +1908,13 @@ int main(int argc, char **argv) {
     mod_loader_execute_on_minecraft_init(ninecraft_app, version_id);
     
 #ifdef NINECRAFT_HEADLESS
-    server_instance = init_server(version_id, storage_path, "Sh0AAKocAAA=", "Server level", "Some MOTD", 19132, 10);
+    if (!get_level_name(storage_path, game_parameters.server_level_file, server_level_name, sizeof(server_level_name) / sizeof(char))) {
+        printf("Could not find level by file name '%s'. (Must be file name, and not level name or file path)\n", game_parameters.server_level_file);
+        exit(1);
+    }
+    
+    server_instance = init_server(version_id, storage_path, game_parameters.server_level_file, server_level_name, game_parameters.server_motd,
+        game_parameters.server_port, game_parameters.server_max_players);
     *(void **)((char *)ninecraft_app + 0x15c) = server_instance; // serverInstance
 #endif
     
