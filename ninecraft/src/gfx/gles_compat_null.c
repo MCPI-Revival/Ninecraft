@@ -1,387 +1,388 @@
 #include <ninecraft/gfx/gles_compat.h>
 
-#ifndef NINECRAFT_HEADLESS
+#ifdef NINECRAFT_HEADLESS
 FLOAT_ABI_FIX void gl_alpha_func(GLenum func, GLclampf ref) {
-    glAlphaFunc(func, ref);
+    return;
 }
 
 void gl_bind_buffer(GLenum target, GLuint buffer) {
-    glBindBuffer(target, buffer);
+    return;
 }
 
 void gl_bind_texture(GLenum target, GLuint texture) {
-    glBindTexture(target, texture);
+    return;
 }
 
 void gl_blend_func(GLenum sfactor, GLenum dfactor) {
-    glBlendFunc(sfactor, dfactor);
+    return;
 }
 
 void gl_buffer_data(GLenum target, GLsizeiptr size, const void *data, GLenum usage) {
-    glBufferData(target, size, data, usage);
+    return;
 }
 
 void gl_clear(GLbitfield mask) {
-    glClear(mask);
+    return;
 }
 
 FLOAT_ABI_FIX void gl_clear_color(GLclampf red, GLclampf green, GLclampf blue, GLclampf alpha) {
-    glClearColor(red, green, blue, alpha);
+    return;
 }
 
 FLOAT_ABI_FIX void gl_color_4_f(GLfloat red, GLfloat green, GLfloat blue, GLfloat alpha) {
-    glColor4f(red, green, blue, alpha);
+    return;
 }
 
 void gl_color_mask(GLboolean red, GLboolean green, GLboolean blue, GLboolean alpha) {
-    glColorMask(red, green, blue, alpha);
+    return;
 }
 
 void gl_color_pointer(GLint size, GLenum type, GLsizei stride, const void *pointer) {
-    glColorPointer(size, type, stride, pointer);
+    return;
 }
 
 void gl_cull_face(GLenum mode) {
-    glCullFace(mode);
+    return;
 }
 
 void gl_delete_buffers(GLsizei n, const GLuint *buffers) {
-    glDeleteBuffers(n, buffers);
+    return;
 }
 
 void gl_delete_textures(GLsizei n, const GLuint *textures) {
-    glDeleteTextures(n, textures);
+    return;
 }
 
 void gl_depth_func(GLenum func) {
-    glDepthFunc(func);
+    return;
 }
 
 void gl_depth_mask(GLboolean flag) {
-    glDepthMask(flag);
+    return;
 }
 
 FLOAT_ABI_FIX void gl_depth_range_f(GLclampf near, GLclampf far) {
-    glDepthRange((GLclampd)near, (GLclampd)far);
+    return;
 }
 
 void gl_disable(GLenum cap) {
-    glDisable(cap);
+    return;
 }
 
 void gl_disable_client_state(GLenum array) {
-    glDisableClientState(array);
+    return;
 }
 
 void gl_draw_arrays(GLenum mode, GLint first, GLsizei count) {
-    glDrawArrays(mode, first, count);
+    return;
 }
 
 void gl_enable(GLenum cap) {
-    glEnable(cap);
+    return;
 }
 
 void gl_enable_client_state(GLenum array) {
-    glEnableClientState(array);
+    return;
 }
 
 FLOAT_ABI_FIX void gl_fog_f(GLenum pname, GLfloat param) {
-    glFogf(pname, param);
+    return;
 }
 
 FLOAT_ABI_FIX void gl_fog_f_v(GLenum pname, const GLfloat *params) {
-    glFogfv(pname, params);
+    return;
 }
 
 void gl_fog_x(GLenum pname, GLfixed param) {
-    glFogi(pname, param);
+    return;
 }
 
 void gl_gen_textures(GLsizei n, GLuint *textures) {
-    glGenTextures(n, textures);
+    return;
 }
 
 FLOAT_ABI_FIX void gl_get_float_v(GLenum pname, GLfloat *params) {
-    glGetFloatv(pname, params);
+    return;
 }
 
 const GLubyte *gl_get_string(GLenum name) {
-    return glGetString(name);
+    return NULL;
 }
 
 void gl_hint(GLenum target, GLenum mode) {
-    glHint(target, mode);
+    return;
 }
 
 FLOAT_ABI_FIX void gl_line_width(GLfloat width) {
-    glLineWidth(width);
+    return;
 }
 
 void gl_load_identity() {
-    glLoadIdentity();
+    return;
 }
 
 void gl_matrix_mode(GLenum mode) {
-    glMatrixMode(mode);
+    return;
 }
 
 FLOAT_ABI_FIX void gl_mult_matrix_f(const GLfloat *m) {
-    glMultMatrixf(m);
+    return;
 }
 
 FLOAT_ABI_FIX void gl_normal_3_f(GLfloat nx, GLfloat ny, GLfloat nz) {
-    glNormal3f(nx, ny, nz);
+    return;
 }
 
 FLOAT_ABI_FIX void gl_ortho_f(GLfloat left, GLfloat right, GLfloat bottom, GLfloat top, GLfloat near, GLfloat far) {
-    glOrtho((GLdouble)left, (GLdouble)right, (GLdouble)bottom, (GLdouble)top, (GLdouble)near, (GLdouble)far);
+    return;
 }
 
 FLOAT_ABI_FIX void gl_polygon_offset(GLfloat factor, GLfloat units) {
-    glPolygonOffset(factor, units);
+    return;
 }
 
 void gl_pop_matrix() {
-    glPopMatrix();
+    return;
 }
 
 void gl_push_matrix() {
-    glPushMatrix();
+    return;
 }
 
 void gl_read_pixels(GLint x, GLint y, GLsizei width, GLsizei height, GLenum format, GLenum type, GLvoid *pixels) {
-    glReadPixels(x, y, width, height, format, type, pixels);
+    return;
 }
 
 FLOAT_ABI_FIX void gl_rotate_f(GLfloat angle, GLfloat x, GLfloat y, GLfloat z) {
-    glRotatef(angle, x, y, z);
+    return;
 }
 
 FLOAT_ABI_FIX void gl_scale_f(GLfloat x, GLfloat y, GLfloat z) {
-    glScalef(x, y, z);
+    return;
 }
 
 void gl_scissor(GLint x, GLint y, GLsizei width, GLsizei height) {
-    glScissor(x, y, width, height);
+    return;
 }
 
 void gl_shade_model(GLenum mode) {
-    glShadeModel(mode);
+    return;
 }
 
 void gl_tex_coord_pointer(GLint size, GLenum type, GLsizei stride, const GLvoid *pointer) {
-    glTexCoordPointer(size, type, stride, pointer);
+    return;
 }
 
 void gl_tex_image_2_d(GLenum target, GLint level, GLint internalformat, GLsizei width, GLsizei height, GLint border, GLenum format, GLenum type, const GLvoid *pixels) {
-    glTexImage2D(target, level, internalformat, width, height, border, format, type, pixels);
+    return;
 }
 
 void gl_tex_parameter_i(GLenum target, GLenum pname, GLint param) {
-    glTexParameteri(target, pname, param);
+    return;
 }
 
 void gl_tex_sub_image_2_d(GLenum target, GLint level, GLint xoffset, GLint yoffset, GLsizei width, GLsizei height, GLenum format, GLenum type, const GLvoid *pixels) {
-    glTexSubImage2D(target, level, xoffset, yoffset, width, height, format, type, pixels);
+    return;
 }
 
 FLOAT_ABI_FIX void gl_translate_f(GLfloat x, GLfloat y, GLfloat z) {
-    glTranslatef(x, y, z);
+    return;
 }
 
 void gl_vertex_pointer(GLint size, GLenum type, GLsizei stride, const GLvoid *pointer) {
-    glVertexPointer(size, type, stride, pointer);
+    return;
 }
 
 void gl_viewport(GLint x, GLint y, GLsizei width, GLsizei height) {
-    glViewport(x, y, width, height);
+    return;
 }
 
 void gl_draw_elements(GLenum mode, GLsizei count, GLenum type, const void *indices) {
-    glDrawElements(mode, count, type, indices);
+    return;
 }
 
 GLenum gl_get_error() {
-    return glGetError();
+    // For some reason this has to be 1 or Minecraft will crash
+    return 1;
 }
 
 void gl_gen_buffers(GLsizei n, GLuint *buffers) {
-    glGenBuffers(n, buffers);
+    return;
 }
 
 void gl_stencil_func(GLenum func, GLint ref, GLuint mask) {
-    glStencilFunc(func, ref, mask);
+    return;
 }
 
 void gl_stencil_mask(GLuint mask) {
-    glStencilMask(mask);
+    return;
 }
 
 FLOAT_ABI_FIX void gl_light_model_f(GLenum pname, GLfloat param) {
-    glLightModelf(pname, param);
+    return;
 }
 
 FLOAT_ABI_FIX void gl_light_f_v(GLenum light, GLenum pname, const GLfloat *params) {
-    glLightfv(light, pname, params);
+    return;
 }
 
 void gl_normal_pointer(GLenum type, GLsizei stride, const GLvoid *pointer) {
-    glNormalPointer(type, stride, pointer);
+    return;
 }
 
 void gl_stencil_op(GLenum fail, GLenum zfail, GLenum zpass) {
-    glStencilOp(fail, zfail, zpass);
+    return;
 }
 
 void gl_active_texture(GLenum texture) {
-    glActiveTexture(texture);
+    return;
 }
 
 void gl_attach_shader(GLuint program, GLuint shader) {
-    glAttachShader(program, shader);
+    return;
 }
 
 void gl_clear_stencil(GLint s) {
-    glClearStencil(s);
+    return;
 }
 
 void gl_compile_shader(GLuint shader) {
-    glCompileShader(shader);
+    return;
 }
 
 GLuint gl_create_program() {
-    return glCreateProgram();
+    return 0;
 }
 
 GLuint gl_create_shader(GLenum type) {
-    return glCreateShader(type);
+    return 0;
 }
 
 void gl_delete_program(GLuint program) {
-    glDeleteProgram(program);
+    return;
 }
 
 void gl_enable_vertex_attrib_array(GLuint index) {
-    glEnableVertexAttribArray(index);
+    return;
 }
 
 void gl_get_active_attrib(GLuint program, GLuint index, GLsizei bufSize, GLsizei *length, GLint *size, GLenum *type, GLchar *name) {
-    glGetActiveAttrib(program, index, bufSize, length, size, type, name);
+    return;
 }
 
 void gl_get_active_uniform(GLuint program, GLuint index, GLsizei bufSize, GLsizei *length, GLint *size, GLenum *type, GLchar *name) {
-    glGetActiveUniform(program, index, bufSize, length, size, type, name);
+    return;
 }
 
 GLint gl_get_attrib_location(GLuint program, const GLchar *name) {
-    return glGetAttribLocation(program, name);
+    return 0;
 }
 
 void gl_get_program_info_log(GLuint program, GLsizei bufSize, GLsizei *length, GLchar *infoLog) {
-    glGetProgramInfoLog(program, bufSize, length, infoLog);
+    return;
 }
 
 void gl_get_program_i_v(GLuint program, GLenum pname, GLint *params) {
-    glGetProgramiv(program, pname, params);
+    return;
 }
 
 void gl_get_shader_info_log(GLuint shader, GLsizei bufSize, GLsizei *length, GLchar *infoLog) {
-    glGetShaderInfoLog(shader, bufSize, length, infoLog);
+    return;
 }
 
 void gl_get_shader_i_v(GLuint shader, GLenum pname, GLint *params) {
-    glGetShaderiv(shader, pname, params);
+    return;
 }
 
 void gl_get_shader_precision_format(GLenum shadertype, GLenum precisiontype, GLint *range, GLint *precision) {
-    glGetShaderPrecisionFormat(shadertype, precisiontype, range, precision);
+    return;
 }
 
 GLint gl_get_uniform_location(GLuint program, const GLchar *name) {
-    return glGetUniformLocation(program, name);
+    return 0;
 }
 
 void gl_link_program(GLuint program) {
-    glLinkProgram(program);
+    return;
 }
 
 void gl_release_shader_compiler() {
-    glReleaseShaderCompiler();
+    return;
 }
 
 void gl_shader_source(GLuint shader, GLsizei count, const GLchar *const *string, const GLint *length) {
-    glShaderSource(shader, count, string, length);
+    return;
 }
 
 FLOAT_ABI_FIX void gl_uniform_1_f_v(GLint location, GLsizei count, const GLfloat *value) {
-    glUniform1fv(location, count, value);
+    return;
 }
 
 void gl_uniform_1_i_v(GLint location, GLsizei count, const GLint *value) {
-    glUniform1iv(location, count, value);
+    return;
 }
 
 FLOAT_ABI_FIX void gl_uniform_2_f_v(GLint location, GLsizei count, const GLfloat *value) {
-    glUniform2fv(location, count, value);
+    return;
 }
 
 void gl_uniform_2_i_v(GLint location, GLsizei count, const GLint *value) {
-    glUniform2iv(location, count, value);
+    return;
 }
 
 FLOAT_ABI_FIX void gl_uniform_3_f_v(GLint location, GLsizei count, const GLfloat *value) {
-    glUniform3fv(location, count, value);
+    return;
 }
 
 void gl_uniform_3_i_v(GLint location, GLsizei count, const GLint *value) {
-    glUniform3iv(location, count, value);
+    return;
 }
 
 FLOAT_ABI_FIX void gl_uniform_4_f_v(GLint location, GLsizei count, const GLfloat *value) {
-    glUniform4fv(location, count, value);
+    return;
 }
 
 void gl_uniform_4_i_v(GLint location, GLsizei count, const GLint *value) {
-    glUniform4iv(location, count, value);
+    return;
 }
 
 FLOAT_ABI_FIX void gl_uniform_matrix_2_f_v(GLint location, GLsizei count, GLboolean transpose, const GLfloat *value) {
-    glUniformMatrix2fv(location, count, transpose, value);
+    return;
 }
 
 FLOAT_ABI_FIX void gl_uniform_matrix_3_f_v(GLint location, GLsizei count, GLboolean transpose, const GLfloat *value) {
-    glUniformMatrix3fv(location, count, transpose, value);
+    return;
 }
 
 FLOAT_ABI_FIX void gl_uniform_matrix_4_f_v(GLint location, GLsizei count, GLboolean transpose, const GLfloat *value) {
-    glUniformMatrix4fv(location, count, transpose, value);
+    return;
 }
 
 void gl_use_program(GLuint program) {
-    glUseProgram(program);
+    return;
 }
 
 void gl_vertex_attrib_pointer(GLuint index, GLint size, GLenum type, GLboolean normalized, GLsizei stride, const void *pointer) {
-    glVertexAttribPointer(index, size, type, normalized, stride, pointer);
+    return;
 }
 
 void gl_stencil_func_separate(GLenum face, GLenum func, GLint ref, GLuint mask) {
-    glStencilFuncSeparate(face, func, ref, mask);
+    return;
 }
 
 void gl_stencil_op_separate(GLenum face, GLenum sfail, GLenum dpfail, GLenum dppass) {
-    glStencilOpSeparate(face, sfail, dpfail, dppass);
+    return;
 }
 
 void gl_delete_shader(GLuint shader) {
-    glDeleteShader(shader);
+    return;
 }
 
 void gl_uniform_1_i(GLint location, GLint v0) {
-    glUniform1i(location, v0);
+    return;
 }
 
 void gl_buffer_sub_data(GLenum target, GLintptr offset, GLsizeiptr size, const void *data) {
-    glBufferSubData(target, offset, size, data);
+    return;
 }
 #endif

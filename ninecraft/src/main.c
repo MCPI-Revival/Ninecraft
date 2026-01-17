@@ -1,3 +1,4 @@
+#include <signal.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -1364,6 +1365,58 @@ static bool detect_version() {
     return found;
 }
 
+void *init_server(int version_id, char *storage_path, char *level_path, char *level_name, char *motd, int port, int max_players) {
+    void *external_storage_source, *server_instance;
+    int level_settings;
+    android_string_t storage_path_an, level_path_an, level_name_an, motd_an;
+    
+    android_string_cstr(&storage_path_an, storage_path);
+    android_string_cstr(&level_path_an, level_path);
+    android_string_cstr(&level_name_an, level_name);
+    android_string_cstr(&motd_an, motd);
+    
+    external_storage_source = malloc(get_external_level_storage_size(version_id));
+    external_level_storage_construct(external_storage_source, &storage_path_an);
+    
+    server_instance = malloc(get_server_instance_size(version_id));
+    server_instance_construct(server_instance, external_storage_source);
+    
+    level_settings = -1;
+    server_instance_load_level(server_instance, &level_path_an, &level_name_an, &level_settings);
+    server_instance_start_server(server_instance, &motd_an, port, max_players);
+    return server_instance;
+}
+
+bool get_level_name(char *storage_path, char *level_file_name, char *level_name, int level_name_size) {
+    char *level_name_path;
+    FILE *f;
+    struct stat file_stat;
+    int c;
+
+    level_name_path = (char *)malloc(1024);
+    level_name_path[0] = '\0';
+    strcat(level_name_path, storage_path);
+    strcat(level_name_path, "/games/com.mojang/minecraftWorlds/");
+    strcat(level_name_path, level_file_name);
+    strcat(level_name_path, "/levelname.txt");
+    
+    if (stat(level_name_path, &file_stat) != 0) {
+        strcpy(level_name, "null");
+        return false;
+    }
+    
+    f = fopen(level_name_path, "r");
+    c = fread(level_name, sizeof(char), level_name_size, f);
+    level_name[c] = '\0';
+    fclose(f);
+    return true;
+}
+
+volatile sig_atomic_t sigstop = 0;
+void sighandler(int sigid) {
+    sigstop = 1;
+}
+
 int main(int argc, char **argv) {
     struct soinfo *so_liblog, *so_libgles, *so_libgles2, *so_libegl;
     struct soinfo *so_libandroid, *so_libopensles, *so_libz;
@@ -1375,8 +1428,14 @@ int main(int argc, char **argv) {
     bool running = true;
     SDL_Event event;
     char *minecraft_options;
-    void *icon_pixels;
-
+    void *icon_pixels, *server_instance;
+#ifdef NINECRAFT_HEADLESS
+    char server_level_name[1024];
+    
+    signal(SIGTERM, sighandler);
+    signal(SIGINT, sighandler);
+#endif
+    
     parse_game_parameters(argc, argv);
 
     storage_path = (char *)malloc(1024);
@@ -1421,6 +1480,7 @@ int main(int argc, char **argv) {
     strncat(ovc_path, game_parameters.home_path, 1023);
     strncat(ovc_path, "/options.txt", 1023);
 
+#ifndef NINECRAFT_HEADLESS
     icon_path = (char *)malloc(1024);
     if (!icon_path) {
         puts("out of memory");
@@ -1433,7 +1493,8 @@ int main(int argc, char **argv) {
     icon_path[0] = '\0';
     strncat(icon_path, game_parameters.game_path, 1023);
     strncat(icon_path, "/res/drawable/iconx.png", 1023);
-
+#endif
+    
     if (stat(game_parameters.home_path, &st) == -1) {
         mkdir(game_parameters.home_path, 0700);
     }
@@ -1455,6 +1516,7 @@ int main(int argc, char **argv) {
 
     android_linker_init();
 
+#ifndef NINECRAFT_HEADLESS
     if (SDL_Init(SDL_INIT_VIDEO) < 0) {
         printf("SDL_Init Error: %s\n", SDL_GetError());
         free(storage_path);
@@ -1520,7 +1582,8 @@ int main(int argc, char **argv) {
     gladLoadGL((GLADloadfunc)SDL_GL_GetProcAddress);
 
     audio_engine_init();
-
+#endif
+    
     gles_hook();
     missing_hook();
     add_custom_hook("__android_log_print", (void *)__android_log_print);
@@ -1542,7 +1605,7 @@ int main(int argc, char **argv) {
     so_libz = android_library_create("libz.so");
 
     handle = load_library("libminecraftpe.so");
-
+    
     if (!handle) {
         puts("libminecraftpe.so not loaded");
         free(storage_path);
@@ -1852,7 +1915,18 @@ int main(int argc, char **argv) {
     }
 
     mod_loader_execute_on_minecraft_init(ninecraft_app, version_id);
-
+    
+#ifdef NINECRAFT_HEADLESS
+    if (!get_level_name(storage_path, game_parameters.server_level_file, server_level_name, sizeof(server_level_name) / sizeof(char))) {
+        printf("Could not find level by file name '%s'. (Must be file name, and not level name or file path)\n", game_parameters.server_level_file);
+        exit(1);
+    }
+    
+    server_instance = init_server(version_id, storage_path, game_parameters.server_level_file, server_level_name, game_parameters.server_motd,
+        game_parameters.server_port, game_parameters.server_max_players);
+    *(void **)((char *)ninecraft_app + 0x15c) = server_instance; // serverInstance
+#endif
+    
     if (version_id >= version_id_0_1_0_touch) {
         set_ninecraft_size(720, 480);
     } else {
@@ -1958,6 +2032,7 @@ int main(int argc, char **argv) {
     }
     
     while (running) {
+#ifndef NINECRAFT_HEADLESS
         if (((bool *)ninecraft_app)[minecraft_isgrabbed_offset]) {
             if (!mouse_pointer_hidden) {
                 grab_mouse();
@@ -1967,6 +2042,7 @@ int main(int argc, char **argv) {
                 release_mouse();
             }
         }
+#endif
         if (version_id >= version_id_0_6_0 && version_id <= version_id_0_8_1) {
             if (minecraft_is_level_generated(ninecraft_app)) {
                 if (!mcpi_api_initialized) {
@@ -1994,9 +2070,10 @@ int main(int argc, char **argv) {
 #endif
         mod_loader_execute_on_minecraft_update(ninecraft_app, version_id);
 
+#ifndef NINECRAFT_HEADLESS
         audio_engine_tick();
         SDL_GL_SwapWindow(_window);
-
+        
         while (SDL_PollEvent(&event)) {
             if (event.type == SDL_QUIT) {
                 running = false;
@@ -2014,11 +2091,21 @@ int main(int argc, char **argv) {
                 resize_callback(_window, event.window.data1, event.window.data2);
             }
         }
+#else
+        if (sigstop) {
+            running = false;
+        }
+#endif
     }
+#ifndef NINECRAFT_HEADLESS
     audio_engine_destroy();
     SDL_GL_DeleteContext(gl_context);
     SDL_DestroyWindow(_window);
     SDL_Quit();
+#else
+    printf("Stopping server...\n");
+    minecraft_client_leave_game(ninecraft_app, false);
+#endif
     free(storage_path);
     free(mods_path);
     free(global_overrides_path);
