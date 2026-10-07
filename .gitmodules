@@ -3,10 +3,10 @@
 	url = https://github.com/nothings/stb.git
 [submodule "zlib"]
 	path = zlib
-	url = http://github.com/madler/zlib
+	url = https://github.com/madler/zlib
 [submodule "ancmp"]
 	path = ancmp
-	url = http://github.com/MFDGaming/ancmp
+	url = https://github.com/MFDGaming/ancmp
 [submodule "glad"]
 	path = glad
 	url = https://github.com/Dav1dde/glad
